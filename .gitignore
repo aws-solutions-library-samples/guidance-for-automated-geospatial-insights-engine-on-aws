@@ -172,14 +172,9 @@ cdk.context.json
 **/.idea/
 **/*.bkp
 **/*.dtmp
-site
-**/.antlr
 
 license-checker/
+**/~*.xlsx
 
-**/caml/model/
-
-model.tar.gz
-/python/apps/caml/model/
 predeploy.json
-?
+
