@@ -29,7 +29,7 @@ build({
 	minify: false,
 	format: 'esm',
 	platform: 'node',
-	target: 'node18.16',
+	target: 'node20',
 	sourcemap: false,
 	sourcesContent: false,
 	outfile: 'dist/dynamodb-seeder/lambdas/index.mjs',

@@ -1,0 +1,4118 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ARCADE Regions",
+    "description": "Manages hierarchical structures of groups, regions, and zones.",
+    "version": "0.0.1"
+  },
+  "components": {
+    "schemas": {
+      "def-0": {
+        "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+        "type": "object",
+        "title": "attributes",
+        "additionalProperties": {}
+      },
+      "def-1": {
+        "description": "User-defined searchable tags",
+        "type": "object",
+        "title": "tags",
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "def-2": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Group.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "createGroupRequestBody"
+      },
+      "def-3": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Group.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "title": "editGroupRequestBody"
+      },
+      "def-4": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique Group ID.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the Group.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdBy",
+          "createdAt"
+        ],
+        "title": "groupResource"
+      },
+      "def-5": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-4"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluatedToken": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "groups"
+        ],
+        "title": "groupList"
+      },
+      "def-6": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Region.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "createRegionRequestBody"
+      },
+      "def-7": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Region.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "title": "editRegionRequestBody"
+      },
+      "def-8": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the Region.",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdBy",
+          "createdAt"
+        ],
+        "title": "regionResource"
+      },
+      "def-9": {
+        "type": "object",
+        "properties": {
+          "regions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-8"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluatedToken": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "regions"
+        ],
+        "title": "regionList"
+      },
+      "def-10": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Zone.",
+            "type": "string"
+          },
+          "boundary": {
+            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "type": "array",
+            "items": {
+              "description": "Coordinates",
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "description": "Latitude",
+                  "type": "number"
+                },
+                "lon": {
+                  "description": "Longitude",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "lat",
+                "lon"
+              ]
+            }
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "required": [
+          "name",
+          "boundary"
+        ],
+        "title": "createZoneRequestBody"
+      },
+      "def-11": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the Zone.",
+            "type": "string"
+          },
+          "boundary": {
+            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "type": "array",
+            "items": {
+              "description": "Coordinates",
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "description": "Latitude",
+                  "type": "number"
+                },
+                "lon": {
+                  "description": "Longitude",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "lat",
+                "lon"
+              ]
+            }
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "title": "editZoneRequestBody"
+      },
+      "def-12": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique Zone ID.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the Zone.",
+            "type": "string"
+          },
+          "boundary": {
+            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "type": "array",
+            "items": {
+              "description": "Coordinates",
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "description": "Latitude",
+                  "type": "number"
+                },
+                "lon": {
+                  "description": "Longitude",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "lat",
+                "lon"
+              ]
+            }
+          },
+          "acres": {
+            "description": "The areas of the Zone.",
+            "type": "number"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "boundary",
+          "acres",
+          "createdBy",
+          "createdAt"
+        ],
+        "title": "zoneResource"
+      },
+      "def-13": {
+        "type": "object",
+        "properties": {
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-12"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluatedToken": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "zones"
+        ],
+        "title": "zoneList"
+      },
+      "def-14": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "required": [
+          "timestamp"
+        ],
+        "title": "createStateRequestBody"
+      },
+      "def-15": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          }
+        },
+        "title": "editStateRequestBody"
+      },
+      "def-16": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique State ID.",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "attributes": {
+            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "$ref": "#/components/schemas/def-1"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "timestamp",
+          "createdBy",
+          "createdAt"
+        ],
+        "title": "stateResource"
+      },
+      "def-17": {
+        "type": "object",
+        "properties": {
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-16"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluatedToken": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "states"
+        ],
+        "title": "stateList"
+      }
+    }
+  },
+  "paths": {
+    "/groups": {
+      "post": {
+        "operationId": "createGroup",
+        "summary": "Define a new group",
+        "tags": [
+          "Groups"
+        ],
+        "description": "Define a new group.\n\nPermissions:\n- Only `admin` and above may create new groups.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-2"
+              },
+              "examples": {
+                "New group": {
+                  "summary": "Create a new group.",
+                  "value": {
+                    "name": "Berkshire & West LLC"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Group.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "New group": {
+                    "summary": "New group created successfully.",
+                    "value": {
+                      "id": "03d66e78d",
+                      "name": "Berkshire & West LLC",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `name` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listGroups",
+        "summary": "List all groups.",
+        "tags": [
+          "Groups"
+        ],
+        "description": "List all groups.\n\nPermissions:\n- `readers` may list groups.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Tag key and value in the format of `key:value`.",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "tags",
+            "required": false,
+            "description": "Tag keys and values to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-4"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "lastEvaluatedToken": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "groups"
+                  ]
+                },
+                "examples": {
+                  "List of groups": {
+                    "summary": "Paginated list of groups.",
+                    "value": {
+                      "groups": [
+                        {
+                          "id": "03d66e78d",
+                          "name": "Berkshire & West LLC",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        },
+                        {
+                          "id": "jduuye683",
+                          "name": "Withom Holdings",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com",
+                          "updatedAt": "2022-08-12T07:34:23.132Z",
+                          "updatedBy": "someoneelse@somewhere.com"
+                        },
+                        {
+                          "id": "jf836sd23",
+                          "name": "Boondock Manor",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        }
+                      ],
+                      "pagination": {
+                        "lastEvaluatedToken": "03d66e78d"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/{groupId}": {
+      "get": {
+        "operationId": "getGroup",
+        "summary": "Retrieve a group.",
+        "tags": [
+          "Groups"
+        ],
+        "description": "Retrieve the details of a group.\n\nPermissions:\n- Only `reader` and above may view groups.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "description": "Unique Group ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Group.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing group": {
+                    "summary": "Group retrieved successfully.",
+                    "value": {
+                      "id": "03d66e78d",
+                      "name": "Berkshire & West LLC",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteGroup",
+        "summary": "Deletes a group.",
+        "tags": [
+          "Groups"
+        ],
+        "description": "Deletes a group.\n\nPermissions:\n- Only `admin` and above may delete groups.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "description": "Unique Group ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateGroup",
+        "summary": "Update a group.",
+        "tags": [
+          "Groups"
+        ],
+        "description": "Update an existing group.\n\nPermissions:\n- Only `admins` may update groups.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-3"
+              },
+              "examples": {
+                "Update group": {
+                  "summary": "Update an existing group.",
+                  "value": {
+                    "name": "Berkshire & West LLC"
+                  }
+                },
+                "Changing tags": {
+                  "summary": "Changing the tags of a group.",
+                  "value": {
+                    "tags": {
+                      "tier": "GOLD"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "description": "Unique Group ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Group.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing group updated successfully": {
+                    "summary": "Existing group created successfully.",
+                    "value": {
+                      "id": "jduuye683",
+                      "name": "Withom Holdings",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com",
+                      "updatedAt": "2022-08-12T07:34:23.132Z",
+                      "updatedBy": "someoneelse@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `formula` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/{groupId}/regions": {
+      "post": {
+        "operationId": "createRegion",
+        "summary": "Define a new region",
+        "tags": [
+          "Regions"
+        ],
+        "description": "Define a new region.\n\nPermissions:\n- Only `admin` and above may create new regions.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-6"
+              },
+              "examples": {
+                "New region": {
+                  "summary": "Create a new region.",
+                  "value": {
+                    "name": "Abshire Harvest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "description": "Unique Group ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Region.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "New region": {
+                    "summary": "New region created successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "name": "Abshire Harvest",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `name` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions": {
+      "get": {
+        "operationId": "listRegions",
+        "summary": "List all regions.",
+        "tags": [
+          "Regions"
+        ],
+        "description": "List all regions.\n\nPermissions:\n- `readers` may list regions.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Tag key and value in the format of `key:value`.",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "tags",
+            "required": false,
+            "description": "Tag keys and values to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "groupId",
+            "required": false,
+            "description": "Group ID to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "regions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-8"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "lastEvaluatedToken": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "regions"
+                  ]
+                },
+                "examples": {
+                  "List of regions": {
+                    "summary": "Paginated list of regions.",
+                    "value": {
+                      "regions": [
+                        {
+                          "id": "76ghytgt5",
+                          "name": "Abshire Harvest",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        },
+                        {
+                          "id": "0980yht42",
+                          "name": "Barrows Meadows",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com",
+                          "updatedAt": "2022-08-12T07:34:23.132Z",
+                          "updatedBy": "someoneelse@somewhere.com"
+                        },
+                        {
+                          "id": "rrwth876d",
+                          "name": "Bashirian Paddock",
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        }
+                      ],
+                      "pagination": {
+                        "lastEvaluatedToken": "76ghytgt5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{regionId}": {
+      "get": {
+        "operationId": "getRegion",
+        "summary": "Retrieve a region.",
+        "tags": [
+          "Regions"
+        ],
+        "description": "Retrieve the details of a region.\n\nPermissions:\n- Only `reader` and above may view regions.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Region.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing region": {
+                    "summary": "Region retrieved successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "name": "Abshire Harvest",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteRegion",
+        "summary": "Deletes a region.",
+        "tags": [
+          "Regions"
+        ],
+        "description": "Deletes a region.\n\nPermissions:\n- Only `admin` and above may delete regions.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateRegion",
+        "summary": "Update a region.",
+        "tags": [
+          "Regions"
+        ],
+        "description": "Update an existing region.\n\nPermissions:\n- Only `admins` may update regions.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-7"
+              },
+              "examples": {
+                "Update region": {
+                  "summary": "Update an existing region.",
+                  "value": {
+                    "name": "Abshire Harvest"
+                  }
+                },
+                "Changing tags": {
+                  "summary": "Changing the tags of a region.",
+                  "value": {
+                    "tags": {
+                      "tier": "GOLD"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Region.",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing region updated successfully": {
+                    "summary": "Existing region created successfully.",
+                    "value": {
+                      "id": "0980yht42",
+                      "name": "Barrows Meadows",
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com",
+                      "updatedAt": "2022-08-12T07:34:23.132Z",
+                      "updatedBy": "someoneelse@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `formula` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{regionId}/zones": {
+      "post": {
+        "operationId": "createZone",
+        "summary": "Define a new zone",
+        "tags": [
+          "Zones"
+        ],
+        "description": "Define a new zone.\n\nPermissions:\n- Only `admin` and above may create new zones.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-10"
+              },
+              "examples": {
+                "New zone": {
+                  "summary": "Create a new zone.",
+                  "value": {
+                    "name": "Field 1",
+                    "boundary": [
+                      {
+                        "lat": 39.9194752,
+                        "lon": -104.5079674
+                      },
+                      {
+                        "lat": 39.9193435,
+                        "lon": -104.4894065
+                      },
+                      {
+                        "lat": 39.9122295,
+                        "lon": -104.4893912
+                      },
+                      {
+                        "lat": 39.9123941,
+                        "lon": -104.5078877
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Zone.",
+                      "type": "string"
+                    },
+                    "boundary": {
+                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "type": "array",
+                      "items": {
+                        "description": "Coordinates",
+                        "type": "object",
+                        "properties": {
+                          "lat": {
+                            "description": "Latitude",
+                            "type": "number"
+                          },
+                          "lon": {
+                            "description": "Longitude",
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "lat",
+                          "lon"
+                        ]
+                      }
+                    },
+                    "acres": {
+                      "description": "The areas of the Zone.",
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "boundary",
+                    "acres",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "New zone": {
+                    "summary": "New zone created successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "name": "Field 1",
+                      "boundary": [
+                        {
+                          "lat": 39.9194752,
+                          "lon": -104.5079674
+                        },
+                        {
+                          "lat": 39.9193435,
+                          "lon": -104.4894065
+                        },
+                        {
+                          "lat": 39.9122295,
+                          "lon": -104.4893912
+                        },
+                        {
+                          "lat": 39.9123941,
+                          "lon": -104.5078877
+                        }
+                      ],
+                      "acres": 175,
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `name` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/zones": {
+      "get": {
+        "operationId": "listZones",
+        "summary": "List all zones.",
+        "tags": [
+          "Zones"
+        ],
+        "description": "List all zones.\n\nPermissions:\n- `readers` may list zones.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Tag key and value in the format of `key:value`.",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "tags",
+            "required": false,
+            "description": "Tag keys and values to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "groupId",
+            "required": false,
+            "description": "Group ID to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "regionId",
+            "required": false,
+            "description": "Region ID to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "zones": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-12"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "lastEvaluatedToken": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "zones"
+                  ]
+                },
+                "examples": {
+                  "List of zones": {
+                    "summary": "Paginated list of zones.",
+                    "value": {
+                      "zones": [
+                        {
+                          "id": "76ghytgt5",
+                          "name": "Field 1",
+                          "boundary": [
+                            {
+                              "lat": 39.9194752,
+                              "lon": -104.5079674
+                            },
+                            {
+                              "lat": 39.9193435,
+                              "lon": -104.4894065
+                            },
+                            {
+                              "lat": 39.9122295,
+                              "lon": -104.4893912
+                            },
+                            {
+                              "lat": 39.9123941,
+                              "lon": -104.5078877
+                            }
+                          ],
+                          "acres": 175,
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        },
+                        {
+                          "id": "0980yht42",
+                          "name": "Field 2",
+                          "boundary": [
+                            {
+                              "lat": 39.9390518,
+                              "lon": -104.4895628
+                            },
+                            {
+                              "lat": 39.938295,
+                              "lon": -104.492009
+                            },
+                            {
+                              "lat": 39.9376369,
+                              "lon": -104.4926527
+                            },
+                            {
+                              "lat": 39.9378015,
+                              "lon": -104.494026
+                            },
+                            {
+                              "lat": 39.9367485,
+                              "lon": -104.4971159
+                            },
+                            {
+                              "lat": 39.9345767,
+                              "lon": -104.4993046
+                            },
+                            {
+                              "lat": 39.9332933,
+                              "lon": -104.4992188
+                            },
+                            {
+                              "lat": 39.931615,
+                              "lon": -104.4999483
+                            },
+                            {
+                              "lat": 39.926909,
+                              "lon": -104.4996908
+                            },
+                            {
+                              "lat": 39.9268103,
+                              "lon": -104.4895199
+                            }
+                          ],
+                          "acres": 655,
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com",
+                          "updatedAt": "2022-08-12T07:34:23.132Z",
+                          "updatedBy": "someoneelse@somewhere.com"
+                        }
+                      ],
+                      "pagination": {
+                        "lastEvaluatedToken": "76ghytgt5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/zones/{zoneId}": {
+      "get": {
+        "operationId": "getZone",
+        "summary": "Retrieve a zone.",
+        "tags": [
+          "Zones"
+        ],
+        "description": "Retrieve the details of a zone.\n\nPermissions:\n- Only `reader` and above may view zones.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "zoneId",
+            "required": true,
+            "description": "Unique Zone ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Zone.",
+                      "type": "string"
+                    },
+                    "boundary": {
+                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "type": "array",
+                      "items": {
+                        "description": "Coordinates",
+                        "type": "object",
+                        "properties": {
+                          "lat": {
+                            "description": "Latitude",
+                            "type": "number"
+                          },
+                          "lon": {
+                            "description": "Longitude",
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "lat",
+                          "lon"
+                        ]
+                      }
+                    },
+                    "acres": {
+                      "description": "The areas of the Zone.",
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "boundary",
+                    "acres",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing zone": {
+                    "summary": "Zone retrieved successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "name": "Field 1",
+                      "boundary": [
+                        {
+                          "lat": 39.9194752,
+                          "lon": -104.5079674
+                        },
+                        {
+                          "lat": 39.9193435,
+                          "lon": -104.4894065
+                        },
+                        {
+                          "lat": 39.9122295,
+                          "lon": -104.4893912
+                        },
+                        {
+                          "lat": 39.9123941,
+                          "lon": -104.5078877
+                        }
+                      ],
+                      "acres": 175,
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteZone",
+        "summary": "Deletes a zone.",
+        "tags": [
+          "Zones"
+        ],
+        "description": "Deletes a zone.\n\nPermissions:\n- Only `admin` and above may delete zones.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "zoneId",
+            "required": true,
+            "description": "Unique Zone ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateZone",
+        "summary": "Update a zone.",
+        "tags": [
+          "Zones"
+        ],
+        "description": "Update an existing zone.\n\nPermissions:\n- Only `admins` may update zones.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-11"
+              },
+              "examples": {
+                "Update zone": {
+                  "summary": "Update an existing zone.",
+                  "value": {
+                    "name": "Field 1",
+                    "boundary": [
+                      {
+                        "lat": 39.9194752,
+                        "lon": -104.5079674
+                      },
+                      {
+                        "lat": 39.9193435,
+                        "lon": -104.4894065
+                      },
+                      {
+                        "lat": 39.9122295,
+                        "lon": -104.4893912
+                      },
+                      {
+                        "lat": 39.9123941,
+                        "lon": -104.5078877
+                      }
+                    ]
+                  }
+                },
+                "Changing tags": {
+                  "summary": "Changing the tags of a zone.",
+                  "value": {
+                    "tags": {
+                      "tier": "GOLD"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "zoneId",
+            "required": true,
+            "description": "Unique Zone ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the Zone.",
+                      "type": "string"
+                    },
+                    "boundary": {
+                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "type": "array",
+                      "items": {
+                        "description": "Coordinates",
+                        "type": "object",
+                        "properties": {
+                          "lat": {
+                            "description": "Latitude",
+                            "type": "number"
+                          },
+                          "lon": {
+                            "description": "Longitude",
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "lat",
+                          "lon"
+                        ]
+                      }
+                    },
+                    "acres": {
+                      "description": "The areas of the Zone.",
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "boundary",
+                    "acres",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing zone updated successfully": {
+                    "summary": "Existing zone created successfully.",
+                    "value": {
+                      "id": "0980yht42",
+                      "name": "Field 2",
+                      "boundary": [
+                        {
+                          "lat": 39.9390518,
+                          "lon": -104.4895628
+                        },
+                        {
+                          "lat": 39.938295,
+                          "lon": -104.492009
+                        },
+                        {
+                          "lat": 39.9376369,
+                          "lon": -104.4926527
+                        },
+                        {
+                          "lat": 39.9378015,
+                          "lon": -104.494026
+                        },
+                        {
+                          "lat": 39.9367485,
+                          "lon": -104.4971159
+                        },
+                        {
+                          "lat": 39.9345767,
+                          "lon": -104.4993046
+                        },
+                        {
+                          "lat": 39.9332933,
+                          "lon": -104.4992188
+                        },
+                        {
+                          "lat": 39.931615,
+                          "lon": -104.4999483
+                        },
+                        {
+                          "lat": 39.926909,
+                          "lon": -104.4996908
+                        },
+                        {
+                          "lat": 39.9268103,
+                          "lon": -104.4895199
+                        }
+                      ],
+                      "acres": 655,
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com",
+                      "updatedAt": "2022-08-12T07:34:23.132Z",
+                      "updatedBy": "someoneelse@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `formula` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/zones/{zoneId}/states": {
+      "post": {
+        "operationId": "createState",
+        "summary": "Define a new state",
+        "tags": [
+          "States"
+        ],
+        "description": "Define a new state of a zone.\n\nPermissions:\n- Only `admin` and above may create new states.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-14"
+              },
+              "examples": {
+                "New state": {
+                  "summary": "Create a new state.",
+                  "value": {
+                    "timestamp": "2024-04-15T00:00:00.000Z",
+                    "attributes": {
+                      "estimatedYield": 1026
+                    },
+                    "tags": {
+                      "plantedAt": "2024-04-15T00:00:00.000Z",
+                      "crop": "corn"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "zoneId",
+            "required": true,
+            "description": "Unique Zone ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique State ID.",
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "timestamp",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "New state": {
+                    "summary": "New state created successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "timestamp": "2024-04-15T00:00:00.000Z",
+                      "attributes": {
+                        "estimatedYield": 1026
+                      },
+                      "tags": {
+                        "plantedAt": "2024-04-15T00:00:00.000Z",
+                        "crop": "corn"
+                      },
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `name` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/states": {
+      "get": {
+        "operationId": "listStates",
+        "summary": "List all states.",
+        "tags": [
+          "States"
+        ],
+        "description": "List all states.\n\nPermissions:\n- `readers` may list states.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Tag key and value in the format of `key:value`.",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "tags",
+            "required": false,
+            "description": "Tag keys and values to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "groupId",
+            "required": false,
+            "description": "Group ID to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "regionId",
+            "required": false,
+            "description": "Region ID to filter by."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "zoneId",
+            "required": false,
+            "description": "Zone ID to filter by."
+          },
+          {
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "latestOnly",
+            "required": false,
+            "description": "Returns latest state only."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "states": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-16"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "lastEvaluatedToken": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "states"
+                  ]
+                },
+                "examples": {
+                  "List of states": {
+                    "summary": "Paginated list of states.",
+                    "value": {
+                      "states": [
+                        {
+                          "id": "76ghytgt5",
+                          "timestamp": "2024-04-15T00:00:00.000Z",
+                          "attributes": {
+                            "estimatedYield": 1026
+                          },
+                          "tags": {
+                            "plantedAt": "2024-04-15T00:00:00.000Z",
+                            "crop": "corn"
+                          },
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        },
+                        {
+                          "id": "0980yht42",
+                          "timestamp": "2023-04-11T00:00:00.000Z",
+                          "attributes": {
+                            "estimatedYield": 925
+                          },
+                          "tags": {
+                            "plantedAt": "2023-04-11T00:00:00.000Z",
+                            "harvestedAt": "2023-10-02T00:00:00.000Z",
+                            "crop": "corn"
+                          },
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com",
+                          "updatedAt": "2022-08-12T07:34:23.132Z",
+                          "updatedBy": "someoneelse@somewhere.com"
+                        },
+                        {
+                          "id": "rrwth876d",
+                          "timestamp": "2022-04-11T00:00:00.000Z",
+                          "attributes": {
+                            "estimatedYield": 879
+                          },
+                          "tags": {
+                            "plantedAt": "2022-04-11T00:00:00.000Z",
+                            "harvestedAt": "2022-10-02T00:00:00.000Z",
+                            "crop": "corn"
+                          },
+                          "createdAt": "2022-08-10T23:55:20.322Z",
+                          "createdBy": "someone@somewhere.com"
+                        }
+                      ],
+                      "pagination": {
+                        "lastEvaluatedToken": "76ghytgt5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/states/{stateId}": {
+      "get": {
+        "operationId": "getState",
+        "summary": "Retrieve a state.",
+        "tags": [
+          "States"
+        ],
+        "description": "Retrieve the state of a zone.\n\nPermissions:\n- Only `reader` and above may view states.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "stateId",
+            "required": true,
+            "description": "Unique State ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique State ID.",
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "timestamp",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing state": {
+                    "summary": "State retrieved successfully.",
+                    "value": {
+                      "id": "76ghytgt5",
+                      "timestamp": "2024-04-15T00:00:00.000Z",
+                      "attributes": {
+                        "estimatedYield": 1026
+                      },
+                      "tags": {
+                        "plantedAt": "2024-04-15T00:00:00.000Z",
+                        "crop": "corn"
+                      },
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteState",
+        "summary": "Deletes a state.",
+        "tags": [
+          "States"
+        ],
+        "description": "Deletes a state.\n\nPermissions:\n- Only `admin` and above may delete states.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "stateId",
+            "required": true,
+            "description": "Unique State ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateState",
+        "summary": "Update a state.",
+        "tags": [
+          "States"
+        ],
+        "description": "Update an existing state.\n\nPermissions:\n- Only `admins` may update states.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-15"
+              },
+              "examples": {
+                "Update state": {
+                  "summary": "Update an existing state.",
+                  "value": {
+                    "timestamp": "2024-04-15T00:00:00.000Z",
+                    "attributes": {
+                      "estimatedYield": 1026
+                    },
+                    "tags": {
+                      "plantedAt": "2024-04-15T00:00:00.000Z",
+                      "crop": "corn"
+                    }
+                  }
+                },
+                "Changing tags": {
+                  "summary": "Changing the tags of a state.",
+                  "value": {
+                    "tags": {
+                      "harvestedAt": "2024-10-02T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "stateId",
+            "required": true,
+            "description": "Unique State ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique State ID.",
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "attributes": {
+                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "tags": {
+                      "$ref": "#/components/schemas/def-1"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "timestamp",
+                    "createdBy",
+                    "createdAt"
+                  ]
+                },
+                "examples": {
+                  "Existing state updated successfully": {
+                    "summary": "Existing state created successfully.",
+                    "value": {
+                      "id": "0980yht42",
+                      "timestamp": "2023-04-11T00:00:00.000Z",
+                      "attributes": {
+                        "estimatedYield": 925
+                      },
+                      "tags": {
+                        "plantedAt": "2023-04-11T00:00:00.000Z",
+                        "harvestedAt": "2023-10-02T00:00:00.000Z",
+                        "crop": "corn"
+                      },
+                      "createdAt": "2022-08-10T23:55:20.322Z",
+                      "createdBy": "someone@somewhere.com",
+                      "updatedAt": "2022-08-12T07:34:23.132Z",
+                      "updatedBy": "someoneelse@somewhere.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected `formula` to be defined but not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "syntaxErrors": {
+                      "type": "object",
+                      "properties": {
+                        "charPositionInLine": {
+                          "type": "integer"
+                        },
+                        "line": {
+                          "type": "integer"
+                        },
+                        "msg": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "charPositionInLine",
+                        "line",
+                        "msg"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Name in use": {
+                    "summary": "The `name` is already in use.",
+                    "value": {
+                      "description": "Name `xyz` already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Groups",
+      "description": "Groups represent collections of Regions."
+    },
+    {
+      "name": "Regions",
+      "description": "Regions represent collections of Zones."
+    },
+    {
+      "name": "Zones",
+      "description": "Zones represent a specific geographic location."
+    }
+  ]
+}

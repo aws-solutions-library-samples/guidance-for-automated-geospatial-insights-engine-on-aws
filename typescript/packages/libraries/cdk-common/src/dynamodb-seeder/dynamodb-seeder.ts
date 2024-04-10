@@ -1,12 +1,12 @@
-import * as path from 'path';
 import type { ITable } from 'aws-cdk-lib/aws-dynamodb';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Code, Runtime, SingletonFunction } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { CustomResource, Duration } from 'aws-cdk-lib/core';
-import type { Seeds } from './seeds';
 import { Construct } from 'constructs';
+import * as path from 'path';
 import { fileURLToPath } from 'url';
+import type { Seeds } from './seeds.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +33,7 @@ export class DynamoDBSeeder extends Construct {
 
 		const handler = new SingletonFunction(this, 'CustomResourceHandler', {
 			uuid: 'Custom::DynamodbSeeder',
-			runtime: Runtime.NODEJS_18_X,
+			runtime: Runtime.NODEJS_20_X,
 			code: Code.fromAsset(path.join(__dirname, 'lambdas')),
 			handler: 'index.handler',
 			lambdaPurpose: 'Custom::DynamodbSeeder',
@@ -45,7 +45,7 @@ export class DynamoDBSeeder extends Construct {
 				effect: Effect.ALLOW,
 				actions: ['dynamodb:BatchWriteItem'],
 				resources: [props.table.tableArn],
-			}),
+			})
 		);
 
 		if (props.table.encryptionKey) {
@@ -54,7 +54,7 @@ export class DynamoDBSeeder extends Construct {
 					effect: Effect.ALLOW,
 					actions: ['kms:Encrypt', 'kms:Decrypt', 'kms:ReEncrypt*', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:CreateGrant'],
 					resources: [props.table.encryptionKey.keyArn],
-				}),
+				})
 			);
 		}
 
@@ -66,7 +66,7 @@ export class DynamoDBSeeder extends Construct {
 					effect: Effect.ALLOW,
 					actions: ['s3:GetObject'],
 					resources: [seedsBucket.arnForObjects(objectKey)],
-				}),
+				})
 			);
 		}
 

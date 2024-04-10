@@ -2,9 +2,6 @@ import { EventBus } from 'aws-cdk-lib/aws-events';
 import { Construct } from 'constructs';
 import { eventBusName } from './util.js';
 
-export interface EventBusConstructProperties {
-}
-
 export class Bus extends Construct {
 	public readonly eventBusName: string;
 	public readonly eventBusArn: string;
