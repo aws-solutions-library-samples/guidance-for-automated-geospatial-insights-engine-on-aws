@@ -12,41 +12,54 @@
  */
 
 import { Type } from '@sinclair/typebox';
+import { commonHeaders, notFoundResponse, stateId } from '../../common/schemas.js';
+import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
-import { commonHeaders, forbiddenResponse, stateId, noBodyResponse, notFoundResponse } from '../../common/schemas.js';
-import { atLeastAdmin } from '../../common/scopes.js';
+import { stateResourceExample1 } from './example.js';
+import { stateResource } from './schemas.js';
 
-export default function deleteStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function getStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
-		method: 'DELETE',
+		method: 'GET',
 		url: '/states/:stateId',
 
 		schema: {
-			summary: 'Deletes a state.',
-			description: `Deletes a state.
+			summary: 'Retrieve a state.',
+			description: `Retrieve the state of a zone.
 
 Permissions:
-- Only \`admin\` and above may delete states.
+- Only \`reader\` and above may view states.
 `,
 			tags: ['States'],
-			operationId: 'deleteState',
+			operationId: 'getState',
 			headers: commonHeaders,
 			params: Type.Object({
 				stateId: stateId,
 			}),
 			response: {
-				204: noBodyResponse,
-				403: forbiddenResponse,
+				200: {
+					description: 'Success.',
+					...stateResource,
+					'x-examples': {
+						'Existing state': {
+							summary: 'State retrieved successfully.',
+							value: stateResourceExample1,
+						},
+					},
+				},
 				404: notFoundResponse,
 			},
-			'x-security-scopes': atLeastAdmin,
+			'x-security-scopes': atLeastReader,
 		},
 		constraints: {
 			version: apiVersion100,
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('stateService');
+			const { stateId } = request.params;
+			const state = await svc.get(request.authz, stateId);
+			return reply.status(200).send(state);
 		},
 	});
 

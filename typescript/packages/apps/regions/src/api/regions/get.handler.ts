@@ -12,11 +12,11 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, regionId, notFoundResponse } from '../../common/schemas.js';
+import { commonHeaders, notFoundResponse, regionId } from '../../common/schemas.js';
+import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { regionResourceExample1 } from './example.js';
 import { regionResource } from './schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 
 export default function getRegionRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -56,7 +56,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('regionService');
+			const { regionId } = request.params;
+			const region = await svc.get(request.authz, regionId);
+			return reply.status(200).send(region);
 		},
 	});
 

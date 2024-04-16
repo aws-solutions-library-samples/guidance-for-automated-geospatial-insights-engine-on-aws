@@ -1,5 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, zoneId, paginationToken, tags, updatedAt, updatedBy } from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, paginationToken, regionId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
+import { stateResource } from '../states/schemas.js';
 
 /**
  * Zone specific path parameters
@@ -8,21 +9,21 @@ import { attributes, createdAt, createdBy, zoneId, paginationToken, tags, update
 /**
  * Zone specific query string parameters
  */
+export const includeLatestStateQS = Type.Optional(Type.Boolean({ description: 'Include latest state in results.', default: false }));
 
 /**
  * Zone specific resource parameters
  */
-export const name = Type.String({ description: 'The name of the Zone.' });
-export const acres = Type.Number({ description: 'The areas of the Zone.' });
-export const boundary = Type.Array(
-	Type.Object({
-		lat: Type.Number({description: 'Latitude'}),
-		lon: Type.Number({description: 'Longitude'}),
-	}, {description: 'Coordinates'}),
-	{description: 'Coordinates of the boundary (polygon) of the Zone.'}
-);
+const name = Type.String({ description: 'The name of the Zone.' });
+const area = Type.Number({ description: 'The area of the Zone.' });
+export const polygon = Type.Array(Type.Array(Type.Number({ description: 'Latitude' }), Type.Number({ description: 'Longitude' })), {
+	$id: 'polygon',
+	description: 'Coordinates defining a polygon.',
+});
+export type Polygon = Static<typeof polygon>;
 
-
+const boundary = Type.Ref(polygon, { description: 'The boundary of the Zone.' });
+const exclusions = Type.Array(Type.Ref(polygon), { description: 'Boundaries to be excluded from the Zone.' });
 
 /**
  * Zone specific resources
@@ -32,7 +33,8 @@ export const createZoneRequestBody = Type.Object(
 	{
 		name,
 		boundary,
-		attributes: Type.Optional(attributes),
+		exclusions: Type.Optional(exclusions),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
 	{ $id: 'createZoneRequestBody' }
@@ -43,7 +45,8 @@ export const editZoneRequestBody = Type.Object(
 	{
 		name: Type.Optional(name),
 		boundary: Type.Optional(boundary),
-		attributes: Type.Optional(attributes),
+		exclusions: Type.Optional(exclusions),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
 	{ $id: 'editZoneRequestBody' }
@@ -54,10 +57,13 @@ export const zoneResource = Type.Object(
 	{
 		id: zoneId,
 		name,
+		regionId,
 		boundary,
-		acres,
-		attributes: Type.Optional(attributes),
+		exclusions: Type.Optional(exclusions),
+		area,
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
+		state: Type.Optional(Type.Ref(stateResource)),
 		createdBy: createdBy,
 		createdAt: createdAt,
 		updatedBy: Type.Optional(updatedBy),
@@ -72,7 +78,8 @@ export const zoneList = Type.Object(
 		zones: Type.Array(Type.Ref(zoneResource)),
 		pagination: Type.Optional(
 			Type.Object({
-				lastEvaluatedToken: Type.Optional(paginationToken),
+				token: Type.Optional(paginationToken),
+				count: Type.Number(),
 			})
 		),
 	},

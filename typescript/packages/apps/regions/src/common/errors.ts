@@ -25,13 +25,6 @@ export class UserNotAuthorizedError extends Error {
 	}
 }
 
-export class InvalidAssetError extends Error {
-	public constructor(message: string) {
-		super(message);
-		this.name = 'InvalidAssetError';
-	}
-}
-
 export class InvalidStateError extends Error {
 	public constructor(message: string) {
 		super(message);
@@ -46,6 +39,21 @@ export class InvalidRequestError extends Error {
 	}
 }
 
+export class DatabaseTransactionError extends Error {
+	public readonly reasons: TransactionCancellationReason[];
+
+	public constructor(reasons: TransactionCancellationReason[]) {
+		super('Transaction failed.');
+		this.name = 'DatabaseTransactionError';
+		this.reasons = reasons;
+	}
+}
+
+export interface TransactionCancellationReason {
+	item: unknown;
+	code: string;
+	message: string;
+}
 
 export function handleError(error, _request, reply) {
 	// Log error
@@ -59,7 +67,6 @@ export function handleError(error, _request, reply) {
 	} else {
 		switch (error.name) {
 			case 'InvalidStateError':
-			case 'InvalidAssetError':
 				return reply.conflict(error.message);
 			case 'InvalidRequestError':
 			case 'InvalidNameError':
@@ -70,13 +77,15 @@ export function handleError(error, _request, reply) {
 			case 'UnauthorizedError':
 				return reply.unauthorized(error.message);
 			case 'InvalidTokenError':
-				return reply.forbidden(error.message);
 			case 'ForbiddenError':
+			case 'ExpiredTokenException':
 				return reply.forbidden(error.message);
 			case 'NotImplementedError':
 				return reply.notImplemented(error.message);
+			case 'DatabaseTransactionError':
+				return reply.internalServerError(error.message);
 			default:
-				return reply.imateapot('Unhandled error which needs wiring up in the error handler!');
+				return reply.imateapot(`${error.name}: ${error.message}`);
 		}
 	}
 }

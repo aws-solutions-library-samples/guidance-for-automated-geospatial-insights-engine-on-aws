@@ -3,9 +3,7 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"rootDir": "src",
-		"types": [
-			"node"
-		],
+		"types": ["node"],
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
@@ -15,19 +13,10 @@
 
 		// overrides of extends
 		"strict": false,
-		"exactOptionalPropertyTypes": false
+		"exactOptionalPropertyTypes": false,
+
+		"composite": true
 	},
-	"include": [
-		"src/**/*.ts"
-	],
-	"exclude": [
-		"./**/__mocks__/*.ts",
-		".git",
-		".history",
-		".vscode",
-		"cdk.out",
-		"dist",
-		"lib",
-		"node_modules"
-	]
+	"include": ["src/**/*.ts"],
+	"exclude": ["./**/__mocks__/*.ts", ".git", ".history", ".vscode", "cdk.out", "dist", "lib", "node_modules"]
 }

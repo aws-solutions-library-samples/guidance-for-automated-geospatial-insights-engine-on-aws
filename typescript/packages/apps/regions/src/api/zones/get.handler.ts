@@ -12,11 +12,11 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, zoneId, notFoundResponse } from '../../common/schemas.js';
+import { commonHeaders, notFoundResponse, zoneId } from '../../common/schemas.js';
+import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { zoneResourceExample1 } from './example.js';
 import { zoneResource } from './schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 
 export default function getZoneRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -56,7 +56,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('zoneService');
+			const { zoneId } = request.params;
+			const zone = await svc.get(request.authz, zoneId);
+			return reply.status(200).send(zone);
 		},
 	});
 

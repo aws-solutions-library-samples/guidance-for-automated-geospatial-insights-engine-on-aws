@@ -13,10 +13,10 @@
 
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, groupId, notFoundResponse } from '../../common/schemas.js';
+import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { groupPatchRequestExample1, groupPatchRequestExample2, groupResourceExample2 } from './example.js';
 import { editGroupRequestBody, groupResource } from './schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 
 export default function updateGroupRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -91,8 +91,11 @@ Permissions:
 			version: apiVersion100,
 		},
 
-		handler: async (_request, _reply) => {
-			// TODO
+		handler: async (request, reply) => {
+			const svc = fastify.diContainer.resolve('groupService');
+			const { groupId } = request.params;
+			const saved = await svc.update(request.authz, groupId, request.body);
+			return reply.status(200).send(saved);
 		},
 	});
 

@@ -4,6 +4,7 @@ import type { Construct } from 'constructs';
 import { CognitoIdpCreator } from './cognitoIdpCreator.construct.js';
 
 export type CognitoCustomStackProperties = StackProps & {
+	environment: string;
 	samlMetaDataUrl: string;
 	ssoRegion: string;
 	userPoolIdParameter: string;
@@ -18,6 +19,7 @@ export class CognitoCustomStack extends Stack {
 			// SAML metadata available deploy federated cognito
 
 			new CognitoIdpCreator(this,'CognitoIdpCreator',{
+				environment: props.environment,
 				userPoolIdParameter: props.userPoolIdParameter,
 				samlMetaDataUrl: props.samlMetaDataUrl,
 				callbackUrls: props.callbackUrls

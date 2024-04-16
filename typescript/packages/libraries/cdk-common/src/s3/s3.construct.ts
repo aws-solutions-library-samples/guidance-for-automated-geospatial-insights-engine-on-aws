@@ -1,11 +1,17 @@
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import {RemovalPolicy, Duration, Stack} from 'aws-cdk-lib';
+
+export const bucketNameParameter = (environment: string) => `/arcade/${environment}/shared/bucketName`;
+export const bucketArnParameter = (environment: string) => `/arcade/${environment}/shared/bucketArn`;
 
 export interface S3ConstructProperties {
+	environment: string;
+	bucketName: string;
+	cdkResourceNamePrefix: string;
 	deleteBucket: boolean;
 }
-
 export class S3 extends Construct {
 	public readonly bucketName: string;
 	public readonly bucketArn: string;
@@ -13,20 +19,15 @@ export class S3 extends Construct {
 	constructor(scope: Construct, id: string, props: S3ConstructProperties) {
 		super(scope, id);
 
-		const accountId = Stack.of(this).account;
-		const region = Stack.of(this).region;
-		const bucketName = `arcade-platform-${accountId}-${region}`;
-
-
-		const bucket = new s3.Bucket(this, 'dfBucket', {
-			bucketName: bucketName,
+		const bucket = new s3.Bucket(this, `${props.cdkResourceNamePrefix}Bucket`, {
+			bucketName: props.bucketName,
 			encryption: s3.BucketEncryption.S3_MANAGED,
 			intelligentTieringConfigurations: [
 				{
 					name: 'archive',
 					archiveAccessTierTime: Duration.days(90),
-					deepArchiveAccessTierTime: Duration.days(180)
-				}
+					deepArchiveAccessTierTime: Duration.days(180),
+				},
 			],
 			blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
 			enforceSSL: true,
@@ -38,5 +39,17 @@ export class S3 extends Construct {
 
 		this.bucketArn = bucket.bucketArn;
 		this.bucketName = bucket.bucketName;
+
+		new StringParameter(this, `${props.cdkResourceNamePrefix}BucketNameParameter`, {
+			parameterName: bucketNameParameter(props.environment),
+			description: `${props.cdkResourceNamePrefix} ARCADE bucket (${props.environment})`,
+			stringValue: this.bucketName,
+		});
+
+		new StringParameter(this, `${props.cdkResourceNamePrefix}BucketArnParameter`, {
+			parameterName: bucketArnParameter(props.environment),
+			description: `${props.cdkResourceNamePrefix} ARCADE bucket (${props.environment})`,
+			stringValue: this.bucketArn,
+		});
 	}
 }

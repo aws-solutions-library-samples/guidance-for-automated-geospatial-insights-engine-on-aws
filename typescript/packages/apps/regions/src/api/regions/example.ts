@@ -1,7 +1,7 @@
-import { CreateRegion, EditRegion, Region, RegionList } from "./schemas.js";
+import { CreateRegion, EditRegion, Region, RegionList } from './schemas.js';
 
 export const regionPostRequestExample: CreateRegion = {
-	name: "Abshire Harvest"
+	name: 'Abshire Harvest',
 };
 
 export const regionPatchRequestExample1: EditRegion = regionPostRequestExample;
@@ -16,6 +16,7 @@ export const regionPatchRequestExample2: EditRegion = {
  */
 export const regionResourceExample1: Region = {
 	id: '76ghytgt5',
+	groupId: 'sjduwydjd',
 	...regionPostRequestExample,
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
@@ -23,7 +24,8 @@ export const regionResourceExample1: Region = {
 
 export const regionResourceExample2: Region = {
 	id: '0980yht42',
-	name: "Barrows Meadows",
+	groupId: 'sjduwydjd',
+	name: 'Barrows Meadows',
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
 	updatedAt: '2022-08-12T07:34:23.132Z',
@@ -32,14 +34,16 @@ export const regionResourceExample2: Region = {
 
 export const regionResourceExample3: Region = {
 	id: 'rrwth876d',
-	name: "Bashirian Paddock",
+	groupId: 'sjduwydjd',
+	name: 'Bashirian Paddock',
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
 };
 
 export const regionListResource: RegionList = {
-	regions: [regionResourceExample1,regionResourceExample2,regionResourceExample3],
+	regions: [regionResourceExample1, regionResourceExample2, regionResourceExample3],
 	pagination: {
-		lastEvaluatedToken: regionResourceExample1.id,
+		token: regionResourceExample1.id,
+		count: 3,
 	},
 };

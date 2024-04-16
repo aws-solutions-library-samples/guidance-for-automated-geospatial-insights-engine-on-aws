@@ -16,7 +16,7 @@ import { commonHeaders, countPaginationQS, fromTokenPaginationQS, groupIdQS, reg
 import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { stateListResource } from './example.js';
-import { latestStateOnlyQS, stateList } from './schemas.js';
+import { StateList, latestStateOnlyQS, stateList } from './schemas.js';
 
 export default function listStatesRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -35,7 +35,7 @@ Permissions:
 			headers: commonHeaders,
 			querystring: Type.Object({
 				count: countPaginationQS,
-				fromToken: fromTokenPaginationQS,
+				paginationToken: fromTokenPaginationQS,
 				tags: tagFilterQS,
 				groupId: groupIdQS,
 				regionId: regionIdQS,
@@ -60,8 +60,32 @@ Permissions:
 			version: apiVersion100,
 		},
 
-		handler: async (_request, _reply) => {
-			// TODO
+		handler: async (request, reply) => {
+			const svc = fastify.diContainer.resolve('stateService');
+			const tagUtils = fastify.diContainer.resolve('tagUtils');
+
+			// parse request
+			const { count, paginationToken, tags, groupId, regionId, zoneId, latestOnly } = request.query;
+			const [states, nextToken] = await svc.list(request.authz, {
+				count,
+				token: paginationToken,
+				tags: tagUtils.expandTagsQS(tags),
+				groupId,
+				regionId,
+				zoneId,
+				latestOnly,
+			});
+
+			const response: StateList = { states };
+			if (count || nextToken) {
+				response.pagination = {
+					token: nextToken,
+					count,
+				};
+			}
+
+			fastify.log.debug(`list.handler> exit:${JSON.stringify(response)}`);
+			await reply.status(200).send(response); // nosemgrep
 		},
 	});
 

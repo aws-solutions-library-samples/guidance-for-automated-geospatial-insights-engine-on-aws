@@ -12,51 +12,44 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, stateId, notFoundResponse } from '../../common/schemas.js';
+import { commonHeaders, forbiddenResponse, noBodyResponse, notFoundResponse, stateId } from '../../common/schemas.js';
+import { atLeastAdmin } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
-import { stateResourceExample1 } from './example.js';
-import { stateResource } from './schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 
-export default function getStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function deleteStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
-		method: 'GET',
+		method: 'DELETE',
 		url: '/states/:stateId',
 
 		schema: {
-			summary: 'Retrieve a state.',
-			description: `Retrieve the state of a zone.
+			summary: 'Deletes a state.',
+			description: `Deletes a state.
 
 Permissions:
-- Only \`reader\` and above may view states.
+- Only \`admin\` and above may delete states.
 `,
 			tags: ['States'],
-			operationId: 'getState',
+			operationId: 'deleteState',
 			headers: commonHeaders,
 			params: Type.Object({
 				stateId: stateId,
 			}),
 			response: {
-				200: {
-					description: 'Success.',
-					...stateResource,
-					'x-examples': {
-						'Existing state': {
-							summary: 'State retrieved successfully.',
-							value: stateResourceExample1,
-						},
-					},
-				},
+				204: noBodyResponse,
+				403: forbiddenResponse,
 				404: notFoundResponse,
 			},
-			'x-security-scopes': atLeastReader,
+			'x-security-scopes': atLeastAdmin,
 		},
 		constraints: {
 			version: apiVersion100,
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('stateService');
+			const { stateId } = request.params;
+			await svc.delete(request.authz, stateId);
+			return reply.status(204).send();
 		},
 	});
 

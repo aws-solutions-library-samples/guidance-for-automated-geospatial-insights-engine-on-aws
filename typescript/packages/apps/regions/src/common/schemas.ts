@@ -13,7 +13,7 @@
 
 /* eslint-disable @rushstack/typedef-var */
 import { Static, Type } from '@sinclair/typebox';
-import { Nullable } from './types.js';
+import { Nullable, apiVersion100 } from './types.js';
 
 /**
  * Common path parameters
@@ -31,6 +31,7 @@ export const countPaginationQS = Type.Optional(Type.Integer({ description: 'Coun
 export const fromIdPaginationQS = Type.Optional(Type.String({ description: 'Id to paginate from (exclusive).' }));
 export const fromTokenPaginationQS = Type.Optional(Type.String({ description: 'Token used to paginate from (exclusive).' }));
 export const nextTokenPaginationQS = Type.Optional(Type.String({ description: 'Pagination token.' }));
+export const nameQS = Type.Optional(Type.String({ description: 'Name to filter by.' }));
 export const tagFilterQS = Type.Optional(Type.Array(Type.String({ description: 'Tag key and value in the format of `key:value`.' }), { description: 'Tag keys and values to filter by.' }));
 
 /**
@@ -76,8 +77,8 @@ export type Attributes = Static<typeof attributes>;
  * Common headers
  */
 export const commonHeaders = Type.Object({
-	'accept-version': Type.String({ description: 'API version' }),
-	accept: Type.String({ description: 'Accepted Content Type' }),
+	'accept-version': Type.String({ description: 'API version', default: apiVersion100 }),
+	accept: Type.String({ description: 'Accepted Content Type', default: 'application/json' }),
 });
 
 /**

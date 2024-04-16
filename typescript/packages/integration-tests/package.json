@@ -1,0 +1,30 @@
+{
+	"name": "@arcade/integration-tests",
+	"version": "0.0.1",
+	"description": "Framework wide integration tests.",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run"
+	},
+	"devDependencies": {
+		"@arcade/regions": "workspace:*",
+		"@tsconfig/node20": "~20",
+		"@types/node": "~20",
+		"@vitest/ui": "~1",
+		"dayjs": "~1",
+		"dotenv": "~16",
+		"esbuild": "~0",
+		"eslint": "~9",
+		"jwt-encode": "~1",
+		"pactum-matchers": "~1",
+		"pactum": "~3",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
+	},
+	"private": false
+}

@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, regionId, paginationToken, tags, updatedAt, updatedBy } from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, tags, updatedAt, updatedBy } from '../../common/schemas.js';
 
 /**
  * Region specific path parameters
@@ -12,8 +12,7 @@ import { attributes, createdAt, createdBy, regionId, paginationToken, tags, upda
 /**
  * Region specific resource parameters
  */
-export const name = Type.String({ description: 'The name of the Region.' });
-
+const name = Type.String({ description: 'The name of the Region.' });
 
 /**
  * Region specific resources
@@ -22,8 +21,9 @@ export const name = Type.String({ description: 'The name of the Region.' });
 export const createRegionRequestBody = Type.Object(
 	{
 		name,
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
+		// TODO: add schedule
 	},
 	{ $id: 'createRegionRequestBody' }
 );
@@ -32,8 +32,9 @@ export type CreateRegion = Static<typeof createRegionRequestBody>;
 export const editRegionRequestBody = Type.Object(
 	{
 		name: Type.Optional(name),
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
+		// TODO: add schedule
 	},
 	{ $id: 'editRegionRequestBody' }
 );
@@ -42,9 +43,11 @@ export type EditRegion = Static<typeof editRegionRequestBody>;
 export const regionResource = Type.Object(
 	{
 		id: regionId,
+		groupId,
 		name,
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
+		// TODO: add schedule
 		createdBy: createdBy,
 		createdAt: createdAt,
 		updatedBy: Type.Optional(updatedBy),
@@ -59,7 +62,8 @@ export const regionList = Type.Object(
 		regions: Type.Array(Type.Ref(regionResource)),
 		pagination: Type.Optional(
 			Type.Object({
-				lastEvaluatedToken: Type.Optional(paginationToken),
+				token: Type.Optional(paginationToken),
+				count: Type.Number(),
 			})
 		),
 	},

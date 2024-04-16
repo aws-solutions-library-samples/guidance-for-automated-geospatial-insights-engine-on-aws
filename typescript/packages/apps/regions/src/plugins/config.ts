@@ -17,10 +17,13 @@ import { Static, Type } from '@sinclair/typebox';
 import fp from 'fastify-plugin';
 
 export const configSchema = Type.Object({
-	PORT: Type.Number({ default: 30001 }),
 	AWS_REGION: Type.String(),
+	AWS_XRAY_CONTEXT_MISSING: Type.String({ default: 'local' }),
+	EVENT_BUS_NAME: Type.String(),
 	LOG_LEVEL: Type.String({ default: 'info' }),
-	NODE_ENV: Type.String({ default: 'dev' }),
+	NODE_ENV: Type.String({ default: 'local' }),
+	PORT: Type.Number({ default: 30001 }),
+	TABLE_NAME: Type.String(),
 });
 
 export type ConfigSchemaType = Static<typeof configSchema>;

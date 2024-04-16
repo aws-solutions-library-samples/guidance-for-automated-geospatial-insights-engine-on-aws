@@ -2,7 +2,7 @@
  * This is the main configuration file for Rush.
  * For full documentation, please see https://rushjs.io
  */
- {
+{
 	"$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
 	/**
 	 * (Required) This specifies the version of the Rush engine to be used in this repo.
@@ -15,7 +15,7 @@
 	 * path segment in the "$schema" field for all your Rush config files.  This will ensure
 	 * correct error-underlining and tab-completion for editors such as VS Code.
 	 */
-	"rushVersion": "5.117.1",
+	"rushVersion": "5.120.4",
 	/**
 	 * The next field selects which package manager should be installed and determines its version.
 	 * Rush installs its own local copy of the package manager to ensure that your build process
@@ -24,7 +24,7 @@
 	 * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
 	 * for details about these alternatives.
 	 */
-	"pnpmVersion": "8.15.6",
+	"pnpmVersion": "9.0.2",
 	// "npmVersion": "6.14.15",
 	// "yarnVersion": "1.9.4",
 
@@ -305,6 +305,18 @@
 		{
 			"packageName": "@arcade/regions",
 			"projectFolder": "typescript/packages/apps/regions",
+			"reviewCategory": "production",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/dynamodb-utils",
+			"projectFolder": "typescript/packages/libraries/dynamodb-utils",
+			"reviewCategory": "production",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/integration-tests",
+			"projectFolder": "typescript/packages/integration-tests",
 			"reviewCategory": "production",
 			"shouldPublish": true
 		}

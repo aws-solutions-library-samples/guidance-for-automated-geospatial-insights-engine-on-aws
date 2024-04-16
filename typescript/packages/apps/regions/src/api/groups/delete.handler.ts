@@ -12,9 +12,9 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { commonHeaders, forbiddenResponse, groupId, noBodyResponse, notFoundResponse } from '../../common/schemas.js';
 import { atLeastAdmin } from '../../common/scopes.js';
+import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 
 export default function deleteGroupRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -46,7 +46,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('groupService');
+			const { groupId } = request.params;
+			await svc.delete(request.authz, groupId);
+			return reply.status(204).send();
 		},
 	});
 

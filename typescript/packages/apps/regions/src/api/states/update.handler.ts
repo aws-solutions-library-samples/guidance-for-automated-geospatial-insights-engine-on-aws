@@ -12,11 +12,11 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, stateId, notFoundResponse } from '../../common/schemas.js';
+import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, notFoundResponse, stateId } from '../../common/schemas.js';
+import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { statePatchRequestExample1, statePatchRequestExample2, stateResourceExample2 } from './example.js';
 import { editStateRequestBody, stateResource } from './schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 
 export default function updateStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -91,8 +91,11 @@ Permissions:
 			version: apiVersion100,
 		},
 
-		handler: async (_request, _reply) => {
-			// TODO
+		handler: async (request, reply) => {
+			const svc = fastify.diContainer.resolve('stateService');
+			const { stateId } = request.params;
+			const saved = await svc.update(request.authz, stateId, request.body);
+			return reply.status(200).send(saved);
 		},
 	});
 

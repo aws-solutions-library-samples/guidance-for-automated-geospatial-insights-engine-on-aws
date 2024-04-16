@@ -1,21 +1,21 @@
-import { CreateState, EditState, State, StateList } from "./schemas.js";
+import { CreateState, EditState, State, StateList } from './schemas.js';
 
 export const statePostRequestExample: CreateState = {
 	timestamp: '2024-04-15T00:00:00.000Z',
 	attributes: {
-		estimatedYield: 1026
+		estimatedYield: 1026,
 	},
 	tags: {
 		plantedAt: '2024-04-15T00:00:00.000Z',
 		crop: 'corn',
-	}
+	},
 };
 
 export const statePatchRequestExample1: EditState = statePostRequestExample;
 export const statePatchRequestExample2: EditState = {
 	tags: {
 		harvestedAt: '2024-10-02T00:00:00.000Z',
-	}
+	},
 };
 
 /**
@@ -24,15 +24,17 @@ export const statePatchRequestExample2: EditState = {
 export const stateResourceExample1: State = {
 	id: '76ghytgt5',
 	...statePostRequestExample,
+	zoneId: 'jutdjshjdksk',
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
 };
 
 export const stateResourceExample2: State = {
 	id: '0980yht42',
+	zoneId: 'jutdjshjdksk',
 	timestamp: '2023-04-11T00:00:00.000Z',
 	attributes: {
-		estimatedYield: 925
+		estimatedYield: 925,
 	},
 	tags: {
 		plantedAt: '2023-04-11T00:00:00.000Z',
@@ -47,9 +49,10 @@ export const stateResourceExample2: State = {
 
 export const stateResourceExample3: State = {
 	id: 'rrwth876d',
+	zoneId: 'jutdjshjdksk',
 	timestamp: '2022-04-11T00:00:00.000Z',
 	attributes: {
-		estimatedYield: 879
+		estimatedYield: 879,
 	},
 	tags: {
 		plantedAt: '2022-04-11T00:00:00.000Z',
@@ -61,8 +64,9 @@ export const stateResourceExample3: State = {
 };
 
 export const stateListResource: StateList = {
-	states: [stateResourceExample1,stateResourceExample2,stateResourceExample3],
+	states: [stateResourceExample1, stateResourceExample2, stateResourceExample3],
 	pagination: {
-		lastEvaluatedToken: stateResourceExample1.id,
+		token: stateResourceExample1.id,
+		count: 3,
 	},
 };

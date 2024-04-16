@@ -30,11 +30,11 @@ export interface CognitoConstructProperties {
 	};
 }
 
-export const userPoolIdParameter = (environment: string) => `/arcade/${environment}/cognito/userPoolId`;
-export const userPoolArnParameter = (environment: string) => `/arcade/${environment}/cognito/userPoolArn`;
-export const userPoolClientIdParameter = (environment: string) => `/arcade/${environment}/cognito/userPoolClientId`;
-export const userPoolDomainParameter = (environment: string) => `/arcade/${environment}/cognito/userPoolDomain`;
-export const adminUserParameter = (environment: string) => `/arcade/${environment}/cognito/adminUser`;
+export const userPoolIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolId`;
+export const userPoolArnParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolArn`;
+export const userPoolClientIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolClientId`;
+export const userPoolDomainParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolDomain`;
+export const adminUserParameter = (environment: string) => `/arcade/${environment}/shared/cognitoAdminUser`;
 
 export class Cognito extends Construct {
 	public readonly userPoolId: string;

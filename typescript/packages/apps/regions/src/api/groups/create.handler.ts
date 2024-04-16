@@ -13,10 +13,10 @@
 
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse } from '../../common/schemas.js';
+import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { groupPostRequestExample, groupResourceExample1 } from './example.js';
 import { createGroupRequestBody, groupResource } from './schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 export default function createGroupRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'POST',
@@ -82,7 +82,9 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('groupService');
+			const saved = await svc.create(request.authz, request.body);
+			return reply.header('x-id', saved.id).status(201).send(saved);
 		},
 	});
 

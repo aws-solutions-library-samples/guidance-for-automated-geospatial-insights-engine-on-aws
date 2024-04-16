@@ -12,7 +12,7 @@ import { attributes, createdAt, createdBy, groupId, paginationToken, tags, updat
 /**
  * Group specific resource parameters
  */
-export const name = Type.String({ description: 'The name of the Group.' });
+const name = Type.String({ description: 'The name of the Group.' });
 
 /**
  * Group specific resources
@@ -21,7 +21,7 @@ export const name = Type.String({ description: 'The name of the Group.' });
 export const createGroupRequestBody = Type.Object(
 	{
 		name,
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
 	{ $id: 'createGroupRequestBody' }
@@ -31,7 +31,7 @@ export type CreateGroup = Static<typeof createGroupRequestBody>;
 export const editGroupRequestBody = Type.Object(
 	{
 		name: Type.Optional(name),
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
 	{ $id: 'editGroupRequestBody' }
@@ -42,7 +42,7 @@ export const groupResource = Type.Object(
 	{
 		id: groupId,
 		name,
-		attributes: Type.Optional(attributes),
+		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 		createdBy: createdBy,
 		createdAt: createdAt,
@@ -58,7 +58,8 @@ export const groupList = Type.Object(
 		groups: Type.Array(Type.Ref(groupResource)),
 		pagination: Type.Optional(
 			Type.Object({
-				lastEvaluatedToken: Type.Optional(paginationToken),
+				token: Type.Optional(paginationToken),
+				count: Type.Optional(Type.Number()),
 			})
 		),
 	},

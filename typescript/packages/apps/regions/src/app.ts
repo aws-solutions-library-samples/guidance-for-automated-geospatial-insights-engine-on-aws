@@ -28,17 +28,17 @@ import getRegionRoute from './api/regions/get.handler.js';
 import listRegionsRoute from './api/regions/list.handler.js';
 import { createRegionRequestBody, editRegionRequestBody, regionList, regionResource } from './api/regions/schemas.js';
 import updateRegionRoute from './api/regions/update.handler.js';
-import createStateRoute from './api/state/create.handler.js';
-import deleteStateRoute from './api/state/delete.handler.js';
-import getStateRoute from './api/state/get.handler.js';
-import listStatesRoute from './api/state/list.handler.js';
-import { createStateRequestBody, editStateRequestBody, stateList, stateResource } from './api/state/schemas.js';
-import updateStateRoute from './api/state/update.handler.js';
+import createStateRoute from './api/states/create.handler.js';
+import deleteStateRoute from './api/states/delete.handler.js';
+import getStateRoute from './api/states/get.handler.js';
+import listStatesRoute from './api/states/list.handler.js';
+import { createStateRequestBody, editStateRequestBody, stateList, stateResource } from './api/states/schemas.js';
+import updateStateRoute from './api/states/update.handler.js';
 import createZoneRoute from './api/zones/create.handler.js';
 import deleteZoneRoute from './api/zones/delete.handler.js';
 import getZoneRoute from './api/zones/get.handler.js';
 import listZonesRoute from './api/zones/list.handler.js';
-import { createZoneRequestBody, editZoneRequestBody, zoneList, zoneResource } from './api/zones/schemas.js';
+import { createZoneRequestBody, editZoneRequestBody, polygon, zoneList, zoneResource } from './api/zones/schemas.js';
 import updateZoneRoute from './api/zones/update.handler.js';
 import { handleError } from './common/errors.js';
 import { attributes, tags } from './common/schemas.js';
@@ -48,7 +48,7 @@ import moduleAwilix from './plugins/module.awilix.js';
 import swagger from './plugins/swagger.js';
 
 export const buildApp = async (): Promise<FastifyInstance> => {
-	const environment = process.env['NODE_ENV'] as string;
+	const node_env = process.env['NODE_ENV'] as string;
 	const logLevel = process.env['LOG_LEVEL'] as string;
 	const envToLogger = {
 		local: {
@@ -61,13 +61,13 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 				},
 			},
 		},
-		prod: {
+		cloud: {
 			level: logLevel ?? 'warn',
 		},
 	};
 
 	const app = fastify({
-		logger: envToLogger[environment] ?? {
+		logger: envToLogger[node_env] ?? {
 			level: logLevel ?? 'info',
 		},
 		ajv: {
@@ -97,6 +97,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
 	app.addSchema(attributes);
 	app.addSchema(tags);
+	app.addSchema(polygon);
 
 	app.addSchema(createGroupRequestBody);
 	app.addSchema(editGroupRequestBody);

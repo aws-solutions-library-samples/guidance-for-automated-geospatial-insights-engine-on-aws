@@ -23,11 +23,11 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 			info: {
 				title: 'ARCADE Regions',
 				description: `Manages hierarchical structures of groups, regions, and zones.`,
-				version: '0.0.1',
+				version: '1.0.0',
 			},
 			servers: [
 				{
-					url: 'http://localhost',
+					url: 'http://localhost:30001',
 				},
 			],
 			tags: [
@@ -42,6 +42,10 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 				{
 					name: 'Zones',
 					description: 'Zones represent a specific geographic location.',
+				},
+				{
+					name: 'States',
+					description: 'States represent the state of a specific zone at a specific point in time.',
 				},
 			],
 			security: [],

@@ -1,9 +1,7 @@
-import { Bus, userPoolIdParameter } from '@arcade/cdk-common';
+import { Bus, S3 } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
-import * as ssm from 'aws-cdk-lib/aws-ssm';
 import type { Construct } from 'constructs';
 import { Cognito } from './cognito.construct.js';
-import { S3, bucketArnParameter, bucketNameParameter } from './s3.construct.js';
 
 export type SharedStackProperties = StackProps & {
 	environment: string;
@@ -22,20 +20,15 @@ export class SharedInfrastructureStack extends Stack {
 	constructor(scope: Construct, id: string, props: SharedStackProperties) {
 		super(scope, id, props);
 
-		const s3 = new S3(this, 'S3', {
-			deleteBucket: false,
-		});
+		const accountId = Stack.of(this).account;
+		const region = Stack.of(this).region;
 
-		new ssm.StringParameter(this, 'bucketNameParameter', {
-			parameterName: bucketNameParameter,
-			description: 'Shared Bucket Name for ARCADE',
-			stringValue: s3.bucketName,
-		});
-
-		new ssm.StringParameter(this, 'bucketArnParameter', {
-			parameterName: bucketArnParameter,
-			description: 'Shared Bucket Arn for ARCADE',
-			stringValue: s3.bucketArn,
+		const bucketName = `arcade-${accountId}-${region}-shared`;
+		new S3(this, 'S3', {
+			environment: props.environment,
+			bucketName,
+			cdkResourceNamePrefix: 'Shared',
+			deleteBucket: props.deleteBucket,
 		});
 
 		new Cognito(this, 'Cognito', {
@@ -44,7 +37,11 @@ export class SharedInfrastructureStack extends Stack {
 			userPoolEmail: props.userPoolEmail,
 		});
 
-		new Bus(this, 'EventBus');
+		const eventBusName = `arcade-${accountId}-${region}`;
+		new Bus(this, 'EventBus', {
+			environment: props.environment,
+			eventBusName,
+		});
 
 	}
 }

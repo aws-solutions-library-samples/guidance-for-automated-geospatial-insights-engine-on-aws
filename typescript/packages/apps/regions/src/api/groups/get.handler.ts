@@ -13,10 +13,10 @@
 
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, groupId, notFoundResponse } from '../../common/schemas.js';
+import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { groupResourceExample1 } from './example.js';
 import { groupResource } from './schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 
 export default function getGroupRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -34,7 +34,7 @@ Permissions:
 			operationId: 'getGroup',
 			headers: commonHeaders,
 			params: Type.Object({
-				groupId: groupId,
+				groupId,
 			}),
 			response: {
 				200: {
@@ -56,7 +56,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('groupService');
+			const { groupId } = request.params;
+			const group = await svc.get(request.authz, groupId);
+			return reply.status(200).send(group);
 		},
 	});
 

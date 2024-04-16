@@ -95,11 +95,11 @@ assets/**
 # misc
 **/npm-debug.log
 **/testem.log
-**/.vscode/settings.json
+# **/.vscode/settings.json
 
 # System Files
 **/.DS_Store
-**/.vscode
+# **/.vscode
 
 **/build
 **/nyc_output
@@ -155,7 +155,7 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+# .vscode/
 
 ### Mac OS ###
 .DS_Store

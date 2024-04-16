@@ -1,24 +1,15 @@
 {
 	"name": "@arcade",
-	"version": "0.1.0",
+	"version": "0.0.1",
 	"description": "",
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"scripts": {},
 	"engines": {
 		"node": ">=20.11.1 < 21",
-		"pnpm": "=8.15.6"
+		"pnpm": "=9.0.2"
 	},
 	"private": true,
-	"devDependencies": {
-		"@commitlint/cli": "^17.7.1",
-		"@commitlint/config-conventional": "^17.7.0",
-		"@rushstack/eslint-config": "^3.3.2",
-		"commitlint": "17.7.1",
-		"esbuild": "0.18.14",
-		"eslint": "8.45.0",
-		"husky": "8.0.3",
-		"vite": "^4.4.4"
-	},
+	"devDependencies": {},
 	"husky": {
 		"hooks": {
 			"pre-commit": "rush lint",

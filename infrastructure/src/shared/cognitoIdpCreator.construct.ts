@@ -16,14 +16,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export interface CognitoIdpCreatorConstructProperties {
+	environment: string;
 	userPoolIdParameter: string;
 	samlMetaDataUrl: string;
 	callbackUrls: string;
 }
 
-export const idpNameParameter = `/arcade/shared/ssoApplicationArnParameter`;
-export const ssoApplicationMetadataUrlParameter = `/arcade/shared/MetadataUrlParameter`;
-export const CognitoClientIdParameter = `/arcade/shared/cognito/clientId`;
+export const idpNameParameter = (environment: string) => `/arcade/${environment}/shared/ssoApplicationArnParameter`;
+export const ssoApplicationMetadataUrlParameter = (environment: string) => `/arcade/${environment}/shared/MetadataUrlParameter`;
+export const cognitoClientIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoClientId`;
 
 export class CognitoIdpCreator extends Construct {
 	private accountId = cdk.Stack.of(this).account;
@@ -35,7 +36,7 @@ export class CognitoIdpCreator extends Construct {
 		const namePrefix = `arcade`;
 
 		new ssm.StringParameter(this, 'ssoApplicationMetadataUrlParameter', {
-			parameterName: ssoApplicationMetadataUrlParameter,
+			parameterName: ssoApplicationMetadataUrlParameter(props.environment),
 			stringValue: props.samlMetaDataUrl,
 		});
 		const userPoolId = ssm.StringParameter.valueForStringParameter(this, props.userPoolIdParameter);
@@ -61,9 +62,9 @@ export class CognitoIdpCreator extends Construct {
 			},
 			environment: {
 				USER_POOL_ID_PARAMETER: props.userPoolIdParameter,
-				IDENTITY_PROVIDER_NAME_PARAMETER: idpNameParameter,
-				METADATA_URL_PARAMETER: ssoApplicationMetadataUrlParameter,
-				COGNITO_CLIENT_ID_PARAMETER: CognitoClientIdParameter,
+				IDENTITY_PROVIDER_NAME_PARAMETER: idpNameParameter(props.environment),
+				METADATA_URL_PARAMETER: ssoApplicationMetadataUrlParameter(props.environment),
+				COGNITO_CLIENT_ID_PARAMETER: cognitoClientIdParameter(props.environment),
 				CALLBACK_URLS: props.callbackUrls,
 			},
 			depsLockFilePath: path.join(__dirname, '../../../../common/config/rush/pnpm-lock.yaml'),

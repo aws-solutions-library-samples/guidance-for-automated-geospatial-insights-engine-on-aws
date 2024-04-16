@@ -86,7 +86,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			// TODO
+			const svc = fastify.diContainer.resolve('stateService');
+			const { zoneId } = request.params;
+			const saved = await svc.create(request.authz, zoneId, request.body);
+			return reply.header('x-id', saved.id).status(201).send(saved);
 		},
 	});
 

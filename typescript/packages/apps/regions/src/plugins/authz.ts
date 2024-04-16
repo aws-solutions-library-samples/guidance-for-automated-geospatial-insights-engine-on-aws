@@ -64,8 +64,7 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			try {
 				lambdaEvent = JSON.parse(decodeURIComponent(req.headers['x-apigateway-event'] as string));
 			} catch (e) {
-				app.log.warn('authz> onRequest> missing or malformed authorization token.');
-				return;
+				throw new UnauthorizedError('Missing or malformed authorization token.');
 			}
 			// extract the users claims from the ID token (provided by the COGNITO_USER_POOLS integration)
 			email = lambdaEvent?.requestContext?.authorizer?.claims?.['email'] as string;
@@ -73,14 +72,12 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			userId = identities.userId;
 			// TODO: check this once auth figured out:
 			role = lambdaEvent?.requestContext?.authorizer?.claims?.['cognito:groups'] as SecurityScope;
-
 		} else {
 			// if in local mode, to simplify local development we extract from user provided headers
 			app.log.warn(`authz> onRequest> running in local development mode which means Cognito authorization is not enabled!!!`);
 
 			if (!req.headers.authorization) {
-				app.log.warn('authz> onRequest> missing or malformed authorization token.');
-				throw new UnauthorizedError('Missing authorization token');
+				throw new UnauthorizedError('Missing or malformed authorization token.');
 			}
 
 			let jws = req.headers.authorization?.replace('Bearer ', '');
@@ -92,6 +89,9 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			 */
 			email = decodedToken.email; // nosemgrep
 			userId = decodedToken.identities[0].userId; // nosemgrep
+
+			// TODO: figure out how the role is passed
+			role = decodedToken['cognito:groups']?.[0] as SecurityScope;
 		}
 
 		// place the group roles and email on the request in case a handler needs to perform finer grained access control

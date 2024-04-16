@@ -3,7 +3,7 @@
   "info": {
     "title": "ARCADE Regions",
     "description": "Manages hierarchical structures of groups, regions, and zones.",
-    "version": "0.0.1"
+    "version": "1.0.0"
   },
   "components": {
     "schemas": {
@@ -29,6 +29,19 @@
         }
       },
       "def-2": {
+        "description": "Coordinates defining a polygon.",
+        "type": "array",
+        "items": {
+          "description": "Longitude",
+          "type": "array",
+          "items": {
+            "description": "Latitude",
+            "type": "number"
+          }
+        },
+        "title": "polygon"
+      },
+      "def-3": {
         "type": "object",
         "properties": {
           "name": {
@@ -36,9 +49,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -49,7 +60,7 @@
         ],
         "title": "createGroupRequestBody"
       },
-      "def-3": {
+      "def-4": {
         "type": "object",
         "properties": {
           "name": {
@@ -57,9 +68,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -67,7 +76,7 @@
         },
         "title": "editGroupRequestBody"
       },
-      "def-4": {
+      "def-5": {
         "type": "object",
         "properties": {
           "id": {
@@ -79,9 +88,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -113,21 +120,24 @@
         ],
         "title": "groupResource"
       },
-      "def-5": {
+      "def-6": {
         "type": "object",
         "properties": {
           "groups": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/def-4"
+              "$ref": "#/components/schemas/def-5"
             }
           },
           "pagination": {
             "type": "object",
             "properties": {
-              "lastEvaluatedToken": {
+              "token": {
                 "description": "Token used to paginate to the next page of search result.",
                 "type": "string"
+              },
+              "count": {
+                "type": "number"
               }
             }
           }
@@ -137,7 +147,7 @@
         ],
         "title": "groupList"
       },
-      "def-6": {
+      "def-7": {
         "type": "object",
         "properties": {
           "name": {
@@ -145,9 +155,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -158,7 +166,7 @@
         ],
         "title": "createRegionRequestBody"
       },
-      "def-7": {
+      "def-8": {
         "type": "object",
         "properties": {
           "name": {
@@ -166,9 +174,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -176,11 +182,15 @@
         },
         "title": "editRegionRequestBody"
       },
-      "def-8": {
+      "def-9": {
         "type": "object",
         "properties": {
           "id": {
             "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "groupId": {
+            "description": "Unique Group ID.",
             "type": "string"
           },
           "name": {
@@ -188,9 +198,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -216,29 +224,36 @@
         },
         "required": [
           "id",
+          "groupId",
           "name",
           "createdBy",
           "createdAt"
         ],
         "title": "regionResource"
       },
-      "def-9": {
+      "def-10": {
         "type": "object",
         "properties": {
           "regions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/def-8"
+              "$ref": "#/components/schemas/def-9"
             }
           },
           "pagination": {
             "type": "object",
             "properties": {
-              "lastEvaluatedToken": {
+              "token": {
                 "description": "Token used to paginate to the next page of search result.",
                 "type": "string"
+              },
+              "count": {
+                "type": "number"
               }
-            }
+            },
+            "required": [
+              "count"
+            ]
           }
         },
         "required": [
@@ -246,7 +261,7 @@
         ],
         "title": "regionList"
       },
-      "def-10": {
+      "def-11": {
         "type": "object",
         "properties": {
           "name": {
@@ -254,31 +269,18 @@
             "type": "string"
           },
           "boundary": {
-            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "description": "The boundary of the Zone.",
+            "$ref": "#/components/schemas/def-2"
+          },
+          "exclusions": {
+            "description": "Boundaries to be excluded from the Zone.",
             "type": "array",
             "items": {
-              "description": "Coordinates",
-              "type": "object",
-              "properties": {
-                "lat": {
-                  "description": "Latitude",
-                  "type": "number"
-                },
-                "lon": {
-                  "description": "Longitude",
-                  "type": "number"
-                }
-              },
-              "required": [
-                "lat",
-                "lon"
-              ]
+              "$ref": "#/components/schemas/def-2"
             }
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -290,7 +292,7 @@
         ],
         "title": "createZoneRequestBody"
       },
-      "def-11": {
+      "def-12": {
         "type": "object",
         "properties": {
           "name": {
@@ -298,31 +300,18 @@
             "type": "string"
           },
           "boundary": {
-            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "description": "The boundary of the Zone.",
+            "$ref": "#/components/schemas/def-2"
+          },
+          "exclusions": {
+            "description": "Boundaries to be excluded from the Zone.",
             "type": "array",
             "items": {
-              "description": "Coordinates",
-              "type": "object",
-              "properties": {
-                "lat": {
-                  "description": "Latitude",
-                  "type": "number"
-                },
-                "lon": {
-                  "description": "Longitude",
-                  "type": "number"
-                }
-              },
-              "required": [
-                "lat",
-                "lon"
-              ]
+              "$ref": "#/components/schemas/def-2"
             }
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -330,7 +319,7 @@
         },
         "title": "editZoneRequestBody"
       },
-      "def-12": {
+      "def-13": {
         "type": "object",
         "properties": {
           "id": {
@@ -341,39 +330,33 @@
             "description": "The name of the Zone.",
             "type": "string"
           },
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
           "boundary": {
-            "description": "Coordinates of the boundary (polygon) of the Zone.",
+            "description": "The boundary of the Zone.",
+            "$ref": "#/components/schemas/def-2"
+          },
+          "exclusions": {
+            "description": "Boundaries to be excluded from the Zone.",
             "type": "array",
             "items": {
-              "description": "Coordinates",
-              "type": "object",
-              "properties": {
-                "lat": {
-                  "description": "Latitude",
-                  "type": "number"
-                },
-                "lon": {
-                  "description": "Longitude",
-                  "type": "number"
-                }
-              },
-              "required": [
-                "lat",
-                "lon"
-              ]
+              "$ref": "#/components/schemas/def-2"
             }
           },
-          "acres": {
-            "description": "The areas of the Zone.",
+          "area": {
+            "description": "The area of the Zone.",
             "type": "number"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
+          },
+          "state": {
+            "$ref": "#/components/schemas/def-17"
           },
           "createdBy": {
             "description": "ID of owner.",
@@ -397,30 +380,37 @@
         "required": [
           "id",
           "name",
+          "regionId",
           "boundary",
-          "acres",
+          "area",
           "createdBy",
           "createdAt"
         ],
         "title": "zoneResource"
       },
-      "def-13": {
+      "def-14": {
         "type": "object",
         "properties": {
           "zones": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/def-12"
+              "$ref": "#/components/schemas/def-13"
             }
           },
           "pagination": {
             "type": "object",
             "properties": {
-              "lastEvaluatedToken": {
+              "token": {
                 "description": "Token used to paginate to the next page of search result.",
                 "type": "string"
+              },
+              "count": {
+                "type": "number"
               }
-            }
+            },
+            "required": [
+              "count"
+            ]
           }
         },
         "required": [
@@ -428,7 +418,7 @@
         ],
         "title": "zoneList"
       },
-      "def-14": {
+      "def-15": {
         "type": "object",
         "properties": {
           "timestamp": {
@@ -437,9 +427,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -450,13 +438,11 @@
         ],
         "title": "createStateRequestBody"
       },
-      "def-15": {
+      "def-16": {
         "type": "object",
         "properties": {
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -464,11 +450,15 @@
         },
         "title": "editStateRequestBody"
       },
-      "def-16": {
+      "def-17": {
         "type": "object",
         "properties": {
           "id": {
             "description": "Unique State ID.",
+            "type": "string"
+          },
+          "zoneId": {
+            "description": "Unique Zone ID.",
             "type": "string"
           },
           "timestamp": {
@@ -477,9 +467,7 @@
             "type": "string"
           },
           "attributes": {
-            "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-            "type": "object",
-            "additionalProperties": {}
+            "$ref": "#/components/schemas/def-0"
           },
           "tags": {
             "$ref": "#/components/schemas/def-1"
@@ -505,29 +493,36 @@
         },
         "required": [
           "id",
+          "zoneId",
           "timestamp",
           "createdBy",
           "createdAt"
         ],
         "title": "stateResource"
       },
-      "def-17": {
+      "def-18": {
         "type": "object",
         "properties": {
           "states": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/def-16"
+              "$ref": "#/components/schemas/def-17"
             }
           },
           "pagination": {
             "type": "object",
             "properties": {
-              "lastEvaluatedToken": {
+              "token": {
                 "description": "Token used to paginate to the next page of search result.",
                 "type": "string"
+              },
+              "count": {
+                "type": "number"
               }
-            }
+            },
+            "required": [
+              "count"
+            ]
           }
         },
         "required": [
@@ -550,7 +545,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-2"
+                "$ref": "#/components/schemas/def-3"
               },
               "examples": {
                 "New group": {
@@ -566,6 +561,7 @@
         "parameters": [
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -575,6 +571,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -605,9 +602,7 @@
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -749,9 +744,18 @@
               "type": "string"
             },
             "in": "query",
-            "name": "fromToken",
+            "name": "paginationToken",
             "required": false,
             "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "description": "Name to filter by."
           },
           {
             "schema": {
@@ -768,6 +772,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -777,6 +782,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -802,15 +808,18 @@
                     "groups": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/def-4"
+                        "$ref": "#/components/schemas/def-5"
                       }
                     },
                     "pagination": {
                       "type": "object",
                       "properties": {
-                        "lastEvaluatedToken": {
+                        "token": {
                           "description": "Token used to paginate to the next page of search result.",
                           "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
                         }
                       }
                     }
@@ -846,7 +855,8 @@
                         }
                       ],
                       "pagination": {
-                        "lastEvaluatedToken": "03d66e78d"
+                        "token": "03d66e78d",
+                        "count": 3
                       }
                     }
                   }
@@ -877,6 +887,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -886,6 +897,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -917,9 +929,7 @@
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -1004,6 +1014,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1013,6 +1024,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1088,7 +1100,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-3"
+                "$ref": "#/components/schemas/def-4"
               },
               "examples": {
                 "Update group": {
@@ -1121,6 +1133,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1130,6 +1143,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1160,9 +1174,7 @@
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -1335,7 +1347,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-6"
+                "$ref": "#/components/schemas/def-7"
               },
               "examples": {
                 "New region": {
@@ -1360,6 +1372,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1369,6 +1382,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1394,14 +1408,16 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "name": {
                       "description": "The name of the Region.",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -1427,6 +1443,7 @@
                   },
                   "required": [
                     "id",
+                    "groupId",
                     "name",
                     "createdBy",
                     "createdAt"
@@ -1437,6 +1454,7 @@
                     "summary": "New region created successfully.",
                     "value": {
                       "id": "76ghytgt5",
+                      "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
@@ -1545,9 +1563,18 @@
               "type": "string"
             },
             "in": "query",
-            "name": "fromToken",
+            "name": "paginationToken",
             "required": false,
             "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "description": "Name to filter by."
           },
           {
             "schema": {
@@ -1573,6 +1600,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1582,6 +1610,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1607,17 +1636,23 @@
                     "regions": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/def-8"
+                        "$ref": "#/components/schemas/def-9"
                       }
                     },
                     "pagination": {
                       "type": "object",
                       "properties": {
-                        "lastEvaluatedToken": {
+                        "token": {
                           "description": "Token used to paginate to the next page of search result.",
                           "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
                         }
-                      }
+                      },
+                      "required": [
+                        "count"
+                      ]
                     }
                   },
                   "required": [
@@ -1631,12 +1666,14 @@
                       "regions": [
                         {
                           "id": "76ghytgt5",
+                          "groupId": "sjduwydjd",
                           "name": "Abshire Harvest",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         },
                         {
                           "id": "0980yht42",
+                          "groupId": "sjduwydjd",
                           "name": "Barrows Meadows",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
@@ -1645,13 +1682,15 @@
                         },
                         {
                           "id": "rrwth876d",
+                          "groupId": "sjduwydjd",
                           "name": "Bashirian Paddock",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         }
                       ],
                       "pagination": {
-                        "lastEvaluatedToken": "76ghytgt5"
+                        "token": "76ghytgt5",
+                        "count": 3
                       }
                     }
                   }
@@ -1682,6 +1721,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1691,6 +1731,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1717,14 +1758,16 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "name": {
                       "description": "The name of the Region.",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -1750,6 +1793,7 @@
                   },
                   "required": [
                     "id",
+                    "groupId",
                     "name",
                     "createdBy",
                     "createdAt"
@@ -1760,6 +1804,7 @@
                     "summary": "Region retrieved successfully.",
                     "value": {
                       "id": "76ghytgt5",
+                      "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
@@ -1809,6 +1854,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1818,6 +1864,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1893,7 +1940,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-7"
+                "$ref": "#/components/schemas/def-8"
               },
               "examples": {
                 "Update region": {
@@ -1926,6 +1973,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -1935,6 +1983,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -1960,14 +2009,16 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "name": {
                       "description": "The name of the Region.",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -1993,6 +2044,7 @@
                   },
                   "required": [
                     "id",
+                    "groupId",
                     "name",
                     "createdBy",
                     "createdAt"
@@ -2003,6 +2055,7 @@
                     "summary": "Existing region created successfully.",
                     "value": {
                       "id": "0980yht42",
+                      "groupId": "sjduwydjd",
                       "name": "Barrows Meadows",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
@@ -2140,7 +2193,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-10"
+                "$ref": "#/components/schemas/def-11"
               },
               "examples": {
                 "New zone": {
@@ -2148,22 +2201,26 @@
                   "value": {
                     "name": "Field 1",
                     "boundary": [
-                      {
-                        "lat": 39.9194752,
-                        "lon": -104.5079674
-                      },
-                      {
-                        "lat": 39.9193435,
-                        "lon": -104.4894065
-                      },
-                      {
-                        "lat": 39.9122295,
-                        "lon": -104.4893912
-                      },
-                      {
-                        "lat": 39.9123941,
-                        "lon": -104.5078877
-                      }
+                      [
+                        -104.5079674,
+                        39.9194752
+                      ],
+                      [
+                        -104.4894065,
+                        39.9193435
+                      ],
+                      [
+                        -104.4893912,
+                        39.9122295
+                      ],
+                      [
+                        -104.5078877,
+                        39.9123941
+                      ],
+                      [
+                        -104.5079674,
+                        39.9194752
+                      ]
                     ]
                   }
                 }
@@ -2183,6 +2240,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -2192,6 +2250,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -2221,39 +2280,33 @@
                       "description": "The name of the Zone.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
                     "boundary": {
-                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "description": "The boundary of the Zone.",
+                      "$ref": "#/components/schemas/def-2"
+                    },
+                    "exclusions": {
+                      "description": "Boundaries to be excluded from the Zone.",
                       "type": "array",
                       "items": {
-                        "description": "Coordinates",
-                        "type": "object",
-                        "properties": {
-                          "lat": {
-                            "description": "Latitude",
-                            "type": "number"
-                          },
-                          "lon": {
-                            "description": "Longitude",
-                            "type": "number"
-                          }
-                        },
-                        "required": [
-                          "lat",
-                          "lon"
-                        ]
+                        "$ref": "#/components/schemas/def-2"
                       }
                     },
-                    "acres": {
-                      "description": "The areas of the Zone.",
+                    "area": {
+                      "description": "The area of the Zone.",
                       "type": "number"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
+                    },
+                    "state": {
+                      "$ref": "#/components/schemas/def-17"
                     },
                     "createdBy": {
                       "description": "ID of owner.",
@@ -2277,8 +2330,9 @@
                   "required": [
                     "id",
                     "name",
+                    "regionId",
                     "boundary",
-                    "acres",
+                    "area",
                     "createdBy",
                     "createdAt"
                   ]
@@ -2290,24 +2344,29 @@
                       "id": "76ghytgt5",
                       "name": "Field 1",
                       "boundary": [
-                        {
-                          "lat": 39.9194752,
-                          "lon": -104.5079674
-                        },
-                        {
-                          "lat": 39.9193435,
-                          "lon": -104.4894065
-                        },
-                        {
-                          "lat": 39.9122295,
-                          "lon": -104.4893912
-                        },
-                        {
-                          "lat": 39.9123941,
-                          "lon": -104.5078877
-                        }
+                        [
+                          -104.5079674,
+                          39.9194752
+                        ],
+                        [
+                          -104.4894065,
+                          39.9193435
+                        ],
+                        [
+                          -104.4893912,
+                          39.9122295
+                        ],
+                        [
+                          -104.5078877,
+                          39.9123941
+                        ],
+                        [
+                          -104.5079674,
+                          39.9194752
+                        ]
                       ],
-                      "acres": 175,
+                      "regionId": "htgdjajdhja",
+                      "area": 175,
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -2415,9 +2474,18 @@
               "type": "string"
             },
             "in": "query",
-            "name": "fromToken",
+            "name": "paginationToken",
             "required": false,
             "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "description": "Name to filter by."
           },
           {
             "schema": {
@@ -2452,6 +2520,17 @@
           },
           {
             "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "includeLatestState",
+            "required": false,
+            "description": "Include latest state in results."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -2461,6 +2540,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -2486,17 +2566,23 @@
                     "zones": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/def-12"
+                        "$ref": "#/components/schemas/def-13"
                       }
                     },
                     "pagination": {
                       "type": "object",
                       "properties": {
-                        "lastEvaluatedToken": {
+                        "token": {
                           "description": "Token used to paginate to the next page of search result.",
                           "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
                         }
-                      }
+                      },
+                      "required": [
+                        "count"
+                      ]
                     }
                   },
                   "required": [
@@ -2512,73 +2598,83 @@
                           "id": "76ghytgt5",
                           "name": "Field 1",
                           "boundary": [
-                            {
-                              "lat": 39.9194752,
-                              "lon": -104.5079674
-                            },
-                            {
-                              "lat": 39.9193435,
-                              "lon": -104.4894065
-                            },
-                            {
-                              "lat": 39.9122295,
-                              "lon": -104.4893912
-                            },
-                            {
-                              "lat": 39.9123941,
-                              "lon": -104.5078877
-                            }
+                            [
+                              -104.5079674,
+                              39.9194752
+                            ],
+                            [
+                              -104.4894065,
+                              39.9193435
+                            ],
+                            [
+                              -104.4893912,
+                              39.9122295
+                            ],
+                            [
+                              -104.5078877,
+                              39.9123941
+                            ],
+                            [
+                              -104.5079674,
+                              39.9194752
+                            ]
                           ],
-                          "acres": 175,
+                          "regionId": "htgdjajdhja",
+                          "area": 175,
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         },
                         {
                           "id": "0980yht42",
                           "name": "Field 2",
+                          "regionId": "htgdjajdhja",
                           "boundary": [
-                            {
-                              "lat": 39.9390518,
-                              "lon": -104.4895628
-                            },
-                            {
-                              "lat": 39.938295,
-                              "lon": -104.492009
-                            },
-                            {
-                              "lat": 39.9376369,
-                              "lon": -104.4926527
-                            },
-                            {
-                              "lat": 39.9378015,
-                              "lon": -104.494026
-                            },
-                            {
-                              "lat": 39.9367485,
-                              "lon": -104.4971159
-                            },
-                            {
-                              "lat": 39.9345767,
-                              "lon": -104.4993046
-                            },
-                            {
-                              "lat": 39.9332933,
-                              "lon": -104.4992188
-                            },
-                            {
-                              "lat": 39.931615,
-                              "lon": -104.4999483
-                            },
-                            {
-                              "lat": 39.926909,
-                              "lon": -104.4996908
-                            },
-                            {
-                              "lat": 39.9268103,
-                              "lon": -104.4895199
-                            }
+                            [
+                              -104.4895628,
+                              39.9390518
+                            ],
+                            [
+                              -104.492009,
+                              39.938295
+                            ],
+                            [
+                              -104.4926527,
+                              39.9376369
+                            ],
+                            [
+                              -104.494026,
+                              39.9378015
+                            ],
+                            [
+                              -104.4971159,
+                              39.9367485
+                            ],
+                            [
+                              -104.4993046,
+                              39.9345767
+                            ],
+                            [
+                              -104.4992188,
+                              39.9332933
+                            ],
+                            [
+                              -104.4999483,
+                              39.931615
+                            ],
+                            [
+                              -104.4996908,
+                              39.926909
+                            ],
+                            [
+                              -104.4895199,
+                              39.9268103
+                            ],
+                            [
+                              -104.4895628,
+                              39.9390518
+                            ]
                           ],
-                          "acres": 655,
+                          "area": 655,
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
                           "updatedAt": "2022-08-12T07:34:23.132Z",
@@ -2586,7 +2682,8 @@
                         }
                       ],
                       "pagination": {
-                        "lastEvaluatedToken": "76ghytgt5"
+                        "token": "76ghytgt5",
+                        "count": 2
                       }
                     }
                   }
@@ -2617,6 +2714,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -2626,6 +2724,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -2656,39 +2755,33 @@
                       "description": "The name of the Zone.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
                     "boundary": {
-                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "description": "The boundary of the Zone.",
+                      "$ref": "#/components/schemas/def-2"
+                    },
+                    "exclusions": {
+                      "description": "Boundaries to be excluded from the Zone.",
                       "type": "array",
                       "items": {
-                        "description": "Coordinates",
-                        "type": "object",
-                        "properties": {
-                          "lat": {
-                            "description": "Latitude",
-                            "type": "number"
-                          },
-                          "lon": {
-                            "description": "Longitude",
-                            "type": "number"
-                          }
-                        },
-                        "required": [
-                          "lat",
-                          "lon"
-                        ]
+                        "$ref": "#/components/schemas/def-2"
                       }
                     },
-                    "acres": {
-                      "description": "The areas of the Zone.",
+                    "area": {
+                      "description": "The area of the Zone.",
                       "type": "number"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
+                    },
+                    "state": {
+                      "$ref": "#/components/schemas/def-17"
                     },
                     "createdBy": {
                       "description": "ID of owner.",
@@ -2712,8 +2805,9 @@
                   "required": [
                     "id",
                     "name",
+                    "regionId",
                     "boundary",
-                    "acres",
+                    "area",
                     "createdBy",
                     "createdAt"
                   ]
@@ -2725,24 +2819,29 @@
                       "id": "76ghytgt5",
                       "name": "Field 1",
                       "boundary": [
-                        {
-                          "lat": 39.9194752,
-                          "lon": -104.5079674
-                        },
-                        {
-                          "lat": 39.9193435,
-                          "lon": -104.4894065
-                        },
-                        {
-                          "lat": 39.9122295,
-                          "lon": -104.4893912
-                        },
-                        {
-                          "lat": 39.9123941,
-                          "lon": -104.5078877
-                        }
+                        [
+                          -104.5079674,
+                          39.9194752
+                        ],
+                        [
+                          -104.4894065,
+                          39.9193435
+                        ],
+                        [
+                          -104.4893912,
+                          39.9122295
+                        ],
+                        [
+                          -104.5078877,
+                          39.9123941
+                        ],
+                        [
+                          -104.5079674,
+                          39.9194752
+                        ]
                       ],
-                      "acres": 175,
+                      "regionId": "htgdjajdhja",
+                      "area": 175,
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -2791,6 +2890,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -2800,6 +2900,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -2875,7 +2976,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-11"
+                "$ref": "#/components/schemas/def-12"
               },
               "examples": {
                 "Update zone": {
@@ -2883,22 +2984,26 @@
                   "value": {
                     "name": "Field 1",
                     "boundary": [
-                      {
-                        "lat": 39.9194752,
-                        "lon": -104.5079674
-                      },
-                      {
-                        "lat": 39.9193435,
-                        "lon": -104.4894065
-                      },
-                      {
-                        "lat": 39.9122295,
-                        "lon": -104.4893912
-                      },
-                      {
-                        "lat": 39.9123941,
-                        "lon": -104.5078877
-                      }
+                      [
+                        -104.5079674,
+                        39.9194752
+                      ],
+                      [
+                        -104.4894065,
+                        39.9193435
+                      ],
+                      [
+                        -104.4893912,
+                        39.9122295
+                      ],
+                      [
+                        -104.5078877,
+                        39.9123941
+                      ],
+                      [
+                        -104.5079674,
+                        39.9194752
+                      ]
                     ]
                   }
                 },
@@ -2926,6 +3031,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -2935,6 +3041,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -2964,39 +3071,33 @@
                       "description": "The name of the Zone.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
                     "boundary": {
-                      "description": "Coordinates of the boundary (polygon) of the Zone.",
+                      "description": "The boundary of the Zone.",
+                      "$ref": "#/components/schemas/def-2"
+                    },
+                    "exclusions": {
+                      "description": "Boundaries to be excluded from the Zone.",
                       "type": "array",
                       "items": {
-                        "description": "Coordinates",
-                        "type": "object",
-                        "properties": {
-                          "lat": {
-                            "description": "Latitude",
-                            "type": "number"
-                          },
-                          "lon": {
-                            "description": "Longitude",
-                            "type": "number"
-                          }
-                        },
-                        "required": [
-                          "lat",
-                          "lon"
-                        ]
+                        "$ref": "#/components/schemas/def-2"
                       }
                     },
-                    "acres": {
-                      "description": "The areas of the Zone.",
+                    "area": {
+                      "description": "The area of the Zone.",
                       "type": "number"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
+                    },
+                    "state": {
+                      "$ref": "#/components/schemas/def-17"
                     },
                     "createdBy": {
                       "description": "ID of owner.",
@@ -3020,8 +3121,9 @@
                   "required": [
                     "id",
                     "name",
+                    "regionId",
                     "boundary",
-                    "acres",
+                    "area",
                     "createdBy",
                     "createdAt"
                   ]
@@ -3032,49 +3134,54 @@
                     "value": {
                       "id": "0980yht42",
                       "name": "Field 2",
+                      "regionId": "htgdjajdhja",
                       "boundary": [
-                        {
-                          "lat": 39.9390518,
-                          "lon": -104.4895628
-                        },
-                        {
-                          "lat": 39.938295,
-                          "lon": -104.492009
-                        },
-                        {
-                          "lat": 39.9376369,
-                          "lon": -104.4926527
-                        },
-                        {
-                          "lat": 39.9378015,
-                          "lon": -104.494026
-                        },
-                        {
-                          "lat": 39.9367485,
-                          "lon": -104.4971159
-                        },
-                        {
-                          "lat": 39.9345767,
-                          "lon": -104.4993046
-                        },
-                        {
-                          "lat": 39.9332933,
-                          "lon": -104.4992188
-                        },
-                        {
-                          "lat": 39.931615,
-                          "lon": -104.4999483
-                        },
-                        {
-                          "lat": 39.926909,
-                          "lon": -104.4996908
-                        },
-                        {
-                          "lat": 39.9268103,
-                          "lon": -104.4895199
-                        }
+                        [
+                          -104.4895628,
+                          39.9390518
+                        ],
+                        [
+                          -104.492009,
+                          39.938295
+                        ],
+                        [
+                          -104.4926527,
+                          39.9376369
+                        ],
+                        [
+                          -104.494026,
+                          39.9378015
+                        ],
+                        [
+                          -104.4971159,
+                          39.9367485
+                        ],
+                        [
+                          -104.4993046,
+                          39.9345767
+                        ],
+                        [
+                          -104.4992188,
+                          39.9332933
+                        ],
+                        [
+                          -104.4999483,
+                          39.931615
+                        ],
+                        [
+                          -104.4996908,
+                          39.926909
+                        ],
+                        [
+                          -104.4895199,
+                          39.9268103
+                        ],
+                        [
+                          -104.4895628,
+                          39.9390518
+                        ]
                       ],
-                      "acres": 655,
+                      "area": 655,
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
                       "updatedAt": "2022-08-12T07:34:23.132Z",
@@ -3211,7 +3318,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-14"
+                "$ref": "#/components/schemas/def-15"
               },
               "examples": {
                 "New state": {
@@ -3243,6 +3350,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -3252,6 +3360,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -3277,15 +3386,17 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
+                    "zoneId": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -3311,6 +3422,7 @@
                   },
                   "required": [
                     "id",
+                    "zoneId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -3329,6 +3441,7 @@
                         "plantedAt": "2024-04-15T00:00:00.000Z",
                         "crop": "corn"
                       },
+                      "zoneId": "jutdjshjdksk",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -3436,7 +3549,7 @@
               "type": "string"
             },
             "in": "query",
-            "name": "fromToken",
+            "name": "paginationToken",
             "required": false,
             "description": "Token used to paginate from (exclusive)."
           },
@@ -3492,6 +3605,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -3501,6 +3615,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -3526,17 +3641,23 @@
                     "states": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/def-16"
+                        "$ref": "#/components/schemas/def-17"
                       }
                     },
                     "pagination": {
                       "type": "object",
                       "properties": {
-                        "lastEvaluatedToken": {
+                        "token": {
                           "description": "Token used to paginate to the next page of search result.",
                           "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
                         }
-                      }
+                      },
+                      "required": [
+                        "count"
+                      ]
                     }
                   },
                   "required": [
@@ -3558,11 +3679,13 @@
                             "plantedAt": "2024-04-15T00:00:00.000Z",
                             "crop": "corn"
                           },
+                          "zoneId": "jutdjshjdksk",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         },
                         {
                           "id": "0980yht42",
+                          "zoneId": "jutdjshjdksk",
                           "timestamp": "2023-04-11T00:00:00.000Z",
                           "attributes": {
                             "estimatedYield": 925
@@ -3579,6 +3702,7 @@
                         },
                         {
                           "id": "rrwth876d",
+                          "zoneId": "jutdjshjdksk",
                           "timestamp": "2022-04-11T00:00:00.000Z",
                           "attributes": {
                             "estimatedYield": 879
@@ -3593,7 +3717,8 @@
                         }
                       ],
                       "pagination": {
-                        "lastEvaluatedToken": "76ghytgt5"
+                        "token": "76ghytgt5",
+                        "count": 3
                       }
                     }
                   }
@@ -3624,6 +3749,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -3633,6 +3759,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -3659,15 +3786,17 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
+                    "zoneId": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -3693,6 +3822,7 @@
                   },
                   "required": [
                     "id",
+                    "zoneId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -3711,6 +3841,7 @@
                         "plantedAt": "2024-04-15T00:00:00.000Z",
                         "crop": "corn"
                       },
+                      "zoneId": "jutdjshjdksk",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -3759,6 +3890,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -3768,6 +3900,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -3843,7 +3976,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/def-15"
+                "$ref": "#/components/schemas/def-16"
               },
               "examples": {
                 "Update state": {
@@ -3883,6 +4016,7 @@
           },
           {
             "schema": {
+              "default": "1.0.0",
               "type": "string"
             },
             "in": "header",
@@ -3892,6 +4026,7 @@
           },
           {
             "schema": {
+              "default": "application/json",
               "type": "string"
             },
             "in": "header",
@@ -3917,15 +4052,17 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
+                    "zoneId": {
+                      "description": "Unique Zone ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
                       "type": "string"
                     },
                     "attributes": {
-                      "description": "any non-searchable or filterable key:val attributes to specify metadata such as label, description etc.",
-                      "type": "object",
-                      "additionalProperties": {}
+                      "$ref": "#/components/schemas/def-0"
                     },
                     "tags": {
                       "$ref": "#/components/schemas/def-1"
@@ -3951,6 +4088,7 @@
                   },
                   "required": [
                     "id",
+                    "zoneId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -3961,6 +4099,7 @@
                     "summary": "Existing state created successfully.",
                     "value": {
                       "id": "0980yht42",
+                      "zoneId": "jutdjshjdksk",
                       "timestamp": "2023-04-11T00:00:00.000Z",
                       "attributes": {
                         "estimatedYield": 925
@@ -4097,7 +4236,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost"
+      "url": "http://localhost:30001"
     }
   ],
   "security": [],
@@ -4113,6 +4252,10 @@
     {
       "name": "Zones",
       "description": "Zones represent a specific geographic location."
+    },
+    {
+      "name": "States",
+      "description": "States represent the state of a specific zone at a specific point in time."
     }
   ]
 }
