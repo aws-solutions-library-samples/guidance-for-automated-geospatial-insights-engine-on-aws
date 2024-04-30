@@ -1,9 +1,15 @@
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { TIntersect, TLiteral, TNull, TSchema, TUnion, Type, JsonTypeBuilder } from '@sinclair/typebox';
-import type { FastifyInstance, FastifyBaseLogger, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault } from 'fastify';
+import { JsonTypeBuilder, TIntersect, TLiteral, TNull, TSchema, TUnion, Type } from '@sinclair/typebox';
+import type { FastifyBaseLogger, FastifyInstance, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault } from 'fastify';
 export const apiVersion100: string = '1.0.0';
 
-export type FastifyTypebox = FastifyInstance<RawServerDefault, RawRequestDefaultExpression<RawServerDefault>, RawReplyDefaultExpression<RawServerDefault>, FastifyBaseLogger, TypeBoxTypeProvider>;
+export type FastifyTypebox = FastifyInstance<
+	RawServerDefault,
+	RawRequestDefaultExpression<RawServerDefault>,
+	RawReplyDefaultExpression<RawServerDefault>,
+	FastifyBaseLogger,
+	TypeBoxTypeProvider
+>;
 
 export type DynamoDbPaginationKey = { [key: string]: string } | undefined;
 
@@ -16,9 +22,9 @@ type IntoStringLiteralUnion<T> = { [K in keyof T]: T[K] extends string ? TLitera
 
 export function convertFromTypeBoxIntersectToJSONSchema(intersectTypeBox: TIntersect): any {
 	const schema = {
-		'type': 'object',
-		'properties': {},
-		'required': []
+		type: 'object',
+		properties: {},
+		required: [],
 	};
 	const requiredSets = new Set<string>();
 

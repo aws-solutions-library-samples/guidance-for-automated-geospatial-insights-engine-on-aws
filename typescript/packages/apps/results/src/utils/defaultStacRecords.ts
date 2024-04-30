@@ -1,4 +1,4 @@
-import { StacItem, Collection } from '@arcade/events';
+import { Collection, StacItem } from '@arcade/events';
 
 export class DefaultStacRecords {
 	public defaultCollection: Collection;
@@ -11,21 +11,20 @@ export class DefaultStacRecords {
 			stac_extensions: [
 				'https://stac-extensions.github.io/eo/v1.0.0/schema.json',
 				'https://stac-extensions.github.io/projection/v1.0.0/schema.json',
-				'https://stac-extensions.github.io/view/v1.0.0/schema.json'
-
+				'https://stac-extensions.github.io/view/v1.0.0/schema.json',
 			],
 			description: '',
 			license: 'proprietary',
 			extent: {
-				spatial:{
-					bbox:[]
+				spatial: {
+					bbox: [],
 				},
-				temporal:{
-					interval:[]
-				}
+				temporal: {
+					interval: [],
+				},
 			},
-			links: []
-		}
+			links: [],
+		};
 		this.defaultStacItem = {
 			id: '',
 			collection: '',
@@ -34,7 +33,7 @@ export class DefaultStacRecords {
 			stac_extensions: [],
 			geometry: {
 				type: 'Polygon',
-				coordinates: [null, null]
+				coordinates: [null, null],
 			},
 			bbox: [],
 			properties: {
@@ -42,11 +41,11 @@ export class DefaultStacRecords {
 				description: '',
 				datetime: '',
 				start_datetime: '',
-				end_datetime: ''
+				end_datetime: '',
 			},
 
 			links: [],
-			assets: {}
+			assets: {},
 		};
 	}
 }

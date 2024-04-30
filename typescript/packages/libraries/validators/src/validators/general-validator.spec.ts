@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { validateAtLeast, validateDefined, validateHasSome, validateNotEmpty } from './general-validators.js';
 
 describe('general validator', () => {
@@ -26,8 +26,6 @@ describe('general validator', () => {
 		expect(() => validateNotEmpty('', 'test')).toThrowError("Missing required parameter 'test'");
 		expect(() => validateNotEmpty([], 'test')).toThrowError("Missing required parameter 'test'");
 		expect(() => validateNotEmpty({}, 'test')).toThrowError("Missing required parameter 'test'");
-
-
 	});
 	it('validateAtLeast - valid', () => {
 		validateAtLeast(5, 5, 'test');

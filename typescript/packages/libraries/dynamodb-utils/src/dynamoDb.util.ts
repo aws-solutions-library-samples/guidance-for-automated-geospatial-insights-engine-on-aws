@@ -19,10 +19,10 @@ import {
 	BatchWriteCommandInput,
 	BatchWriteCommandOutput,
 	DynamoDBDocumentClient,
-	UpdateCommandInput,
-	UpdateCommand,
-	PutCommandInput,
 	PutCommand,
+	PutCommandInput,
+	UpdateCommand,
+	UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 
 import type { NativeAttributeValue } from '@aws-sdk/util-dynamodb';

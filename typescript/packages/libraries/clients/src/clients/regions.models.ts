@@ -9,7 +9,6 @@ export interface Group {
 	updatedAt?: string;
 }
 
-
 export interface Region {
 	id: string;
 	groupId: string;
@@ -25,7 +24,7 @@ export interface Region {
 export interface State {
 	id: string;
 	zoneId: string;
-	timestamp: string
+	timestamp: string;
 	attributes?: Record<string, string>;
 	tags?: Record<string, string>;
 	createdBy: string;

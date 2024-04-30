@@ -1,12 +1,12 @@
+import type { Collection, StacItem } from '@arcade/events';
 import { InvokeCommand, InvokeCommandInput, LambdaClient } from '@aws-sdk/client-lambda';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
-import { ClientServiceBase } from '../common/common.js';
 import type { BaseLogger } from 'pino';
-import type { Collection, StacItem } from '@arcade/events';
+import { ClientServiceBase } from '../common/common.js';
 
 export class StacServerClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
-	private readonly snsClient: SNSClient
+	private readonly snsClient: SNSClient;
 	private readonly lambdaClient: LambdaClient;
 	private readonly stacServerIngestSnsTopicArn: string;
 	private readonly stacServerApiFunctionName: string;
@@ -18,16 +18,17 @@ export class StacServerClient extends ClientServiceBase {
 		this.stacServerIngestSnsTopicArn = stacServerIngestSnsTopicArn;
 		this.lambdaClient = lambdaClient;
 		this.stacServerApiFunctionName = stacServerApiFunctionName;
-
 	}
 
 	public async publishCollection(req: Collection): Promise<void> {
 		this.log.trace(`StacServerClient > publishCollection > in > request: ${JSON.stringify(req)}`);
 
-		await this.snsClient.send(new PublishCommand({
-			Message: JSON.stringify(req),
-			TopicArn: this.stacServerIngestSnsTopicArn
-		}));
+		await this.snsClient.send(
+			new PublishCommand({
+				Message: JSON.stringify(req),
+				TopicArn: this.stacServerIngestSnsTopicArn,
+			})
+		);
 
 		this.log.trace(`StacServerClient > publishCollection > exit`);
 	}
@@ -35,10 +36,12 @@ export class StacServerClient extends ClientServiceBase {
 	public async publishStacItem(req: StacItem): Promise<void> {
 		this.log.trace(`StacServerClient > publishStacItem > in > request: ${JSON.stringify(req)}`);
 
-		await this.snsClient.send(new PublishCommand({
-			Message: JSON.stringify(req),
-			TopicArn: this.stacServerIngestSnsTopicArn
-		}));
+		await this.snsClient.send(
+			new PublishCommand({
+				Message: JSON.stringify(req),
+				TopicArn: this.stacServerIngestSnsTopicArn,
+			})
+		);
 
 		this.log.trace(`StacServerClient > publishStacItem > exit`);
 	}
@@ -51,7 +54,6 @@ export class StacServerClient extends ClientServiceBase {
 		const input: InvokeCommandInput = {
 			FunctionName: this.stacServerApiFunctionName,
 			Payload: Buffer.from(JSON.stringify(req)),
-
 		};
 
 		const result = await this.lambdaClient.send(new InvokeCommand(input));
@@ -59,7 +61,5 @@ export class StacServerClient extends ClientServiceBase {
 
 		this.log.trace(`StacServerClient > search > exit payload:${JSON.stringify(payload)}`);
 		return payload;
-
 	}
-
 }

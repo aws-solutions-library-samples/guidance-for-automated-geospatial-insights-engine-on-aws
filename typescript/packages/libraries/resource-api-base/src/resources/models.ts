@@ -8,7 +8,6 @@ export interface ListIdsPaginationTokenKey {
 	paginationToken: string;
 }
 
-
 export interface ListIdsPaginationOptions {
 	count?: number;
 	from?: ListIdsPaginationKey;

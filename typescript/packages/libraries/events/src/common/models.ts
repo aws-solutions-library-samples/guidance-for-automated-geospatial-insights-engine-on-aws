@@ -1,4 +1,4 @@
-import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from "../results/models.js";
+import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from '../results/models.js';
 
 type EventType = 'COMPLETE' | 'ABORT' | 'FAIL';
 
@@ -27,31 +27,28 @@ export const RESULTS_STARTED_EVENT = `${ARCADE_EVENT_SOURCE}>results>started`;
 export const RESULTS_FAILED_EVENT = `${ARCADE_EVENT_SOURCE}>results>failed`;
 export const RESULTS_COMPLETED_EVENT = `${ARCADE_EVENT_SOURCE}>results>completed`;
 
-
 export interface groupChangeEvent {
-	account: string,
-	region: string,
-	source: string,
-	'detail-type': string,
-	detail: GroupDetails,
-};
+	account: string;
+	region: string;
+	source: string;
+	'detail-type': string;
+	detail: GroupDetails;
+}
 
 export interface regionChangeEvent {
-	account: string,
-	region: string,
-	source: string,
-	'detail-type': string,
-	detail: RegionDetails,
-};
+	account: string;
+	region: string;
+	source: string;
+	'detail-type': string;
+	detail: RegionDetails;
+}
 
 export interface resultsChangeEvent {
-	account: string,
-	region: string,
-	source: string,
-	'detail-type': string,
-	detail: PipelineMetadataDetails,
-};
+	account: string;
+	region: string;
+	source: string;
+	'detail-type': string;
+	detail: PipelineMetadataDetails;
+}
 
-export type { groupChangeEvent as GroupChangeEvent };
-export type { regionChangeEvent as RegionChangeEvent };
-export type { resultsChangeEvent as ResultsChangeEvent };
+export type { groupChangeEvent as GroupChangeEvent, regionChangeEvent as RegionChangeEvent, resultsChangeEvent as ResultsChangeEvent };

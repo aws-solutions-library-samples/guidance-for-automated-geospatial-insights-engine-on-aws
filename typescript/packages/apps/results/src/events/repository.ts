@@ -1,14 +1,12 @@
-import type { PipelineMetadataListOptions } from "../api/schemas.js";
-import type { BaseLogger } from "pino";
-import { createDelimitedAttribute, DocumentDbClientItem } from "@arcade/dynamodb-utils";
-import { PkType } from "../common/pkUtils.js";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, PutCommandInput, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { PipelineMetadataDetails } from "@arcade/events";
+import { createDelimitedAttribute, DocumentDbClientItem } from '@arcade/dynamodb-utils';
+import type { PipelineMetadataDetails } from '@arcade/events';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, PutCommandInput, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
+import type { BaseLogger } from 'pino';
+import type { PipelineMetadataListOptions } from '../api/schemas.js';
+import { PkType } from '../common/pkUtils.js';
 
 export class ResultsRepository {
-
-	constructor(private readonly log: BaseLogger, private readonly dynamoDBClient: DynamoDBDocumentClient, private readonly tableName: string) {
-	}
+	constructor(private readonly log: BaseLogger, private readonly dynamoDBClient: DynamoDBDocumentClient, private readonly tableName: string) {}
 
 	public async get(executionId: string, zoneId: string): Promise<PipelineMetadataDetails | undefined> {
 		this.log.debug(`ResultsRepository> get> executionId: ${executionId}, zoneId: ${zoneId}`);
@@ -16,13 +14,15 @@ export class ResultsRepository {
 		const zoneIdKey = createDelimitedAttribute(PkType.ZoneId, zoneId);
 		const executionIdKey = createDelimitedAttribute(PkType.ExecutionId, executionId);
 
-		const response = await this.dynamoDBClient.send(new GetCommand({
-			TableName: this.tableName,
-			Key: {
-				pk: executionIdKey,
-				sk: zoneIdKey
-			}
-		}));
+		const response = await this.dynamoDBClient.send(
+			new GetCommand({
+				TableName: this.tableName,
+				Key: {
+					pk: executionIdKey,
+					sk: zoneIdKey,
+				},
+			})
+		);
 		if (response.Item === undefined) {
 			this.log.debug(`ResultsRepository> get> early exit: undefined`);
 			return undefined;
@@ -46,16 +46,18 @@ export class ResultsRepository {
 				':hash': executionIdKey,
 			},
 			Limit: options?.count,
-			ExclusiveStartKey: options?.lastEvaluatedToken ? {
-				pk: executionIdKey,
-				sk: options.lastEvaluatedToken
-			} : undefined
+			ExclusiveStartKey: options?.lastEvaluatedToken
+				? {
+						pk: executionIdKey,
+						sk: options.lastEvaluatedToken,
+				  }
+				: undefined,
 		};
 
 		try {
 			const response = await this.dynamoDBClient.send(new QueryCommand(queryCommandParams));
 			this.log.debug(`ResultsRepository> list> response:${JSON.stringify(response)}`);
-			return [this.assemblePipelineMetadataList(response.Items), response?.LastEvaluatedKey?.['sk']]
+			return [this.assemblePipelineMetadataList(response.Items), response?.LastEvaluatedKey?.['sk']];
 		} catch (err) {
 			if (err instanceof Error) {
 				this.log.error(err);
@@ -63,7 +65,7 @@ export class ResultsRepository {
 			}
 		}
 		this.log.info(`ResultsRepository> list> exit`);
-		return [[], undefined]
+		return [[], undefined];
 	}
 
 	public async put(pipelineMetadata: PipelineMetadataDetails): Promise<void> {
@@ -75,8 +77,8 @@ export class ResultsRepository {
 			Item: {
 				pk: executionIdKey,
 				sk: zoneIdKey,
-				...pipelineMetadata
-			}
+				...pipelineMetadata,
+			},
 		};
 
 		try {
@@ -122,8 +124,7 @@ export class ResultsRepository {
 			updatedAt: item['updatedAt'],
 			status: item['status'],
 			engineOutPutLocation: item['engineOutPutLocation'],
-			message: item['message']
+			message: item['message'],
 		};
 	}
-
 }

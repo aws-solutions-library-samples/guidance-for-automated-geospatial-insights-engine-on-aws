@@ -1,11 +1,11 @@
-import { asFunction, Lifetime } from 'awilix';
-import pkg from 'aws-xray-sdk';
-const { captureAWSv3Client } = pkg;
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { SQSClient } from '@aws-sdk/client-sqs';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { Cradle, diContainer } from '@fastify/awilix';
+import { Lifetime, asFunction } from 'awilix';
+import pkg from 'aws-xray-sdk';
+const { captureAWSv3Client } = pkg;
 //// @ts-ignore
 import { Invoker } from '@arcade/lambda-invoker';
 import { Utils } from '../common/utils.js';
@@ -14,8 +14,7 @@ import type { FastifyBaseLogger } from 'fastify';
 
 // declaration merging to allow for typescript checking
 declare module '@fastify/awilix' {
-	interface Cradle extends BaseCradle {
-	}
+	interface Cradle extends BaseCradle {}
 }
 
 export interface BaseCradle {
@@ -33,10 +32,10 @@ class DynamoDBDocumentClientFactory {
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
-			convertClassInstanceToMap: false
+			convertClassInstanceToMap: false,
 		};
 		const unmarshallOptions = {
-			wrapNumbers: false
+			wrapNumbers: false,
 		};
 		const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 		const dbc = DynamoDBDocumentClient.from(ddb, translateConfig);
@@ -58,32 +57,31 @@ class SQSClientFactory {
 
 export function registerBaseAwilix(logger: FastifyBaseLogger) {
 	const commonInjectionOptions = {
-		lifetime: Lifetime.SINGLETON
+		lifetime: Lifetime.SINGLETON,
 	};
 
 	const awsRegion = process.env['AWS_REGION'];
 
 	// then we can register our classes with the DI container
 	diContainer.register({
-
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		lambdaClient: asFunction(() => LambdaClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		sqsClient: asFunction(() => SQSClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		invoker: asFunction((container: Cradle) => new Invoker(logger, container.lambdaClient), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
-		utils: asFunction(() => new Utils(logger ), {
-			...commonInjectionOptions
-		})
+		utils: asFunction(() => new Utils(logger), {
+			...commonInjectionOptions,
+		}),
 	});
 }

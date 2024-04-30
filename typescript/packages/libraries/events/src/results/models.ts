@@ -30,13 +30,12 @@ export type Role = 'thumbnail' | 'overview' | 'data' | 'metadata';
  */
 export type GeometryType = 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon' | 'GeometryCollection';
 
-
-
 export interface Geometry {
 	type: GeometryType;
-	coordinates: [number, number] //Point
-	| [[number, number]] //LineString
-	| [[[number, number]]] //Polygon
+	coordinates:
+		| [number, number] //Point
+		| [[number, number]] //LineString
+		| [[[number, number]]]; //Polygon
 }
 
 /**
@@ -101,11 +100,10 @@ export interface Asset {
 	 * Attributes enable via extension
 	 */
 	[k: string]: unknown;
-
 }
 
 export interface Assets {
-	[k: string]: Asset
+	[k: string]: Asset;
 }
 
 export interface StacItem {
@@ -118,12 +116,12 @@ export interface StacItem {
 	 */
 	collection: string;
 	/**
-	* Type of the GeoJSON Object. MUST be set to Feature.
-	*/
+	 * Type of the GeoJSON Object. MUST be set to Feature.
+	 */
 	type: string;
 	/**
-	* The STAC version the Item implements.
-	*/
+	 * The STAC version the Item implements.
+	 */
 	stac_version: string;
 	/**
 	 * A list of extensions the Item implements.
@@ -131,18 +129,18 @@ export interface StacItem {
 	 */
 	stac_extensions: string[];
 	/**
-	* Defines the full footprint of the asset represented by this item, formatted according to RFC 7946, section 3.1.
-	* The footprint should be the default GeoJSON geometry, though additional geometries can be included.
-	* Coordinates are specified in Longitude/Latitude or Longitude/Latitude/Elevation based on WGS 84.
-	*/
+	 * Defines the full footprint of the asset represented by this item, formatted according to RFC 7946, section 3.1.
+	 * The footprint should be the default GeoJSON geometry, though additional geometries can be included.
+	 * Coordinates are specified in Longitude/Latitude or Longitude/Latitude/Elevation based on WGS 84.
+	 */
 	geometry: Geometry;
 	/**
 	 * Bounding Box of the asset represented by this Item, formatted according to RFC 7946, section 5.
 	 */
 	bbox: number[];
 	/**
-	* A dictionary of additional metadata for the Item.
-	*/
+	 * A dictionary of additional metadata for the Item.
+	 */
 	properties: Properties;
 	/**
 	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
@@ -152,7 +150,6 @@ export interface StacItem {
 	 * Dictionary of asset objects that can be downloaded, each with a unique key.
 	 */
 	assets: Assets;
-
 }
 
 /**
@@ -190,8 +187,8 @@ export interface Spatial {
 }
 
 /**
-* The object describes the temporal extents of the Collection.
-*/
+ * The object describes the temporal extents of the Collection.
+ */
 
 export interface Temporal {
 	/**
@@ -199,7 +196,6 @@ export interface Temporal {
 	 */
 	interval: string[][];
 }
-
 
 /**
  * The object describes the spatio-temporal extents of the Collection. Both spatial and temporal extents are required to be specified.
@@ -215,7 +211,6 @@ export interface Extent {
 	temporal: Temporal;
 }
 
-
 export interface Collection {
 	/**
 	 * Identifier for the Collection that is unique across the provider.
@@ -226,14 +221,14 @@ export interface Collection {
 	 */
 	type: string;
 	/**
-	* The STAC version the Collection implements.
-	*/
+	 * The STAC version the Collection implements.
+	 */
 	stac_version: string;
 
 	/**
 	 * A list of extension identifiers the Collection implements.
-	*/
-	stac_extensions?: string[]
+	 */
+	stac_extensions?: string[];
 	/**
 	 * A short descriptive one-line title for the Collection.
 	 */
@@ -244,7 +239,7 @@ export interface Collection {
 	description: string;
 	/**
 	 * List of keywords describing the Collection.
-	*/
+	 */
 	keywords?: string[];
 	/**
 	 * Collection's license(s), either a SPDX License identifier, various if multiple licenses apply or proprietary for all other cases.
@@ -279,67 +274,61 @@ export interface Collection {
 	[k: string]: unknown;
 }
 
-
 export type Status = 'QUEUED' | 'STARTED' | 'FAILED' | 'SUCCEEDED';
 
 export interface pipelineMetadataDetails {
 	/**
 	 * The id of the step function execution that this metadata belongs to
 	 */
-	executionId: string,
+	executionId: string;
 	/**
 	 * The arn of the job arn that this metadata belongs to
 	 */
-	jobArn: string,
+	jobArn: string;
 	/**
 	 * A grower may own many farms. A grower is represented as a group.
 	 */
-	groupId: string
+	groupId: string;
 	/**
 	 * Farms are comprised of many fields. A farm is represented as a region.
 	 */
-	regionId: string
+	regionId: string;
 	/**
 	 * Fields are represented as a zone
 	 */
-	zoneId: string
+	zoneId: string;
 	/**
 	 * Over time a field will have many different crop seasons. Each of these crop seasons is represented as a state of a zone
 	 */
 	stateId: string;
 
-	createdAt?: string,
-	updatedAt?: string,
-	status?: Status,
+	createdAt?: string;
+	updatedAt?: string;
+	status?: Status;
 	/**
 	 * The S3 key of the metadata output of the job
 	 */
-	engineOutPutLocation?: string,
+	engineOutPutLocation?: string;
 	message?: string;
 }
-
 
 export interface groupDetails {
 	/**
 	 * The id of the group the collection belongs to
 	 */
-	groupId: string,
-	extent: Extent,
-	links: Link[],
-	createdAt?: string,
-	updatedAt?: string,
-	deleted?: boolean,
+	groupId: string;
+	extent: Extent;
+	links: Link[];
+	createdAt?: string;
+	updatedAt?: string;
+	deleted?: boolean;
 }
 
 export interface regionDetails extends groupDetails {
-
 	/**
 	 * The id of the group the collection belongs to
 	 */
-	regionId: string,
-
+	regionId: string;
 }
 
-export type { pipelineMetadataDetails as PipelineMetadataDetails };
-export type { groupDetails as GroupDetails };
-export type { regionDetails as RegionDetails };
+export type { groupDetails as GroupDetails, pipelineMetadataDetails as PipelineMetadataDetails, regionDetails as RegionDetails };

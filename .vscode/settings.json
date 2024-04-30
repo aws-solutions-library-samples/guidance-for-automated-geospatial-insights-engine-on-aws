@@ -7,5 +7,19 @@
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	// "vitest.rootConfig": "./vitest.config.ts",
 	"vitest.vitestPackagePath": "./common/temp/node_modules/.pnpm/vitest@1.5.2_@types+node@20.12.7_@vitest+ui@1.5.2/node_modules/vitest/package.json",
-	"vitest.workspaceConfig": "./vitest.workspace.ts"
+	"vitest.workspaceConfig": "./vitest.workspace.ts",
+	"formatFiles.excludedFolders": [
+		"node_modules",
+		".vscode",
+		".git",
+		"dist",
+		".chrome",
+		".rush",
+		".history",
+		"common/temp",
+		"cdk.out",
+		"lib"
+	],
+	"formatFiles.runOrganizeImports": true,
+	"formatFiles.excludePattern": "*.log,*.tsbuildinfo"
 }

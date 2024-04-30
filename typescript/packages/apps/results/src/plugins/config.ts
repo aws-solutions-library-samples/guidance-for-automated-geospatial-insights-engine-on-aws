@@ -1,6 +1,6 @@
-import fp from 'fastify-plugin';
 import fastifyEnv, { FastifyEnvOptions } from '@fastify/env';
 import { Static, Type } from '@sinclair/typebox';
+import fp from 'fastify-plugin';
 // @ts-ignore
 import { baseConfigSchema, convertFromTypeBoxIntersectToJSONSchema } from '@arcade/resource-api-base';
 

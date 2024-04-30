@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { NativeAttributeValue } from "@aws-sdk/lib-dynamodb";
+import { NativeAttributeValue } from '@aws-sdk/lib-dynamodb';
 
 // TODO: refactor to use common library
 
@@ -62,7 +62,4 @@ export function isPkType(value: string, keyPrefix: string): boolean {
 
 export type DocumentDbClientItem = {
 	[key: string]: NativeAttributeValue;
-}
-
-
-
+};

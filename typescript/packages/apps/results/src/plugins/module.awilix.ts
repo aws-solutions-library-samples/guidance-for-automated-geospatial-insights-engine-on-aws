@@ -1,27 +1,26 @@
-import pkg from 'aws-xray-sdk';
+import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
 import { asFunction, Lifetime } from 'awilix';
+import pkg from 'aws-xray-sdk';
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { ResultsRepository } from "../events/repository.js";
+import { ResultsRepository } from '../events/repository.js';
 // @ts-ignore
-import { BaseCradle, registerBaseAwilix } from '@arcade/resource-api-base';
-import { EventPublisher } from '@arcade/events';
-import { S3Client } from '@aws-sdk/client-s3';
-import type { MetadataBearer, RequestPresigningArguments } from '@aws-sdk/types';
-import type { Client, Command } from '@aws-sdk/smithy-client';
-import { SSMClient } from '@aws-sdk/client-ssm';
-import { SNSClient } from '@aws-sdk/client-sns';
-import { EventProcessor } from "../events/eventProcessor.js";
-import { DynamoDBDocumentClient, TranslateConfig } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { RESULTS_EVENT_SOURCE } from '@arcade/events';
-import { StacServerClient, RegionsClient } from '@arcade/clients';
-import { StacUtil } from '../utils/stacUtil.js';
-import { LambdaClient } from '@aws-sdk/client-lambda';
+import { RegionsClient, StacServerClient } from '@arcade/clients';
+import { EventPublisher, RESULTS_EVENT_SOURCE } from '@arcade/events';
 import { Invoker } from '@arcade/lambda-invoker';
+import { BaseCradle, registerBaseAwilix } from '@arcade/resource-api-base';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { LambdaClient } from '@aws-sdk/client-lambda';
+import { S3Client } from '@aws-sdk/client-s3';
+import { SNSClient } from '@aws-sdk/client-sns';
+import { SSMClient } from '@aws-sdk/client-ssm';
+import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
+import type { Client, Command } from '@aws-sdk/smithy-client';
+import type { MetadataBearer, RequestPresigningArguments } from '@aws-sdk/types';
+import { EventProcessor } from '../events/eventProcessor.js';
+import { StacUtil } from '../utils/stacUtil.js';
 
 const { captureAWSv3Client } = pkg;
 
@@ -33,7 +32,6 @@ export type GetSignedUrl = <InputTypesUnion extends object, InputType extends In
 
 declare module '@fastify/awilix' {
 	interface Cradle extends BaseCradle {
-
 		eventProcessor: EventProcessor;
 		eventBridgeClient: EventBridgeClient;
 		dynamoDbUtils: DynamoDbUtils;
@@ -57,10 +55,10 @@ class DynamoDBDocumentClientFactory {
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
-			convertClassInstanceToMap: false
+			convertClassInstanceToMap: false,
 		};
 		const unmarshallOptions = {
-			wrapNumbers: false
+			wrapNumbers: false,
 		};
 		const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 		const dbc = DynamoDBDocumentClient.from(ddb, translateConfig);
@@ -103,27 +101,25 @@ class SNSClientFactory {
 
 const registerContainer = (app?: FastifyInstance) => {
 	const commonInjectionOptions = {
-		lifetime: Lifetime.SINGLETON
+		lifetime: Lifetime.SINGLETON,
 	};
 
 	const awsRegion = process.env['AWS_REGION'];
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 	const bucketName = process.env['BUCKET_NAME'];
 	const tableName = process.env['TABLE_NAME'];
-	const stacServerFunctionName = process.env['STAC_SERVER_FUNCTION_NAME']
-	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN']
-	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME']
-
+	const stacServerFunctionName = process.env['STAC_SERVER_FUNCTION_NAME'];
+	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
+	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
 
 	diContainer.register({
-
 		// Clients
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		s3Client: asFunction(() => S3ClientFactory.create(awsRegion), {
@@ -143,57 +139,41 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		eventPublisher: asFunction((container: Cradle) => new EventPublisher(app.log, container.eventBridgeClient, eventBusName, RESULTS_EVENT_SOURCE), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		lambdaClient: asFunction(() => LambdaClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
-		stacServerClient: asFunction((container: Cradle) => new StacServerClient(app.log, container.snsClient, container.lambdaClient, stacServerTopicArn, stacServerFunctionName), {
-			...commonInjectionOptions
-		}),
-
-		lambdaInvoker: asFunction((container: Cradle) => new Invoker(app.log, container.lambdaClient), {
-			...commonInjectionOptions
-		}),
-
-		regionsClient: asFunction((container: Cradle) => new RegionsClient(app.log, container.lambdaInvoker, regionsFunctionName), {
-			...commonInjectionOptions
-		}),
-
-		stacUtil: asFunction((container: Cradle) => new StacUtil(app.log, container.s3Client, bucketName, container.regionsClient), {
-			...commonInjectionOptions
-		}),
-
-
-		// Event Processors
-		eventProcessor: asFunction(
-			(container) =>
-				new EventProcessor(
-					app.log,
-					container.resultsRepository,
-					container.stacServerClient,
-					container.stacUtil
-				),
-			{
-				...commonInjectionOptions
-			}
-		),
-
-		// Repositories
-		resultsRepository: asFunction(
-			(container) =>
-				new ResultsRepository(
-					app.log,
-					container.dynamoDBDocumentClient,
-					tableName
-				),
+		stacServerClient: asFunction(
+			(container: Cradle) => new StacServerClient(app.log, container.snsClient, container.lambdaClient, stacServerTopicArn, stacServerFunctionName),
 			{
 				...commonInjectionOptions,
 			}
 		),
 
+		lambdaInvoker: asFunction((container: Cradle) => new Invoker(app.log, container.lambdaClient), {
+			...commonInjectionOptions,
+		}),
+
+		regionsClient: asFunction((container: Cradle) => new RegionsClient(app.log, container.lambdaInvoker, regionsFunctionName), {
+			...commonInjectionOptions,
+		}),
+
+		stacUtil: asFunction((container: Cradle) => new StacUtil(app.log, container.s3Client, bucketName, container.regionsClient), {
+			...commonInjectionOptions,
+		}),
+
+		// Event Processors
+		eventProcessor: asFunction((container) => new EventProcessor(app.log, container.resultsRepository, container.stacServerClient, container.stacUtil), {
+			...commonInjectionOptions,
+		}),
+
+		// Repositories
+		resultsRepository: asFunction((container) => new ResultsRepository(app.log, container.dynamoDBDocumentClient, tableName), {
+			...commonInjectionOptions,
+		}),
 	});
 };
 
@@ -201,7 +181,7 @@ export default fp<FastifyAwilixOptions>(async (app: FastifyInstance): Promise<vo
 	// first register the DI plugin
 	await app.register(fastifyAwilixPlugin, {
 		disposeOnClose: true,
-		disposeOnResponse: false
+		disposeOnResponse: false,
 	});
 
 	registerBaseAwilix(app.log);

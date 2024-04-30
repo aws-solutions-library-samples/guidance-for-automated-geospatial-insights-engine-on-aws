@@ -16,7 +16,13 @@ import { TIntersect, TSchema, Type } from '@sinclair/typebox';
 import type { FastifyBaseLogger, FastifyInstance, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault } from 'fastify';
 export const apiVersion100: string = '1.0.0';
 
-export type FastifyTypebox = FastifyInstance<RawServerDefault, RawRequestDefaultExpression<RawServerDefault>, RawReplyDefaultExpression<RawServerDefault>, FastifyBaseLogger, TypeBoxTypeProvider>;
+export type FastifyTypebox = FastifyInstance<
+	RawServerDefault,
+	RawRequestDefaultExpression<RawServerDefault>,
+	RawReplyDefaultExpression<RawServerDefault>,
+	FastifyBaseLogger,
+	TypeBoxTypeProvider
+>;
 
 export const Nullable = <T extends TSchema>(type: T) => Type.Union([type, Type.Null()]);
 

@@ -7,7 +7,7 @@ export interface AwsEnvironment {
 
 const getAwsEnvironment = async (): Promise<AwsEnvironment> => {
 	const sts = new STS({});
-	
+
 	let accountId, region;
 	try {
 		const callerIdentity = await sts.getCallerIdentity({});
@@ -18,10 +18,9 @@ const getAwsEnvironment = async (): Promise<AwsEnvironment> => {
 	}
 
 	return {
-		accountId, region
+		accountId,
+		region,
 	};
 };
 
-export {
-	getAwsEnvironment
-};
+export { getAwsEnvironment };

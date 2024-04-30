@@ -1,4 +1,4 @@
-import { Bus, S3} from '@arcade/cdk-common';
+import { Bus, S3 } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
 import { Cognito } from './cognito.construct.js';
@@ -50,6 +50,5 @@ export class SharedInfrastructureStack extends Stack {
 
 		this.eventBusName = eventBusName;
 		this.eventBusArn = bus.eventBusArn;
-
 	}
 }

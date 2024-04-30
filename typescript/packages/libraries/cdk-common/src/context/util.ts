@@ -29,7 +29,4 @@ function getOrThrow(app: App, name: string): string {
 	return attribute;
 }
 
-export {
-	tryGetBooleanContext,
-	getOrThrow,
-};
+export { getOrThrow, tryGetBooleanContext };

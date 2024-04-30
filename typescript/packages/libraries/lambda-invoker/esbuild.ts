@@ -37,7 +37,8 @@ esbuild
 	})
 	.catch((e) => {
 		console.log(e);
-		process.exit(1)});
+		process.exit(1);
+	});
 
 // cjs output bundle
 esbuild
@@ -56,7 +57,8 @@ esbuild
 	})
 	.catch((e) => {
 		console.log(e);
-		process.exit(1)});
+		process.exit(1);
+	});
 
 // an entry file for esm at the root of the bundle
 writeFileSync(join(dist, 'index.js'), "export * from './esm/index.js';");
