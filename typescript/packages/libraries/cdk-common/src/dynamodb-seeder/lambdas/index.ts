@@ -1,9 +1,9 @@
-import type { CloudFormationCustomResourceEvent } from 'aws-lambda';
-import { customResourceHelper, OnCreateHandler, ResourceHandler, ResourceHandlerReturn } from 'custom-resource-helper';
-import chunk from 'lodash.chunk';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { BatchWriteCommand, DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { BatchWriteCommand, DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
+import type { CloudFormationCustomResourceEvent } from 'aws-lambda';
+import { OnCreateHandler, ResourceHandler, ResourceHandlerReturn, customResourceHelper } from 'custom-resource-helper';
+import chunk from 'lodash.chunk';
 
 // DynamoDB has a 25 item limit in batch requests
 // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
@@ -27,10 +27,10 @@ const s3 = new S3Client({ region });
 const marshallOptions = {
 	convertEmptyValues: false,
 	removeUndefinedValues: true,
-	convertClassInstanceToMap: false
+	convertClassInstanceToMap: false,
 };
 const unmarshallOptions = {
-	wrapNumbers: false
+	wrapNumbers: false,
 };
 const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({ region }), translateConfig);
@@ -68,11 +68,13 @@ const getSeedsFromS3 = async (s3Location: { s3Bucket?: string; s3Key?: string; s
 		throw new Error('Bucket configuration missing!');
 	}
 
-	const { Body: body } = await s3.send(new GetObjectCommand({
-		Bucket: s3Bucket,
-		Key: s3Key,
-		VersionId: s3ObjectVersion,
-	}));
+	const { Body: body } = await s3.send(
+		new GetObjectCommand({
+			Bucket: s3Bucket,
+			Key: s3Key,
+			VersionId: s3ObjectVersion,
+		})
+	);
 
 	if (!body) {
 		throw new Error(`Cannot load seeds from bucket ${s3Bucket} with key ${s3Key}`);
@@ -94,17 +96,19 @@ const writeSeeds = async (tableName: string, seeds: Seeds): Promise<void> => {
 				},
 			}));
 
-			return dynamodb.send(new BatchWriteCommand({
-				RequestItems: {
-					[tableName]: requests,
-				},
-			}));
-		}),
+			return dynamodb.send(
+				new BatchWriteCommand({
+					RequestItems: {
+						[tableName]: requests,
+					},
+				})
+			);
+		})
 	);
 };
 
 export const handler = customResourceHelper(
 	(): ResourceHandler => ({
 		onCreate: handleCreate,
-	}),
+	})
 );

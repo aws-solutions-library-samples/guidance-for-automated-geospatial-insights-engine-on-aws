@@ -15,7 +15,7 @@
 		"strict": false,
 		"exactOptionalPropertyTypes": false,
 		"paths": {
-			"@arcade/resource-api-base":["../node_modules/@arcade/resource-api-base"]
+			"@arcade/resource-api-base": ["../node_modules/@arcade/resource-api-base"]
 		}
 	},
 	"include": ["src/**/*.ts"],

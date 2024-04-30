@@ -1,9 +1,9 @@
-import type { PipelineMetadataDetails, ResultsChangeEvent, GroupChangeEvent, RegionChangeEvent } from '@arcade/events';
+import type { StacServerClient } from '@arcade/clients';
+import type { GroupChangeEvent, PipelineMetadataDetails, RegionChangeEvent, ResultsChangeEvent } from '@arcade/events';
 import { validateNotEmpty } from '@arcade/validators';
 import type { BaseLogger } from 'pino';
+import { StacUtil } from '../utils/stacUtil.js';
 import type { ResultsRepository } from './repository.js';
-import type { StacServerClient } from '@arcade/clients';
-import { StacUtil } from '../utils/stacUtil.js'
 
 export class EventProcessor {
 	constructor(
@@ -11,9 +11,7 @@ export class EventProcessor {
 		private readonly repository: ResultsRepository,
 		private readonly stacServerClient: StacServerClient,
 		private readonly stacUtil: StacUtil
-	) {
-	}
-
+	) {}
 
 	public async processGroupChangeEvent(event: GroupChangeEvent): Promise<void> {
 		this.log.info(`EventProcessor > processGroupChangeEvent >in  event: ${JSON.stringify(event)}`);
@@ -23,8 +21,7 @@ export class EventProcessor {
 		validateNotEmpty(event.detail.groupId, 'event.detail.groupId');
 
 		// Construct stac items
-		if (!event.detail?.deleted){
-
+		if (!event.detail?.deleted) {
 			// extra validation
 			validateNotEmpty(event.detail.extent, 'event.detail.extent');
 			validateNotEmpty(event.detail.links, 'event.detail.links');
@@ -46,8 +43,7 @@ export class EventProcessor {
 		validateNotEmpty(event.detail.regionId, 'event.detail.regionId');
 
 		// Construct stac items
-		if (!event.detail?.deleted){
-
+		if (!event.detail?.deleted) {
 			// extra validation
 			validateNotEmpty(event.detail.groupId, 'event.detail.groupId');
 			validateNotEmpty(event.detail.extent, 'event.detail.extent');
@@ -145,14 +141,14 @@ export class EventProcessor {
 		// Get the full payload
 		pipelineMetadata = await this.repository.get(event.detail.executionId, event.detail.zoneId);
 
-		if( !pipelineMetadata){
+		if (!pipelineMetadata) {
 			// Get the full payload
 			pipelineMetadata = event.detail;
 		}
 
 		// Update the metadata details
 		pipelineMetadata.status = 'SUCCEEDED';
-		pipelineMetadata.engineOutPutLocation =  event.detail.engineOutPutLocation;
+		pipelineMetadata.engineOutPutLocation = event.detail.engineOutPutLocation;
 		pipelineMetadata.updatedAt = new Date().toISOString();
 		await this.repository.put(pipelineMetadata);
 
@@ -164,5 +160,4 @@ export class EventProcessor {
 
 		this.log.info(`EventProcessor > processCompletedEvent >exit`);
 	}
-
 }

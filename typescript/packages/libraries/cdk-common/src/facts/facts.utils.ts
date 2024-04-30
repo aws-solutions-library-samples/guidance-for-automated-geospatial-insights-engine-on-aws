@@ -11,17 +11,16 @@
  *  and limitations under the License.
  */
 
-import { factMappings, RegionMapping } from './fact-tables.js';
 import { Fact } from 'aws-cdk-lib/region-info';
-
+import { factMappings, RegionMapping } from './fact-tables.js';
 
 function registerFact(factName: string, regionMapping: RegionMapping) {
 	for (const [region, value] of Object.entries(regionMapping)) {
 		Fact.register({
 			region,
 			name: factName,
-			value: value
-		})
+			value: value,
+		});
 	}
 }
 export function registerAllFacts(): void {

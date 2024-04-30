@@ -7,8 +7,7 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 		openapi: {
 			info: {
 				title: 'arcade: Results module',
-				description:
-					'\nIs responsible for:\n- managing Stac Items in the Stac Server\n',
+				description: '\nIs responsible for:\n- managing Stac Items in the Stac Server\n',
 				version: '0.0.1',
 			},
 			servers: [
@@ -24,7 +23,7 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 			],
 
 			security: [],
-		}
+		},
 	});
 
 	if (process.env['NODE_ENV'] === 'local') {

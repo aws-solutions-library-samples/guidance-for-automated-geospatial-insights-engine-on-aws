@@ -1,9 +1,9 @@
-import { ClientServiceBase } from '../common/common.js';
-import type { BaseLogger } from 'pino';
 import { Invoker, LambdaApiGatewayEventBuilder } from '@arcade/lambda-invoker';
-import { Group, Region, Zone } from './regions.models.js';
 import { State } from '@aws-sdk/client-lambda';
+import type { BaseLogger } from 'pino';
+import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
+import { Group, Region, Zone } from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -15,7 +15,6 @@ export class RegionsClient extends ClientServiceBase {
 		this.log = log;
 		this.lambdaInvoker = lambdaInvoker;
 		this.regionsApiFunctionName = regionsApiFunctionName;
-
 	}
 
 	public async getGroupById(id: string, requestContext?: LambdaRequestContext): Promise<Group | undefined> {
@@ -32,7 +31,6 @@ export class RegionsClient extends ClientServiceBase {
 		this.log.trace(`RegionsClient> getGroupById> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
-
 
 	public async getRegionById(id: string, requestContext?: LambdaRequestContext): Promise<Region | undefined> {
 		this.log.trace(`RegionsClient> getRegionById> in: id:${id}}`);
@@ -64,7 +62,6 @@ export class RegionsClient extends ClientServiceBase {
 		return result;
 	}
 
-
 	public async getStateById(id: string, requestContext?: LambdaRequestContext): Promise<State | undefined> {
 		this.log.trace(`RegionsClient> getStateById> in: id:${id}}`);
 		const additionalHeaders = {};
@@ -79,5 +76,4 @@ export class RegionsClient extends ClientServiceBase {
 		this.log.trace(`RegionsClient> getStateById> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
-
 }

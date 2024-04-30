@@ -29,31 +29,30 @@ export type State = Static<typeof state>;
 export const createdBy = Type.String({ description: 'ID of owner.' });
 export const createdAt = Type.String({
 	description: 'Date/time created',
-	format: 'date-time'
+	format: 'date-time',
 });
 export const updatedBy = Type.String({ description: 'Last ID of user who made a change.' });
 export const updatedAt = Type.String({
 	description: 'Date/time updated',
-	format: 'date-time'
+	format: 'date-time',
 });
 export const count = Type.Optional(
 	Type.Integer({
-		description: 'No. of results returned when pagination requested.'
+		description: 'No. of results returned when pagination requested.',
 	})
 );
 export const nextToken = Type.Optional(
 	Type.String({
-		description: 'Pagination token'
+		description: 'Pagination token',
 	})
 );
-
 
 /**
  * Common headers
  */
 export const commonHeaders = Type.Object({
 	'accept-version': Type.String({ description: 'API version' }),
-	accept: Type.String({ description: 'Accepted Content Type' })
+	accept: Type.String({ description: 'Accepted Content Type' }),
 });
 
 /**
@@ -61,14 +60,14 @@ export const commonHeaders = Type.Object({
  */
 export const notFoundResponse = Type.Object(
 	{
-		message: Type.String()
+		message: Type.String(),
 	},
 	{ $id: 'notFoundResponse', description: 'Not found.' }
 );
 
 export const acceptedResponse = Type.Object(
 	{
-		message: Type.String()
+		message: Type.String(),
 	},
 	{ $id: 'acceptedResponse', description: 'Accepted.' }
 );
@@ -81,22 +80,21 @@ export const serviceUnavailableResponse = Type.Object({}, { $id: 'serviceUnavail
 
 export const badRequestResponse = Type.Object(
 	{
-		message: Type.String()
+		message: Type.String(),
 	},
 	{ $id: 'badRequestResponse', description: 'Bad request.' }
 );
 
-
 export const notImplementedResponse = Type.Object(
 	{
-		message: Type.String()
+		message: Type.String(),
 	},
 	{ $id: 'notImplementedResponse', description: 'Not implemented.' }
 );
 
 export const forbiddenResponse = Type.Object(
 	{
-		message: Type.String()
+		message: Type.String(),
 	},
 	{ $id: 'forbiddenResponse', description: 'Forbidden.' }
 );
@@ -108,9 +106,9 @@ export const conflictResponse = Type.Object(
 			Type.Object({
 				charPositionInLine: Type.Integer(),
 				line: Type.Integer(),
-				msg: Type.String()
+				msg: Type.String(),
 			})
-		)
+		),
 	},
 	{ $id: 'conflictResponse', description: 'Conflict.' }
 );
@@ -122,12 +120,11 @@ export const configuration = Type.Object(
 		//TODO
 	},
 	{
-		$id: 'configuration'
+		$id: 'configuration',
 	}
 );
 
 export const configurationSource = Type.Record(Type.String({ description: 'id of the group' }), configuration, {
 	description: 'application configuration specified on the group',
-	$id: 'configurationSource'
+	$id: 'configurationSource',
 });
-

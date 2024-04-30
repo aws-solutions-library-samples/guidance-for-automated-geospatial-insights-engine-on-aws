@@ -5,7 +5,6 @@ export class StacItemDefinitionError extends Error {
 	}
 }
 
-
 export class InvalidParameterError extends Error {
 	public constructor(message: string) {
 		super(message);
@@ -26,7 +25,6 @@ export async function errorHandler(error, _request, reply) {
 		return reply.badRequest(error.message);
 	} else {
 		switch (error.name) {
-
 			case 'ResourceInUseError':
 			case 'QueryParameterError':
 			case 'InvalidRequestError':

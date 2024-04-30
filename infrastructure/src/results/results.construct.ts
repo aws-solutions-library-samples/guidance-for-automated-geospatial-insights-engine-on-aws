@@ -1,21 +1,27 @@
-import { Construct } from 'constructs';
-import { RemovalPolicy, Duration, Stack } from 'aws-cdk-lib';
+import { getLambdaArchitecture } from '@arcade/cdk-common';
+import {
+	RESULTS_COMPLETED_EVENT,
+	RESULTS_FAILED_EVENT,
+	RESULTS_GROUP_CHANGE_EVENT,
+	RESULTS_QUEUED_EVENT,
+	RESULTS_REGION_CHANGE_EVENT,
+	RESULTS_STARTED_EVENT,
+} from '@arcade/events';
+import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
-import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
-import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Topic } from 'aws-cdk-lib/aws-sns';
-import { getLambdaArchitecture } from '@arcade/cdk-common';
-import { RESULTS_GROUP_CHANGE_EVENT, RESULTS_REGION_CHANGE_EVENT, RESULTS_COMPLETED_EVENT, RESULTS_FAILED_EVENT, RESULTS_QUEUED_EVENT, RESULTS_STARTED_EVENT } from '@arcade/events';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { NagSuppressions } from 'cdk-nag';
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +40,6 @@ export class ResultsConstruct extends Construct {
 	public readonly tableName: string;
 	public readonly tableArn: string;
 
-
 	constructor(scope: Construct, id: string, props: ResultsConstructProperties) {
 		super(scope, id);
 
@@ -46,8 +51,6 @@ export class ResultsConstruct extends Construct {
 		const bucket = Bucket.fromBucketName(this, 'Bucket', props.bucketName);
 		const topic = Topic.fromTopicArn(this, 'StacServerArn', props.stacServerTopicArn);
 		const regionsLambda = NodejsFunction.fromFunctionName(this, 'RegionLambda', props.regionsFunctionName);
-
-
 
 		// DynamoDb Table
 
@@ -64,7 +67,7 @@ export class ResultsConstruct extends Construct {
 			billingMode: BillingMode.PAY_PER_REQUEST,
 			encryption: TableEncryption.AWS_MANAGED,
 			pointInTimeRecovery: true,
-			removalPolicy: RemovalPolicy.DESTROY
+			removalPolicy: RemovalPolicy.DESTROY,
 		});
 
 		// define GSI1
@@ -101,7 +104,7 @@ export class ResultsConstruct extends Construct {
 				STAC_SERVER_TOPIC_ARN: topic.topicArn,
 				STAC_SERVER_FUNCTION_NAME: props.stacServerFunctionName,
 				REGIONS_FUNCTION_NAME: props.regionsFunctionName,
-				BUCKET_NAME: bucket.bucketName
+				BUCKET_NAME: bucket.bucketName,
 			},
 			bundling: {
 				minify: true,
@@ -109,11 +112,11 @@ export class ResultsConstruct extends Construct {
 				target: 'node20.1',
 				sourceMap: false,
 				sourcesContent: false,
-				banner: 'import { createRequire } from \'module\';const require = createRequire(import.meta.url);import { fileURLToPath } from \'url\';import { dirname } from \'path\';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);',
-				externalModules: ['aws-sdk', 'pg-native']
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk', 'pg-native'],
 			},
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
-			architecture: getLambdaArchitecture(scope)
+			architecture: getLambdaArchitecture(scope),
 		});
 		eventBus.grantPutEventsTo(eventProcessorLambda);
 		table.grantReadWriteData(eventProcessorLambda);
@@ -122,59 +125,59 @@ export class ResultsConstruct extends Construct {
 		bucket.grantRead(eventProcessorLambda);
 
 		const deadLetterQueue = new Queue(this, 'DeadLetterQueue');
-		deadLetterQueue.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sqs:*'],
-			resources: [deadLetterQueue.queueArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
-				}
-			}
-		}));
+		deadLetterQueue.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [deadLetterQueue.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
 
-		NagSuppressions.addResourceSuppressions([deadLetterQueue],
+		NagSuppressions.addResourceSuppressions(
+			[deadLetterQueue],
 			[
 				{
 					id: 'AwsSolutions-SQS3',
-					reason: 'This is the dead letter queue.'
-
-				}
+					reason: 'This is the dead letter queue.',
+				},
 			],
-			true);
-
+			true
+		);
 
 		//Trigger Rule
 		const resultsRule = new Rule(this, 'ResultsRule', {
 			eventBus: eventBus,
 			eventPattern: {
-				detailType: [RESULTS_QUEUED_EVENT, RESULTS_FAILED_EVENT, RESULTS_STARTED_EVENT, RESULTS_GROUP_CHANGE_EVENT, RESULTS_REGION_CHANGE_EVENT, RESULTS_COMPLETED_EVENT]
-			}
+				detailType: [RESULTS_QUEUED_EVENT, RESULTS_FAILED_EVENT, RESULTS_STARTED_EVENT, RESULTS_GROUP_CHANGE_EVENT, RESULTS_REGION_CHANGE_EVENT, RESULTS_COMPLETED_EVENT],
+			},
 		});
 
 		resultsRule.addTarget(
 			new LambdaFunction(eventProcessorLambda, {
 				deadLetterQueue: deadLetterQueue,
 				maxEventAge: Duration.minutes(5),
-				retryAttempts: 2
+				retryAttempts: 2,
 			})
 		);
 
-		NagSuppressions.addResourceSuppressions([eventProcessorLambda],
+		NagSuppressions.addResourceSuppressions(
+			[eventProcessorLambda],
 			[
 				{
 					id: 'AwsSolutions-L1',
-					reason: 'Latest runtime not needed.'
+					reason: 'Latest runtime not needed.',
 				},
 				{
 					id: 'AwsSolutions-IAM4',
-					appliesTo: [
-						'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-					],
-					reason: 'This policy is the one generated by CDK.'
-
+					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'],
+					reason: 'This policy is the one generated by CDK.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',
@@ -186,13 +189,12 @@ export class ResultsConstruct extends Construct {
 						'Resource::arn:<AWS::Partition>:s3:::<S3SharedBucket4DDF4F1A>/*',
 						'Resource::<ResultsImageProcessorLambda0378B9F4.Arn>:*',
 						`Resource::arn:<AWS::Partition>:lambda:${region}:${accountId}:function:arcade-${props.environment}-regionsApi:*`,
-						'Resource::<ResultsTable7B2FF7F9.Arn>/index/*'
+						'Resource::<ResultsTable7B2FF7F9.Arn>/index/*',
 					],
-					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.'
-
-				}
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
+				},
 			],
-			true);
-
+			true
+		);
 	}
 }

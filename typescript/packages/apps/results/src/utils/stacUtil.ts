@@ -1,15 +1,14 @@
-import type { BaseLogger } from 'pino';
+import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
 import { Collection, GroupDetails, PipelineMetadataDetails, RegionDetails, StacItem } from '@arcade/events';
-import { EngineMetadata } from 'events/models.js';
-import { DefaultStacRecords } from './defaultStacRecords.js';
+import { validateNotEmpty } from '@arcade/validators';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
-import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import { validateNotEmpty } from '@arcade/validators';
 import dayjs from 'dayjs';
 import utc from 'dayjs-plugin-utc';
-dayjs.extend(utc)
-
+import { EngineMetadata } from 'events/models.js';
+import type { BaseLogger } from 'pino';
+import { DefaultStacRecords } from './defaultStacRecords.js';
+dayjs.extend(utc);
 
 export class StacUtil {
 	private readonly log: BaseLogger;
@@ -26,19 +25,18 @@ export class StacUtil {
 
 		// TODO must replace with valid credentials
 		// Credentials used for calling the regions API
-		this.context =  {
+		this.context = {
 			authorizer: {
 				claims: {
 					identities: JSON.stringify({
-						userId: 'results'
+						userId: 'results',
 					}),
 					email: 'results',
-					'cognito:groups': '/|||reader'
-				}
-			}
-		}
+					'cognito:groups': '/|||reader',
+				},
+			},
+		};
 	}
-
 
 	public async constructStacItems(pipelineMetadata: PipelineMetadataDetails): Promise<StacItem> {
 		this.log.debug(`StacUtil > constructStacItems > in ${JSON.stringify(pipelineMetadata)}`);
@@ -52,15 +50,14 @@ export class StacUtil {
 		validateNotEmpty(pipelineMetadata.stateId, 'pipelineMetadata.stateId');
 		validateNotEmpty(pipelineMetadata.engineOutPutLocation, 'pipelineMetadata.engineOutPutLocation');
 
-
 		const stacItem = new DefaultStacRecords().defaultStacItem;
 
-		const response = await this.s3Client.send(new GetObjectCommand({
-			Bucket: this.bucketName,
-			Key: pipelineMetadata.engineOutPutLocation
-		}));
-
-
+		const response = await this.s3Client.send(
+			new GetObjectCommand({
+				Bucket: this.bucketName,
+				Key: pipelineMetadata.engineOutPutLocation,
+			})
+		);
 
 		const engineMetadata: EngineMetadata = JSON.parse(await sdkStreamMixin(response.Body).transformToString());
 
@@ -74,23 +71,22 @@ export class StacUtil {
 		validateNotEmpty(engineMetadata.links, 'engineMetadata.links');
 		validateNotEmpty(engineMetadata.properties, 'engineMetadata.properties');
 
-
 		// const date = new Date(pipelineMetadata.createdAt);
 		const date = dayjs(pipelineMetadata.createdAt).format();
 		const utcDate = date.split('T')[0];
 		const utcTime = date.split('T')[1].split('+')[0];
 
-		const [group, region, zone ]= await Promise.all([
-		// get Group Collection
-		this.regionsClient.getGroupById(pipelineMetadata.groupId, this.context),
-		// get Region Collection
-		this.regionsClient.getRegionById(pipelineMetadata.regionId, this.context),
-		//  Get Zone Collection
-		this.regionsClient.getZoneById(pipelineMetadata.zoneId, this.context)
+		const [group, region, zone] = await Promise.all([
+			// get Group Collection
+			this.regionsClient.getGroupById(pipelineMetadata.groupId, this.context),
+			// get Region Collection
+			this.regionsClient.getRegionById(pipelineMetadata.regionId, this.context),
+			//  Get Zone Collection
+			this.regionsClient.getZoneById(pipelineMetadata.zoneId, this.context),
 		]);
 
 		// Update stac item id
-		stacItem.id = `${zone.id}_${utcDate}_${utcTime}`
+		stacItem.id = `${zone.id}_${utcDate}_${utcTime}`;
 
 		// set the collection
 		stacItem.collection = `region_${region.id}`;
@@ -106,52 +102,51 @@ export class StacUtil {
 		stacItem.links = [
 			...engineMetadata.links,
 			{
-				"rel": "self",
-				"href": `./${stacItem.id}.json`,
-				"type": "application/geo+json",
-				"title": zone.name
+				rel: 'self',
+				href: `./${stacItem.id}.json`,
+				type: 'application/geo+json',
+				title: zone.name,
 			},
 			{
-				"rel": "collection",
-				"href": `./region_${region.id}.json`,
-				"type": "application/json",
-				"title": region.name
+				rel: 'collection',
+				href: `./region_${region.id}.json`,
+				type: 'application/json',
+				title: region.name,
 			},
 			{
-				"rel": "parent",
-				"href": `./region_${region.id}.json`,
-				"type": "application/json",
-				"title": region.name
+				rel: 'parent',
+				href: `./region_${region.id}.json`,
+				type: 'application/json',
+				title: region.name,
 			},
 			{
-				"rel": "collection",
-				"href": `./group_${group.id}.json`,
-				"type": "application/json",
-				"title": group.name
+				rel: 'collection',
+				href: `./group_${group.id}.json`,
+				type: 'application/json',
+				title: group.name,
 			},
 			{
-				"rel": "root",
-				"href": "../catalog.json",
-				"type": "application/json",
-				"title": "ARCADE Catalog"
-			}
-		]
+				rel: 'root',
+				href: '../catalog.json',
+				type: 'application/json',
+				title: 'ARCADE Catalog',
+			},
+		];
 
 		// update extensiona
-		stacItem.stac_extensions = engineMetadata.extensions
+		stacItem.stac_extensions = engineMetadata.extensions;
 
 		// Update the properties
 		stacItem.properties = {
 			datetime: pipelineMetadata.createdAt,
-			...engineMetadata.properties
-		}
+			...engineMetadata.properties,
+		};
 
 		stacItem.assets = engineMetadata.assets;
 
 		this.log.debug(`StacUtil > constructStacItems > exit ${JSON.stringify(stacItem)}`);
 		return stacItem;
 	}
-
 
 	public async constructGroupCollection(groupDetail: GroupDetails): Promise<Collection> {
 		this.log.debug(`StacUtil > constructGroupCollection > in ${JSON.stringify(groupDetail)}`);
@@ -161,7 +156,6 @@ export class StacUtil {
 		validateNotEmpty(groupDetail.groupId, 'event.detail.groupId');
 		validateNotEmpty(groupDetail.extent, 'event.detail.extent');
 		validateNotEmpty(groupDetail.links, 'event.detail.links');
-
 
 		const collection = new DefaultStacRecords().defaultCollection;
 		const group = await this.regionsClient.getGroupById(groupDetail.groupId, this.context);
@@ -175,24 +169,24 @@ export class StacUtil {
 		collection.links = [
 			...groupDetail.links,
 			{
-				"rel": "self",
-				"href": `./group_${group.id}.json`,
-				"type": "application/geo+json",
-				"title": group.name
+				rel: 'self',
+				href: `./group_${group.id}.json`,
+				type: 'application/geo+json',
+				title: group.name,
 			},
 			{
-				"rel": "parent",
-				"href": "../catalog.json",
-				"type": "application/json",
-				"title": "ARCADE Catalog"
+				rel: 'parent',
+				href: '../catalog.json',
+				type: 'application/json',
+				title: 'ARCADE Catalog',
 			},
 			{
-				"rel": "root",
-				"href": "../catalog.json",
-				"type": "application/json",
-				"title": "ARCADE Catalog"
-			}
-		]
+				rel: 'root',
+				href: '../catalog.json',
+				type: 'application/json',
+				title: 'ARCADE Catalog',
+			},
+		];
 
 		this.log.debug(`StacUtil > constructGroupCollection > exit ${JSON.stringify(collection)}`);
 		return collection;
@@ -208,10 +202,9 @@ export class StacUtil {
 		validateNotEmpty(regionDetail.extent, 'event.detail.extent');
 		validateNotEmpty(regionDetail.links, 'event.detail.links');
 
-
 		const collection = new DefaultStacRecords().defaultCollection;
 
-		const [group, region ]= await Promise.all([
+		const [group, region] = await Promise.all([
 			// get Group Collection
 			this.regionsClient.getGroupById(regionDetail.groupId, this.context),
 			// get Region Collection
@@ -227,29 +220,26 @@ export class StacUtil {
 		collection.links = [
 			...regionDetail.links,
 			{
-				"rel": "self",
-				"href": `./region_${region.id}.json`,
-				"type": "application/geo+json",
-				"title": region.name
+				rel: 'self',
+				href: `./region_${region.id}.json`,
+				type: 'application/geo+json',
+				title: region.name,
 			},
 			{
-				"rel": "parent",
-				"href": `./group_${group.id}.json`,
-				"type": "application/geo+json",
-				"title": group.name
+				rel: 'parent',
+				href: `./group_${group.id}.json`,
+				type: 'application/geo+json',
+				title: group.name,
 			},
 			{
-				"rel": "root",
-				"href": "../catalog.json",
-				"type": "application/json",
-				"title": "ARCADE Catalog"
-			}
-		]
+				rel: 'root',
+				href: '../catalog.json',
+				type: 'application/json',
+				title: 'ARCADE Catalog',
+			},
+		];
 
 		this.log.debug(`StacUtil > constructGroupCollection > exit ${JSON.stringify(collection)}`);
 		return collection;
 	}
-
-
-
 }

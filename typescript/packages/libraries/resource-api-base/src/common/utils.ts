@@ -8,7 +8,6 @@ export class Utils {
 		this.log = log;
 	}
 
-
 	public encodeToPaginationToken(from: ListIdsPaginationKey): ListIdsPaginationTokenKey {
 		this.log.debug(`Utils > encodeToPaginationToken > in`);
 		if (!from?.id) return undefined;
@@ -30,5 +29,4 @@ export class Utils {
 			groupId,
 		};
 	}
-
 }

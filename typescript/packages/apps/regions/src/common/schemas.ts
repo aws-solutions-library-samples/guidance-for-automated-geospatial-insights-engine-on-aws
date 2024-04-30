@@ -32,7 +32,9 @@ export const fromIdPaginationQS = Type.Optional(Type.String({ description: 'Id t
 export const fromTokenPaginationQS = Type.Optional(Type.String({ description: 'Token used to paginate from (exclusive).' }));
 export const nextTokenPaginationQS = Type.Optional(Type.String({ description: 'Pagination token.' }));
 export const nameQS = Type.Optional(Type.String({ description: 'Name to filter by.' }));
-export const tagFilterQS = Type.Optional(Type.Array(Type.String({ description: 'Tag key and value in the format of `key:value`.' }), { description: 'Tag keys and values to filter by.' }));
+export const tagFilterQS = Type.Optional(
+	Type.Array(Type.String({ description: 'Tag key and value in the format of `key:value`.' }), { description: 'Tag keys and values to filter by.' })
+);
 
 /**
  * Common resource parameters

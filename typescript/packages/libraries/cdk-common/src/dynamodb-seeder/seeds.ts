@@ -1,7 +1,7 @@
-import * as fs from 'fs';
 import type { IBucket, Location } from 'aws-cdk-lib/aws-s3';
 import { Asset, AssetOptions } from 'aws-cdk-lib/aws-s3-assets';
 import type { Construct } from 'constructs';
+import * as fs from 'fs';
 
 export abstract class Seeds {
 	/**

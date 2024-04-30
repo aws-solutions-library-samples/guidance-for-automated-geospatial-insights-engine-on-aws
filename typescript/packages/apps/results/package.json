@@ -27,9 +27,9 @@
 		"@aws-sdk/smithy-client": "~3",
 		"@aws-sdk/client-ssm": "~3",
 		"@aws-sdk/client-sns": "~3",
-		"@aws-sdk/types" : "~3",
-		"@aws-sdk/client-lambda" : "~3",
-		"@aws-sdk/util-stream-node" : "~3",
+		"@aws-sdk/types": "~3",
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/util-stream-node": "~3",
 		"aws-lambda": "~1",
 		"@fastify/awilix": "~5",
 		"@fastify/aws-lambda": "~4",
@@ -52,7 +52,7 @@
 		"ulid": "~2",
 		"aws-xray-sdk": "~3",
 		"dayjs": "~1",
-		"dayjs-plugin-utc" : "0.1.2"
+		"dayjs-plugin-utc": "0.1.2"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",

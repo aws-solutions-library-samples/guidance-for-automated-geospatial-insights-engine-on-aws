@@ -22,8 +22,8 @@ interface FactMappings {
 
 // Fact names
 export const FactNames = {
-	PREFERRED_LAMBDA_ARCHITECTURE: "PREFERRED_LAMBDA_ARCHITECTURE",
-}
+	PREFERRED_LAMBDA_ARCHITECTURE: 'PREFERRED_LAMBDA_ARCHITECTURE',
+};
 
 // Fact mappings
 // https://aws.amazon.com/lambda/pricing/
@@ -57,8 +57,8 @@ const preferredLambdaArchitectures: RegionMapping = {
 	'sa-east-1': Architecture.ARM_64.name, //	South America (Sao Paulo)
 	'us-gov-east-1': Architecture.X86_64.name, //	AWS GovCloud (US-East)
 	'us-gov-west-1': Architecture.X86_64.name, //	AWS GovCloud (US-West)
-}
+};
 
 export const factMappings: FactMappings = {
-	[FactNames.PREFERRED_LAMBDA_ARCHITECTURE]: preferredLambdaArchitectures
-}
+	[FactNames.PREFERRED_LAMBDA_ARCHITECTURE]: preferredLambdaArchitectures,
+};

@@ -1,7 +1,7 @@
 export interface LambdaRequestContext {
 	authorizer: {
 		claims: {
-			identities: string,
+			identities: string;
 			email: string;
 			'cognito:groups': string;
 		};

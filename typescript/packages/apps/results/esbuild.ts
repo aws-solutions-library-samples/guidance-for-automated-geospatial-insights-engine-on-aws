@@ -1,6 +1,4 @@
 import { build } from 'esbuild';
-import { dirname as _dirname } from 'path';
-
 const banner = `
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);

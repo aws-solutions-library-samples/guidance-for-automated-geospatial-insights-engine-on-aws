@@ -13,7 +13,17 @@
 
 import { getLambdaArchitecture } from '@arcade/cdk-common';
 import { Aspects, Duration, RemovalPolicy } from 'aws-cdk-lib';
-import { AccessLogFormat, AuthorizationType, CfnMethod, CognitoUserPoolsAuthorizer, Cors, EndpointType, LambdaRestApi, LogGroupLogDestination, MethodLoggingLevel } from 'aws-cdk-lib/aws-apigateway';
+import {
+	AccessLogFormat,
+	AuthorizationType,
+	CfnMethod,
+	CognitoUserPoolsAuthorizer,
+	Cors,
+	EndpointType,
+	LambdaRestApi,
+	LogGroupLogDestination,
+	MethodLoggingLevel,
+} from 'aws-cdk-lib/aws-apigateway';
 import { UserPool } from 'aws-cdk-lib/aws-cognito';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus } from 'aws-cdk-lib/aws-events';
@@ -176,18 +186,17 @@ export class RegionsModule extends Construct {
 				actions: ['dynamodb:Scan'],
 				effect: Effect.DENY,
 				resources: [table.tableArn],
-			}
-			));
+			})
+		);
 
 		// Grant partiSQLSelect access
 		apiLambda.addToRolePolicy(
 			new PolicyStatement({
 				actions: ['dynamodb:PartiQLSelect'],
 				effect: Effect.ALLOW,
-				resources: [table.tableArn,`${table.tableArn}/index/*`],
-			}
-			));
-
+				resources: [table.tableArn, `${table.tableArn}/index/*`],
+			})
+		);
 
 		eventBus.grantPutEventsTo(apiLambda);
 
@@ -256,7 +265,14 @@ export class RegionsModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Action::s3:Abort*', 'Action::s3:DeleteObject*', 'Action::s3:GetBucket*', 'Action::s3:GetObject*', 'Action::s3:List*', 'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*'],
+					appliesTo: [
+						'Action::s3:Abort*',
+						'Action::s3:DeleteObject*',
+						'Action::s3:GetBucket*',
+						'Action::s3:GetObject*',
+						'Action::s3:List*',
+						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
+					],
 					reason: 'This policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
 				},
 				{

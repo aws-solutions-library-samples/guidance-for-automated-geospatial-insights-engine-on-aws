@@ -11,13 +11,13 @@
  *  and limitations under the License.
  */
 
+import { eventBusNameParameter } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { userPoolIdParameter } from '../shared/cognito.construct.js';
 import { RegionsModule } from './regions.construct.js';
-import { eventBusNameParameter } from '@arcade/cdk-common';
 
 export type RegionsStackProperties = StackProps & {
 	environment: string;

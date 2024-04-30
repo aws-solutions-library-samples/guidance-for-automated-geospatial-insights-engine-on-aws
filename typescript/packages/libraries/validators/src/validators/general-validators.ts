@@ -35,7 +35,7 @@ export const validateHasSome = <T>(values: T[], names: string[]) => {
 	}
 };
 
-export const validateRegularExpression = (value: string, name: string, regex:string) => {
+export const validateRegularExpression = (value: string, name: string, regex: string) => {
 	const reg = new RegExp(regex);
 	if (!reg.test(value)) {
 		throw new InvalidParameterError(`${name} value must satisfy regular expression pattern: ${regex}`);

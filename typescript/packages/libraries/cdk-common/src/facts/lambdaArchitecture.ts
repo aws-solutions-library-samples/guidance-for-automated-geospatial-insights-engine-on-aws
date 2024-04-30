@@ -11,11 +11,10 @@
  *  and limitations under the License.
  */
 
-import { Architecture } from 'aws-cdk-lib/aws-lambda';
-import { FactNames } from './fact-tables.js';
-import type { Construct } from 'constructs';
 import { Stack, Token } from 'aws-cdk-lib';
-
+import { Architecture } from 'aws-cdk-lib/aws-lambda';
+import type { Construct } from 'constructs';
+import { FactNames } from './fact-tables.js';
 
 export function getLambdaArchitecture(scope: Construct): Architecture {
 	const preferredArchitecture = Stack.of(scope).regionalFact(FactNames.PREFERRED_LAMBDA_ARCHITECTURE, Architecture.X86_64.name);

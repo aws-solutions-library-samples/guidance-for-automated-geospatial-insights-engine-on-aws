@@ -46,20 +46,21 @@ export class EventPublisher {
 		this.log.debug(`EventPublisher> publishEvent> exit`);
 	}
 
-
 	public async publish(event: EventBridgeEventBuilder): Promise<void> {
 		this.log.debug(`Publisher>publish>in: event:${JSON.stringify(event)}`);
 
 		event.setEventBusName(this.eventBusName);
 
 		const params: PutEventsCommandInput = {
-			Entries: [{
-				Source: event.Source,
-				EventBusName: event.EventBusName,
-				DetailType: event.DetailType,
-				Time: event.Time,
-				Detail: event.Detail
-			}]
+			Entries: [
+				{
+					Source: event.Source,
+					EventBusName: event.EventBusName,
+					DetailType: event.DetailType,
+					Time: event.Time,
+					Detail: event.Detail,
+				},
+			],
 		};
 
 		await this.client.send(new PutEventsCommand(params));
@@ -80,31 +81,30 @@ export class EventBridgeEventBuilder {
 
 	public setSource(source: string): EventBridgeEventBuilder {
 		this.Source = source;
-		return this
+		return this;
 	}
 
 	public setRegions(regions: string[]): EventBridgeEventBuilder {
 		this.regions = regions;
-		return this
+		return this;
 	}
 
 	public getRegions(): string[] {
-		return this.regions
+		return this.regions;
 	}
 
 	public setEventBusName(name: string): EventBridgeEventBuilder {
 		this.EventBusName = name;
-		return this
+		return this;
 	}
 
 	public setDetailType(detailType: string): EventBridgeEventBuilder {
-		this.DetailType = detailType
-		return this
+		this.DetailType = detailType;
+		return this;
 	}
 
 	public setDetail(detail: unknown): EventBridgeEventBuilder {
 		this.Detail = JSON.stringify(detail);
-		return this
+		return this;
 	}
 }
-
