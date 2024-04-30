@@ -8,11 +8,7 @@ import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { getLambdaArchitecture } from '@arcade/cdk-common';
-<<<<<<< HEAD
 import { RESULTS_GROUP_CHANGE_EVENT, RESULTS_REGION_CHANGE_EVENT, RESULTS_COMPLETED_EVENT, RESULTS_FAILED_EVENT, RESULTS_QUEUED_EVENT, RESULTS_STARTED_EVENT } from '@arcade/events';
-=======
-import { RESULTS_COLLECTION_CREATE_EVENT, RESULTS_COMPLETED_EVENT, RESULTS_FAILED_EVENT, RESULTS_QUEUED_EVENT, RESULTS_STARTED_EVENT } from '@arcade/events';
->>>>>>> main
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
