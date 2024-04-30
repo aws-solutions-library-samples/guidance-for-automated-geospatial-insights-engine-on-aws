@@ -303,14 +303,50 @@
 			"shouldPublish": true
 		},
 		{
-			"packageName": "@arcade/regions",
-			"projectFolder": "typescript/packages/apps/regions",
-			"reviewCategory": "production",
+			"packageName": "@arcade/events",
+			"projectFolder": "typescript/packages/libraries/events",
+			"reviewCategory": "library",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/validators",
+			"projectFolder": "typescript/packages/libraries/validators",
+			"reviewCategory": "library",
 			"shouldPublish": true
 		},
 		{
 			"packageName": "@arcade/dynamodb-utils",
 			"projectFolder": "typescript/packages/libraries/dynamodb-utils",
+			"reviewCategory": "library",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/resource-api-base",
+			"projectFolder": "typescript/packages/libraries/resource-api-base",
+			"reviewCategory": "library",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/lambda-invoker",
+			"projectFolder": "typescript/packages/libraries/lambda-invoker",
+			"reviewCategory": "library",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/clients",
+			"projectFolder": "typescript/packages/libraries/clients",
+			"reviewCategory": "library",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/results",
+			"projectFolder": "typescript/packages/apps/results",
+			"reviewCategory": "production",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/regions",
+			"projectFolder": "typescript/packages/apps/regions",
 			"reviewCategory": "production",
 			"shouldPublish": true
 		},

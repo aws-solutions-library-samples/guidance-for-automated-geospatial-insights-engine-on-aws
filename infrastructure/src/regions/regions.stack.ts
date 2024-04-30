@@ -24,6 +24,7 @@ export type RegionsStackProperties = StackProps & {
 };
 
 export class RegionsApiStack extends Stack {
+	regionsFunctionName: string;
 	constructor(scope: Construct, id: string, props: RegionsStackProperties) {
 		super(scope, id, props);
 
@@ -45,6 +46,8 @@ export class RegionsApiStack extends Stack {
 			cognitoUserPoolId,
 			eventBusName,
 		});
+
+		this.regionsFunctionName = regionsModule.regionsFunctionName;
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,

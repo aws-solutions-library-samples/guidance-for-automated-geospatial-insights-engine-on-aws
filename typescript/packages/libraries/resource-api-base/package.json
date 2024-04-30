@@ -1,0 +1,68 @@
+{
+	"name": "@arcade/resource-api-base",
+	"version": "1.0.0",
+	"description": "Base containing common functionality to support all resource API's.",
+	"author": "Dean Hart <deanhart@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsx esbuild.ts",
+		"test": "npm run build && vitest run"
+	},
+	"dependencies": {
+		"@aws-sdk/client-dynamodb": "~3",
+		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/client-sqs": "~3",
+		"@aws-sdk/lib-dynamodb": "~3",
+		"@aws-sdk/smithy-client": "~3",
+		"@aws-sdk/types": "~3",
+		"@aws-sdk/util-dynamodb": "~3",
+		"@fastify/awilix": "~5",
+		"@fastify/aws-lambda": "~4",
+		"@fastify/cors": "~9",
+		"@fastify/env": "~4",
+		"@fastify/sensible": "~5",
+		"@fastify/swagger": "~8",
+		"@fastify/type-provider-typebox": "~4",
+		"@sinclair/typebox": "~0",
+		"@arcade/dynamodb-utils": "workspace:*",
+		"@arcade/lambda-invoker": "workspace:*",
+		"awilix": "~10",
+		"fastify-plugin": "~4",
+		"fastify": "~4",
+		"merge-anything": "~5",
+		"node-cache": "~5",
+		"p-limit": "~5",
+		"vite": "~5",
+		"aws-xray-sdk": "~3"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/node": "~20",
+		"@types/prettier": "~3",
+		"@typescript-eslint/eslint-plugin": "~7",
+		"@typescript-eslint/parser": "~7",
+		"aws-sdk-client-mock": "~4",
+		"eslint": "~9",
+		"pino-pretty": "~11",
+		"pino": "~8",
+		"esbuild": "~0",
+		"tsx": "~4",
+		"shx": "~0",
+		"ts-node": "~10",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
+	},
+	"private": false
+}

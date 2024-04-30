@@ -6,3 +6,4 @@ export * from './facts/facts.utils.js';
 export * from './facts/lambdaArchitecture.js';
 export * from './eventBridge/eventbus.construct.js';
 export * from './s3/s3.construct.js';
+export * from './eventBridge/eventbus.construct.js';

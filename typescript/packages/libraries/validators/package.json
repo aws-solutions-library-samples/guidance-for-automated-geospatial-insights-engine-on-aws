@@ -1,0 +1,38 @@
+{
+	"name": "@arcade/validators",
+	"version": "1.0.0",
+	"description": "Validation library to validate data inputs",
+	"author": "Pouya Bahavar <bahavar@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run"
+	},
+	"dependencies": {
+		"validator": "13.9.0"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/prettier": "~3",
+		"@types/node": "~20",
+		"@typescript-eslint/eslint-plugin": "~7",
+		"@typescript-eslint/parser": "~7",
+		"eslint": "~9",
+		"pino": "~8",
+		"shx": "~0",
+		"ts-node": "~10",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
+	},
+	"private": false
+}

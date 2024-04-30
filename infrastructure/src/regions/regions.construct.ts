@@ -179,6 +179,15 @@ export class RegionsModule extends Construct {
 			}
 			));
 
+		// Grant partiSQLSelect access
+		apiLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['dynamodb:PartiQLSelect'],
+				effect: Effect.ALLOW,
+				resources: [table.tableArn,`${table.tableArn}/index/*`],
+			}
+			));
+
 
 		eventBus.grantPutEventsTo(apiLambda);
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { getOrThrow, tryGetBooleanContext } from '@arcade/cdk-common';
 import * as cdk from 'aws-cdk-lib';
-import { App } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
 import * as fs from 'fs';
 import { RegionsApiStack } from './regions/regions.stack.js';
@@ -11,8 +10,10 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import { ResultsStack } from './results/results.stack.js';
 
-const app = new App();
+
+const app = new cdk.App();
 
 // mandatory config
 const environment = getOrThrow(app, 'environment');
@@ -26,6 +27,10 @@ const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as str
 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
+
+// Optional stac server
+const stacServerTopicArn = app.node.tryGetContext('stacServerTopicArn') as string;
+const stacServerFunctionName = app.node.tryGetContext('stacServerFunctionName') as string;
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 
@@ -43,11 +48,11 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-						fromEmail: cognitoFromEmail,
-						fromName: cognitoFromName,
-						replyTo: cognitoReplyToEmail,
-						sesVerifiedDomain: cognitoVerifiedDomain,
-				  }
+					fromEmail: cognitoFromEmail,
+					fromName: cognitoFromName,
+					replyTo: cognitoReplyToEmail,
+					sesVerifiedDomain: cognitoVerifiedDomain,
+				}
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -68,6 +73,25 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	// 	description: stackDescription('Engine'),
 	// 	environment,
 	// });
+
+	const resultStack = new ResultsStack(app, 'ResultsStack', {
+		stackName: stackName('results'),
+		description: stackDescription('Results module stack'),
+		moduleName: 'results',
+		environment,
+		bucketName: sharedStack.bucketName,
+		stacServerTopicArn,
+		stacServerFunctionName,
+		eventBusName: sharedStack.eventBusName,
+		regionsFunctionName: regionsStack.regionsFunctionName,
+		env: {
+			// The ARCADE_REGION domain variable
+			region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
+			account: callerEnvironment?.accountId
+		}
+	});
+	resultStack.addDependency(sharedStack);
+	resultStack.addDependency(regionsStack);
 };
 
 const getCallerEnvironment = (): { accountId?: string; region?: string } | undefined => {
