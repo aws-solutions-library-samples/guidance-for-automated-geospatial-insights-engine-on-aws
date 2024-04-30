@@ -7,7 +7,7 @@ import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
 import { validateNotEmpty } from '@arcade/validators';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import utc from 'dayjs-plugin-utc';
 dayjs.extend(utc)
 
 
