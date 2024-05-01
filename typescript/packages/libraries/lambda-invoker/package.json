@@ -20,6 +20,7 @@
 	"dependencies": {
 		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/util-utf8-node": "~3",
+		"@aws-sdk/client-sso-oidc": "~3",
 		"http-errors": "2.0.0",
 		"js-yaml": "4.1.0",
 		"readable-stream": "4.4.2"

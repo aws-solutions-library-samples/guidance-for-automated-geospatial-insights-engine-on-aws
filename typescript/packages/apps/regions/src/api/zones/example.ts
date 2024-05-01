@@ -2,6 +2,8 @@ import { CreateZone, EditZone, Zone, ZoneList } from './schemas.js';
 
 export const zonePostRequestExample: CreateZone = {
 	name: 'Field 1',
+	scheduleExpression: 'rate(5 days)',
+	scheduleExpressionTimezone: 'Australia/Perth',
 	boundary: [
 		[-104.5079674, 39.9194752],
 		[-104.4894065, 39.9193435],
@@ -13,6 +15,8 @@ export const zonePostRequestExample: CreateZone = {
 
 export const zonePatchRequestExample1: EditZone = zonePostRequestExample;
 export const zonePatchRequestExample2: EditZone = {
+	scheduleExpression: 'rate(5 days)',
+	scheduleExpressionTimezone: 'Australia/Perth',
 	tags: {
 		tier: 'GOLD',
 	},

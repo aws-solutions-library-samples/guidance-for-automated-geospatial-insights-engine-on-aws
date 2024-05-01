@@ -1,15 +1,18 @@
 import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from '../results/models.js';
 
-type EventType = 'COMPLETE' | 'ABORT' | 'FAIL';
+type EventType = 'created' | 'updated' | 'deleted';
+
+type ResourceType = 'zones' | 'groups' | 'regions';
 
 export interface DomainEvent<T> {
-	resourceType: string;
+	resourceType: ResourceType;
 	eventType: EventType;
 	id: string;
 	old?: T;
 	new?: T;
 	error?: Error;
 }
+
 export const AWS_EVENT_BRIDGE_SCHEDULED_EVENT_SOURCE: string = 'aws.events';
 export const ARCADE_EVENT_SOURCE: string = 'com.aws.arcade';
 export const RESULTS_EVENT_SOURCE: string = 'com.aws.arcade.results';
@@ -26,6 +29,8 @@ export const RESULTS_QUEUED_EVENT = `${ARCADE_EVENT_SOURCE}>results>queued`;
 export const RESULTS_STARTED_EVENT = `${ARCADE_EVENT_SOURCE}>results>started`;
 export const RESULTS_FAILED_EVENT = `${ARCADE_EVENT_SOURCE}>results>failed`;
 export const RESULTS_COMPLETED_EVENT = `${ARCADE_EVENT_SOURCE}>results>completed`;
+export const RESULTS_ZONE_CREATED_EVENT = `${REGIONS_EVENT_SOURCE}>zones>created`;
+export const RESULTS_ZONE_UPDATED_EVENT = `${REGIONS_EVENT_SOURCE}>zones>updated`;
 
 export interface groupChangeEvent {
 	account: string;

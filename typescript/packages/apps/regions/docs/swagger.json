@@ -279,6 +279,14 @@
               "$ref": "#/components/schemas/def-2"
             }
           },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
+            "type": "string"
+          },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
           },
@@ -309,6 +317,14 @@
             "items": {
               "$ref": "#/components/schemas/def-2"
             }
+          },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
+            "type": "string"
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -348,6 +364,14 @@
           "area": {
             "description": "The area of the Zone.",
             "type": "number"
+          },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
+            "type": "string"
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -2200,6 +2224,8 @@
                   "summary": "Create a new zone.",
                   "value": {
                     "name": "Field 1",
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth",
                     "boundary": [
                       [
                         -104.5079674,
@@ -2299,6 +2325,14 @@
                       "description": "The area of the Zone.",
                       "type": "number"
                     },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
+                      "type": "string"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -2343,6 +2377,8 @@
                     "value": {
                       "id": "76ghytgt5",
                       "name": "Field 1",
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
                       "boundary": [
                         [
                           -104.5079674,
@@ -2597,6 +2633,8 @@
                         {
                           "id": "76ghytgt5",
                           "name": "Field 1",
+                          "scheduleExpression": "rate(5 days)",
+                          "scheduleExpressionTimezone": "Australia/Perth",
                           "boundary": [
                             [
                               -104.5079674,
@@ -2774,6 +2812,14 @@
                       "description": "The area of the Zone.",
                       "type": "number"
                     },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
+                      "type": "string"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -2818,6 +2864,8 @@
                     "value": {
                       "id": "76ghytgt5",
                       "name": "Field 1",
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
                       "boundary": [
                         [
                           -104.5079674,
@@ -2983,6 +3031,8 @@
                   "summary": "Update an existing zone.",
                   "value": {
                     "name": "Field 1",
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth",
                     "boundary": [
                       [
                         -104.5079674,
@@ -3010,6 +3060,8 @@
                 "Changing tags": {
                   "summary": "Changing the tags of a zone.",
                   "value": {
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth",
                     "tags": {
                       "tier": "GOLD"
                     }
@@ -3089,6 +3141,14 @@
                     "area": {
                       "description": "The area of the Zone.",
                       "type": "number"
+                    },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
+                      "type": "string"
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"

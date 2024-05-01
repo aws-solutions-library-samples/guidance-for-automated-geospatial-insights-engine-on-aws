@@ -1,18 +1,21 @@
 #!/usr/bin/env node
 import { getOrThrow, tryGetBooleanContext } from '@arcade/cdk-common';
 import * as cdk from 'aws-cdk-lib';
+import { App } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
 import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { EngineStack } from './engine/engine.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
 import { ResultsStack } from './results/results.stack.js';
+import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = new cdk.App();
+const app = new App();
 
 // mandatory config
 const environment = getOrThrow(app, 'environment');
@@ -46,11 +49,11 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-						fromEmail: cognitoFromEmail,
-						fromName: cognitoFromName,
-						replyTo: cognitoReplyToEmail,
-						sesVerifiedDomain: cognitoVerifiedDomain,
-				  }
+					fromEmail: cognitoFromEmail,
+					fromName: cognitoFromName,
+					replyTo: cognitoReplyToEmail,
+					sesVerifiedDomain: cognitoVerifiedDomain,
+				}
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -65,39 +68,58 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	});
 	regionsStack.addDependency(sharedStack);
 
-	// new EngineStack(app, 'EngineModule', {
-	// 	stackName: stackName('engine'),
-	// 	description: stackDescription('Engine'),
-	// 	environment,
-	// });
-
-	const resultStack = new ResultsStack(app, 'ResultsStack', {
-		stackName: stackName('results'),
-		description: stackDescription('Results module stack'),
-		moduleName: 'results',
+	const engineStack = new EngineStack(app, 'EngineModule', {
+		stackName: stackName('engine'),
+		description: stackDescription('Engine'),
 		environment,
-		bucketName: sharedStack.bucketName,
-		stacServerTopicArn,
-		stacServerFunctionName,
-		eventBusName: sharedStack.eventBusName,
-		regionsFunctionName: regionsStack.regionsFunctionName,
+		vpc: sharedStack.vpc,
 		env: {
-			// The ARCADE_REGION domain variable
-			region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
+			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId,
 		},
 	});
-	resultStack.addDependency(sharedStack);
-	resultStack.addDependency(regionsStack);
+
+	engineStack.addDependency(sharedStack);
+
+	const schedulerStack = new SchedulerStack(app, 'SchedulerModule', {
+		stackName: stackName('scheduler'),
+		description: stackDescription('Scheduler'),
+		environment,
+	});
+
+	schedulerStack.addDependency(sharedStack);
+	schedulerStack.addDependency(engineStack);
+
+	if (stacServerFunctionName && stacServerTopicArn) {
+		const resultStack = new ResultsStack(app, 'ResultsStack', {
+			stackName: stackName('results'),
+			description: stackDescription('Results module stack'),
+			moduleName: 'results',
+			environment,
+			bucketName: sharedStack.bucketName,
+			stacServerTopicArn,
+			stacServerFunctionName,
+			eventBusName: sharedStack.eventBusName,
+			regionsFunctionName: regionsStack.regionsFunctionName,
+			env: {
+				// The ARCADE_REGION domain variable
+				region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
+				account: callerEnvironment?.accountId,
+			},
+		});
+		resultStack.addDependency(sharedStack);
+		resultStack.addDependency(regionsStack);
+	}
+
 };
 
 const getCallerEnvironment = (): { accountId?: string; region?: string } | undefined => {
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-				'EXAMPLE\n' +
-				'$ npm run cdk deploy -- -e sampleEnvironment'
+			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+			'EXAMPLE\n' +
+			'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));
