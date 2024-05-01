@@ -146,14 +146,14 @@ export class SchedulerModule extends Construct {
 			resources: [cfnScheduleGroup.attrArn],
 		}))
 
-		const zoneRuleDlq = new Queue(this, 'ZoneRuleDq');
+		const regionModifiedRuleDlq = new Queue(this, 'RegionModifiedRuleDLQ');
 
-		zoneRuleDlq.addToResourcePolicy(new PolicyStatement({
+		regionModifiedRuleDlq.addToResourcePolicy(new PolicyStatement({
 			sid: 'enforce-ssl',
 			effect: Effect.DENY,
 			principals: [new AnyPrincipal()],
 			actions: ['sqs:*'],
-			resources: [zoneRuleDlq.queueArn],
+			resources: [regionModifiedRuleDlq.queueArn],
 			conditions: {
 				'Bool': {
 					'aws:SecureTransport': 'false'
@@ -161,7 +161,7 @@ export class SchedulerModule extends Construct {
 			}
 		}));
 
-		const zoneCreatedRule = new Rule(this, 'ZoneCreatedRule', {
+		const regionModifiedRule = new Rule(this, 'RegionModifiedRule', {
 			eventBus: eventBus,
 			eventPattern: {
 				detailType: [
@@ -173,9 +173,9 @@ export class SchedulerModule extends Construct {
 			}
 		});
 
-		zoneCreatedRule.addTarget(
+		regionModifiedRule.addTarget(
 			new LambdaFunction(eventbridgeLambda, {
-				deadLetterQueue: zoneRuleDlq,
+				deadLetterQueue: regionModifiedRuleDlq,
 				maxEventAge: Duration.minutes(5),
 				retryAttempts: 2
 			})
@@ -263,7 +263,7 @@ export class SchedulerModule extends Construct {
 			true
 		);
 
-		NagSuppressions.addResourceSuppressions([engineDlq, zoneRuleDlq],
+		NagSuppressions.addResourceSuppressions([engineDlq, regionModifiedRuleDlq],
 			[
 				{
 					id: 'AwsSolutions-SQS3',

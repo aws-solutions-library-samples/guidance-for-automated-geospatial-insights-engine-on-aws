@@ -12,7 +12,7 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, countPaginationQS, fromTokenPaginationQS, groupIdQS, regionIdQS, tagFilterQS, zoneIdQS } from '../../common/schemas.js';
+import { commonHeaders, countPaginationQS, fromTokenPaginationQS, groupIdQS, regionIdQS, tagFilterQS, polygonIdQS } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { stateListResource } from './example.js';
@@ -39,7 +39,7 @@ Permissions:
 				tags: tagFilterQS,
 				groupId: groupIdQS,
 				regionId: regionIdQS,
-				zoneId: zoneIdQS,
+				polygonId: polygonIdQS,
 				latestOnly: latestStateOnlyQS,
 			}),
 			response: {
@@ -65,14 +65,14 @@ Permissions:
 			const tagUtils = fastify.diContainer.resolve('tagUtils');
 
 			// parse request
-			const { count, paginationToken, tags, groupId, regionId, zoneId, latestOnly } = request.query;
+			const { count, paginationToken, tags, groupId, regionId, polygonId, latestOnly } = request.query;
 			const [states, nextToken] = await svc.list(request.authz, {
 				count,
 				token: paginationToken,
 				tags: tagUtils.expandTagsQS(tags),
 				groupId,
 				regionId,
-				zoneId,
+				polygonId,
 				latestOnly,
 			});
 

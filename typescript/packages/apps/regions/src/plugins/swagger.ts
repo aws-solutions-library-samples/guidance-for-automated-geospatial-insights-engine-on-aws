@@ -22,7 +22,7 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 		openapi: {
 			info: {
 				title: 'ARCADE Regions',
-				description: `Manages hierarchical structures of groups, regions, and zones.`,
+				description: `Manages hierarchical structures of groups, regions, and polygons.`,
 				version: '1.0.0',
 			},
 			servers: [
@@ -37,15 +37,15 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 				},
 				{
 					name: 'Regions',
-					description: 'Regions represent collections of Zones.',
+					description: 'Regions represent collections of Polygons.',
 				},
 				{
-					name: 'Zones',
-					description: 'Zones represent a specific geographic location.',
+					name: 'Polygons',
+					description: 'Polygons represent a specific geographic location.',
 				},
 				{
 					name: 'States',
-					description: 'States represent the state of a specific zone at a specific point in time.',
+					description: 'States represent the state of a specific polygon at a specific point in time.',
 				},
 			],
 			security: [],

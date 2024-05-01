@@ -41,7 +41,7 @@ export type GetArgs = BaseExpectArgs & ResponseBodyExpectArgs & IdExpectArgs;
 export type ListExpectArgs = BaseExpectArgs & {
 	withCount?: number;
 	withToken?: string;
-	withZoneId?: string;
+	withPolygonId?: string;
 	withRegionId?: string;
 	withGroupId?: string;
 	withTags?: Tags;
@@ -116,8 +116,8 @@ export const listResources = (resourcePlural: string, args: ListExpectArgs): Spe
 		// s = s.withQueryParams('paginationToken', encodeURIComponent(args.withToken));
 		s = s.withQueryParams('paginationToken', args.withToken);
 	}
-	if (args.withZoneId) {
-		s = s.withQueryParams('zoneId', args.withZoneId);
+	if (args.withPolygonId) {
+		s = s.withQueryParams('polygonId', args.withPolygonId);
 	}
 	if (args.withRegionId) {
 		s = s.withQueryParams('regionId', args.withRegionId);

@@ -33,7 +33,7 @@ class EngineProcessRequest(DataClassJsonMixin):
 	coordinates: List[tuple[float, float]] = field(metadata=config(field_name="coordinates"), default=None)
 	group_id: str = field(metadata=config(field_name="groupId"), default=None)
 	region_id: str = field(metadata=config(field_name="regionId"), default=None)
-	zone_id: str = field(metadata=config(field_name="zoneId"), default=None)
+	polygon_id: str = field(metadata=config(field_name="polygonId"), default=None)
 
 
 class STACCatalogProcessor:
@@ -51,12 +51,12 @@ class STACCatalogProcessor:
 		five_days_before_schedule = (datetime.datetime.strptime(self.request.schedule_date_time, "%Y-%m-%d") - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
 		time_filter = "{}/{}".format(five_days_before_schedule, self.request.schedule_date_time)
 		CRS = 'epsg:4326'
-		zone = geom.Polygon(self.request.coordinates)
+		polygon = geom.Polygon(self.request.coordinates)
 		max_cloud_cover = 10
-		zone_array = [zone]
-		zone_series = gpd.GeoSeries(zone_array, crs=CRS)
+		polygon_array = [polygon]
+		polygon_series = gpd.GeoSeries(polygon_array, crs=CRS)
 		# Store the bounding box
-		self.bounding_box = zone_series.total_bounds
+		self.bounding_box = polygon_series.total_bounds
 		# Set the previous tif raster if any
 		# TODO: comment this out for now until result server PRs are merged
 		# self.previous_tif_raster = get_previous_tif(self.request.region_id, self.bounding_box.tolist())
@@ -91,7 +91,7 @@ class STACCatalogProcessor:
 		stac_assets = stac_load(
 			[self.stac_item],
 			bands=("red", "green", "blue", "nir08", "scl"),  # <-- filter on just the bands we need
-			bbox=self.bounding_box,  # <-- filters based on overall zone boundaries
+			bbox=self.bounding_box,  # <-- filters based on overall polygon boundaries
 			output_crs=output_crs,
 			resolution=10,
 			groupby="solar_day",  # <-- merge tiles of same day

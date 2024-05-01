@@ -14,9 +14,9 @@
 export enum PkType {
 	Group = 'g',
 	Region = 'r',
-	Zone = 'z',
+	Polygon = 'p',
 	State = 's',
-	LatestState = 'zs',
+	LatestState = 'ps',
 	TagKey = 'tk',
 	TagValue = 'tv',
 	Timestamp = 'ts',

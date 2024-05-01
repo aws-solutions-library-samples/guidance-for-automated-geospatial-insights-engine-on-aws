@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ARCADE Regions",
-    "description": "Manages hierarchical structures of groups, regions, and zones.",
+    "description": "Manages hierarchical structures of groups, regions, and polygons.",
     "version": "1.0.0"
   },
   "components": {
@@ -289,27 +289,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "description": "The name of the Zone.",
+            "description": "The name of the Polygon.",
             "type": "string"
           },
           "boundary": {
-            "description": "The boundary of the Zone.",
+            "description": "The boundary of the Polygon.",
             "$ref": "#/components/schemas/def-2"
           },
           "exclusions": {
-            "description": "Boundaries to be excluded from the Zone.",
+            "description": "Boundaries to be excluded from the Polygon.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/def-2"
             }
-          },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
-          },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -322,33 +314,25 @@
           "name",
           "boundary"
         ],
-        "title": "createZoneRequestBody"
+        "title": "createPolygonRequestBody"
       },
       "def-12": {
         "type": "object",
         "properties": {
           "name": {
-            "description": "The name of the Zone.",
+            "description": "The name of the Polygon.",
             "type": "string"
           },
           "boundary": {
-            "description": "The boundary of the Zone.",
+            "description": "The boundary of the Polygon.",
             "$ref": "#/components/schemas/def-2"
           },
           "exclusions": {
-            "description": "Boundaries to be excluded from the Zone.",
+            "description": "Boundaries to be excluded from the Polygon.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/def-2"
             }
-          },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
-          },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -357,17 +341,17 @@
             "$ref": "#/components/schemas/def-1"
           }
         },
-        "title": "editZoneRequestBody"
+        "title": "editPolygonRequestBody"
       },
       "def-13": {
         "type": "object",
         "properties": {
           "id": {
-            "description": "Unique Zone ID.",
+            "description": "Unique Polygon ID.",
             "type": "string"
           },
           "name": {
-            "description": "The name of the Zone.",
+            "description": "The name of the Polygon.",
             "type": "string"
           },
           "regionId": {
@@ -379,27 +363,19 @@
             "type": "string"
           },
           "boundary": {
-            "description": "The boundary of the Zone.",
+            "description": "The boundary of the Polygon.",
             "$ref": "#/components/schemas/def-2"
           },
           "exclusions": {
-            "description": "Boundaries to be excluded from the Zone.",
+            "description": "Boundaries to be excluded from the Polygon.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/def-2"
             }
           },
           "area": {
-            "description": "The area of the Zone.",
+            "description": "The area of the Polygon.",
             "type": "number"
-          },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
-          },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -439,12 +415,12 @@
           "createdBy",
           "createdAt"
         ],
-        "title": "zoneResource"
+        "title": "polygonResource"
       },
       "def-14": {
         "type": "object",
         "properties": {
-          "zones": {
+          "polygons": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/def-13"
@@ -467,9 +443,9 @@
           }
         },
         "required": [
-          "zones"
+          "polygons"
         ],
-        "title": "zoneList"
+        "title": "polygonList"
       },
       "def-15": {
         "type": "object",
@@ -510,8 +486,8 @@
             "description": "Unique State ID.",
             "type": "string"
           },
-          "zoneId": {
-            "description": "Unique Zone ID.",
+          "polygonId": {
+            "description": "Unique Polygon ID.",
             "type": "string"
           },
           "regionId": {
@@ -554,7 +530,7 @@
         },
         "required": [
           "id",
-          "zoneId",
+          "polygonId",
           "regionId",
           "groupId",
           "timestamp",
@@ -795,13 +771,12 @@
         "parameters": [
           {
             "schema": {
-              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": true,
-            "description": "Count of results to return, if not specified default to 20"
+            "required": false,
+            "description": "Count of results to return."
           },
           {
             "schema": {
@@ -1627,13 +1602,12 @@
         "parameters": [
           {
             "schema": {
-              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": true,
-            "description": "Count of results to return, if not specified default to 20"
+            "required": false,
+            "description": "Count of results to return."
           },
           {
             "schema": {
@@ -2282,14 +2256,14 @@
         }
       }
     },
-    "/regions/{regionId}/zones": {
+    "/regions/{regionId}/polygons": {
       "post": {
-        "operationId": "createZone",
-        "summary": "Define a new zone",
+        "operationId": "createPolygon",
+        "summary": "Define a new polygon",
         "tags": [
-          "Zones"
+          "Polygons"
         ],
-        "description": "Define a new zone.\n\nPermissions:\n- Only `admin` and above may create new zones.\n",
+        "description": "Define a new polygon.\n\nPermissions:\n- Only `admin` and above may create new polygons.\n",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2297,12 +2271,10 @@
                 "$ref": "#/components/schemas/def-11"
               },
               "examples": {
-                "New zone": {
-                  "summary": "Create a new zone.",
+                "New polygon": {
+                  "summary": "Create a new polygon.",
                   "value": {
                     "name": "Field 1",
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth",
                     "boundary": [
                       [
                         -104.5079674,
@@ -2376,11 +2348,11 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "description": "Unique Zone ID.",
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "name": {
-                      "description": "The name of the Zone.",
+                      "description": "The name of the Polygon.",
                       "type": "string"
                     },
                     "regionId": {
@@ -2392,27 +2364,19 @@
                       "type": "string"
                     },
                     "boundary": {
-                      "description": "The boundary of the Zone.",
+                      "description": "The boundary of the Polygon.",
                       "$ref": "#/components/schemas/def-2"
                     },
                     "exclusions": {
-                      "description": "Boundaries to be excluded from the Zone.",
+                      "description": "Boundaries to be excluded from the Polygon.",
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/def-2"
                       }
                     },
                     "area": {
-                      "description": "The area of the Zone.",
+                      "description": "The area of the Polygon.",
                       "type": "number"
-                    },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
-                    },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -2454,13 +2418,11 @@
                   ]
                 },
                 "examples": {
-                  "New zone": {
-                    "summary": "New zone created successfully.",
+                  "New polygon": {
+                    "summary": "New polygon created successfully.",
                     "value": {
                       "id": "76ghytgt5",
                       "name": "Field 1",
-                      "scheduleExpression": "rate(5 days)",
-                      "scheduleExpressionTimezone": "Australia/Perth",
                       "boundary": [
                         [
                           -104.5079674,
@@ -2570,24 +2532,23 @@
         }
       }
     },
-    "/zones": {
+    "/polygons": {
       "get": {
-        "operationId": "listZones",
-        "summary": "List all zones.",
+        "operationId": "listPolygons",
+        "summary": "List all polygons.",
         "tags": [
-          "Zones"
+          "Polygons"
         ],
-        "description": "List all zones.\n\nPermissions:\n- `readers` may list zones.\n",
+        "description": "List all polygons.\n\nPermissions:\n- `readers` may list polygons.\n",
         "parameters": [
           {
             "schema": {
-              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": true,
-            "description": "Count of results to return, if not specified default to 20"
+            "required": false,
+            "description": "Count of results to return."
           },
           {
             "schema": {
@@ -2683,7 +2644,7 @@
                   "description": "Success.",
                   "type": "object",
                   "properties": {
-                    "zones": {
+                    "polygons": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/def-13"
@@ -2706,19 +2667,17 @@
                     }
                   },
                   "required": [
-                    "zones"
+                    "polygons"
                   ]
                 },
                 "examples": {
-                  "List of zones": {
-                    "summary": "Paginated list of zones.",
+                  "List of polygons": {
+                    "summary": "Paginated list of polygons.",
                     "value": {
-                      "zones": [
+                      "polygons": [
                         {
                           "id": "76ghytgt5",
                           "name": "Field 1",
-                          "scheduleExpression": "rate(5 days)",
-                          "scheduleExpressionTimezone": "Australia/Perth",
                           "boundary": [
                             [
                               -104.5079674,
@@ -2818,23 +2777,23 @@
         }
       }
     },
-    "/zones/{zoneId}": {
+    "/polygons/{polygonId}": {
       "get": {
-        "operationId": "getZone",
-        "summary": "Retrieve a zone.",
+        "operationId": "getPolygon",
+        "summary": "Retrieve a polygon.",
         "tags": [
-          "Zones"
+          "Polygons"
         ],
-        "description": "Retrieve the details of a zone.\n\nPermissions:\n- Only `reader` and above may view zones.\n",
+        "description": "Retrieve the details of a polygon.\n\nPermissions:\n- Only `reader` and above may view polygons.\n",
         "parameters": [
           {
             "schema": {
               "type": "string"
             },
             "in": "path",
-            "name": "zoneId",
+            "name": "polygonId",
             "required": true,
-            "description": "Unique Zone ID."
+            "description": "Unique Polygon ID."
           },
           {
             "schema": {
@@ -2872,11 +2831,11 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "description": "Unique Zone ID.",
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "name": {
-                      "description": "The name of the Zone.",
+                      "description": "The name of the Polygon.",
                       "type": "string"
                     },
                     "regionId": {
@@ -2888,27 +2847,19 @@
                       "type": "string"
                     },
                     "boundary": {
-                      "description": "The boundary of the Zone.",
+                      "description": "The boundary of the Polygon.",
                       "$ref": "#/components/schemas/def-2"
                     },
                     "exclusions": {
-                      "description": "Boundaries to be excluded from the Zone.",
+                      "description": "Boundaries to be excluded from the Polygon.",
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/def-2"
                       }
                     },
                     "area": {
-                      "description": "The area of the Zone.",
+                      "description": "The area of the Polygon.",
                       "type": "number"
-                    },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
-                    },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -2950,13 +2901,11 @@
                   ]
                 },
                 "examples": {
-                  "Existing zone": {
-                    "summary": "Zone retrieved successfully.",
+                  "Existing polygon": {
+                    "summary": "Polygon retrieved successfully.",
                     "value": {
                       "id": "76ghytgt5",
                       "name": "Field 1",
-                      "scheduleExpression": "rate(5 days)",
-                      "scheduleExpressionTimezone": "Australia/Perth",
                       "boundary": [
                         [
                           -104.5079674,
@@ -3012,21 +2961,21 @@
         }
       },
       "delete": {
-        "operationId": "deleteZone",
-        "summary": "Deletes a zone.",
+        "operationId": "deletePolygon",
+        "summary": "Deletes a polygon.",
         "tags": [
-          "Zones"
+          "Polygons"
         ],
-        "description": "Deletes a zone.\n\nPermissions:\n- Only `admin` and above may delete zones.\n",
+        "description": "Deletes a polygon.\n\nPermissions:\n- Only `admin` and above may delete polygons.\n",
         "parameters": [
           {
             "schema": {
               "type": "string"
             },
             "in": "path",
-            "name": "zoneId",
+            "name": "polygonId",
             "required": true,
-            "description": "Unique Zone ID."
+            "description": "Unique Polygon ID."
           },
           {
             "schema": {
@@ -3106,12 +3055,12 @@
         }
       },
       "patch": {
-        "operationId": "updateZone",
-        "summary": "Update a zone.",
+        "operationId": "updatePolygon",
+        "summary": "Update a polygon.",
         "tags": [
-          "Zones"
+          "Polygons"
         ],
-        "description": "Update an existing zone.\n\nPermissions:\n- Only `admins` may update zones.\n",
+        "description": "Update an existing polygon.\n\nPermissions:\n- Only `admins` may update polygons.\n",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3119,12 +3068,10 @@
                 "$ref": "#/components/schemas/def-12"
               },
               "examples": {
-                "Update zone": {
-                  "summary": "Update an existing zone.",
+                "Update polygon": {
+                  "summary": "Update an existing polygon.",
                   "value": {
                     "name": "Field 1",
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth",
                     "boundary": [
                       [
                         -104.5079674,
@@ -3150,10 +3097,8 @@
                   }
                 },
                 "Changing tags": {
-                  "summary": "Changing the tags of a zone.",
+                  "summary": "Changing the tags of a polygon.",
                   "value": {
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth",
                     "tags": {
                       "tier": "GOLD"
                     }
@@ -3169,9 +3114,9 @@
               "type": "string"
             },
             "in": "path",
-            "name": "zoneId",
+            "name": "polygonId",
             "required": true,
-            "description": "Unique Zone ID."
+            "description": "Unique Polygon ID."
           },
           {
             "schema": {
@@ -3208,11 +3153,11 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "description": "Unique Zone ID.",
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "name": {
-                      "description": "The name of the Zone.",
+                      "description": "The name of the Polygon.",
                       "type": "string"
                     },
                     "regionId": {
@@ -3224,27 +3169,19 @@
                       "type": "string"
                     },
                     "boundary": {
-                      "description": "The boundary of the Zone.",
+                      "description": "The boundary of the Polygon.",
                       "$ref": "#/components/schemas/def-2"
                     },
                     "exclusions": {
-                      "description": "Boundaries to be excluded from the Zone.",
+                      "description": "Boundaries to be excluded from the Polygon.",
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/def-2"
                       }
                     },
                     "area": {
-                      "description": "The area of the Zone.",
+                      "description": "The area of the Polygon.",
                       "type": "number"
-                    },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
-                    },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -3286,8 +3223,8 @@
                   ]
                 },
                 "examples": {
-                  "Existing zone updated successfully": {
-                    "summary": "Existing zone created successfully.",
+                  "Existing polygon updated successfully": {
+                    "summary": "Existing polygon created successfully.",
                     "value": {
                       "id": "0980yht42",
                       "name": "Field 2",
@@ -3464,14 +3401,14 @@
         }
       }
     },
-    "/zones/{zoneId}/states": {
+    "/polygons/{polygonId}/states": {
       "post": {
         "operationId": "createState",
         "summary": "Define a new state",
         "tags": [
           "States"
         ],
-        "description": "Define a new state of a zone.\n\nPermissions:\n- Only `admin` and above may create new states.\n",
+        "description": "Define a new state of a polygon.\n\nPermissions:\n- Only `admin` and above may create new states.\n",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3502,9 +3439,9 @@
               "type": "string"
             },
             "in": "path",
-            "name": "zoneId",
+            "name": "polygonId",
             "required": true,
-            "description": "Unique Zone ID."
+            "description": "Unique Polygon ID."
           },
           {
             "schema": {
@@ -3544,8 +3481,8 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
-                    "zoneId": {
-                      "description": "Unique Zone ID.",
+                    "polygonId": {
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "regionId": {
@@ -3588,7 +3525,7 @@
                   },
                   "required": [
                     "id",
-                    "zoneId",
+                    "polygonId",
                     "regionId",
                     "groupId",
                     "timestamp",
@@ -3609,7 +3546,7 @@
                         "plantedAt": "2024-04-15T00:00:00.000Z",
                         "crop": "corn"
                       },
-                      "zoneId": "jutdjshjdksk",
+                      "polygonId": "jutdjshjdksk",
                       "regionId": "eyhdksjdk8js",
                       "groupId": "jsuueyhdjs8",
                       "createdAt": "2022-08-10T23:55:20.322Z",
@@ -3707,13 +3644,12 @@
         "parameters": [
           {
             "schema": {
-              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": true,
-            "description": "Count of results to return, if not specified default to 20"
+            "required": false,
+            "description": "Count of results to return."
           },
           {
             "schema": {
@@ -3760,9 +3696,9 @@
               "type": "string"
             },
             "in": "query",
-            "name": "zoneId",
+            "name": "polygonId",
             "required": false,
-            "description": "Zone ID to filter by."
+            "description": "Polygon ID to filter by."
           },
           {
             "schema": {
@@ -3850,7 +3786,7 @@
                             "plantedAt": "2024-04-15T00:00:00.000Z",
                             "crop": "corn"
                           },
-                          "zoneId": "jutdjshjdksk",
+                          "polygonId": "jutdjshjdksk",
                           "regionId": "eyhdksjdk8js",
                           "groupId": "jsuueyhdjs8",
                           "createdAt": "2022-08-10T23:55:20.322Z",
@@ -3858,7 +3794,7 @@
                         },
                         {
                           "id": "0980yht42",
-                          "zoneId": "jutdjshjdksk",
+                          "polygonId": "jutdjshjdksk",
                           "regionId": "eyhdksjdk8js",
                           "groupId": "jsuueyhdjs8",
                           "timestamp": "2023-04-11T00:00:00.000Z",
@@ -3877,7 +3813,7 @@
                         },
                         {
                           "id": "rrwth876d",
-                          "zoneId": "jutdjshjdksk",
+                          "polygonId": "jutdjshjdksk",
                           "regionId": "eyhdksjdk8js",
                           "groupId": "jsuueyhdjs8",
                           "timestamp": "2022-04-11T00:00:00.000Z",
@@ -3913,7 +3849,7 @@
         "tags": [
           "States"
         ],
-        "description": "Retrieve the state of a zone.\n\nPermissions:\n- Only `reader` and above may view states.\n",
+        "description": "Retrieve the state of a polygon.\n\nPermissions:\n- Only `reader` and above may view states.\n",
         "parameters": [
           {
             "schema": {
@@ -3963,8 +3899,8 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
-                    "zoneId": {
-                      "description": "Unique Zone ID.",
+                    "polygonId": {
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "regionId": {
@@ -4007,7 +3943,7 @@
                   },
                   "required": [
                     "id",
-                    "zoneId",
+                    "polygonId",
                     "regionId",
                     "groupId",
                     "timestamp",
@@ -4028,7 +3964,7 @@
                         "plantedAt": "2024-04-15T00:00:00.000Z",
                         "crop": "corn"
                       },
-                      "zoneId": "jutdjshjdksk",
+                      "polygonId": "jutdjshjdksk",
                       "regionId": "eyhdksjdk8js",
                       "groupId": "jsuueyhdjs8",
                       "createdAt": "2022-08-10T23:55:20.322Z",
@@ -4241,8 +4177,8 @@
                       "description": "Unique State ID.",
                       "type": "string"
                     },
-                    "zoneId": {
-                      "description": "Unique Zone ID.",
+                    "polygonId": {
+                      "description": "Unique Polygon ID.",
                       "type": "string"
                     },
                     "regionId": {
@@ -4285,7 +4221,7 @@
                   },
                   "required": [
                     "id",
-                    "zoneId",
+                    "polygonId",
                     "regionId",
                     "groupId",
                     "timestamp",
@@ -4298,7 +4234,7 @@
                     "summary": "Existing state created successfully.",
                     "value": {
                       "id": "0980yht42",
-                      "zoneId": "jutdjshjdksk",
+                      "polygonId": "jutdjshjdksk",
                       "regionId": "eyhdksjdk8js",
                       "groupId": "jsuueyhdjs8",
                       "timestamp": "2023-04-11T00:00:00.000Z",
@@ -4448,15 +4384,15 @@
     },
     {
       "name": "Regions",
-      "description": "Regions represent collections of Zones."
+      "description": "Regions represent collections of Polygons."
     },
     {
-      "name": "Zones",
-      "description": "Zones represent a specific geographic location."
+      "name": "Polygons",
+      "description": "Polygons represent a specific geographic location."
     },
     {
       "name": "States",
-      "description": "States represent the state of a specific zone at a specific point in time."
+      "description": "States represent the state of a specific polygon at a specific point in time."
     }
   ]
 }

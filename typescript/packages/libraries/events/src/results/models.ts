@@ -294,11 +294,11 @@ export interface pipelineMetadataDetails {
 	 */
 	regionId: string;
 	/**
-	 * Fields are represented as a zone
+	 * Fields are represented as a polygon
 	 */
-	zoneId: string;
+	polygonId: string;
 	/**
-	 * Over time a field will have many different crop seasons. Each of these crop seasons is represented as a state of a zone
+	 * Over time a field will have many different crop seasons. Each of these crop seasons is represented as a state of a polygon
 	 */
 	stateId: string;
 

@@ -8,7 +8,7 @@ import { SecurityContext } from '../../common/scopes.js';
 import { RegionService } from '../regions/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
-import { ZoneService } from '../zones/service.js';
+import { PolygonService } from '../polygons/service.js';
 import { StateRepository } from './repository.js';
 import { CreateState, EditState, State } from './schemas.js';
 
@@ -16,29 +16,29 @@ export type StateListFilterOptions = TagFilterOptions & {
 	name?: string;
 	groupId?: string;
 	regionId?: string;
-	zoneId?: string;
+	polygonId?: string;
 	latestOnly?: boolean;
 };
-const RESERVED_FIELDS_AS_TAGS = ['name', 'groupId', 'regionId', 'zoneId'];
+const RESERVED_FIELDS_AS_TAGS = ['name', 'groupId', 'regionId', 'polygonId'];
 
 export class StateService {
 	public constructor(
 		readonly log: FastifyBaseLogger,
 		readonly stateRepository: StateRepository,
 		readonly regionService: RegionService,
-		readonly zoneService: ZoneService,
+		readonly polygonService: PolygonService,
 		readonly commonService: CommonService,
 		readonly commonRepository: CommonRepository,
 		readonly eventPublisher: EventPublisher
 	) {}
 
-	public async create(securityContext: SecurityContext, zoneId: string, state: CreateState): Promise<State> {
-		this.log.debug(`StateService> create> in> zoneId:${zoneId}, state:${JSON.stringify(state)}`);
+	public async create(securityContext: SecurityContext, polygonId: string, state: CreateState): Promise<State> {
+		this.log.debug(`StateService> create> in> polygonId:${polygonId}, state:${JSON.stringify(state)}`);
 
 		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// Validation
-		ow(zoneId, ow.string.nonEmpty);
+		ow(polygonId, ow.string.nonEmpty);
 		ow(
 			state,
 			ow.object.exactShape({
@@ -50,19 +50,19 @@ export class StateService {
 
 		// TODO: perform more detailed validation on attributes and tags
 
-		// ensure parent zone exists (will throw error if not exist or insufficient privileges).
-		const zoneFuture = this.zoneService.get(securityContext, zoneId);
-		// obtain details of existing latest state for the zone
-		const existingLatestStateFuture = this.getLatestState(securityContext, zoneId);
-		const [zone, existingLatestState] = await Promise.all([zoneFuture, existingLatestStateFuture]);
+		// ensure parent polygon exists (will throw error if not exist or insufficient privileges).
+		const polygonFuture = this.polygonService.get(securityContext, polygonId);
+		// obtain details of existing latest state for the polygon
+		const existingLatestStateFuture = this.getLatestState(securityContext, polygonId);
+		const [polygon, existingLatestState] = await Promise.all([polygonFuture, existingLatestStateFuture]);
 
 		// construct what we're saving
-		const region = await this.regionService.get(securityContext, zone.regionId);
+		const region = await this.regionService.get(securityContext, polygon.regionId);
 		const toSave = this.commonService.prepareResourceForCreate<CreateState, State>(
 			state,
 			RESERVED_FIELDS_AS_TAGS,
 			{
-				zoneId,
+				polygonId,
 				regionId: region.id,
 				groupId: region.groupId,
 				createdBy: securityContext.email,
@@ -90,9 +90,9 @@ export class StateService {
 		return saved;
 	}
 
-	private async getLatestState(securityContext: SecurityContext, zoneId: string) {
-		this.log.debug(`StateService> getLatestState> in> zoneId:${zoneId}`);
-		const result = await this.commonService.listResourceIdsByTag(PkType.State, { tags: { ___zoneId: zoneId, ___isLatest: 'true' } });
+	private async getLatestState(securityContext: SecurityContext, polygonId: string) {
+		this.log.debug(`StateService> getLatestState> in> polygonId:${polygonId}`);
+		const result = await this.commonService.listResourceIdsByTag(PkType.State, { tags: { ___polygonId: polygonId, ___isLatest: 'true' } });
 		const existingLatestStateId = result?.[0]?.[0];
 		const existingLatestState = existingLatestStateId ? await this.get(securityContext, existingLatestStateId) : undefined;
 		this.log.debug(`StateService> getLatestState> exit> ${JSON.stringify(existingLatestState)}`);
@@ -124,7 +124,6 @@ export class StateService {
 		// save
 		await this.stateRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
 		const saved = await this.get(securityContext, id);
-
 		// publish event
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
@@ -161,15 +160,15 @@ export class StateService {
 		// check exists
 		const state = await this.get(securityContext, id);
 
-		// obtain details of existing latest state for the zone
-		const existingLatestState = await this.getLatestState(securityContext, state.zoneId);
+		// obtain details of existing latest state for the polygon
+		const existingLatestState = await this.getLatestState(securityContext, state.polygonId);
 
 		// delete
 		await this.stateRepository.delete(state, existingLatestState);
 
 		// publish event
 		await this.eventPublisher.publishEvent({
-			eventType: 'deleted',
+			eventType: 'updated',
 			id: state.id,
 			resourceType: 'states',
 			old: state,

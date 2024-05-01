@@ -22,4 +22,3 @@ export const handler: EventBridgeHandler<string, DomainEvent<RegionResource>, an
 
 	app.log.info(`EventBridgeLambda > handler >exit`);
 };
-

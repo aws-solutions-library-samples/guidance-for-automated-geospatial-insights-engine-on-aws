@@ -1,9 +1,7 @@
-import { CreateZone, EditZone, Zone, ZoneList } from './schemas.js';
+import { CreatePolygon, EditPolygon, Polygon, PolygonList } from './schemas.js';
 
-export const zonePostRequestExample: CreateZone = {
+export const polygonPostRequestExample: CreatePolygon = {
 	name: 'Field 1',
-	scheduleExpression: 'rate(5 days)',
-	scheduleExpressionTimezone: 'Australia/Perth',
 	boundary: [
 		[-104.5079674, 39.9194752],
 		[-104.4894065, 39.9193435],
@@ -13,10 +11,8 @@ export const zonePostRequestExample: CreateZone = {
 	],
 };
 
-export const zonePatchRequestExample1: EditZone = zonePostRequestExample;
-export const zonePatchRequestExample2: EditZone = {
-	scheduleExpression: 'rate(5 days)',
-	scheduleExpressionTimezone: 'Australia/Perth',
+export const polygonPatchRequestExample1: EditPolygon = polygonPostRequestExample;
+export const polygonPatchRequestExample2: EditPolygon = {
 	tags: {
 		tier: 'GOLD',
 	},
@@ -25,9 +21,9 @@ export const zonePatchRequestExample2: EditZone = {
 /**
  * Example after initial creation
  */
-export const zoneResourceExample1: Zone = {
+export const polygonResourceExample1: Polygon = {
 	id: '76ghytgt5',
-	...zonePostRequestExample,
+	...polygonPostRequestExample,
 	regionId: 'htgdjajdhja',
 	groupId: 'jsuueyhdjs8',
 	area: 175,
@@ -35,7 +31,7 @@ export const zoneResourceExample1: Zone = {
 	createdBy: 'someone@somewhere.com',
 };
 
-export const zoneResourceExample2: Zone = {
+export const polygonResourceExample2: Polygon = {
 	id: '0980yht42',
 	name: 'Field 2',
 	regionId: 'htgdjajdhja',
@@ -60,10 +56,10 @@ export const zoneResourceExample2: Zone = {
 	updatedBy: 'someoneelse@somewhere.com',
 };
 
-export const zoneListResource: ZoneList = {
-	zones: [zoneResourceExample1, zoneResourceExample2],
+export const polygonListResource: PolygonList = {
+	polygons: [polygonResourceExample1, polygonResourceExample2],
 	pagination: {
-		token: zoneResourceExample1.id,
+		token: polygonResourceExample1.id,
 		count: 2,
 	},
 };

@@ -134,10 +134,10 @@ export class RegionService {
 		// check exists
 		const existing = await this.get(securityContext, id);
 
-		// ensure no zones are associated with the region
-		const zones = await this.commonService.listResourceIdsByTag(PkType.Zone, { count: 1, tags: { ___regionId: id } });
-		if ((zones[0]?.length ?? 0) > 0) {
-			throw new InvalidStateError(`Region '${id}' cannot be deleted as it still has associated zones.`);
+		// ensure no polygons are associated with the region
+		const polygons = await this.commonService.listResourceIdsByTag(PkType.Polygon, { count: 1, tags: { ___regionId: id } });
+		if ((polygons[0]?.length ?? 0) > 0) {
+			throw new InvalidStateError(`Region '${id}' cannot be deleted as it still has associated polygons.`);
 		}
 
 		// delete

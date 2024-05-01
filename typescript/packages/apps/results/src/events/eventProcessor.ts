@@ -81,7 +81,7 @@ export class EventProcessor {
 		validateNotEmpty(event.detail.executionId, 'executionId');
 		validateNotEmpty(event.detail.groupId, 'groupId');
 		validateNotEmpty(event.detail.regionId, 'regionId');
-		validateNotEmpty(event.detail.zoneId, 'zoneId');
+		validateNotEmpty(event.detail.polygonId, 'polygonId');
 		validateNotEmpty(event.detail.stateId, 'stateId');
 
 		// Get the full payload
@@ -103,12 +103,12 @@ export class EventProcessor {
 		validateNotEmpty(event.detail.executionId, 'executionId');
 		validateNotEmpty(event.detail.groupId, 'groupId');
 		validateNotEmpty(event.detail.regionId, 'regionId');
-		validateNotEmpty(event.detail.zoneId, 'zoneId');
+		validateNotEmpty(event.detail.polygonId, 'polygonId');
 		validateNotEmpty(event.detail.stateId, 'stateId');
 		validateNotEmpty(event.detail.message, 'message');
 
 		// Get the full payload
-		const pipelineMetadata: PipelineMetadataDetails = await this.repository.get(event.detail.executionId, event.detail.zoneId);
+		const pipelineMetadata: PipelineMetadataDetails = await this.repository.get(event.detail.executionId, event.detail.polygonId);
 
 		// Update the metadata details
 		pipelineMetadata.status = 'FAILED';
@@ -133,13 +133,13 @@ export class EventProcessor {
 		validateNotEmpty(event.detail.executionId, 'executionId');
 		validateNotEmpty(event.detail.groupId, 'groupId');
 		validateNotEmpty(event.detail.regionId, 'regionId');
-		validateNotEmpty(event.detail.zoneId, 'zoneId');
+		validateNotEmpty(event.detail.polygonId, 'polygonId');
 		validateNotEmpty(event.detail.stateId, 'stateId');
 		validateNotEmpty(event.detail.engineOutPutLocation, 'engineOutPutLocation');
 
 		let pipelineMetadata: PipelineMetadataDetails = undefined;
 		// Get the full payload
-		pipelineMetadata = await this.repository.get(event.detail.executionId, event.detail.zoneId);
+		pipelineMetadata = await this.repository.get(event.detail.executionId, event.detail.polygonId);
 
 		if (!pipelineMetadata) {
 			// Get the full payload

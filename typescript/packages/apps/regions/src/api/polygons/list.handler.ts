@@ -14,24 +14,24 @@
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, countPaginationQS, fromTokenPaginationQS, groupIdQS, nameQS, regionIdQS, tagFilterQS } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
-import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { zoneListResource } from './example.js';
-import { includeLatestStateQS, ZoneList, zoneList } from './schemas.js';
+import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
+import { polygonListResource } from './example.js';
+import { PolygonList, includeLatestStateQS, polygonList } from './schemas.js';
 
-export default function listZonesRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function listPolygonsRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'GET',
-		url: '/zones',
+		url: '/polygons',
 
 		schema: {
-			summary: 'List all zones.',
-			description: `List all zones.
+			summary: 'List all polygons.',
+			description: `List all polygons.
 
 Permissions:
-- \`readers\` may list zones.
+- \`readers\` may list polygons.
 `,
-			tags: ['Zones'],
-			operationId: 'listZones',
+			tags: ['Polygons'],
+			operationId: 'listPolygons',
 			headers: commonHeaders,
 			querystring: Type.Object({
 				count: countPaginationQS,
@@ -45,11 +45,11 @@ Permissions:
 			response: {
 				200: {
 					description: 'Success.',
-					...zoneList,
+					...polygonList,
 					'x-examples': {
-						'List of zones': {
-							summary: 'Paginated list of zones.',
-							value: zoneListResource,
+						'List of polygons': {
+							summary: 'Paginated list of polygons.',
+							value: polygonListResource,
 						},
 					},
 				},
@@ -61,23 +61,22 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('zoneService');
+			const svc = fastify.diContainer.resolve('polygonService');
 			const tagUtils = fastify.diContainer.resolve('tagUtils');
 
 			// parse request
 			const { count, paginationToken, name, tags, groupId, regionId, includeLatestState } = request.query;
-
-			const [zones, nextToken] = await svc.list(request.authz, {
-				regionId,
+			const [polygons, nextToken] = await svc.list(request.authz, {
 				count,
 				token: paginationToken,
 				name,
 				tags: tagUtils.expandTagsQS(tags),
 				groupId,
+				regionId,
 				includeLatestState,
 			});
 
-			const response: ZoneList = { zones };
+			const response: PolygonList = { polygons };
 			if (count || nextToken) {
 				response.pagination = {
 					token: nextToken,

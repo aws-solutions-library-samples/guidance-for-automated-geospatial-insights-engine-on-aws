@@ -12,38 +12,38 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, notFoundResponse, zoneId } from '../../common/schemas.js';
+import { commonHeaders, notFoundResponse, polygonId } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
-import { zoneResourceExample1 } from './example.js';
-import { zoneResource } from './schemas.js';
+import { polygonResourceExample1 } from './example.js';
+import { polygonResource } from './schemas.js';
 
-export default function getZoneRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function getPolygonRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'GET',
-		url: '/zones/:zoneId',
+		url: '/polygons/:polygonId',
 
 		schema: {
-			summary: 'Retrieve a zone.',
-			description: `Retrieve the details of a zone.
+			summary: 'Retrieve a polygon.',
+			description: `Retrieve the details of a polygon.
 
 Permissions:
-- Only \`reader\` and above may view zones.
+- Only \`reader\` and above may view polygons.
 `,
-			tags: ['Zones'],
-			operationId: 'getZone',
+			tags: ['Polygons'],
+			operationId: 'getPolygon',
 			headers: commonHeaders,
 			params: Type.Object({
-				zoneId: zoneId,
+				polygonId: polygonId,
 			}),
 			response: {
 				200: {
 					description: 'Success.',
-					...zoneResource,
+					...polygonResource,
 					'x-examples': {
-						'Existing zone': {
-							summary: 'Zone retrieved successfully.',
-							value: zoneResourceExample1,
+						'Existing polygon': {
+							summary: 'Polygon retrieved successfully.',
+							value: polygonResourceExample1,
 						},
 					},
 				},
@@ -56,10 +56,10 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('zoneService');
-			const { zoneId } = request.params;
-			const zone = await svc.get(request.authz, zoneId);
-			return reply.status(200).send(zone);
+			const svc = fastify.diContainer.resolve('polygonService');
+			const { polygonId } = request.params;
+			const polygon = await svc.get(request.authz, polygonId);
+			return reply.status(200).send(polygon);
 		},
 	});
 

@@ -12,51 +12,51 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, notFoundResponse, zoneId } from '../../common/schemas.js';
+import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, notFoundResponse, polygonId } from '../../common/schemas.js';
 import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
-import { zonePatchRequestExample1, zonePatchRequestExample2, zoneResourceExample2 } from './example.js';
-import { editZoneRequestBody, zoneResource } from './schemas.js';
+import { polygonPatchRequestExample1, polygonPatchRequestExample2, polygonResourceExample2 } from './example.js';
+import { editPolygonRequestBody, polygonResource } from './schemas.js';
 
-export default function updateZoneRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function updatePolygonRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'PATCH',
-		url: '/zones/:zoneId',
+		url: '/polygons/:polygonId',
 
 		schema: {
-			summary: 'Update a zone.',
-			description: `Update an existing zone.
+			summary: 'Update a polygon.',
+			description: `Update an existing polygon.
 
 Permissions:
-- Only \`admins\` may update zones.
+- Only \`admins\` may update polygons.
 `,
-			tags: ['Zones'],
-			operationId: 'updateZone',
+			tags: ['Polygons'],
+			operationId: 'updatePolygon',
 			headers: commonHeaders,
 			params: Type.Object({
-				zoneId: zoneId,
+				polygonId: polygonId,
 			}),
 			body: {
-				...Type.Ref(editZoneRequestBody),
+				...Type.Ref(editPolygonRequestBody),
 				'x-examples': {
-					'Update zone': {
-						summary: 'Update an existing zone.',
-						value: zonePatchRequestExample1,
+					'Update polygon': {
+						summary: 'Update an existing polygon.',
+						value: polygonPatchRequestExample1,
 					},
 					'Changing tags': {
-						summary: 'Changing the tags of a zone.',
-						value: zonePatchRequestExample2,
+						summary: 'Changing the tags of a polygon.',
+						value: polygonPatchRequestExample2,
 					},
 				},
 			},
 			response: {
 				200: {
 					description: 'Success.',
-					...zoneResource,
+					...polygonResource,
 					'x-examples': {
-						'Existing zone updated successfully': {
-							summary: 'Existing zone created successfully.',
-							value: zoneResourceExample2,
+						'Existing polygon updated successfully': {
+							summary: 'Existing polygon created successfully.',
+							value: polygonResourceExample2,
 						},
 					},
 				},
@@ -92,9 +92,9 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('zoneService');
-			const { zoneId } = request.params;
-			const saved = await svc.update(request.authz, zoneId, request.body);
+			const svc = fastify.diContainer.resolve('polygonService');
+			const { polygonId } = request.params;
+			const saved = await svc.update(request.authz, polygonId, request.body);
 			return reply.status(200).send(saved);
 		},
 	});

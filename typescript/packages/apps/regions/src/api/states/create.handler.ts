@@ -12,7 +12,7 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { badRequestResponse, commonHeaders, conflictResponse, zoneId } from '../../common/schemas.js';
+import { badRequestResponse, commonHeaders, conflictResponse, polygonId } from '../../common/schemas.js';
 import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { statePostRequestExample, stateResourceExample1 } from './example.js';
@@ -21,11 +21,11 @@ import { createStateRequestBody, stateResource } from './schemas.js';
 export default function createStateRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'POST',
-		url: '/zones/:zoneId/states',
+		url: '/polygons/:polygonId/states',
 
 		schema: {
 			summary: 'Define a new state',
-			description: `Define a new state of a zone.
+			description: `Define a new state of a polygon.
 
 Permissions:
 - Only \`admin\` and above may create new states.
@@ -34,7 +34,7 @@ Permissions:
 			headers: commonHeaders,
 			operationId: 'createState',
 			params: Type.Object({
-				zoneId: zoneId,
+				polygonId: polygonId,
 			}),
 			body: {
 				...Type.Ref(createStateRequestBody),
@@ -87,8 +87,8 @@ Permissions:
 
 		handler: async (request, reply) => {
 			const svc = fastify.diContainer.resolve('stateService');
-			const { zoneId } = request.params;
-			const saved = await svc.create(request.authz, zoneId, request.body);
+			const { polygonId } = request.params;
+			const saved = await svc.create(request.authz, polygonId, request.body);
 			return reply.header('x-id', saved.id).status(201).send(saved);
 		},
 	});

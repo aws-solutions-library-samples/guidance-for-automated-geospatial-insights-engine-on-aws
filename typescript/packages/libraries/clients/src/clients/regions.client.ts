@@ -3,7 +3,7 @@ import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
-import { Group, ListZonesOptions, Region, Zone, ZoneListResource } from './regions.models.js';
+import { Group, ListZonesOptions, Polygon, PolygonListResource, Region } from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -47,8 +47,8 @@ export class RegionsClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async listZones(options?: ListZonesOptions, requestContext?: LambdaRequestContext): Promise<ZoneListResource | undefined> {
-		this.log.trace(`RegionsClient> listZones> in: options:${options}}`);
+	public async listPolygons(options?: ListZonesOptions, requestContext?: LambdaRequestContext): Promise<PolygonListResource | undefined> {
+		this.log.trace(`RegionsClient> listPolygons> in: options:${options}}`);
 
 		const additionalHeaders = {};
 
@@ -60,7 +60,7 @@ export class RegionsClient extends ClientServiceBase {
 
 		if (rest) queryStrings.push(...Object.entries(rest).map(([key, value]) => `${key}=${value}`))
 
-		const path = queryStrings.length > 0 ? `/zones?${queryStrings.join('&')}` : `/zones`
+		const path = queryStrings.length > 0 ? `/polygons?${queryStrings.join('&')}` : `/polygons`
 
 		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
 			.setMethod('GET')
@@ -68,23 +68,24 @@ export class RegionsClient extends ClientServiceBase {
 			.setRequestContext(requestContext)
 			.setPath(path);
 
-		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as ZoneListResource;
-		this.log.trace(`RegionsClient> listZones> exit> result: ${JSON.stringify(result)}`);
+		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as PolygonListResource;
+		this.log.trace(`RegionsClient> listPolygons> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
 
-	public async getZoneById(id: string, requestContext?: LambdaRequestContext): Promise<Zone | undefined> {
-		this.log.trace(`RegionsClient> getZoneById> in: id:${id}}`);
+
+	public async getPolygonById(id: string, requestContext?: LambdaRequestContext): Promise<Polygon | undefined> {
+		this.log.trace(`RegionsClient> getPolygonById> in: id:${id}}`);
 		const additionalHeaders = {};
 
 		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
 			.setMethod('GET')
 			.setHeaders(super.buildHeaders(additionalHeaders))
 			.setRequestContext(requestContext)
-			.setPath(`/zones/${id}`);
+			.setPath(`/polygons/${id}`);
 
-		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as Zone;
-		this.log.trace(`RegionsClient> getZoneById> exit> result: ${JSON.stringify(result)}`);
+		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as Polygon;
+		this.log.trace(`RegionsClient> getPolygonById> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
 

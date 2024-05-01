@@ -37,7 +37,7 @@ const createGroup = async (): Promise<string> => {
 };
 
 const teardown = async () => {
-	await teardownResources('zones', REGIONS_INTEGRATION_TEST_TAG_KEY, REGIONS_INTEGRATION_TEST_TAG_VALUE);
+	await teardownResources('polygons', REGIONS_INTEGRATION_TEST_TAG_KEY, REGIONS_INTEGRATION_TEST_TAG_VALUE);
 	await teardownResources('regions', REGIONS_INTEGRATION_TEST_TAG_KEY, REGIONS_INTEGRATION_TEST_TAG_VALUE);
 	await teardownResources('groups', REGIONS_INTEGRATION_TEST_TAG_KEY, REGIONS_INTEGRATION_TEST_TAG_VALUE);
 };
@@ -317,7 +317,7 @@ describe(TEST_PREFIX + 'deleting regions', () => {
 		}).toss();
 	});
 
-	// TODO: test unable to delete region if it has zones
+	// TODO: test unable to delete region if it has polygons
 
-	// TODO: test able to delete region with zones if override provided
+	// TODO: test able to delete region with polygons if override provided
 });

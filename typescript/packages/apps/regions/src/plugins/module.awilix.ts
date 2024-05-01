@@ -29,8 +29,8 @@ import { CommonRepository } from '../api/repository.common.js';
 import { CommonService } from '../api/service.common.js';
 import { StateRepository } from '../api/states/repository.js';
 import { StateService } from '../api/states/service.js';
-import { ZoneRepository } from '../api/zones/repository.js';
-import { ZoneService } from '../api/zones/service.js';
+import { PolygonRepository } from '../api/polygons/repository.js';
+import { PolygonService } from '../api/polygons/service.js';
 import { TagUtils } from '../tags/tags.util.js';
 
 const { captureAWSv3Client } = pkg;
@@ -46,8 +46,8 @@ declare module '@fastify/awilix' {
 		groupRepository: GroupRepository;
 		regionService: RegionService;
 		regionRepository: RegionRepository;
-		zoneService: ZoneService;
-		zoneRepository: ZoneRepository;
+		polygonService: PolygonService;
+		polygonRepository: PolygonRepository;
 		stateService: StateService;
 		stateRepository: StateRepository;
 		eventPublisher: EventPublisher;
@@ -65,7 +65,6 @@ class EventBridgeClientFactory {
 		return eventBridge;
 	}
 }
-
 class DynamoDBDocumentClientFactory {
 	public static create(region: string): DynamoDBDocumentClient {
 		const ddb = captureAWSv3Client(new DynamoDBClient({ region }));
@@ -130,17 +129,17 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository, c.eventPublisher), {
 			...commonInjectionOptions,
 		}),
-		zoneRepository: asFunction((c: Cradle) => new ZoneRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
+		polygonRepository: asFunction((c: Cradle) => new PolygonRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
 			...commonInjectionOptions,
 		}),
-		zoneService: asFunction((c: Cradle) => new ZoneService(app.log, c.zoneRepository, c.regionService, c.commonService, c.commonRepository, c.eventPublisher), {
+		polygonService: asFunction((c: Cradle) => new PolygonService(app.log, c.polygonRepository, c.regionService, c.commonService, c.commonRepository, c.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 		stateRepository: asFunction((c: Cradle) => new StateRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
 		stateService: asFunction(
-			(c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.zoneService, c.commonService, c.commonRepository, c.eventPublisher),
+			(c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.polygonService, c.commonService, c.commonRepository, c.eventPublisher),
 			{
 				...commonInjectionOptions,
 			}
