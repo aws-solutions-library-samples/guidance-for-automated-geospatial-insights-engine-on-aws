@@ -3,7 +3,7 @@ import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
-import { Group, Region, Zone } from './regions.models.js';
+import { Group, ListZonesOptions, Region, Zone, ZoneListResource } from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -44,6 +44,32 @@ export class RegionsClient extends ClientServiceBase {
 
 		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as Region;
 		this.log.trace(`RegionsClient> getRegionById> exit> result: ${JSON.stringify(result)}`);
+		return result;
+	}
+
+	public async listZones(options?: ListZonesOptions, requestContext?: LambdaRequestContext): Promise<ZoneListResource | undefined> {
+		this.log.trace(`RegionsClient> listZones> in: options:${options}}`);
+
+		const additionalHeaders = {};
+
+		const { tags, ...rest } = options;
+
+		const queryStrings = [];
+
+		if (tags) queryStrings.push(...tags.map(t => {`tags=${t}`}))
+
+		if (rest) queryStrings.push(...Object.entries(rest).map(([key, value]) => `${key}=${value}`))
+
+		const path = queryStrings.length > 0 ? `/zones?${queryStrings.join('&')}` : `/zones`
+
+		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
+			.setMethod('GET')
+			.setHeaders(super.buildHeaders(additionalHeaders))
+			.setRequestContext(requestContext)
+			.setPath(path);
+
+		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as ZoneListResource;
+		this.log.trace(`RegionsClient> listZones> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
 

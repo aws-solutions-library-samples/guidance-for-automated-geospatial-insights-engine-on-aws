@@ -65,6 +65,7 @@ class EventBridgeClientFactory {
 		return eventBridge;
 	}
 }
+
 class DynamoDBDocumentClientFactory {
 	public static create(region: string): DynamoDBDocumentClient {
 		const ddb = captureAWSv3Client(new DynamoDBClient({ region }));
@@ -120,13 +121,13 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		groupRepository: asFunction((c: Cradle) => new GroupRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
-		groupService: asFunction((c: Cradle) => new GroupService(app.log, c.groupRepository, c.commonService, c.commonRepository), {
+		groupService: asFunction((c: Cradle) => new GroupService(app.log, c.groupRepository, c.commonService, c.commonRepository, c.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 		regionRepository: asFunction((c: Cradle) => new RegionRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
-		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository), {
+		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository, c.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 		zoneRepository: asFunction((c: Cradle) => new ZoneRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
@@ -138,9 +139,12 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		stateRepository: asFunction((c: Cradle) => new StateRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
-		stateService: asFunction((c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.zoneService, c.commonService, c.commonRepository), {
-			...commonInjectionOptions,
-		}),
+		stateService: asFunction(
+			(c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.zoneService, c.commonService, c.commonRepository, c.eventPublisher),
+			{
+				...commonInjectionOptions,
+			}
+		),
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, REGIONS_EVENT_SOURCE), {
 			...commonInjectionOptions,
 		}),

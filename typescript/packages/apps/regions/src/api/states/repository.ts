@@ -66,6 +66,8 @@ export class StateRepository {
 							siKey3: createDelimitedAttribute(PkType.Timestamp, s.timestamp),
 							id: s.id,
 							zoneId: s.zoneId,
+							regionId: s.regionId,
+							groupId: s.groupId,
 							timestamp: s.timestamp,
 							attributes: s.attributes,
 							createdAt: s.createdAt,
@@ -213,6 +215,8 @@ export class StateRepository {
 			state = {
 				id: stateItem.id,
 				zoneId: stateItem.zoneId,
+				regionId: stateItem.regionId,
+				groupId: stateItem.groupId,
 				timestamp: stateItem.timestamp,
 				attributes: stateItem.attributes,
 				tags: {},

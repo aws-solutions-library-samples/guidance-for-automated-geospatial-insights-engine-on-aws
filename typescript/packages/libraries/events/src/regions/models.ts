@@ -1,10 +1,9 @@
 export type Coordinate = [number, number]
 
-export interface ZoneResource {
-	zoneId: string;
+export interface RegionResource {
+	id: string;
 	groupId: string;
-	regionId: string;
-	coordinates: Coordinate[]
+	name: string;
 	scheduleExpression: string;
 	scheduleExpressionTimezone?: string;
 }

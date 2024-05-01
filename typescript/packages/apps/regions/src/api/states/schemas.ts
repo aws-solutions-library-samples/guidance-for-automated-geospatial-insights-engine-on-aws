@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, paginationToken, stateId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, stateId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
 
 /**
  * State specific path parameters
@@ -45,6 +45,8 @@ export const stateResource = Type.Object(
 	{
 		id: stateId,
 		zoneId,
+		regionId,
+		groupId,
 		timestamp,
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),

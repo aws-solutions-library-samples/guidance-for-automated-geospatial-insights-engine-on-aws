@@ -307,7 +307,7 @@ export class CommonRepository {
 		const results = response?.Items?.map((i) => expandDelimitedAttribute(i.pk)[1]);
 		resourceIds.push(...results);
 
-		const nextToken = encodeURIComponent(response.NextToken);
+		const nextToken = response.NextToken ? encodeURIComponent(response.NextToken) : undefined;
 		this.log.debug(`commonRepository> listResourceIds> exit: result:${JSON.stringify([resourceIds, nextToken])}`);
 		return [resourceIds, nextToken];
 	}

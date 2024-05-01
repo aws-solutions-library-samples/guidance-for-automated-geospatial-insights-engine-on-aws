@@ -33,7 +33,7 @@ export interface ResultsConstructProperties {
 	readonly stacServerTopicArn: string;
 	readonly stacServerFunctionName: string;
 	readonly eventBusName: string;
-	readonly regionsFunctionName: string;
+	readonly regionsApiFunctionArn: string;
 }
 
 export class ResultsConstruct extends Construct {
@@ -50,7 +50,7 @@ export class ResultsConstruct extends Construct {
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const bucket = Bucket.fromBucketName(this, 'Bucket', props.bucketName);
 		const topic = Topic.fromTopicArn(this, 'StacServerArn', props.stacServerTopicArn);
-		const regionsLambda = NodejsFunction.fromFunctionName(this, 'RegionLambda', props.regionsFunctionName);
+		const regionsLambda = NodejsFunction.fromFunctionArn(this, 'RegionLambda', props.regionsApiFunctionArn);
 
 		// DynamoDb Table
 
@@ -103,7 +103,7 @@ export class ResultsConstruct extends Construct {
 				TABLE_NAME: table.tableName,
 				STAC_SERVER_TOPIC_ARN: topic.topicArn,
 				STAC_SERVER_FUNCTION_NAME: props.stacServerFunctionName,
-				REGIONS_FUNCTION_NAME: props.regionsFunctionName,
+				REGIONS_FUNCTION_NAME: regionsLambda.functionName,
 				BUCKET_NAME: bucket.bucketName,
 			},
 			bundling: {

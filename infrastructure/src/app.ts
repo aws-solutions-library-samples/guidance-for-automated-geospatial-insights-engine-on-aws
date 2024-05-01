@@ -27,6 +27,8 @@ const cognitoVerifiedDomain = app.node.tryGetContext('cognitoVerifiedDomain') as
 const cognitoFromName = app.node.tryGetContext('cognitoFromName') as string;
 const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as string;
 
+const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10)
+
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 
@@ -85,6 +87,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		stackName: stackName('scheduler'),
 		description: stackDescription('Scheduler'),
 		environment,
+		concurrencyLimit
 	});
 
 	schedulerStack.addDependency(sharedStack);
@@ -99,8 +102,6 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 			bucketName: sharedStack.bucketName,
 			stacServerTopicArn,
 			stacServerFunctionName,
-			eventBusName: sharedStack.eventBusName,
-			regionsFunctionName: regionsStack.regionsFunctionName,
 			env: {
 				// The ARCADE_REGION domain variable
 				region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,

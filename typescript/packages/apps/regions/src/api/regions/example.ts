@@ -2,10 +2,14 @@ import { CreateRegion, EditRegion, Region, RegionList } from './schemas.js';
 
 export const regionPostRequestExample: CreateRegion = {
 	name: 'Abshire Harvest',
+	scheduleExpression: 'rate(5 days)',
+	scheduleExpressionTimezone: 'Australia/Perth',
 };
 
 export const regionPatchRequestExample1: EditRegion = regionPostRequestExample;
 export const regionPatchRequestExample2: EditRegion = {
+	scheduleExpression: 'rate(5 days)',
+	scheduleExpressionTimezone: 'Australia/Perth',
 	tags: {
 		tier: 'GOLD',
 	},

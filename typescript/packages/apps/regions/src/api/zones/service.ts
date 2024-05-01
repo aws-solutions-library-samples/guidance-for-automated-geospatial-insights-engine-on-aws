@@ -29,8 +29,7 @@ export class ZoneService {
 		readonly commonService: CommonService,
 		readonly commonRepository: CommonRepository,
 		readonly eventPublisher: EventPublisher
-	) {
-	}
+	) {}
 
 	public async create(securityContext: SecurityContext, regionId: string, zone: CreateZone): Promise<Zone> {
 		this.log.debug(`ZoneService> create> regionId:${regionId}, zone:${JSON.stringify(zone)}`);
@@ -45,8 +44,6 @@ export class ZoneService {
 				name: ow.string.nonEmpty,
 				boundary: ow.array.nonEmpty,
 				exclusions: ow.optional.array,
-				scheduleExpression: ow.optional.string,
-				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -59,49 +56,43 @@ export class ZoneService {
 		const region = await this.regionService.get(securityContext, regionId);
 
 		// construct what we're saving
-		const toSave = this.commonService.prepareResourceForCreate<CreateZone, Zone>(
-			zone,
-			RESERVED_FIELDS_AS_TAGS,
-			{ regionId, createdBy: securityContext.email },
-			{ [`${RESERVED_PREFIX}groupId`]: region.groupId }
-		);
-		try {
-			let areaSqMt = area(polygon([toSave.boundary]));
-			toSave.exclusions?.forEach((p) => {
-				// TODO This approach does not take into consideration overlapping of exclusion boundaries.
-				const exclusionArea = area([polygon(p)]);
-				areaSqMt -= exclusionArea;
-			});
-			toSave.area = areaSqMt * SQMT_TO_ACRES;
-		} catch (e) {
-			throw new InvalidRequestError(`Unable to calculate area: ${e.message}`);
-		}
+		const toSave = this.commonService.prepareResourceForCreate<CreateZone, Zone>(zone, RESERVED_FIELDS_AS_TAGS, {
+			regionId,
+			groupId: region.groupId,
+			createdBy: securityContext.email,
+		});
+
+		this.calculateArea(toSave);
 
 		// save
 		await this.zoneRepository.create(toSave);
 
-		// return
-		const saved = await this.zoneRepository.get(toSave.id);
+		const saved = await this.get(securityContext, toSave.id);
 
-		// TODO: publish the whole resource
 		// publish the event
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: saved.id,
 			resourceType: 'zones',
-			new: {
-				regionId: regionId,
-				groupId: region.groupId,
-				zoneId: saved.id,
-				scheduleExpression: saved.scheduleExpression,
-				scheduleExpressionTimezone: saved.scheduleExpressionTimezone,
-				coordinates: saved.boundary,
-				exclusions: saved.exclusions,
-			},
+			new: zone,
 		});
 
 		this.log.debug(`ZoneService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
+	}
+
+	private calculateArea(zone: Zone) {
+		try {
+			let areaSqMt = area(polygon([zone.boundary]));
+			zone.exclusions?.forEach((p) => {
+				// TODO This approach does not take into consideration overlapping of exclusion boundaries.
+				const exclusionArea = area([polygon(p)]);
+				areaSqMt -= exclusionArea;
+			});
+			zone.area = areaSqMt * SQMT_TO_ACRES;
+		} catch (e) {
+			throw new InvalidRequestError(`Unable to calculate area: ${e.message}`);
+		}
 	}
 
 	private validatePolygons(zone: CreateZone | EditZone): void {
@@ -127,8 +118,6 @@ export class ZoneService {
 				name: ow.optional.string,
 				boundary: ow.optional.array,
 				exclusions: ow.optional.array,
-				scheduleExpression: ow.optional.string,
-				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -143,39 +132,20 @@ export class ZoneService {
 		// merge the existing and to be updated
 		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditZone, Zone>(existing, zone, RESERVED_FIELDS_AS_TAGS, securityContext.email);
 
+		this.calculateArea(merged);
+
 		// save
 		await this.zoneRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
 
-		// TODO: publish event
+		const saved = await this.get(securityContext, merged.id);
 
-		const saved = this.zoneRepository.get(merged.id);
-
-		// TODO: return changed in event
-		// ensure parent region exists (will throw error if not exist or insufficient privileges)
-		const region = await this.regionService.get(securityContext, existing.regionId);
 		// publish the event
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
 			resourceType: 'zones',
-			old: {
-				regionId: existing.regionId,
-				groupId: region.groupId,
-				zoneId: existing.id,
-				scheduleExpression: existing.scheduleExpression,
-				scheduleExpressionTimezone: existing.scheduleExpressionTimezone,
-				coordinates: existing.boundary,
-				exclusions: existing.exclusions,
-			},
-			new: {
-				regionId: existing.regionId,
-				groupId: region.groupId,
-				zoneId: merged.id,
-				scheduleExpression: merged.scheduleExpression,
-				scheduleExpressionTimezone: merged.scheduleExpressionTimezone,
-				coordinates: merged.boundary,
-				exclusions: merged.exclusions,
-			},
+			old: existing,
+			new: saved,
 		});
 
 		this.log.debug(`ZoneService> update> exit:${JSON.stringify(saved)}`);
@@ -214,22 +184,12 @@ export class ZoneService {
 		// delete the zone
 		await this.zoneRepository.delete(id);
 
-		// get the region so we can populate the group id
-		const region = await this.regionService.get(securityContext, existing.regionId);
-
+		// publish event
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: existing.id,
 			resourceType: 'zones',
-			old: {
-				regionId: existing.regionId,
-				groupId: region.groupId,
-				zoneId: existing.id,
-				scheduleExpression: existing.scheduleExpression,
-				scheduleExpressionTimezone: existing.scheduleExpressionTimezone,
-				coordinates: existing.boundary,
-				exclusions: existing.exclusions,
-			},
+			old: existing,
 		});
 
 		this.log.debug(`ZoneService> delete> exit:`);

@@ -29,6 +29,7 @@ export const zoneResourceExample1: Zone = {
 	id: '76ghytgt5',
 	...zonePostRequestExample,
 	regionId: 'htgdjajdhja',
+	groupId: 'jsuueyhdjs8',
 	area: 175,
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
@@ -38,6 +39,7 @@ export const zoneResourceExample2: Zone = {
 	id: '0980yht42',
 	name: 'Field 2',
 	regionId: 'htgdjajdhja',
+	groupId: 'jsuueyhdjs8',
 	boundary: [
 		[-104.4895628, 39.9390518],
 		[-104.492009, 39.938295],
