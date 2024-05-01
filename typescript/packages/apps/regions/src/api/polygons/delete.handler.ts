@@ -12,27 +12,27 @@
  */
 
 import { Type } from '@sinclair/typebox';
-import { commonHeaders, forbiddenResponse, noBodyResponse, notFoundResponse, zoneId } from '../../common/schemas.js';
+import { commonHeaders, forbiddenResponse, noBodyResponse, notFoundResponse, polygonId } from '../../common/schemas.js';
 import { atLeastAdmin } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 
-export default function deleteZoneRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function deletePolygonRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'DELETE',
-		url: '/zones/:zoneId',
+		url: '/polygons/:polygonId',
 
 		schema: {
-			summary: 'Deletes a zone.',
-			description: `Deletes a zone.
+			summary: 'Deletes a polygon.',
+			description: `Deletes a polygon.
 
 Permissions:
-- Only \`admin\` and above may delete zones.
+- Only \`admin\` and above may delete polygons.
 `,
-			tags: ['Zones'],
-			operationId: 'deleteZone',
+			tags: ['Polygons'],
+			operationId: 'deletePolygon',
 			headers: commonHeaders,
 			params: Type.Object({
-				zoneId: zoneId,
+				polygonId: polygonId,
 			}),
 			response: {
 				204: noBodyResponse,
@@ -46,9 +46,9 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('zoneService');
-			const { zoneId } = request.params;
-			await svc.delete(request.authz, zoneId);
+			const svc = fastify.diContainer.resolve('polygonService');
+			const { polygonId } = request.params;
+			await svc.delete(request.authz, polygonId);
 			return reply.status(204).send();
 		},
 	});

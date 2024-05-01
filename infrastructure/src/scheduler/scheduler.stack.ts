@@ -16,6 +16,7 @@ export class SchedulerStack extends Stack {
 	constructor(scope: Construct, id: string, props: SchedulerStackProperties) {
 
 		super(scope, id, props);
+
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
 			parameterName: eventBusNameParameter(props.environment),
 			simpleName: false,
@@ -25,6 +26,7 @@ export class SchedulerStack extends Stack {
 			parameterName: regionsApiFunctionArnParameter(props.environment),
 			simpleName: false,
 		}).stringValue;
+
 
 		const jobDefinitionArn = StringParameter.fromStringParameterAttributes(this, 'jobDefinitionArn', {
 			parameterName: engineProcessorJobDefinitionArnParameter(props.environment),

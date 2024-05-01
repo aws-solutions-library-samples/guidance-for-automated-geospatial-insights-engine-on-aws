@@ -46,7 +46,7 @@ export class StacUtil {
 		validateNotEmpty(pipelineMetadata.executionId, 'pipelineMetadata.executionId');
 		validateNotEmpty(pipelineMetadata.groupId, 'pipelineMetadata.groupId');
 		validateNotEmpty(pipelineMetadata.regionId, 'pipelineMetadata.regionId');
-		validateNotEmpty(pipelineMetadata.zoneId, 'pipelineMetadata.zoneId');
+		validateNotEmpty(pipelineMetadata.polygonId, 'pipelineMetadata.polygonId');
 		validateNotEmpty(pipelineMetadata.stateId, 'pipelineMetadata.stateId');
 		validateNotEmpty(pipelineMetadata.engineOutPutLocation, 'pipelineMetadata.engineOutPutLocation');
 
@@ -76,17 +76,17 @@ export class StacUtil {
 		const utcDate = date.split('T')[0];
 		const utcTime = date.split('T')[1].split('+')[0];
 
-		const [group, region, zone] = await Promise.all([
+		const [group, region, polygon] = await Promise.all([
 			// get Group Collection
 			this.regionsClient.getGroupById(pipelineMetadata.groupId, this.context),
 			// get Region Collection
 			this.regionsClient.getRegionById(pipelineMetadata.regionId, this.context),
-			//  Get Zone Collection
-			this.regionsClient.getZoneById(pipelineMetadata.zoneId, this.context),
+			//  Get Polygon Collection
+			this.regionsClient.getPolygonById(pipelineMetadata.polygonId, this.context),
 		]);
 
 		// Update stac item id
-		stacItem.id = `${zone.id}_${utcDate}_${utcTime}`;
+		stacItem.id = `${polygon.id}_${utcDate}_${utcTime}`;
 
 		// set the collection
 		stacItem.collection = `region_${region.id}`;
@@ -105,7 +105,7 @@ export class StacUtil {
 				rel: 'self',
 				href: `./${stacItem.id}.json`,
 				type: 'application/geo+json',
-				title: zone.name,
+				title: polygon.name,
 			},
 			{
 				rel: 'collection',

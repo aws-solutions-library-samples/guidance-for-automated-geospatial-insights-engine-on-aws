@@ -1,10 +1,8 @@
-import { Coordinate } from "@arcade/events";
-
 export interface CreateScheduleRequest {
-	zoneId: string;
+	polygonId: string;
 	groupId: string;
 	regionId: string;
-	coordinates: Coordinate[]
+	coordinates: [[number, number]];
 	scheduleExpression: string;
 	scheduleExpressionTimezone?: string;
 }

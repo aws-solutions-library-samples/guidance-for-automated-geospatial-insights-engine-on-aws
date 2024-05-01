@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, stateId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, stateId, tags, updatedAt, updatedBy, polygonId } from '../../common/schemas.js';
 
 /**
  * State specific path parameters
@@ -44,7 +44,7 @@ export type EditState = Static<typeof editStateRequestBody>;
 export const stateResource = Type.Object(
 	{
 		id: stateId,
-		zoneId,
+		polygonId,
 		regionId,
 		groupId,
 		timestamp,

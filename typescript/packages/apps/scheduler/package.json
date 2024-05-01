@@ -17,7 +17,6 @@
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-ssm": "~3",
 		"@aws-sdk/client-batch": "~3",
-		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
 		"@aws-sdk/client-scheduler": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",
@@ -40,10 +39,7 @@
 		"pino-pretty": "~11",
 		"pino": "~8",
 		"ulid": "~2",
-		"p-limit": "~4",
-		"@arcade/events": "workspace:*",
-		"@arcade/clients": "workspace:*",
-		"@arcade/lambda-invoker": "workspace:*"
+		"@arcade/events": "workspace:*"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",

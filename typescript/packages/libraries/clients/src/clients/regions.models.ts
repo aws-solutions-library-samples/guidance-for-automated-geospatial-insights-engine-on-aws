@@ -23,7 +23,7 @@ export interface Region {
 
 export interface State {
 	id: string;
-	zoneId: string;
+	polygonId: string;
 	timestamp: string;
 	attributes?: Record<string, string>;
 	tags?: Record<string, string>;
@@ -33,15 +33,7 @@ export interface State {
 	updatedAt?: string;
 }
 
-export interface ZoneListResource {
-	zones: Zone[],
-	pagination?: {
-		token: string;
-		count: number;
-	}
-}
-
-export interface Zone {
+export interface Polygon {
 	id: string;
 	name: string;
 	regionId: string;
@@ -56,6 +48,15 @@ export interface Zone {
 	updatedBy?: string;
 	updatedAt?: string;
 }
+
+export interface PolygonListResource {
+	polygons: Polygon[],
+	pagination?: {
+		token: string;
+		count: number;
+	}
+}
+
 
 export interface ListZonesOptions {
 	regionId?: string;

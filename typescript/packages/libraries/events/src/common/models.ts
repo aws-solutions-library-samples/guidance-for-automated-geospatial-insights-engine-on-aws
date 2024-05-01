@@ -2,7 +2,7 @@ import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from '../re
 
 type EventType = 'created' | 'updated' | 'deleted';
 
-type ResourceType = 'zones' | 'groups' | 'regions' | 'states';
+type ResourceType = 'polygons' | 'groups' | 'regions' | 'states';
 
 export interface DomainEvent<T> {
 	resourceType: ResourceType;
@@ -29,9 +29,10 @@ export const RESULTS_QUEUED_EVENT = `${ARCADE_EVENT_SOURCE}>results>queued`;
 export const RESULTS_STARTED_EVENT = `${ARCADE_EVENT_SOURCE}>results>started`;
 export const RESULTS_FAILED_EVENT = `${ARCADE_EVENT_SOURCE}>results>failed`;
 export const RESULTS_COMPLETED_EVENT = `${ARCADE_EVENT_SOURCE}>results>completed`;
-export const RESULTS_ZONE_CREATED_EVENT = `${REGIONS_EVENT_SOURCE}>zones>created`;
-export const RESULTS_ZONE_UPDATED_EVENT = `${REGIONS_EVENT_SOURCE}>zones>updated`;
-export const RESULTS_ZONE_DELETED_EVENT = `${REGIONS_EVENT_SOURCE}>zones>deleted`;
+
+export const RESULTS_POLYGON_CREATED_EVENT = `${REGIONS_EVENT_SOURCE}>polygons>created`;
+export const RESULTS_POLYGON_UPDATED_EVENT = `${REGIONS_EVENT_SOURCE}>polygons>updated`;
+export const RESULTS_POLYGON_DELETED_EVENT = `${REGIONS_EVENT_SOURCE}>polygons>deleted`;
 export const RESULTS_REGION_CREATED_EVENT = `${REGIONS_EVENT_SOURCE}>regions>created`;
 export const RESULTS_REGION_UPDATED_EVENT = `${REGIONS_EVENT_SOURCE}>regions>updated`;
 export const RESULTS_REGION_DELETED_EVENT = `${REGIONS_EVENT_SOURCE}>regions>deleted`;

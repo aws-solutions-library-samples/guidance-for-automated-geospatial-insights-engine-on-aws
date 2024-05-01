@@ -12,7 +12,7 @@ import {
 	update_state_body,
 	updated_state_resource,
 } from './states.data.js';
-import { create_zone_body } from './zones.data.js';
+import { create_polygon_body } from './polygons.data.js';
 
 const TEST_PREFIX = 'regions module (states): ';
 
@@ -50,11 +50,11 @@ const createRegion = async (groupId: string): Promise<string> => {
 		groupId
 	).returns('id');
 };
-const createZone = async (regionId: string): Promise<string> => {
+const createPolygon = async (regionId: string): Promise<string> => {
 	return await createResource(
-		'zones',
+		'polygons',
 		{
-			withJson: create_zone_body,
+			withJson: create_polygon_body,
 			withTags: testTags,
 			expectStatus: 201,
 		},
@@ -64,24 +64,24 @@ const createZone = async (regionId: string): Promise<string> => {
 };
 const teardown = async () => {
 	await teardownResources('states', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, { latestOnly: false });
-	await teardownResources('zones', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
+	await teardownResources('polygons', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
 	await teardownResources('regions', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
 	await teardownResources('groups', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
 };
 
 describe(TEST_PREFIX + 'creating states', () => {
-	let zoneId: string;
+	let polygonId: string;
 	beforeEach(async () => {
 		const groupId = await createGroup();
 		const regionId = await createRegion(groupId);
-		zoneId = await createZone(regionId);
+		polygonId = await createPolygon(regionId);
 	});
 
 	afterEach(async () => {
 		await teardown();
 	});
 
-	it('creating a state - invalid parent zone', async () => {
+	it('creating a state - invalid parent polygon', async () => {
 		await createResource(
 			'states',
 			{
@@ -89,7 +89,7 @@ describe(TEST_PREFIX + 'creating states', () => {
 				withTags: testTags,
 				expectStatus: 404,
 			},
-			'zones',
+			'polygons',
 			'does-not-exist'
 		).toss();
 	});
@@ -101,8 +101,8 @@ describe(TEST_PREFIX + 'creating states', () => {
 				withJson: {},
 				expectStatus: 400,
 			},
-			'zones',
-			zoneId
+			'polygons',
+			polygonId
 		).toss();
 	});
 
@@ -115,27 +115,27 @@ describe(TEST_PREFIX + 'creating states', () => {
 				expectJsonLike: expectStateJsonLike,
 				expectStatus: 201,
 			},
-			'zones',
-			zoneId
+			'polygons',
+			polygonId
 		).returns('id');
 	});
 });
 
 describe(
-	TEST_PREFIX + 'creating states updates zone current state',
+	TEST_PREFIX + 'creating states updates polygon current state',
 	() => {
-		let zoneId: string;
+		let polygonId: string;
 		beforeEach(async () => {
 			const groupId = await createGroup();
 			const regionId = await createRegion(groupId);
-			zoneId = await createZone(regionId);
+			polygonId = await createPolygon(regionId);
 		});
 
 		afterEach(async () => {
 			await teardown();
 		});
 
-		it('updates zone current state', async () => {
+		it('updates polygon current state', async () => {
 			// create the initial state
 			const firstStateId = await createResource(
 				'states',
@@ -150,13 +150,13 @@ describe(
 					},
 					expectStatus: 201,
 				},
-				'zones',
-				zoneId
+				'polygons',
+				polygonId
 			).returns('id');
 
-			// ensure its parent zone has this as its current state
-			let currentState: State = await getResource('zones', {
-				id: zoneId,
+			// ensure its parent polygon has this as its current state
+			let currentState: State = await getResource('polygons', {
+				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
 			expect(currentState.id).toStrictEqual(firstStateId);
@@ -175,13 +175,13 @@ describe(
 					},
 					expectStatus: 201,
 				},
-				'zones',
-				zoneId
+				'polygons',
+				polygonId
 			).returns('id');
 
-			// ensure its parent zone has been updated to this as the current state
-			currentState = await getResource('zones', {
-				id: zoneId,
+			// ensure its parent polygon has been updated to this as the current state
+			currentState = await getResource('polygons', {
+				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
 			expect(currentState.id).toStrictEqual(secondStateId);
@@ -200,13 +200,13 @@ describe(
 					},
 					expectStatus: 201,
 				},
-				'zones',
-				zoneId
+				'polygons',
+				polygonId
 			).returns('id');
 
-			// ensure its parent zone still references the second state
-			currentState = await getResource('zones', {
-				id: zoneId,
+			// ensure its parent polygon still references the second state
+			currentState = await getResource('polygons', {
+				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
 			expect(currentState.id).toStrictEqual(secondStateId);
@@ -217,9 +217,9 @@ describe(
 				expectStatus: 204,
 			});
 
-			// ensure its parent zone now references the third state due to the second being removed
-			currentState = await getResource('zones', {
-				id: zoneId,
+			// ensure its parent polygon now references the third state due to the second being removed
+			currentState = await getResource('polygons', {
+				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
 			expect(currentState.id).toStrictEqual(thirdStateId);
@@ -233,7 +233,7 @@ describe(TEST_PREFIX + 'retrieving states', () => {
 	beforeEach(async () => {
 		const groupId = await createGroup();
 		const regionId = await createRegion(groupId);
-		const zoneId = await createZone(regionId);
+		const polygonId = await createPolygon(regionId);
 		stateId = await createResource(
 			'states',
 			{
@@ -242,8 +242,8 @@ describe(TEST_PREFIX + 'retrieving states', () => {
 				expectJsonLike: expectStateJsonLike,
 				expectStatus: 201,
 			},
-			'zones',
-			zoneId
+			'polygons',
+			polygonId
 		).returns('id');
 	});
 
@@ -272,7 +272,7 @@ describe(TEST_PREFIX + 'updating states', () => {
 	beforeEach(async () => {
 		const groupId = await createGroup();
 		const regionId = await createRegion(groupId);
-		const zoneId = await createZone(regionId);
+		const polygonId = await createPolygon(regionId);
 		stateId = await createResource(
 			'states',
 			{
@@ -281,8 +281,8 @@ describe(TEST_PREFIX + 'updating states', () => {
 				expectJsonLike: expectStateJsonLike,
 				expectStatus: 201,
 			},
-			'zones',
-			zoneId
+			'polygons',
+			polygonId
 		).returns('id');
 	});
 
@@ -327,19 +327,19 @@ describe(TEST_PREFIX + 'updating states', () => {
 });
 
 describe(TEST_PREFIX + 'listing states', () => {
-	// need to have multiple zones, as by design only latest states are returned by default when listing
+	// need to have multiple polygons, as by design only latest states are returned by default when listing
 	let groupId: string;
-	let zone1Id: string, zone2Id: string, zone3Id: string;
+	let polygon1Id: string, polygon2Id: string, polygon3Id: string;
 
 	beforeEach(async () => {
 		groupId = await createGroup();
 		const regionId = await createRegion(groupId);
-		zone1Id = await createResource(
-			'zones',
+		polygon1Id = await createResource(
+			'polygons',
 			{
 				withJson: {
-					...create_zone_body,
-					name: 'pagination-zone-1',
+					...create_polygon_body,
+					name: 'pagination-polygon-1',
 				},
 				expectStatus: 201,
 			},
@@ -356,8 +356,8 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone1Id
+			'polygons',
+			polygon1Id
 		).toss();
 
 		await createResource(
@@ -369,17 +369,17 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone1Id
+			'polygons',
+			polygon1Id
 		).toss();
 
-		zone2Id = await createResource(
-			'zones',
+		polygon2Id = await createResource(
+			'polygons',
 			{
 				expectStatus: 201,
 				withJson: {
-					...create_zone_body,
-					name: 'pagination-zone-2',
+					...create_polygon_body,
+					name: 'pagination-polygon-2',
 				},
 			},
 			'regions',
@@ -395,8 +395,8 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone2Id
+			'polygons',
+			polygon2Id
 		).toss();
 
 		await createResource(
@@ -408,17 +408,17 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone2Id
+			'polygons',
+			polygon2Id
 		).toss();
 
-		zone3Id = await createResource(
-			'zones',
+		polygon3Id = await createResource(
+			'polygons',
 			{
 				expectStatus: 201,
 				withJson: {
-					...create_zone_body,
-					name: 'pagination-zone-3',
+					...create_polygon_body,
+					name: 'pagination-polygon-3',
 				},
 			},
 			'regions',
@@ -434,8 +434,8 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone3Id
+			'polygons',
+			polygon3Id
 		).toss();
 
 		await createResource(
@@ -447,8 +447,8 @@ describe(TEST_PREFIX + 'listing states', () => {
 				},
 				expectStatus: 201,
 			},
-			'zones',
-			zone3Id
+			'polygons',
+			polygon3Id
 		).toss();
 	});
 
@@ -469,12 +469,12 @@ describe(TEST_PREFIX + 'listing states', () => {
 				states: [
 					{
 						...expectStateJsonLike,
-						zoneId: zone1Id,
+						polygonId: polygon1Id,
 						timestamp: '2021-02-01T00:00:00Z',
 					},
 					{
 						...expectStateJsonLike,
-						zoneId: zone2Id,
+						polygonId: polygon2Id,
 						timestamp: '2022-02-01T00:00:00Z',
 					},
 				],
@@ -497,7 +497,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 				states: [
 					{
 						...expectStateJsonLike,
-						zoneId: zone3Id,
+						polygonId: polygon3Id,
 						timestamp: '2023-02-01T00:00:00Z',
 					},
 				],
@@ -515,15 +515,15 @@ describe(TEST_PREFIX + 'deleting states', () => {
 	beforeEach(async () => {
 		const groupId = await createGroup();
 		const regionId = await createRegion(groupId);
-		const zoneId = await createZone(regionId);
+		const polygonId = await createPolygon(regionId);
 		stateId = await createResource(
 			'states',
 			{
 				withJson: create_state_body,
 				expectStatus: 201,
 			},
-			'zones',
-			zoneId
+			'polygons',
+			polygonId
 		).returns('id');
 	});
 

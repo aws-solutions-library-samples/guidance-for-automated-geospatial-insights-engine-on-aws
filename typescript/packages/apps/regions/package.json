@@ -1,7 +1,7 @@
 {
 	"name": "@arcade/regions",
 	"version": "0.0.1",
-	"description": "Manages hierarchical structures of groups, regions, and zones.",
+	"description": "Manages hierarchical structures of groups, regions, and polygons.",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",

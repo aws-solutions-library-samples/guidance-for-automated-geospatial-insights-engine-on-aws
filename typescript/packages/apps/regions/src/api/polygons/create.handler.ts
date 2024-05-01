@@ -15,44 +15,44 @@ import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse, regionId } from '../../common/schemas.js';
 import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
-import { zonePostRequestExample, zoneResourceExample1 } from './example.js';
-import { createZoneRequestBody, zoneResource } from './schemas.js';
+import { polygonPostRequestExample, polygonResourceExample1 } from './example.js';
+import { createPolygonRequestBody, polygonResource } from './schemas.js';
 
-export default function createZoneRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
+export default function createPolygonRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
 		method: 'POST',
-		url: '/regions/:regionId/zones',
+		url: '/regions/:regionId/polygons',
 
 		schema: {
-			summary: 'Define a new zone',
-			description: `Define a new zone.
+			summary: 'Define a new polygon',
+			description: `Define a new polygon.
 
 Permissions:
-- Only \`admin\` and above may create new zones.
+- Only \`admin\` and above may create new polygons.
 `,
-			tags: ['Zones'],
+			tags: ['Polygons'],
 			headers: commonHeaders,
-			operationId: 'createZone',
+			operationId: 'createPolygon',
 			params: Type.Object({
 				regionId: regionId,
 			}),
 			body: {
-				...Type.Ref(createZoneRequestBody),
+				...Type.Ref(createPolygonRequestBody),
 				'x-examples': {
-					'New zone': {
-						summary: 'Create a new zone.',
-						value: zonePostRequestExample,
+					'New polygon': {
+						summary: 'Create a new polygon.',
+						value: polygonPostRequestExample,
 					},
 				},
 			},
 			response: {
 				201: {
 					description: 'Success.',
-					...zoneResource,
+					...polygonResource,
 					'x-examples': {
-						'New zone': {
-							summary: 'New zone created successfully.',
-							value: zoneResourceExample1,
+						'New polygon': {
+							summary: 'New polygon created successfully.',
+							value: polygonResourceExample1,
 						},
 					},
 				},
@@ -86,7 +86,7 @@ Permissions:
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('zoneService');
+			const svc = fastify.diContainer.resolve('polygonService');
 			const { regionId } = request.params;
 			const saved = await svc.create(request.authz, regionId, request.body);
 			return reply.header('x-id', saved.id).status(201).send(saved);

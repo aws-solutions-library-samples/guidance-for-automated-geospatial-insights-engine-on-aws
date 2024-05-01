@@ -39,27 +39,27 @@ export class JobsService {
 		ow(request.id, ow.string.nonEmpty);
 
 		// get list of zones for this particular region
-		const zoneListResource = await this.regionsClient.listZones({ regionId: request.id }, this.context)
+		const polygonListResource = await this.regionsClient.listPolygons({ regionId: request.id }, this.context)
 
-		if (zoneListResource.zones.length === 0) {
-			this.log.warn(`JobsService> start> no zone associated with the region ${request.name}}`)
+		if (polygonListResource.polygons.length === 0) {
+			this.log.warn(`JobsService> start> no polygon associated with the region ${request.name}}`)
 			return;
 		}
 
 		const limit = pLimit(this.concurrencyLimit)
 
 		// run engine processing for each zone
-		const runEngineFutures = zoneListResource.zones.map((zone) => {
+		const runEngineFutures = polygonListResource.polygons.map((polygon) => {
 
 			const containerEngineInput: BatchEngineInput = {
 				...request,
-				coordinates: zone.boundary,
-				exclusions: zone.exclusions,
-				zoneId: zone.id,
+				coordinates: polygon.boundary,
+				exclusions: polygon.exclusions,
+				polygonId: polygon.id,
 				regionId: request.id
 			}
 
-			const jobName = `${request.id}-${zone.id}-${request.scheduleDateTime}`;
+			const jobName = `${request.id}-${polygon.id}-${request.scheduleDateTime}`;
 
 			return limit(() => this.batchClient.send(new SubmitJobCommand({
 				containerOverrides: {

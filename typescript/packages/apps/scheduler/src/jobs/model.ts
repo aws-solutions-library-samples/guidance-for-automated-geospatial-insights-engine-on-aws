@@ -1,9 +1,9 @@
-import { RegionResource } from "@arcade/events";
+import { RegionResource } from '@arcade/events';
 
-export type StartJobRequest = RegionResource & { scheduleDateTime: string }
+export type StartJobRequest = RegionResource & { scheduleDateTime: string };
 
 export interface BatchEngineInput {
-	zoneId: string;
+	polygonId: string;
 	groupId: string;
 	regionId: string;
 	coordinates: [[number, number]],

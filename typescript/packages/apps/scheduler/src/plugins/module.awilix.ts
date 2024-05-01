@@ -11,8 +11,8 @@ import { JobsService } from "../jobs/service.js";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { SchedulesService } from "../schedules/service.js";
 import { RegionsClient } from "@arcade/clients";
-import { LambdaClient } from "@aws-sdk/client-lambda";
 import { Invoker } from "@arcade/lambda-invoker";
+import { LambdaClient } from "@aws-sdk/client-lambda";
 
 const { captureAWSv3Client } = pkg;
 
@@ -27,6 +27,7 @@ declare module '@fastify/awilix' {
 		regionsClient: RegionsClient;
 		lambdaInvoker: Invoker;
 		lambdaClient: LambdaClient;
+
 	}
 }
 
@@ -46,6 +47,7 @@ class DynamoDBDocumentClientFactory {
 		return dbc;
 	}
 }
+
 
 class LambdaClientFactory {
 	public static create(region: string): LambdaClient {
@@ -91,6 +93,7 @@ const registerContainer = (app?: FastifyInstance) => {
 
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
+
 
 	diContainer.register({
 		// Clients

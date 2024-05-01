@@ -25,7 +25,7 @@ export default function getStateRoute(fastify: FastifyTypebox, _options: unknown
 
 		schema: {
 			summary: 'Retrieve a state.',
-			description: `Retrieve the state of a zone.
+			description: `Retrieve the state of a polygon.
 
 Permissions:
 - Only \`reader\` and above may view states.

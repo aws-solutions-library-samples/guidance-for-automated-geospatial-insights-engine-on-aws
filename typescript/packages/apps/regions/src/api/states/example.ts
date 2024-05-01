@@ -24,7 +24,7 @@ export const statePatchRequestExample2: EditState = {
 export const stateResourceExample1: State = {
 	id: '76ghytgt5',
 	...statePostRequestExample,
-	zoneId: 'jutdjshjdksk',
+	polygonId: 'jutdjshjdksk',
 	regionId: 'eyhdksjdk8js',
 	groupId: 'jsuueyhdjs8',
 	createdAt: '2022-08-10T23:55:20.322Z',
@@ -33,7 +33,7 @@ export const stateResourceExample1: State = {
 
 export const stateResourceExample2: State = {
 	id: '0980yht42',
-	zoneId: 'jutdjshjdksk',
+	polygonId: 'jutdjshjdksk',
 	regionId: 'eyhdksjdk8js',
 	groupId: 'jsuueyhdjs8',
 	timestamp: '2023-04-11T00:00:00.000Z',
@@ -53,7 +53,7 @@ export const stateResourceExample2: State = {
 
 export const stateResourceExample3: State = {
 	id: 'rrwth876d',
-	zoneId: 'jutdjshjdksk',
+	polygonId: 'jutdjshjdksk',
 	regionId: 'eyhdksjdk8js',
 	groupId: 'jsuueyhdjs8',
 	timestamp: '2022-04-11T00:00:00.000Z',

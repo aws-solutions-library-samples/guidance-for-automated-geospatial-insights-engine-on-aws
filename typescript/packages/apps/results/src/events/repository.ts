@@ -8,10 +8,10 @@ import { PkType } from '../common/pkUtils.js';
 export class ResultsRepository {
 	constructor(private readonly log: BaseLogger, private readonly dynamoDBClient: DynamoDBDocumentClient, private readonly tableName: string) {}
 
-	public async get(executionId: string, zoneId: string): Promise<PipelineMetadataDetails | undefined> {
-		this.log.debug(`ResultsRepository> get> executionId: ${executionId}, zoneId: ${zoneId}`);
+	public async get(executionId: string, polygonId: string): Promise<PipelineMetadataDetails | undefined> {
+		this.log.debug(`ResultsRepository> get> executionId: ${executionId}, polygonId: ${polygonId}`);
 
-		const zoneIdKey = createDelimitedAttribute(PkType.ZoneId, zoneId);
+		const polygonIdKey = createDelimitedAttribute(PkType.PolygonId, polygonId);
 		const executionIdKey = createDelimitedAttribute(PkType.ExecutionId, executionId);
 
 		const response = await this.dynamoDBClient.send(
@@ -19,7 +19,7 @@ export class ResultsRepository {
 				TableName: this.tableName,
 				Key: {
 					pk: executionIdKey,
-					sk: zoneIdKey,
+					sk: polygonIdKey,
 				},
 			})
 		);
@@ -71,12 +71,12 @@ export class ResultsRepository {
 	public async put(pipelineMetadata: PipelineMetadataDetails): Promise<void> {
 		this.log.info(`ResultsRepository> put> pipelineMetadata:${JSON.stringify(pipelineMetadata)}`);
 		const executionIdKey = createDelimitedAttribute(PkType.ExecutionId, pipelineMetadata.executionId);
-		const zoneIdKey = createDelimitedAttribute(PkType.ZoneId, pipelineMetadata.zoneId);
+		const polygonIdKey = createDelimitedAttribute(PkType.PolygonId, pipelineMetadata.polygonId);
 		const params: PutCommandInput = {
 			TableName: this.tableName,
 			Item: {
 				pk: executionIdKey,
-				sk: zoneIdKey,
+				sk: polygonIdKey,
 				...pipelineMetadata,
 			},
 		};
@@ -117,7 +117,7 @@ export class ResultsRepository {
 			executionId: item['executionId'],
 			groupId: item['groupId'],
 			regionId: item['regionId'],
-			zoneId: item['zoneId'],
+			polygonId: item['polygonId'],
 			stateId: item['stateId'],
 			jobArn: item['jobArn'],
 			createdAt: item['createdAt'],

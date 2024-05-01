@@ -1,11 +1,11 @@
 import { JWT_EMAIL } from '../utils/auth.js';
 import { ID_PATTERN, ISO8601_DATE_TIME_MS_PATTERN } from '../utils/regex.js';
 
-export const ZONES_INTEGRATION_TEST_TAG_KEY = 'created-by-integration-test';
-export const ZONES_INTEGRATION_TEST_TAG_VALUE = 'regions-module-zones';
+export const POLYGONS_INTEGRATION_TEST_TAG_KEY = 'created-by-integration-test';
+export const POLYGONS_INTEGRATION_TEST_TAG_VALUE = 'regions-module-polygons';
 
-export const create_zone_body: object = {
-	name: 'test-zone-1',
+export const create_polygon_body: object = {
+	name: 'test-polygon-1',
 	boundary: [
 		[0, 0],
 		[0, 10],
@@ -22,15 +22,15 @@ export const create_zone_body: object = {
 	},
 };
 
-export const created_zone_resource: object = {
+export const created_polygon_resource: object = {
 	id: ID_PATTERN,
-	...create_zone_body,
+	...create_polygon_body,
 	createdAt: ISO8601_DATE_TIME_MS_PATTERN,
 	createdBy: JWT_EMAIL,
 };
 
-export const update_zone_body: object = {
-	name: 'test-zone-1-updated',
+export const update_polygon_body: object = {
+	name: 'test-polygon-1-updated',
 	boundary: [
 		[0, 0],
 		[0, 20],
@@ -46,9 +46,9 @@ export const update_zone_body: object = {
 	},
 };
 
-export const updated_zone_resource: object = {
-	...created_zone_resource,
-	...update_zone_body,
+export const updated_polygon_resource: object = {
+	...created_polygon_resource,
+	...update_polygon_body,
 	updatedAt: ISO8601_DATE_TIME_MS_PATTERN,
 	updatedBy: JWT_EMAIL,
 };

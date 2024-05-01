@@ -25,7 +25,8 @@ import { apiVersion100, Nullable } from './types.js';
 
 export const groupIdQS = Type.Optional(Type.String({ description: 'Group ID to filter by.' }));
 export const regionIdQS = Type.Optional(Type.String({ description: 'Region ID to filter by.' }));
-export const zoneIdQS = Type.Optional(Type.String({ description: 'Zone ID to filter by.' }));
+export const polygonIdQS = Type.Optional(Type.String({ description: 'Polygon ID to filter by.' }));
+
 export const countPaginationQS = Type.Integer({ description: 'Count of results to return, if not specified default to 20', default: 20 });
 export const fromIdPaginationQS = Type.Optional(Type.String({ description: 'Id to paginate from (exclusive).' }));
 export const fromTokenPaginationQS = Type.Optional(Type.String({ description: 'Token used to paginate from (exclusive).' }));
@@ -40,7 +41,7 @@ export const tagFilterQS = Type.Optional(
  */
 export const groupId = Type.String({ description: 'Unique Group ID.' });
 export const regionId = Type.String({ description: 'Unique Region ID.' });
-export const zoneId = Type.String({ description: 'Unique Zone ID.' });
+export const polygonId = Type.String({ description: 'Unique Polygon ID.' });
 export const stateId = Type.String({ description: 'Unique State ID.' });
 
 export const createdBy = Type.String({ description: 'ID of owner.' });

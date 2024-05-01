@@ -40,7 +40,7 @@ def start_task(
 			'DetailType': 'com.aws.arcade>results>started',
 			'Detail': json.dumps({
 				"groupId": request.group_id,
-				"zoneId": request.zone_id,
+				"polygonId": request.polygon_id,
 				"regionId": request.region_id,
 				"schedule": request.schedule_date_time,
 				"jobId": aws_batch_job_id,
@@ -74,7 +74,7 @@ def start_task(
 
 		temp_dir = "{}/{}".format(os.getcwd(), "output")
 		band_file_paths = write_to_tif(temp_dir, stac_assets, 'images', ['red', 'green', 'blue', 'scl', 'nir08', 'ndvi', 'ndvi_raw', 'scl_cloud_removed', 'ndvi_change'])
-		s3_prefix = 's3://{}/{}/{}/{}/{}'.format(output_bucket, request.group_id, request.region_id, request.zone_id, request.schedule_date_time)
+		s3_prefix = 's3://{}/{}/{}/{}/{}'.format(output_bucket, request.group_id, request.region_id, request.polygon_id, request.schedule_date_time)
 		band_assets = create_tif_file_metadata(stac_assets, band_file_paths, "{}/{}".format(s3_prefix, "images"), checksum_algorithm)
 		output_metadata['assets'] = {**output_metadata['assets'], **band_assets}
 
@@ -84,7 +84,8 @@ def start_task(
 
 		area_acres = processor.calculate_area()
 		# Set the area metadata
-		output_metadata['properties'] = {**output_metadata['properties'], **{'area_size': area_acres, 'area_unit_of_measure': 'acres', 'crop_type': crop, 'crop_planted_at': planted_at}}
+		output_metadata['properties'] = {**output_metadata['properties'],
+										 **{'area_size': area_acres, 'area_unit_of_measure': 'acres', 'crop_type': crop, 'crop_planted_at': planted_at}}
 		# set the nitrogen recommendation
 		nitrogen_recommendation = processor.calculate_nitrogen_recommendation(yield_target, area_acres)
 		output_metadata['assets']['nitrogen_metadata'] = upload_nitroge_recommendation(nitrogen_recommendation, output_bucket, output_metadata, s3_prefix, temp_dir)
@@ -95,7 +96,7 @@ def start_task(
 			file.write(json.dumps(output_metadata))
 
 		# Upload tif images
-		upload_tif_images(output_bucket, '{}/{}/{}/{}'.format(request.group_id, request.region_id, request.zone_id, request.schedule_date_time), s3_prefix, temp_dir)
+		upload_tif_images(output_bucket, '{}/{}/{}/{}'.format(request.group_id, request.region_id, request.polygon_id, request.schedule_date_time), s3_prefix, temp_dir)
 
 		publish_event({
 			'EventBusName': event_bus_name,
@@ -104,7 +105,7 @@ def start_task(
 			'Detail': json.dumps({
 				"executionId": "execution1234",
 				"groupId": request.group_id,
-				"zoneId": request.zone_id,
+				"polygonId": request.polygon_id,
 				"regionId": request.region_id,
 				"schedule": request.schedule_date_time,
 				"jobId": aws_batch_job_id,

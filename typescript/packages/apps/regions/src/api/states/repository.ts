@@ -24,7 +24,7 @@ export class StateRepository {
 
 		// if the state is the new latest state, update accordingly
 		if (existingLatestState === undefined || existingLatestState.timestamp <= state.timestamp) {
-			this.prepareLatestStateTransactionWrite(transaction, state.zoneId, state.id, existingLatestState?.id);
+			this.prepareLatestStateTransactionWrite(transaction, state.polygonId, state.id, existingLatestState?.id);
 		}
 
 		// add any tags
@@ -62,10 +62,10 @@ export class StateRepository {
 							pk: stateDbId,
 							sk: stateDbId,
 							type: PkType.State,
-							siKey2: createDelimitedAttribute(PkType.Zone, s.zoneId),
+							siKey2: createDelimitedAttribute(PkType.Polygon, s.polygonId),
 							siKey3: createDelimitedAttribute(PkType.Timestamp, s.timestamp),
 							id: s.id,
-							zoneId: s.zoneId,
+							polygonId: s.polygonId,
 							regionId: s.regionId,
 							groupId: s.groupId,
 							timestamp: s.timestamp,
@@ -83,11 +83,11 @@ export class StateRepository {
 		return command;
 	}
 
-	private prepareLatestStateTransactionWrite(transaction: TransactWriteCommandInput, zoneId: string, newLatestStateId: string, existingLatestStateId?: string): void {
+	private prepareLatestStateTransactionWrite(transaction: TransactWriteCommandInput, polygonId: string, newLatestStateId: string, existingLatestStateId?: string): void {
 		this.log.debug(
 			`StateRepository> prepareLatestStateTransactionWrite> in> transaction:${JSON.stringify(
 				transaction
-			)}, zoneId:${zoneId}, newLatestStateId:${newLatestStateId}, existingLatestStateId:${existingLatestStateId}`
+			)}, polygonId:${polygonId}, newLatestStateId:${newLatestStateId}, existingLatestStateId:${existingLatestStateId}`
 		);
 		const latestTagKey = `${RESERVED_PREFIX}isLatest`;
 
@@ -102,7 +102,7 @@ export class StateRepository {
 			});
 		}
 
-		const zoneDbId = createDelimitedAttribute(PkType.Zone, zoneId);
+		const polygonDbId = createDelimitedAttribute(PkType.Polygon, polygonId);
 		const latestStateDbId = createDelimitedAttribute(PkType.State, `${RESERVED_PREFIX}latest`);
 
 		// add new latest state stored as a tag (used for listing latest states)
@@ -111,12 +111,12 @@ export class StateRepository {
 				[latestTagKey]: 'true',
 			};
 			transaction.TransactItems.push(...this.commonRepository.prepareTagTransactionWrite(newLatestStateId, PkType.State, latestTag, []).TransactItems);
-			// add the zone to state link (used for quick lookup of latest state when assembling zones)
+			// add the polygon to state link (used for quick lookup of latest state when assembling polygons)
 			transaction.TransactItems.push({
 				Put: {
 					TableName: this.tableName,
 					Item: {
-						pk: zoneDbId,
+						pk: polygonDbId,
 						sk: latestStateDbId,
 						type: PkType.LatestState,
 						id: newLatestStateId,
@@ -125,13 +125,13 @@ export class StateRepository {
 			});
 		}
 
-		// if there's no new or existing latest state to save, such as first state being deleted, remove the existing zone to state link
+		// if there's no new or existing latest state to save, such as first state being deleted, remove the existing polygon to state link
 		if (!newLatestStateId && !existingLatestStateId) {
 			transaction.TransactItems.push({
 				Delete: {
 					TableName: this.tableName,
 					Key: {
-						pk: zoneDbId,
+						pk: polygonDbId,
 						sk: latestStateDbId,
 					},
 				},
@@ -154,14 +154,14 @@ export class StateRepository {
 		// prepare to delete all state items (where pk = stateDbId)
 		const transaction = await this.commonRepository.prepareDeleteItemsTransaction(PkType.State, state.id);
 
-		// if the state being deleted is currently the latest state for a zone, we need to revert back to the previous latest state
+		// if the state being deleted is currently the latest state for a polygon, we need to revert back to the previous latest state
 		if (existingLatestState?.id === state.id) {
 			// we are deleting the latest, therefore find previous latest state
 			const statement = `SELECT * FROM "${this.tableName}"."siKey2-siKey3-index" WHERE "siKey2" = ? ORDER BY "siKey3" desc`; // `siKey3` is `timestamp`
 			const response = await this.dc.send(
 				new ExecuteStatementCommand({
 					Statement: statement,
-					Parameters: [createDelimitedAttribute(PkType.Zone, state.zoneId)],
+					Parameters: [createDelimitedAttribute(PkType.Polygon, state.polygonId)],
 					Limit: 2, // only need to return top 2 which should be current latest (if exists), and previous latest (if exists)
 				})
 			);
@@ -173,7 +173,7 @@ export class StateRepository {
 			const previousLatestStateId = items[0]?.id;
 
 			// unmark current latest, and mark previous latest
-			this.prepareLatestStateTransactionWrite(transaction, state.zoneId, previousLatestStateId, state.id);
+			this.prepareLatestStateTransactionWrite(transaction, state.polygonId, previousLatestStateId, state.id);
 		}
 
 		await this.commonRepository.executeTransaction(transaction);
@@ -214,7 +214,7 @@ export class StateRepository {
 		if (stateItem) {
 			state = {
 				id: stateItem.id,
-				zoneId: stateItem.zoneId,
+				polygonId: stateItem.polygonId,
 				regionId: stateItem.regionId,
 				groupId: stateItem.groupId,
 				timestamp: stateItem.timestamp,
