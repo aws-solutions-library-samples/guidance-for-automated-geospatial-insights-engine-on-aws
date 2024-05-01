@@ -1,26 +1,46 @@
 import { FastifyBaseLogger } from "fastify";
-import { CreateScheduleCommand, CreateScheduleCommandInput, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
-import { CreateScheduleRequest } from "./model.js";
+import { CreateScheduleCommand, CreateScheduleCommandInput, DeleteScheduleCommand, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
 import ow from 'ow';
+import { RegionResource } from "@arcade/events";
 
 export class SchedulesService {
 	constructor(readonly log: FastifyBaseLogger, private readonly schedulerClient: SchedulerClient, private readonly schedulerGroup: string, private readonly sqsArn: string, private readonly roleArn: string) {
 	}
 
-	public async create(request: CreateScheduleRequest): Promise<void> {
+	public async delete(request: RegionResource): Promise<void> {
+		this.log.debug(`SchedulesService> delete> request:${JSON.stringify(request)}`);
+		// validation
+		ow(request, ow.object.nonEmpty);
+		ow(request.id, ow.string.nonEmpty);
+		const scheduleName = `${request.id}-schedule`
+		try {
+			await this.schedulerClient.send(new DeleteScheduleCommand({ Name: scheduleName, GroupName: this.schedulerGroup }))
+		} catch (err) {
+			if (err instanceof Error && err.name === 'ResourceNotFoundException') {
+				// ignore if schedule is no longer there
+			} else {
+				throw err
+			}
+		}
+
+		this.log.debug(`SchedulesService> delete> request:${JSON.stringify(request)}`);
+	}
+
+	public async create(request: RegionResource): Promise<void> {
 		this.log.debug(`SchedulesService> create> request:${JSON.stringify(request)}`);
 
 		// validation
 		ow(request, ow.object.nonEmpty);
-		ow(request.zoneId, ow.string.nonEmpty);
 		ow(request.groupId, ow.string.nonEmpty);
-		ow(request.regionId, ow.string.nonEmpty);
-		ow(request.coordinates, ow.array.nonEmpty);
-		ow(request.scheduleExpression, ow.string.nonEmpty);
-		ow(request.scheduleExpressionTimezone, ow.optional.string);
+		ow(request.id, ow.string.nonEmpty);
+		ow(request.name, ow.string.nonEmpty);
 
-		const scheduleName = `${request.zoneId}-schedule`
+		if (!request.scheduleExpression) {
+			this.log.warn(`SchedulesService> create> scheduleExpression is not specified, schedule is not created`)
+			return;
+		}
 
+		const scheduleName = `${request.id}-schedule`
 		const schedulePayload: CreateScheduleCommandInput = {
 			Name: scheduleName,
 			FlexibleTimeWindow: {
@@ -38,7 +58,7 @@ export class SchedulesService {
 
 		try {
 			// check if schedule already exists
-			await this.schedulerClient.send(new GetScheduleCommand({Name: scheduleName, GroupName: this.schedulerGroup}))
+			await this.schedulerClient.send(new GetScheduleCommand({ Name: scheduleName, GroupName: this.schedulerGroup }))
 			// update the schedule if exists
 			await this.schedulerClient.send(new UpdateScheduleCommand(schedulePayload))
 		} catch (err) {

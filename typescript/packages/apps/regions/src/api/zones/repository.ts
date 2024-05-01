@@ -61,6 +61,7 @@ export class ZoneRepository {
 							id: z.id,
 							name: z.name,
 							regionId: z.regionId,
+							groupId: z.groupId,
 							boundary: z.boundary,
 							exclusions: z.exclusions,
 							area: z.area,
@@ -130,6 +131,7 @@ export class ZoneRepository {
 			zone = {
 				id: zoneItem.id,
 				regionId: zoneItem.regionId,
+				groupId: zoneItem.groupId,
 				name: zoneItem.name,
 				boundary: zoneItem.boundary,
 				exclusions: zoneItem.exclusions,

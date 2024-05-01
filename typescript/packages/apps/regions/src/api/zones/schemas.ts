@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, paginationToken, regionId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, tags, updatedAt, updatedBy, zoneId } from '../../common/schemas.js';
 import { stateResource } from '../states/schemas.js';
 
 /**
@@ -80,6 +80,7 @@ export const zoneResource = Type.Object(
 		id: zoneId,
 		name,
 		regionId,
+		groupId,
 		boundary,
 		exclusions: Type.Optional(exclusions),
 		area,

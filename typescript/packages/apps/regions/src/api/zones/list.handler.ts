@@ -14,9 +14,9 @@
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, countPaginationQS, fromTokenPaginationQS, groupIdQS, nameQS, regionIdQS, tagFilterQS } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
-import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
+import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { zoneListResource } from './example.js';
-import { ZoneList, includeLatestStateQS, zoneList } from './schemas.js';
+import { includeLatestStateQS, ZoneList, zoneList } from './schemas.js';
 
 export default function listZonesRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -66,13 +66,14 @@ Permissions:
 
 			// parse request
 			const { count, paginationToken, name, tags, groupId, regionId, includeLatestState } = request.query;
+
 			const [zones, nextToken] = await svc.list(request.authz, {
+				regionId,
 				count,
 				token: paginationToken,
 				name,
 				tags: tagUtils.expandTagsQS(tags),
 				groupId,
-				regionId,
 				includeLatestState,
 			});
 

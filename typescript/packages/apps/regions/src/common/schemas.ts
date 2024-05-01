@@ -13,7 +13,7 @@
 
 /* eslint-disable @rushstack/typedef-var */
 import { Static, Type } from '@sinclair/typebox';
-import { Nullable, apiVersion100 } from './types.js';
+import { apiVersion100, Nullable } from './types.js';
 
 /**
  * Common path parameters
@@ -26,8 +26,7 @@ import { Nullable, apiVersion100 } from './types.js';
 export const groupIdQS = Type.Optional(Type.String({ description: 'Group ID to filter by.' }));
 export const regionIdQS = Type.Optional(Type.String({ description: 'Region ID to filter by.' }));
 export const zoneIdQS = Type.Optional(Type.String({ description: 'Zone ID to filter by.' }));
-
-export const countPaginationQS = Type.Optional(Type.Integer({ description: 'Count of results to return.' }));
+export const countPaginationQS = Type.Integer({ description: 'Count of results to return, if not specified default to 20', default: 20 });
 export const fromIdPaginationQS = Type.Optional(Type.String({ description: 'Id to paginate from (exclusive).' }));
 export const fromTokenPaginationQS = Type.Optional(Type.String({ description: 'Token used to paginate from (exclusive).' }));
 export const nextTokenPaginationQS = Type.Optional(Type.String({ description: 'Pagination token.' }));

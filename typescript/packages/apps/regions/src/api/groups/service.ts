@@ -1,3 +1,4 @@
+import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
@@ -19,7 +20,8 @@ export class GroupService {
 		readonly log: FastifyBaseLogger,
 		readonly groupRepository: GroupRepository,
 		readonly commonService: CommonService,
-		readonly commonRepository: CommonRepository
+		readonly commonRepository: CommonRepository,
+		readonly eventPublisher: EventPublisher
 	) {}
 
 	public async create(securityContext: SecurityContext, group: CreateGroup): Promise<Group> {
@@ -43,11 +45,17 @@ export class GroupService {
 
 		// save
 		await this.groupRepository.create(toSave);
+		const saved = await this.get(securityContext, toSave.id);
 
-		// TODO: publish event
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: saved.id,
+			resourceType: 'groups',
+			new: saved,
+		});
 
 		// return
-		const saved = await this.get(securityContext, toSave.id);
 		this.log.debug(`GroupService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -77,10 +85,17 @@ export class GroupService {
 
 		// save
 		await this.groupRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
+		const saved = await this.get(securityContext, merged.id);
 
-		// TODO: publish event
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'updated',
+			id: merged.id,
+			resourceType: 'groups',
+			old: existing,
+			new: saved,
+		});
 
-		const saved = this.groupRepository.get(merged.id);
 		this.log.debug(`GroupService> update> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -91,7 +106,7 @@ export class GroupService {
 		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
-		await this.get(securityContext, id);
+		const existing = await this.get(securityContext, id);
 
 		// ensure no regions are associated with the group
 		const regions = await this.commonService.listResourceIdsByTag(PkType.Region, { count: 1, tags: { ___groupId: id } });
@@ -102,7 +117,13 @@ export class GroupService {
 		// delete
 		await this.groupRepository.delete(id);
 
-		// TODO: publish event
+		// publish event
+		await this.eventPublisher.publishEvent({
+			eventType: 'deleted',
+			id: existing.id,
+			resourceType: 'groups',
+			old: existing,
+		});
 
 		this.log.debug(`GroupService> delete> exit:`);
 	}

@@ -223,7 +223,7 @@ export class CommonService {
 			paginationKey = matched[pageSize - 1];
 		}
 
-		const result: [string[], string] = [matched, encodeURIComponent(paginationKey)];
+		const result: [string[], string] = [matched, paginationKey ? encodeURIComponent(paginationKey) : undefined];
 		this.log.debug(`CommonService> listResourceIdsByTag> exit:${JSON.stringify(result)}`);
 		return result;
 	}

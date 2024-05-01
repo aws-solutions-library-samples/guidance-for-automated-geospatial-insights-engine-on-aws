@@ -10,8 +10,11 @@ import { BatchClient } from "@aws-sdk/client-batch";
 import { JobsService } from "../jobs/service.js";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { SchedulesService } from "../schedules/service.js";
+import { RegionsClient } from "@arcade/clients";
+import { LambdaClient } from "@aws-sdk/client-lambda";
+import { Invoker } from "@arcade/lambda-invoker";
 
-const {captureAWSv3Client} = pkg;
+const { captureAWSv3Client } = pkg;
 
 declare module '@fastify/awilix' {
 	interface Cradle {
@@ -21,12 +24,15 @@ declare module '@fastify/awilix' {
 		batchClient: BatchClient;
 		jobsService: JobsService;
 		schedulesService: SchedulesService;
+		regionsClient: RegionsClient;
+		lambdaInvoker: Invoker;
+		lambdaClient: LambdaClient;
 	}
 }
 
 class DynamoDBDocumentClientFactory {
 	public static create(region: string): DynamoDBDocumentClient {
-		const ddb = captureAWSv3Client(new DynamoDBClient({region}));
+		const ddb = captureAWSv3Client(new DynamoDBClient({ region }));
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
@@ -35,28 +41,35 @@ class DynamoDBDocumentClientFactory {
 		const unmarshallOptions = {
 			wrapNumbers: false
 		};
-		const translateConfig: TranslateConfig = {marshallOptions, unmarshallOptions};
+		const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 		const dbc = DynamoDBDocumentClient.from(ddb, translateConfig);
 		return dbc;
 	}
 }
 
+class LambdaClientFactory {
+	public static create(region: string): LambdaClient {
+		return captureAWSv3Client(new LambdaClient({ region }));
+	}
+}
+
+
 class EventBridgeClientFactory {
 	public static create(region: string | undefined): EventBridgeClient {
-		const eb = captureAWSv3Client(new EventBridgeClient({region}));
+		const eb = captureAWSv3Client(new EventBridgeClient({ region }));
 		return eb;
 	}
 }
 
 class BatchClientFactory {
 	public static create(region: string | undefined): BatchClient {
-		return captureAWSv3Client(new BatchClient({region}));
+		return captureAWSv3Client(new BatchClient({ region }));
 	}
 }
 
 class SchedulerClientFactory {
 	public static create(region: string | undefined): SchedulerClient {
-		return captureAWSv3Client(new SchedulerClient({region}));
+		return captureAWSv3Client(new SchedulerClient({ region }));
 	}
 }
 
@@ -75,6 +88,9 @@ const registerContainer = (app?: FastifyInstance) => {
 	const schedulerGroup = process.env['SCHEDULER_GROUP'];
 	const sqsArn = process.env['SQS_ARN'];
 	const roleArn: string = process.env['ROLE_ARN'];
+
+	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
+	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 
 	diContainer.register({
 		// Clients
@@ -95,7 +111,22 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.batchClient, jobDefinitionArn, jobQueueArn),
+			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, jobQueueArn, concurrencyLimit),
+			{
+				...commonInjectionOptions,
+			}
+		),
+
+		lambdaClient: asFunction(() => LambdaClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		lambdaInvoker: asFunction((container: Cradle) => new Invoker(app.log, container.lambdaClient), {
+			...commonInjectionOptions,
+		}),
+
+		regionsClient: asFunction(
+			(c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName),
 			{
 				...commonInjectionOptions,
 			}

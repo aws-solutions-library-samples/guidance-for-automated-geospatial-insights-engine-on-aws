@@ -1,3 +1,4 @@
+import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
@@ -27,7 +28,8 @@ export class StateService {
 		readonly regionService: RegionService,
 		readonly zoneService: ZoneService,
 		readonly commonService: CommonService,
-		readonly commonRepository: CommonRepository
+		readonly commonRepository: CommonRepository,
+		readonly eventPublisher: EventPublisher
 	) {}
 
 	public async create(securityContext: SecurityContext, zoneId: string, state: CreateState): Promise<State> {
@@ -61,6 +63,8 @@ export class StateService {
 			RESERVED_FIELDS_AS_TAGS,
 			{
 				zoneId,
+				regionId: region.id,
+				groupId: region.groupId,
 				createdBy: securityContext.email,
 			},
 			{
@@ -71,11 +75,17 @@ export class StateService {
 
 		// save
 		await this.stateRepository.create(toSave, existingLatestState);
+		const saved = await this.stateRepository.get(toSave.id);
 
-		// TODO: publish event
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: toSave.id,
+			resourceType: 'states',
+			new: saved,
+		});
 
 		// return
-		const saved = await this.stateRepository.get(toSave.id);
 		this.log.debug(`StateService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -113,10 +123,17 @@ export class StateService {
 
 		// save
 		await this.stateRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
+		const saved = await this.get(securityContext, id);
 
-		// TODO: publish event
+		// publish event
+		await this.eventPublisher.publishEvent({
+			eventType: 'updated',
+			id: merged.id,
+			resourceType: 'states',
+			old: existing,
+			new: saved,
+		});
 
-		const saved = this.stateRepository.get(merged.id);
 		this.log.debug(`StateService> update> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -150,7 +167,13 @@ export class StateService {
 		// delete
 		await this.stateRepository.delete(state, existingLatestState);
 
-		// TODO: publish event
+		// publish event
+		await this.eventPublisher.publishEvent({
+			eventType: 'deleted',
+			id: state.id,
+			resourceType: 'states',
+			old: state,
+		});
 
 		this.log.debug(`StateService> delete> exit:`);
 	}

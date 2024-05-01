@@ -1,3 +1,4 @@
+import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
@@ -22,7 +23,8 @@ export class RegionService {
 		readonly regionRepository: RegionRepository,
 		readonly groupService: GroupService,
 		readonly commonService: CommonService,
-		readonly commonRepository: CommonRepository
+		readonly commonRepository: CommonRepository,
+		readonly eventPublisher: EventPublisher
 	) {}
 
 	public async create(securityContext: SecurityContext, groupId: string, region: CreateRegion): Promise<Region> {
@@ -36,6 +38,8 @@ export class RegionService {
 			region,
 			ow.object.exactShape({
 				name: ow.string.nonEmpty,
+				scheduleExpression: ow.optional.string,
+				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -50,11 +54,17 @@ export class RegionService {
 
 		// save
 		await this.regionRepository.create(toSave);
+		const saved = await this.get(securityContext, toSave.id);
 
-		// TODO: publish event
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: saved.id,
+			resourceType: 'regions',
+			new: saved,
+		});
 
 		// return
-		const saved = await this.regionRepository.get(toSave.id);
 		this.log.debug(`RegionService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -69,6 +79,8 @@ export class RegionService {
 			region,
 			ow.object.exactShape({
 				name: ow.optional.string,
+				scheduleExpression: ow.optional.string,
+				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -84,10 +96,17 @@ export class RegionService {
 
 		// save
 		await this.regionRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
+		const saved = await this.get(securityContext, merged.id);
 
-		// TODO: publish event
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'updated',
+			id: merged.id,
+			resourceType: 'regions',
+			old: existing,
+			new: saved,
+		});
 
-		const saved = this.regionRepository.get(merged.id);
 		this.log.debug(`RegionService> update> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -113,7 +132,7 @@ export class RegionService {
 		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
-		await this.get(securityContext, id);
+		const existing = await this.get(securityContext, id);
 
 		// ensure no zones are associated with the region
 		const zones = await this.commonService.listResourceIdsByTag(PkType.Zone, { count: 1, tags: { ___regionId: id } });
@@ -124,7 +143,13 @@ export class RegionService {
 		// delete
 		await this.regionRepository.delete(id);
 
-		// TODO: publish event
+		// publish event
+		await this.eventPublisher.publishEvent({
+			eventType: 'deleted',
+			id: existing.id,
+			resourceType: 'regions',
+			old: existing,
+		});
 
 		this.log.debug(`RegionService> delete> exit:`);
 	}

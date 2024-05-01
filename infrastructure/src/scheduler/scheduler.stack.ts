@@ -5,18 +5,24 @@ import { eventBusNameParameter } from "@arcade/cdk-common";
 import { SchedulerModule } from "./scheduler.construct.js";
 import { NagSuppressions } from "cdk-nag";
 import { engineProcessorJobDefinitionArnParameter, engineProcessorJobQueueArnParameter } from "../engine/engine.construct.js";
+import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
 
 export type SchedulerStackProperties = StackProps & {
 	environment: string;
+	concurrencyLimit: number;
 }
 
 export class SchedulerStack extends Stack {
 	constructor(scope: Construct, id: string, props: SchedulerStackProperties) {
 
 		super(scope, id, props);
-
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
 			parameterName: eventBusNameParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const regionsApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'regionsApiFunctionArn', {
+			parameterName: regionsApiFunctionArnParameter(props.environment),
 			simpleName: false,
 		}).stringValue;
 
@@ -34,7 +40,9 @@ export class SchedulerStack extends Stack {
 			environment: props.environment,
 			eventBusName,
 			jobDefinitionArn,
-			jobQueueArn
+			jobQueueArn,
+			regionsApiFunctionArn,
+			concurrencyLimit: props.concurrencyLimit
 		})
 
 		NagSuppressions.addResourceSuppressionsByPath(

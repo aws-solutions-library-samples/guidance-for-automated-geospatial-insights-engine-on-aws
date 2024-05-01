@@ -154,6 +154,14 @@
             "description": "The name of the Region.",
             "type": "string"
           },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
+            "type": "string"
+          },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
           },
@@ -171,6 +179,14 @@
         "properties": {
           "name": {
             "description": "The name of the Region.",
+            "type": "string"
+          },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
             "type": "string"
           },
           "attributes": {
@@ -195,6 +211,14 @@
           },
           "name": {
             "description": "The name of the Region.",
+            "type": "string"
+          },
+          "scheduleExpression": {
+            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+            "type": "string"
+          },
+          "scheduleExpressionTimezone": {
+            "description": "The timezone in which the scheduling expression is evaluated.",
             "type": "string"
           },
           "attributes": {
@@ -350,6 +374,10 @@
             "description": "Unique Region ID.",
             "type": "string"
           },
+          "groupId": {
+            "description": "Unique Group ID.",
+            "type": "string"
+          },
           "boundary": {
             "description": "The boundary of the Zone.",
             "$ref": "#/components/schemas/def-2"
@@ -405,6 +433,7 @@
           "id",
           "name",
           "regionId",
+          "groupId",
           "boundary",
           "area",
           "createdBy",
@@ -485,6 +514,14 @@
             "description": "Unique Zone ID.",
             "type": "string"
           },
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "groupId": {
+            "description": "Unique Group ID.",
+            "type": "string"
+          },
           "timestamp": {
             "description": "Date/time created",
             "format": "date-time",
@@ -518,6 +555,8 @@
         "required": [
           "id",
           "zoneId",
+          "regionId",
+          "groupId",
           "timestamp",
           "createdBy",
           "createdAt"
@@ -756,12 +795,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -1377,7 +1417,9 @@
                 "New region": {
                   "summary": "Create a new region.",
                   "value": {
-                    "name": "Abshire Harvest"
+                    "name": "Abshire Harvest",
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth"
                   }
                 }
               }
@@ -1440,6 +1482,14 @@
                       "description": "The name of the Region.",
                       "type": "string"
                     },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
+                      "type": "string"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -1480,6 +1530,8 @@
                       "id": "76ghytgt5",
                       "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -1575,12 +1627,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -1692,6 +1745,8 @@
                           "id": "76ghytgt5",
                           "groupId": "sjduwydjd",
                           "name": "Abshire Harvest",
+                          "scheduleExpression": "rate(5 days)",
+                          "scheduleExpressionTimezone": "Australia/Perth",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         },
@@ -1790,6 +1845,14 @@
                       "description": "The name of the Region.",
                       "type": "string"
                     },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
+                      "type": "string"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -1830,6 +1893,8 @@
                       "id": "76ghytgt5",
                       "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -1970,12 +2035,16 @@
                 "Update region": {
                   "summary": "Update an existing region.",
                   "value": {
-                    "name": "Abshire Harvest"
+                    "name": "Abshire Harvest",
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth"
                   }
                 },
                 "Changing tags": {
                   "summary": "Changing the tags of a region.",
                   "value": {
+                    "scheduleExpression": "rate(5 days)",
+                    "scheduleExpressionTimezone": "Australia/Perth",
                     "tags": {
                       "tier": "GOLD"
                     }
@@ -2039,6 +2108,14 @@
                     },
                     "name": {
                       "description": "The name of the Region.",
+                      "type": "string"
+                    },
+                    "scheduleExpression": {
+                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                      "type": "string"
+                    },
+                    "scheduleExpressionTimezone": {
+                      "description": "The timezone in which the scheduling expression is evaluated.",
                       "type": "string"
                     },
                     "attributes": {
@@ -2310,6 +2387,10 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "boundary": {
                       "description": "The boundary of the Zone.",
                       "$ref": "#/components/schemas/def-2"
@@ -2365,6 +2446,7 @@
                     "id",
                     "name",
                     "regionId",
+                    "groupId",
                     "boundary",
                     "area",
                     "createdBy",
@@ -2402,6 +2484,7 @@
                         ]
                       ],
                       "regionId": "htgdjajdhja",
+                      "groupId": "jsuueyhdjs8",
                       "area": 175,
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
@@ -2498,12 +2581,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -2658,6 +2742,7 @@
                             ]
                           ],
                           "regionId": "htgdjajdhja",
+                          "groupId": "jsuueyhdjs8",
                           "area": 175,
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
@@ -2666,6 +2751,7 @@
                           "id": "0980yht42",
                           "name": "Field 2",
                           "regionId": "htgdjajdhja",
+                          "groupId": "jsuueyhdjs8",
                           "boundary": [
                             [
                               -104.4895628,
@@ -2797,6 +2883,10 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "boundary": {
                       "description": "The boundary of the Zone.",
                       "$ref": "#/components/schemas/def-2"
@@ -2852,6 +2942,7 @@
                     "id",
                     "name",
                     "regionId",
+                    "groupId",
                     "boundary",
                     "area",
                     "createdBy",
@@ -2889,6 +2980,7 @@
                         ]
                       ],
                       "regionId": "htgdjajdhja",
+                      "groupId": "jsuueyhdjs8",
                       "area": 175,
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
@@ -3127,6 +3219,10 @@
                       "description": "Unique Region ID.",
                       "type": "string"
                     },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "boundary": {
                       "description": "The boundary of the Zone.",
                       "$ref": "#/components/schemas/def-2"
@@ -3182,6 +3278,7 @@
                     "id",
                     "name",
                     "regionId",
+                    "groupId",
                     "boundary",
                     "area",
                     "createdBy",
@@ -3195,6 +3292,7 @@
                       "id": "0980yht42",
                       "name": "Field 2",
                       "regionId": "htgdjajdhja",
+                      "groupId": "jsuueyhdjs8",
                       "boundary": [
                         [
                           -104.4895628,
@@ -3450,6 +3548,14 @@
                       "description": "Unique Zone ID.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
@@ -3483,6 +3589,8 @@
                   "required": [
                     "id",
                     "zoneId",
+                    "regionId",
+                    "groupId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -3502,6 +3610,8 @@
                         "crop": "corn"
                       },
                       "zoneId": "jutdjshjdksk",
+                      "regionId": "eyhdksjdk8js",
+                      "groupId": "jsuueyhdjs8",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -3597,12 +3707,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -3740,12 +3851,16 @@
                             "crop": "corn"
                           },
                           "zoneId": "jutdjshjdksk",
+                          "regionId": "eyhdksjdk8js",
+                          "groupId": "jsuueyhdjs8",
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com"
                         },
                         {
                           "id": "0980yht42",
                           "zoneId": "jutdjshjdksk",
+                          "regionId": "eyhdksjdk8js",
+                          "groupId": "jsuueyhdjs8",
                           "timestamp": "2023-04-11T00:00:00.000Z",
                           "attributes": {
                             "estimatedYield": 925
@@ -3763,6 +3878,8 @@
                         {
                           "id": "rrwth876d",
                           "zoneId": "jutdjshjdksk",
+                          "regionId": "eyhdksjdk8js",
+                          "groupId": "jsuueyhdjs8",
                           "timestamp": "2022-04-11T00:00:00.000Z",
                           "attributes": {
                             "estimatedYield": 879
@@ -3850,6 +3967,14 @@
                       "description": "Unique Zone ID.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
@@ -3883,6 +4008,8 @@
                   "required": [
                     "id",
                     "zoneId",
+                    "regionId",
+                    "groupId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -3902,6 +4029,8 @@
                         "crop": "corn"
                       },
                       "zoneId": "jutdjshjdksk",
+                      "regionId": "eyhdksjdk8js",
+                      "groupId": "jsuueyhdjs8",
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com"
                     }
@@ -4116,6 +4245,14 @@
                       "description": "Unique Zone ID.",
                       "type": "string"
                     },
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "groupId": {
+                      "description": "Unique Group ID.",
+                      "type": "string"
+                    },
                     "timestamp": {
                       "description": "Date/time created",
                       "format": "date-time",
@@ -4149,6 +4286,8 @@
                   "required": [
                     "id",
                     "zoneId",
+                    "regionId",
+                    "groupId",
                     "timestamp",
                     "createdBy",
                     "createdAt"
@@ -4160,6 +4299,8 @@
                     "value": {
                       "id": "0980yht42",
                       "zoneId": "jutdjshjdksk",
+                      "regionId": "eyhdksjdk8js",
+                      "groupId": "jsuueyhdjs8",
                       "timestamp": "2023-04-11T00:00:00.000Z",
                       "attributes": {
                         "estimatedYield": 925

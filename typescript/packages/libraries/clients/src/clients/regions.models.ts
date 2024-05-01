@@ -33,6 +33,14 @@ export interface State {
 	updatedAt?: string;
 }
 
+export interface ZoneListResource {
+	zones: Zone[],
+	pagination?: {
+		token: string;
+		count: number;
+	}
+}
+
 export interface Zone {
 	id: string;
 	name: string;
@@ -47,4 +55,14 @@ export interface Zone {
 	createdAt: string;
 	updatedBy?: string;
 	updatedAt?: string;
+}
+
+export interface ListZonesOptions {
+	regionId?: string;
+	groupId?: string;
+	name?: string;
+	paginationToken?: string;
+	count?: number;
+	includeLatestState?: boolean;
+	tags?: string[]
 }
