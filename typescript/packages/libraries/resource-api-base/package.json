@@ -5,16 +5,14 @@
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-		"build": "npx tsx esbuild.ts",
+		"build": "npx tsc -b",
 		"test": "npm run build && vitest run"
 	},
 	"dependencies": {
@@ -37,13 +35,13 @@
 		"@arcade/dynamodb-utils": "workspace:*",
 		"@arcade/lambda-invoker": "workspace:*",
 		"awilix": "~10",
+		"aws-xray-sdk": "~3",
 		"fastify-plugin": "~4",
 		"fastify": "~4",
 		"merge-anything": "~5",
 		"node-cache": "~5",
 		"p-limit": "~5",
-		"vite": "~5",
-		"aws-xray-sdk": "~3"
+		"vite": "~5"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
@@ -56,10 +54,8 @@
 		"eslint": "~9",
 		"pino-pretty": "~11",
 		"pino": "~8",
-		"esbuild": "~0",
-		"tsx": "~4",
 		"shx": "~0",
-		"ts-node": "~10",
+		"tsx": "~4",
 		"typescript": "~5",
 		"vitest-mock-extended": "~1",
 		"vitest": "~1"

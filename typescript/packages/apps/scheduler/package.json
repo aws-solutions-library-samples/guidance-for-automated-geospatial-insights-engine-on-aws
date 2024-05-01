@@ -2,6 +2,12 @@
 	"name": "@arcade/scheduler",
 	"version": "0.0.1",
 	"description": "Manage the creation of schedule which will trigger the arcade engine.",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
@@ -9,16 +15,18 @@
 		"test": "npm run build && vitest run",
 		"prestart": "npx tsx src/localConfigGenerator.ts",
 		"start": "rushx build && tsx src/server.ts",
-		"build:bundled": "npx tsx esbuild.ts",
-		"start:bundled": "node dist/app.mjs",
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@aws-sdk/client-dynamodb": "~3",
-		"@aws-sdk/client-ssm": "~3",
+		"@arcade/events": "workspace:*",
+		"@arcade/clients": "workspace:*",
+		"@arcade/lambda-invoker": "workspace:*",
 		"@aws-sdk/client-batch": "~3",
+		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/client-scheduler": "~3",
+		"@aws-sdk/client-ssm": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",
 		"@fastify/awilix": "~5",
 		"@fastify/aws-lambda": "~4",
@@ -31,21 +39,20 @@
 		"awilix": "~10",
 		"aws-lambda": "~1",
 		"aws-xray-sdk": "~3",
+		"dayjs": "~1",
 		"dotenv": "~16",
 		"fastify-plugin": "~4",
 		"fastify": "~4",
 		"ow": "~1",
-		"dayjs": "~1",
 		"pino-pretty": "~11",
 		"pino": "~8",
-		"ulid": "~2",
-		"@arcade/events": "workspace:*"
+		"p-limit": "~5",
+		"ulid": "~2"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
 		"@types/node": "~20",
-		"esbuild": "~0",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",

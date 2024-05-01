@@ -50,20 +50,19 @@ export interface Polygon {
 }
 
 export interface PolygonListResource {
-	polygons: Polygon[],
+	polygons: Polygon[];
 	pagination?: {
 		token: string;
 		count: number;
-	}
+	};
 }
 
-
-export interface ListZonesOptions {
+export interface ListPolygonsOptions {
 	regionId?: string;
 	groupId?: string;
 	name?: string;
 	paginationToken?: string;
 	count?: number;
 	includeLatestState?: boolean;
-	tags?: string[]
+	tags?: string[];
 }

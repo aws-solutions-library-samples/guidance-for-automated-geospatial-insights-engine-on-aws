@@ -5,18 +5,16 @@
 	"author": "Pouya Bahavar <bahavare@amazon.com>",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
 		"build": "npx tsc -b",
 		"test": "npm run build && vitest run --passWithNoTests",
-		"build:bundled": "npx tsx esbuild.ts"
+		"build:bundled": "npx tsx src/esbuild.ts"
 	},
 	"dependencies": {
 		"@aws-sdk/client-dynamodb": "~3",
@@ -39,7 +37,6 @@
 		"aws-cdk": "~2",
 		"cdk-nag": "~2",
 		"custom-resource-helper": "~1",
-		"esbuild": "~0",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",
