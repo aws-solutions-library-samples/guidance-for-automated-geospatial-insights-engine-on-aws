@@ -3,7 +3,7 @@ import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
-import { Group, ListZonesOptions, Polygon, PolygonListResource, Region } from './regions.models.js';
+import { Group, ListPolygonsOptions, Polygon, PolygonListResource, Region } from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -47,7 +47,7 @@ export class RegionsClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async listPolygons(options?: ListZonesOptions, requestContext?: LambdaRequestContext): Promise<PolygonListResource | undefined> {
+	public async listPolygons(options?: ListPolygonsOptions, requestContext?: LambdaRequestContext): Promise<PolygonListResource | undefined> {
 		this.log.trace(`RegionsClient> listPolygons> in: options:${options}}`);
 
 		const additionalHeaders = {};
@@ -56,11 +56,16 @@ export class RegionsClient extends ClientServiceBase {
 
 		const queryStrings = [];
 
-		if (tags) queryStrings.push(...tags.map(t => {`tags=${t}`}))
+		if (tags)
+			queryStrings.push(
+				...tags.map((t) => {
+					`tags=${t}`;
+				})
+			);
 
-		if (rest) queryStrings.push(...Object.entries(rest).map(([key, value]) => `${key}=${value}`))
+		if (rest) queryStrings.push(...Object.entries(rest).map(([key, value]) => `${key}=${value}`));
 
-		const path = queryStrings.length > 0 ? `/polygons?${queryStrings.join('&')}` : `/polygons`
+		const path = queryStrings.length > 0 ? `/polygons?${queryStrings.join('&')}` : `/polygons`;
 
 		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
 			.setMethod('GET')
@@ -72,7 +77,6 @@ export class RegionsClient extends ClientServiceBase {
 		this.log.trace(`RegionsClient> listPolygons> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
-
 
 	public async getPolygonById(id: string, requestContext?: LambdaRequestContext): Promise<Polygon | undefined> {
 		this.log.trace(`RegionsClient> getPolygonById> in: id:${id}}`);

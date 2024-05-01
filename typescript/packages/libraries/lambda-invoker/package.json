@@ -5,25 +5,23 @@
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-		"build": "npx tsx esbuild.ts",
+		"build": "npx tsc -b",
 		"test": "npm run build && vitest run"
 	},
 	"dependencies": {
 		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/util-utf8-node": "~3",
 		"@aws-sdk/client-sso-oidc": "~3",
-		"http-errors": "2.0.0",
-		"js-yaml": "4.1.0",
-		"readable-stream": "4.4.2"
+		"http-errors": "~2",
+		"js-yaml": "~4",
+		"readable-stream": "~4"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
@@ -33,7 +31,6 @@
 		"@typescript-eslint/eslint-plugin": "~7",
 		"@typescript-eslint/parser": "~7",
 		"aws-sdk-client-mock": "~4",
-		"esbuild": "~0",
 		"eslint": "~9",
 		"pino": "~8",
 		"shx": "~0",

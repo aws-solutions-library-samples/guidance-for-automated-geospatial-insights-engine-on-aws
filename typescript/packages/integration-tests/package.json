@@ -15,7 +15,6 @@
 		"@vitest/ui": "~1",
 		"dayjs": "~1",
 		"dotenv": "~16",
-		"esbuild": "~0",
 		"eslint": "~9",
 		"jwt-encode": "~1",
 		"pactum-matchers": "~1",

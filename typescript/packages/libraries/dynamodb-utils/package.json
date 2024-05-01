@@ -5,16 +5,14 @@
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-		"build": "tsc -b",
+		"build": "npx tsc -b",
 		"test": "npm run build && vitest run --passWithNoTests"
 	},
 	"dependencies": {

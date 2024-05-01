@@ -4,11 +4,9 @@
 	"description": "Manages hierarchical structures of groups, regions, and polygons.",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
@@ -17,8 +15,6 @@
 		"test": "npm run build && vitest run",
 		"prestart": "npx tsx src/localConfigGenerator.ts",
 		"start": "rushx build && tsx src/server.ts",
-		"build:bundled": "npx tsx esbuild.ts",
-		"start:bundled": "node dist/app.mjs",
 		"cdk": "cdk"
 	},
 	"dependencies": {
@@ -53,19 +49,17 @@
 		"ulid": "~2"
 	},
 	"devDependencies": {
-		"@arcade/cdk-common": "workspace:*",
 		"@aws-sdk/client-ssm": "~3",
-		"aws-sdk-client-mock": "~4",
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
 		"@types/node": "~20",
-		"esbuild": "~0",
+		"aws-sdk-client-mock": "~4",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",
 		"typescript": "~5",
-		"vitest": "~1",
-		"vitest-mock-extended": "~1"
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
 	},
 	"private": false
 }

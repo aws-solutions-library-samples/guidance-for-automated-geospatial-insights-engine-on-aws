@@ -5,23 +5,21 @@
 	"author": "Pouya Bahavar <bahavar@amazon.com>",
 	"exports": {
 		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
-	"main": "./dist/index.cjs",
 	"types": "./dist/index.d.js",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-		"build": "tsc -b",
+		"build": "npx tsc -b",
 		"test": "npm run build && vitest run --passWithNoTests"
 	},
 	"dependencies": {
-		"@aws-sdk/client-lambda": "~3",
-		"@aws-sdk/client-sns": "~3",
+		"@arcade/events": "workspace:*",
 		"@arcade/lambda-invoker": "workspace:*",
-		"@arcade/events": "workspace:*"
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/client-sns": "~3"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
@@ -29,15 +27,15 @@
 		"@types/prettier": "~3",
 		"@typescript-eslint/eslint-plugin": "~7",
 		"@typescript-eslint/parser": "~7",
-		"eslint": "~8",
-		"shx": "~0",
-		"ts-node": "~10",
-		"typescript": "~5",
 		"aws-sdk-client-mock": "~4",
-		"vitest": "~1",
-		"vitest-mock-extended": "~1",
+		"eslint": "~8",
+		"pino-pretty": "~11",
 		"pino": "~8",
-		"pino-pretty": "~11"
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
 	},
 	"private": false
 }
