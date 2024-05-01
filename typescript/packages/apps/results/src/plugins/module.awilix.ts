@@ -1,17 +1,10 @@
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
-import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
-import { asFunction, Lifetime } from 'awilix';
-import pkg from 'aws-xray-sdk';
-import type { FastifyInstance } from 'fastify';
-import fp from 'fastify-plugin';
-import { ResultsRepository } from '../events/repository.js';
-// @ts-ignore
 import { RegionsClient, StacServerClient } from '@arcade/clients';
+import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventPublisher, RESULTS_EVENT_SOURCE } from '@arcade/events';
 import { Invoker } from '@arcade/lambda-invoker';
 import { BaseCradle, registerBaseAwilix } from '@arcade/resource-api-base';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { S3Client } from '@aws-sdk/client-s3';
 import { SNSClient } from '@aws-sdk/client-sns';
@@ -19,7 +12,13 @@ import { SSMClient } from '@aws-sdk/client-ssm';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import type { Client, Command } from '@aws-sdk/smithy-client';
 import type { MetadataBearer, RequestPresigningArguments } from '@aws-sdk/types';
+import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
+import { asFunction, Lifetime } from 'awilix';
+import pkg from 'aws-xray-sdk';
+import type { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
 import { EventProcessor } from '../events/eventProcessor.js';
+import { ResultsRepository } from '../events/repository.js';
 import { StacUtil } from '../utils/stacUtil.js';
 
 const { captureAWSv3Client } = pkg;

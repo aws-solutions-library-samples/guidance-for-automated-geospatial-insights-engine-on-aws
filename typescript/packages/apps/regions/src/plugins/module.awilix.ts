@@ -15,10 +15,12 @@ import { asFunction, Lifetime } from 'awilix';
 import fp from 'fastify-plugin';
 
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
+import { EventPublisher, REGIONS_EVENT_SOURCE } from '@arcade/events';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
+import pkg from 'aws-xray-sdk';
 import { GroupRepository } from '../api/groups/repository.js';
 import { GroupService } from '../api/groups/service.js';
 import { RegionRepository } from '../api/regions/repository.js';
@@ -31,6 +33,7 @@ import { ZoneRepository } from '../api/zones/repository.js';
 import { ZoneService } from '../api/zones/service.js';
 import { TagUtils } from '../tags/tags.util.js';
 
+const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
 	interface Cradle {
 		eventBridgeClient: EventBridgeClient;
@@ -47,20 +50,24 @@ declare module '@fastify/awilix' {
 		zoneRepository: ZoneRepository;
 		stateService: StateService;
 		stateRepository: StateRepository;
+		eventPublisher: EventPublisher;
 	}
 }
 
 // factories for instantiation of 3rd party objects
 class EventBridgeClientFactory {
 	public static create(region: string): EventBridgeClient {
-		return new EventBridgeClient({
-			region,
-		});
+		const eventBridge = captureAWSv3Client(
+			new EventBridgeClient({
+				region,
+			})
+		);
+		return eventBridge;
 	}
 }
 class DynamoDBDocumentClientFactory {
 	public static create(region: string): DynamoDBDocumentClient {
-		const ddb = new DynamoDBClient({ region });
+		const ddb = captureAWSv3Client(new DynamoDBClient({ region }));
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
@@ -88,6 +95,7 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 
 	const awsRegion = process.env['AWS_REGION'];
 	const tableName = process.env['TABLE_NAME'];
+	const eventBusName = process.env['EVENT_BUS_NAME'];
 
 	// then we can register our classes with the DI c
 	diContainer.register({
@@ -124,13 +132,16 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		zoneRepository: asFunction((c: Cradle) => new ZoneRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
 			...commonInjectionOptions,
 		}),
-		zoneService: asFunction((c: Cradle) => new ZoneService(app.log, c.zoneRepository, c.regionService, c.commonService, c.commonRepository), {
+		zoneService: asFunction((c: Cradle) => new ZoneService(app.log, c.zoneRepository, c.regionService, c.commonService, c.commonRepository, c.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 		stateRepository: asFunction((c: Cradle) => new StateRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
 		stateService: asFunction((c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.zoneService, c.commonService, c.commonRepository), {
+			...commonInjectionOptions,
+		}),
+		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, REGIONS_EVENT_SOURCE), {
 			...commonInjectionOptions,
 		}),
 	});

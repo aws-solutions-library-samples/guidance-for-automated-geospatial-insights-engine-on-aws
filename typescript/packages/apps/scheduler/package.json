@@ -1,15 +1,7 @@
 {
-	"name": "@arcade/regions",
+	"name": "@arcade/scheduler",
 	"version": "0.0.1",
-	"description": "Manages hierarchical structures of groups, regions, and zones.",
-	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"main": "./dist/index.cjs",
-	"types": "./dist/index.d.js",
+	"description": "Manage the creation of schedule which will trigger the arcade engine.",
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
@@ -22,10 +14,11 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@arcade/dynamodb-utils": "workspace:*",
-		"@arcade/events": "workspace:*",
 		"@aws-sdk/client-dynamodb": "~3",
+		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-batch": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-scheduler": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",
 		"@fastify/awilix": "~5",
 		"@fastify/aws-lambda": "~4",
@@ -35,27 +28,20 @@
 		"@fastify/swagger": "~8",
 		"@fastify/type-provider-typebox": "~4",
 		"@sinclair/typebox": "~0",
-		"@turf/turf": "~6",
 		"awilix": "~10",
 		"aws-lambda": "~1",
 		"aws-xray-sdk": "~3",
-		"dayjs": "~1",
 		"dotenv": "~16",
 		"fastify-plugin": "~4",
 		"fastify": "~4",
-		"just-clone": "~6",
-		"jwt-decode": "~4",
-		"merge-anything": "~5",
 		"ow": "~1",
+		"dayjs": "~1",
 		"pino-pretty": "~11",
 		"pino": "~8",
-		"sleep-promise": "~9",
-		"ulid": "~2"
+		"ulid": "~2",
+		"@arcade/events": "workspace:*"
 	},
 	"devDependencies": {
-		"@arcade/cdk-common": "workspace:*",
-		"@aws-sdk/client-ssm": "~3",
-		"aws-sdk-client-mock": "~4",
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
 		"@types/node": "~20",

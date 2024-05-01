@@ -178,3 +178,6 @@ license-checker/
 
 predeploy.json
 
+__pycache__
+/python/apps/arcade-pipeline/output/
+/python/notebook/output/

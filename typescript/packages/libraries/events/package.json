@@ -1,8 +1,8 @@
 {
 	"name": "@arcade/events",
-	"version": "1.0.0",
-	"description": "Platform events",
-	"author": "Pouya Bahavar <bahavar@amazon.com>",
+	"version": "0.0.1",
+	"description": "Arcade events",
+	"author": "William Sia <willsia@amazon.com>",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",

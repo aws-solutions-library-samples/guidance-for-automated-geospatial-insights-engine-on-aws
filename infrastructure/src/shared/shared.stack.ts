@@ -1,7 +1,9 @@
 import { Bus, S3 } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import type { Construct } from 'constructs';
 import { Cognito } from './cognito.construct.js';
+import { Network } from './network.construct.js';
 
 export type SharedStackProperties = StackProps & {
 	environment: string;
@@ -16,7 +18,7 @@ export type SharedStackProperties = StackProps & {
 };
 
 export class SharedInfrastructureStack extends Stack {
-	vpcId: string;
+	vpc: IVpc;
 	bucketName: string;
 	eventBusName: string;
 	eventBusArn: string;
@@ -48,6 +50,8 @@ export class SharedInfrastructureStack extends Stack {
 			eventBusName,
 		});
 
+		const network = new Network(this, 'Network', {});
+		this.vpc = network.vpc;
 		this.eventBusName = eventBusName;
 		this.eventBusArn = bus.eventBusArn;
 	}

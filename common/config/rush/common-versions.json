@@ -29,6 +29,7 @@
 		"@aws-sdk/client-s3": "3.556.0",
 		"@aws-sdk/client-ssm": "3.556.0",
 		"@aws-sdk/client-sso-admin": "3.556.0",
+		"@aws-sdk/client-sso-oidc": "3.556.0",
 		"@aws-sdk/client-sts": "3.556.0",
 		"@aws-sdk/client-sqs": "3.556.0",
 		"@aws-sdk/client-lambda": "3.556.0",

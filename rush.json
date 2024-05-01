@@ -351,6 +351,12 @@
 			"shouldPublish": true
 		},
 		{
+			"packageName": "@arcade/scheduler",
+			"projectFolder": "typescript/packages/apps/scheduler",
+			"reviewCategory": "production",
+			"shouldPublish": true
+		},
+		{
 			"packageName": "@arcade/integration-tests",
 			"projectFolder": "typescript/packages/integration-tests",
 			"reviewCategory": "production",

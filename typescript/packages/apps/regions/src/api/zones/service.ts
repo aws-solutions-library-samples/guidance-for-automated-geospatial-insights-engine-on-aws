@@ -1,3 +1,4 @@
+import { EventPublisher } from '@arcade/events';
 import { area, polygon } from '@turf/turf';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
@@ -26,8 +27,10 @@ export class ZoneService {
 		readonly zoneRepository: ZoneRepository,
 		readonly regionService: RegionService,
 		readonly commonService: CommonService,
-		readonly commonRepository: CommonRepository
-	) {}
+		readonly commonRepository: CommonRepository,
+		readonly eventPublisher: EventPublisher
+	) {
+	}
 
 	public async create(securityContext: SecurityContext, regionId: string, zone: CreateZone): Promise<Zone> {
 		this.log.debug(`ZoneService> create> regionId:${regionId}, zone:${JSON.stringify(zone)}`);
@@ -42,6 +45,8 @@ export class ZoneService {
 				name: ow.string.nonEmpty,
 				boundary: ow.array.nonEmpty,
 				exclusions: ow.optional.array,
+				scheduleExpression: ow.optional.string,
+				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -75,10 +80,26 @@ export class ZoneService {
 		// save
 		await this.zoneRepository.create(toSave);
 
-		// TODO: publish event
-
 		// return
 		const saved = await this.zoneRepository.get(toSave.id);
+
+		// TODO: publish the whole resource
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: saved.id,
+			resourceType: 'zones',
+			new: {
+				regionId: regionId,
+				groupId: region.groupId,
+				zoneId: saved.id,
+				scheduleExpression: saved.scheduleExpression,
+				scheduleExpressionTimezone: saved.scheduleExpressionTimezone,
+				coordinates: saved.boundary,
+				exclusions: saved.exclusions,
+			},
+		});
+
 		this.log.debug(`ZoneService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -106,6 +127,8 @@ export class ZoneService {
 				name: ow.optional.string,
 				boundary: ow.optional.array,
 				exclusions: ow.optional.array,
+				scheduleExpression: ow.optional.string,
+				scheduleExpressionTimezone: ow.optional.string,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -126,6 +149,35 @@ export class ZoneService {
 		// TODO: publish event
 
 		const saved = this.zoneRepository.get(merged.id);
+
+		// TODO: return changed in event
+		// ensure parent region exists (will throw error if not exist or insufficient privileges)
+		const region = await this.regionService.get(securityContext, existing.regionId);
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'updated',
+			id: merged.id,
+			resourceType: 'zones',
+			old: {
+				regionId: existing.regionId,
+				groupId: region.groupId,
+				zoneId: existing.id,
+				scheduleExpression: existing.scheduleExpression,
+				scheduleExpressionTimezone: existing.scheduleExpressionTimezone,
+				coordinates: existing.boundary,
+				exclusions: existing.exclusions,
+			},
+			new: {
+				regionId: existing.regionId,
+				groupId: region.groupId,
+				zoneId: merged.id,
+				scheduleExpression: merged.scheduleExpression,
+				scheduleExpressionTimezone: merged.scheduleExpressionTimezone,
+				coordinates: merged.boundary,
+				exclusions: merged.exclusions,
+			},
+		});
+
 		this.log.debug(`ZoneService> update> exit:${JSON.stringify(saved)}`);
 		return saved;
 	}
@@ -151,7 +203,7 @@ export class ZoneService {
 		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
-		await this.get(securityContext, id);
+		const existing = await this.get(securityContext, id);
 
 		// ensure no states are associated with the zone
 		const states = await this.commonService.listResourceIdsByTag(PkType.State, { count: 1, tags: { ___zoneId: id } });
@@ -162,7 +214,23 @@ export class ZoneService {
 		// delete the zone
 		await this.zoneRepository.delete(id);
 
-		// TODO: publish event
+		// get the region so we can populate the group id
+		const region = await this.regionService.get(securityContext, existing.regionId);
+
+		await this.eventPublisher.publishEvent({
+			eventType: 'deleted',
+			id: existing.id,
+			resourceType: 'zones',
+			old: {
+				regionId: existing.regionId,
+				groupId: region.groupId,
+				zoneId: existing.id,
+				scheduleExpression: existing.scheduleExpression,
+				scheduleExpressionTimezone: existing.scheduleExpressionTimezone,
+				coordinates: existing.boundary,
+				exclusions: existing.exclusions,
+			},
+		});
 
 		this.log.debug(`ZoneService> delete> exit:`);
 	}
