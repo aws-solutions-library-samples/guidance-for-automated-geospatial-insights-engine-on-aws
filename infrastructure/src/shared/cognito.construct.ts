@@ -38,6 +38,7 @@ export const adminUserParameter = (environment: string) => `/arcade/${environmen
 
 export class Cognito extends Construct {
 	public readonly userPoolId: string;
+	public readonly userPoolArn: string;
 
 	constructor(scope: Construct, id: string, props: CognitoConstructProperties) {
 		super(scope, id);
@@ -97,6 +98,7 @@ export class Cognito extends Construct {
 		);
 
 		this.userPoolId = userPool.userPoolId;
+		this.userPoolArn = userPool.userPoolArn;
 
 		new ssm.StringParameter(this, 'cognitoUserPoolIdParameter', {
 			parameterName: userPoolIdParameter(props.environment),
@@ -136,12 +138,14 @@ export class Cognito extends Construct {
 			emailVerified: true,
 		};
 
-		const clientReadAttributes = new ClientAttributes().withStandardAttributes(standardCognitoAttributes);
+		const clientReadAttributes = new ClientAttributes().withStandardAttributes(standardCognitoAttributes).withCustomAttributes('role');
 
-		const clientWriteAttributes = new ClientAttributes().withStandardAttributes({
-			...standardCognitoAttributes,
-			emailVerified: false,
-		});
+		const clientWriteAttributes = new ClientAttributes()
+			.withStandardAttributes({
+				...standardCognitoAttributes,
+				emailVerified: false,
+			})
+			.withCustomAttributes('role');
 
 		// 👇 User Pool Client for end users
 		const userPoolClient = new UserPoolClient(this, 'UserPoolClient', {
@@ -153,6 +157,7 @@ export class Cognito extends Construct {
 			supportedIdentityProviders: [UserPoolClientIdentityProvider.COGNITO],
 			readAttributes: clientReadAttributes,
 			writeAttributes: clientWriteAttributes,
+			preventUserExistenceErrors: true,
 		});
 		userPoolClient.node.addDependency(userPool);
 
@@ -162,31 +167,19 @@ export class Cognito extends Construct {
 		});
 
 		/**
-		 * Seed the default roles as groups
+		 * Seed the group
 		 */
 
-		const adminGroup = new CfnUserPoolGroup(this, 'GlobalAdminGroup', {
-			groupName: 'admin',
+		const group = new CfnUserPoolGroup(this, 'Group', {
+			groupName: 'arcade',
 			userPoolId: userPool.userPoolId,
 		});
-		adminGroup.node.addDependency(userPool);
-
-		const contributorGroup = new CfnUserPoolGroup(this, 'GlobalContributorGroup', {
-			groupName: 'contributor',
-			userPoolId: userPool.userPoolId,
-		});
-		contributorGroup.node.addDependency(userPool);
-
-		const readerGroup = new CfnUserPoolGroup(this, 'GlobalReaderGroup', {
-			groupName: 'reader',
-			userPoolId: userPool.userPoolId,
-		});
-		readerGroup.node.addDependency(userPool);
+		group.node.addDependency(userPool);
 
 		/**
 		 * Seed the initial admin user
 		 */
-		const adminUser = new CfnUserPoolUser(this, 'GlobalAdminUser', {
+		const adminUser = new CfnUserPoolUser(this, 'AdminUser', {
 			userPoolId: userPool.userPoolId,
 			username: props.administratorEmail,
 			userAttributes: [
@@ -194,17 +187,21 @@ export class Cognito extends Construct {
 					name: 'email',
 					value: props.administratorEmail,
 				},
+				{
+					name: 'custom:role',
+					value: 'admin',
+				},
 			],
 		});
 		adminUser.node.addDependency(userPool);
 
 		const membership = new CfnUserPoolUserToGroupAttachment(this, 'AdminUserGroupMembership', {
-			groupName: adminGroup.groupName as string,
+			groupName: group.groupName as string,
 			username: adminUser.username as string,
 			userPoolId: userPool.userPoolId,
 		});
 
-		membership.node.addDependency(adminGroup);
+		membership.node.addDependency(group);
 		membership.node.addDependency(adminUser);
 		membership.node.addDependency(userPool);
 

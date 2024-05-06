@@ -16,19 +16,9 @@ import fp from 'fastify-plugin';
 import { jwtDecode } from 'jwt-decode';
 import type { SecurityContext, SecurityScope } from '../common/scopes.js';
 
-export type Identities = {
-	dateCreated: string;
-	userId: string;
-	providerName: string;
-	providerType: string;
-	issuer: string;
-	primary: string;
-};
-
 export type CognitoAuthToken = {
 	email: string;
-	'cognito:groups': string[];
-	identities: Identities[];
+	role: string;
 };
 
 /**
@@ -68,10 +58,8 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			}
 			// extract the users claims from the ID token (provided by the COGNITO_USER_POOLS integration)
 			email = lambdaEvent?.requestContext?.authorizer?.claims?.['email'] as string;
-			const identities = JSON.parse(lambdaEvent?.requestContext?.authorizer?.claims?.['identities'] as string);
-			userId = identities.userId;
 			// TODO: check this once auth figured out:
-			role = lambdaEvent?.requestContext?.authorizer?.claims?.['cognito:groups'] as SecurityScope;
+			role = lambdaEvent?.requestContext?.authorizer?.claims?.['custom:role'] as SecurityScope;
 		} else {
 			// if in local mode, to simplify local development we extract from user provided headers
 			app.log.warn(`authz> onRequest> running in local development mode which means Cognito authorization is not enabled!!!`);
@@ -88,16 +76,14 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			 * ignore reason : JWT token is verified by APIGW in a prior step and this issue is invalid
 			 */
 			email = decodedToken.email; // nosemgrep
-			userId = decodedToken.identities[0].userId; // nosemgrep
 
 			// TODO: figure out how the role is passed
-			role = decodedToken['cognito:groups']?.[0] as SecurityScope;
+			role = decodedToken['custom:role'] as SecurityScope;
 		}
 
 		// place the group roles and email on the request in case a handler needs to perform finer grained access control
 		req.authz = {
 			email,
-			userId,
 			role,
 		};
 		app.log.debug(`authz> onRequest> req.authz: ${JSON.stringify(req.authz)}`);

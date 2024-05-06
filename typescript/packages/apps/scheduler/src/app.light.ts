@@ -17,7 +17,7 @@ export const buildLightApp = async (): Promise<FastifyInstance> => {
 				},
 			},
 		},
-		prod: {
+		cloud: {
 			level: logLevel ?? 'warn',
 		},
 	};

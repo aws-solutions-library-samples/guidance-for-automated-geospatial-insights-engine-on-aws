@@ -1,0 +1,182 @@
+{
+	"Arcade": {
+		"entityTypes": {
+			"User": {
+				"shape": {
+					"type": "Record",
+					"attributes": {
+						"custom": {
+							"type": "Record",
+							"required": true,
+							"attributes": {
+								"role": {
+									"type": "String",
+									"required": true
+								}
+							}
+						},
+						"email": {
+							"type": "String"
+						}
+					}
+				},
+				"memberOfTypes": ["UserGroup"]
+			},
+			"UserGroup": {
+				"shape": {
+					"type": "Record",
+					"attributes": {}
+				}
+			},
+			"Resource": {
+				"memberOfTypes": [],
+				"shape": {
+					"type": "Record",
+					"attributes": {}
+				}
+			}
+		},
+		"actions": {
+			"CreateGroup": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListGroups": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribeGroup": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"UpdateGroup": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeleteGroup": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"CreateRegion": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListRegions": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribeRegion": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"UpdateRegion": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeleteRegion": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"CreatePolygon": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListPolygons": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribePolygon": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"UpdatePolygon": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeletePolygon": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"CreateState": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListStates": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribeState": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"UpdateState": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeleteState": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			}
+		}
+	}
+}

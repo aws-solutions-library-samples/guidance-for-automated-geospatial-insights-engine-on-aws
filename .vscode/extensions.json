@@ -22,6 +22,7 @@
 		"mike-co.import-sorter",
 		"pmneo.tsimporter",
 		"vitest.explorer",
-		"kingwl.vscode-vitest-runner"
+		"kingwl.vscode-vitest-runner",
+		"cedar-policy.vscode-cedar"
     ]
 }

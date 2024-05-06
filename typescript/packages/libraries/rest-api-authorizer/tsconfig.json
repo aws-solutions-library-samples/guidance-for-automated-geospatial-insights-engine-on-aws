@@ -4,11 +4,13 @@
 		"outDir": "dist",
 		"rootDir": "src",
 		"types": ["node"],
+		"composite": true,
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
 		"esModuleInterop": true,
 		"ignoreDeprecations": "5.0",
+		"noPropertyAccessFromIndexSignature": false,
 		// overrides of extends
 		"strict": false,
 		"exactOptionalPropertyTypes": false

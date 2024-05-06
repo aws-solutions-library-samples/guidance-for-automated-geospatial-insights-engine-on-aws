@@ -13,7 +13,6 @@
 
 export interface SecurityContext {
 	email: string;
-	userId: string;
 	role: SecurityScope;
 }
 

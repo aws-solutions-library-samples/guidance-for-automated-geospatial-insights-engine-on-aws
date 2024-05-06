@@ -1,16 +1,16 @@
+import { eventBusNameParameter } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { ResultsConstruct } from './results.construct.js';
-import { eventBusNameParameter } from "@arcade/cdk-common";
-import { regionsApiFunctionArnParameter, regionsApiNameParameter } from "../regions/regions.construct.js";
 
 export type ResultsStackProperties = StackProps & {
 	moduleName: string;
 	environment: string;
 	bucketName: string;
+	regionsApiFunctionArn: string;
 	stacServerTopicArn: string;
 	stacServerFunctionName: string;
 };
@@ -27,11 +27,6 @@ export class ResultsStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
-		const regionsApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'regionsApiFunctionArn', {
-			parameterName: regionsApiFunctionArnParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
 		const results = new ResultsConstruct(this, 'Results', {
 			moduleName: props.moduleName,
 			environment: props.environment,
@@ -39,7 +34,7 @@ export class ResultsStack extends Stack {
 			stacServerTopicArn: props.stacServerTopicArn,
 			stacServerFunctionName: props.stacServerFunctionName,
 			eventBusName,
-			regionsApiFunctionArn,
+			regionsApiFunctionArn: props.regionsApiFunctionArn,
 		});
 
 		new ssm.StringParameter(this, 'tableNameParameter', {

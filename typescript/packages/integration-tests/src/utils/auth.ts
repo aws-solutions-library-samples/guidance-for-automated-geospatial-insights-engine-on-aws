@@ -14,8 +14,7 @@ export async function getAuthToken(): Promise<string> {
 		iat: Math.floor(Date.now() / 1000),
 		exp: Math.floor(Date.now() / 1000) + 60 * 60, // expires in 1 hour
 		email: JWT_EMAIL,
-		identities: [{ userId: 'johndoe' }],
-		'cognito:groups': ['contributor'],
+		'custom:role': 'contributor',
 	};
 
 	// Sign the token with the secret key.
