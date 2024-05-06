@@ -11,6 +11,7 @@ import { RegionsApiStack } from './regions/regions.stack.js';
 import { ResultsStack } from './results/results.stack.js';
 import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
+import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,7 +28,7 @@ const cognitoVerifiedDomain = app.node.tryGetContext('cognitoVerifiedDomain') as
 const cognitoFromName = app.node.tryGetContext('cognitoFromName') as string;
 const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as string;
 
-const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10)
+const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10);
 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
@@ -51,11 +52,11 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-					fromEmail: cognitoFromEmail,
-					fromName: cognitoFromName,
-					replyTo: cognitoReplyToEmail,
-					sesVerifiedDomain: cognitoVerifiedDomain,
-				}
+						fromEmail: cognitoFromEmail,
+						fromName: cognitoFromName,
+						replyTo: cognitoReplyToEmail,
+						sesVerifiedDomain: cognitoVerifiedDomain,
+				  }
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -67,6 +68,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		stackName: stackName('regions'),
 		description: stackDescription('Regions'),
 		environment,
+		policyStoreIdParameter: verifiedPermissionsPolicyStoreIdParameter(environment),
 	});
 	regionsStack.addDependency(sharedStack);
 
@@ -87,10 +89,10 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		stackName: stackName('scheduler'),
 		description: stackDescription('Scheduler'),
 		environment,
-		concurrencyLimit
+		concurrencyLimit,
 	});
-
 	schedulerStack.addDependency(sharedStack);
+	schedulerStack.addDependency(regionsStack);
 	schedulerStack.addDependency(engineStack);
 
 	if (stacServerFunctionName && stacServerTopicArn) {
@@ -100,6 +102,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 			moduleName: 'results',
 			environment,
 			bucketName: sharedStack.bucketName,
+			regionsApiFunctionArn: regionsStack.regionsFunctionArn,
 			stacServerTopicArn,
 			stacServerFunctionName,
 			env: {
@@ -111,16 +114,15 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		resultStack.addDependency(sharedStack);
 		resultStack.addDependency(regionsStack);
 	}
-
 };
 
 const getCallerEnvironment = (): { accountId?: string; region?: string } | undefined => {
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-			'EXAMPLE\n' +
-			'$ npm run cdk deploy -- -e sampleEnvironment'
+				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+				'EXAMPLE\n' +
+				'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));

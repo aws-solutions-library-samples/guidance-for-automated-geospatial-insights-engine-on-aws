@@ -27,7 +27,8 @@
 		"constructs": "~10",
 		"lodash.chunk": "~4",
 		"octokit": "~3",
-		"shelljs": "~0"
+		"shelljs": "~0",
+		"@aws-sdk/client-verifiedpermissions": "3.567.0"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",

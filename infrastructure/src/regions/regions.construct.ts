@@ -12,19 +12,19 @@
  */
 
 import { getLambdaArchitecture } from '@arcade/cdk-common';
-import { Aspects, Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import {
 	AccessLogFormat,
 	AuthorizationType,
 	CfnMethod,
-	CognitoUserPoolsAuthorizer,
 	Cors,
 	EndpointType,
+	IdentitySource,
 	LambdaRestApi,
 	LogGroupLogDestination,
 	MethodLoggingLevel,
+	RequestAuthorizer,
 } from 'aws-cdk-lib/aws-apigateway';
-import { UserPool } from 'aws-cdk-lib/aws-cognito';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus } from 'aws-cdk-lib/aws-events';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
@@ -43,22 +43,27 @@ const __dirname = path.dirname(__filename);
 export interface RegionsConstructProperties {
 	environment: string;
 	cognitoUserPoolId: string;
+	cognitoClientId: string;
 	eventBusName: string;
+	policyStoreId: string;
 }
 
 export const regionsApiFunctionArnParameter = (environment: string) => `/arcade/${environment}/regions/apiFunctionArn`;
+const regionsApiAuthorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/regions/verifiedPermissionsAuthorizerFunctionArn`;
 export const regionsApiUrlParameter = (environment: string) => `/arcade/${environment}/regions/apiUrl`;
 export const regionsApiNameParameter = (environment: string) => `/arcade/${environment}/regions/apiName`;
 const regionsTableNameParameter = (environment: string) => `/arcade/${environment}/regions/tableName`;
 const regionsTableArnParameter = (environment: string) => `/arcade/${environment}/regions/tableArn`;
 
 export class RegionsModule extends Construct {
-	public regionsFunctionName: string;
-	tableName: string;
+	public readonly regionsFunctionName: string;
+	public readonly regionsFunctionArn: string;
+	public readonly tableName: string;
 
 	constructor(scope: Construct, id: string, props: RegionsConstructProperties) {
 		super(scope, id);
 
+		const account = Stack.of(this).account;
 		const namePrefix = `arcade-${props.environment}`;
 
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
@@ -171,6 +176,7 @@ export class RegionsModule extends Construct {
 		apiLambda.node.addDependency(table);
 
 		this.regionsFunctionName = apiLambda.functionName;
+		this.regionsFunctionArn = apiLambda.functionArn;
 
 		new StringParameter(this, 'regionsApiFunctionArnParameter', {
 			parameterName: regionsApiFunctionArnParameter(props.environment),
@@ -201,16 +207,55 @@ export class RegionsModule extends Construct {
 		eventBus.grantPutEventsTo(apiLambda);
 
 		/**
-		 * Define the API Gateway
+		 * Define the APIGW Authorizer
 		 */
-
-		const userPool = UserPool.fromUserPoolId(this, 'UserPool', props.cognitoUserPoolId);
-
-		const authorizer = new CognitoUserPoolsAuthorizer(this, 'Authorizer', {
-			cognitoUserPools: [userPool],
+		const authorizerLambda = new NodejsFunction(this, 'RegionsApiAuthorizerLambda', {
+			functionName: `${namePrefix}-regionsApi-authorizer`,
+			description: `ARCADE: Regions API Authorizer: ${props.environment}`,
+			entry: path.join(__dirname, '../../../typescript/packages/apps/regions/src/lambda_authorizer.ts'),
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 256,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.seconds(5),
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['pg-native'],
+			},
+			environment: {
+				NODE_ENV: 'cloud',
+				POLICY_STORE_ID: props.policyStoreId,
+				USER_POOL_ID: props.cognitoUserPoolId,
+				CLIENT_ID: props.cognitoClientId,
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
 		});
 
-		// TODO: wire up verified permissions
+		authorizerLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['verifiedpermissions:IsAuthorizedWithToken'],
+				resources: [`arn:aws:verifiedpermissions::${account}:policy-store/${props.policyStoreId}`],
+			})
+		);
+
+		new StringParameter(this, 'regionsApiAuthorizerFunctionArnParameter', {
+			parameterName: regionsApiAuthorizerFunctionArnParameter(props.environment),
+			stringValue: authorizerLambda.functionArn,
+		});
+
+		/**
+		 * Define the API Gateway
+		 */
+		const authorizer = new RequestAuthorizer(this, 'Authorizer', {
+			handler: authorizerLambda,
+			identitySources: [IdentitySource.header('Authorization'), IdentitySource.context('path'), IdentitySource.context('httpMethod')],
+		});
 
 		const logGroup = new LogGroup(this, 'RegionsApiLogs');
 		const apigw = new LambdaRestApi(this, 'RegionsApiGateway', {
@@ -230,7 +275,7 @@ export class RegionsModule extends Construct {
 			},
 			endpointTypes: [EndpointType.REGIONAL],
 			defaultMethodOptions: {
-				authorizationType: AuthorizationType.COGNITO,
+				authorizationType: AuthorizationType.CUSTOM,
 				authorizer,
 			},
 		});
@@ -279,6 +324,23 @@ export class RegionsModule extends Construct {
 					id: 'AwsSolutions-IAM5',
 					appliesTo: [`Resource::<RegionsModuleRegionsTable468824DB.Arn>/index/*`],
 					reason: 'This policy is required for the lambda to access the resource api table.',
+				},
+				{
+					id: 'AwsSolutions-IAM5',
+					appliesTo: ['Resource::*'],
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
+				},
+			],
+			true
+		);
+
+		NagSuppressions.addResourceSuppressions(
+			[authorizerLambda],
+			[
+				{
+					id: 'AwsSolutions-IAM4',
+					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'],
+					reason: 'This policy is the one generated by CDK.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',

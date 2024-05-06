@@ -1,0 +1,45 @@
+{
+	"name": "@arcade/rest-api-authorizer",
+	"version": "0.0.1",
+	"description": "REST API Authorizer.",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run"
+	},
+	"dependencies": {
+		"@arcade/resource-api-base": "workspace:*",
+		"@aws-sdk/client-verifiedpermissions": "~3",
+		"@fastify/awilix": "~5",
+		"awilix": "~10",
+		"aws-jwt-verify": "~4",
+		"aws-lambda": "~1",
+		"aws-xray-sdk": "~3",
+		"dotenv": "~16",
+		"fastify-plugin": "~4",
+		"fastify": "~4",
+		"ow": "~1",
+		"pino-pretty": "~11",
+		"pino": "~8"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/node": "~20",
+		"aws-sdk-client-mock": "~4",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
+	},
+	"private": false
+}

@@ -28,11 +28,8 @@ export class StacUtil {
 		this.context = {
 			authorizer: {
 				claims: {
-					identities: JSON.stringify({
-						userId: 'results',
-					}),
 					email: 'results',
-					'cognito:groups': '/|||reader',
+					'custom:role': '/|||reader',
 				},
 			},
 		};

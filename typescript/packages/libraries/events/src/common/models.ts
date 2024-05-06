@@ -2,7 +2,7 @@ import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from '../re
 
 type EventType = 'created' | 'updated' | 'deleted';
 
-type ResourceType = 'polygons' | 'groups' | 'regions' | 'states';
+type ResourceType = 'polygons' | 'groups' | 'regions' | 'states' | 'users';
 
 export interface DomainEvent<T> {
 	resourceType: ResourceType;

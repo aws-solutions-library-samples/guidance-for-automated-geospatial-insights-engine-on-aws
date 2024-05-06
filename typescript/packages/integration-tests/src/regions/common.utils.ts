@@ -10,9 +10,6 @@ import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 initializeConfig(path.join(__dirname, '..', '..'));
 
 export const PAGINATION_ATTRIBUTE = 'pagination_attribute';
-// export const INTEGRATION_TEST_TAG_KEY = 'created-by-integration-test';
-// export const INTEGRATION_TEST_TAG_VALUE = 'regions-module';
-// export const INTEGRATION_TEST_TAG_QUERY_STRING = `${INTEGRATION_TEST_TAG_KEY}:${INTEGRATION_TEST_TAG_VALUE}`;
 
 export const BASE_URL = process.env.ARCADE_REGIONS_BASE_URL;
 

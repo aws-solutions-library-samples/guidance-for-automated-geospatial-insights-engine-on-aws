@@ -16,6 +16,7 @@ import fp from 'fastify-plugin';
 
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventPublisher, REGIONS_EVENT_SOURCE } from '@arcade/events';
+import { registerAuthAwilix } from '@arcade/rest-api-authorizer';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
@@ -23,34 +24,34 @@ import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '
 import pkg from 'aws-xray-sdk';
 import { GroupRepository } from '../api/groups/repository.js';
 import { GroupService } from '../api/groups/service.js';
+import { PolygonRepository } from '../api/polygons/repository.js';
+import { PolygonService } from '../api/polygons/service.js';
 import { RegionRepository } from '../api/regions/repository.js';
 import { RegionService } from '../api/regions/service.js';
 import { CommonRepository } from '../api/repository.common.js';
 import { CommonService } from '../api/service.common.js';
 import { StateRepository } from '../api/states/repository.js';
 import { StateService } from '../api/states/service.js';
-import { PolygonRepository } from '../api/polygons/repository.js';
-import { PolygonService } from '../api/polygons/service.js';
 import { TagUtils } from '../tags/tags.util.js';
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
 	interface Cradle {
-		eventBridgeClient: EventBridgeClient;
+		commonRepository: CommonRepository;
+		commonService: CommonService;
 		dynamoDBDocumentClient: DynamoDBDocumentClient;
 		dynamoDbUtils: DynamoDbUtils;
-		tagUtils: TagUtils;
-		commonService: CommonService;
-		commonRepository: CommonRepository;
-		groupService: GroupService;
-		groupRepository: GroupRepository;
-		regionService: RegionService;
-		regionRepository: RegionRepository;
-		polygonService: PolygonService;
-		polygonRepository: PolygonRepository;
-		stateService: StateService;
-		stateRepository: StateRepository;
+		eventBridgeClient: EventBridgeClient;
 		eventPublisher: EventPublisher;
+		groupRepository: GroupRepository;
+		groupService: GroupService;
+		polygonRepository: PolygonRepository;
+		polygonService: PolygonService;
+		regionRepository: RegionRepository;
+		regionService: RegionService;
+		stateRepository: StateRepository;
+		stateService: StateService;
+		tagUtils: TagUtils;
 	}
 }
 
@@ -93,11 +94,13 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		lifetime: Lifetime.SINGLETON,
 	};
 
+	registerAuthAwilix(app.log);
+
 	const awsRegion = process.env['AWS_REGION'];
 	const tableName = process.env['TABLE_NAME'];
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 
-	// then we can register our classes with the DI c
+	// then we can register our classes with the DI container
 	diContainer.register({
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
 			...commonInjectionOptions,

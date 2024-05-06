@@ -19,11 +19,8 @@ export class JobsService {
 		this.context = {
 			authorizer: {
 				claims: {
-					identities: JSON.stringify({
-						userId: 'schedulerSqsProcessor',
-					}),
 					email: 'schedulerSqsProcessor',
-					'cognito:groups': '/|||reader',
+					'custom:role': 'reader',
 				},
 			},
 		};

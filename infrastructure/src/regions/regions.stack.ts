@@ -16,15 +16,19 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
-import { userPoolIdParameter } from '../shared/cognito.construct.js';
+import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
+import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPermissions.construct.js';
 import { RegionsModule } from './regions.construct.js';
 
 export type RegionsStackProperties = StackProps & {
 	environment: string;
+	policyStoreIdParameter: string;
 };
 
 export class RegionsApiStack extends Stack {
-	regionsFunctionName: string;
+	public readonly regionsFunctionName: string;
+	public readonly regionsFunctionArn: string;
+
 	constructor(scope: Construct, id: string, props: RegionsStackProperties) {
 		super(scope, id, props);
 
@@ -36,6 +40,16 @@ export class RegionsApiStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
+		const cognitoClientId = StringParameter.fromStringParameterAttributes(this, 'clientId', {
+			parameterName: userPoolClientIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const policyStoreId = StringParameter.fromStringParameterAttributes(this, 'policyStoreId', {
+			parameterName: verifiedPermissionsPolicyStoreIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
 			parameterName: eventBusNameParameter(props.environment),
 			simpleName: false,
@@ -44,10 +58,13 @@ export class RegionsApiStack extends Stack {
 		const regionsModule = new RegionsModule(this, 'RegionsModule', {
 			environment: props.environment,
 			cognitoUserPoolId,
+			cognitoClientId,
 			eventBusName,
+			policyStoreId,
 		});
 
 		this.regionsFunctionName = regionsModule.regionsFunctionName;
+		this.regionsFunctionArn = regionsModule.regionsFunctionArn;
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,
