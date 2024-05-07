@@ -41,7 +41,7 @@ importers:
         version: 1.0.7
       cdk-nag:
         specifier: ~2
-        version: 2.28.109(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0)
+        version: 2.28.110(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0)
       constructs:
         specifier: ~10
         version: 10.3.0
@@ -57,13 +57,13 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       aws-cdk:
         specifier: ~2
         version: 2.140.0
       esbuild:
         specifier: ~0
-        version: 0.20.2
+        version: 0.21.1
       eslint:
         specifier: 9.0.0
         version: 9.0.0
@@ -75,10 +75,10 @@ importers:
         version: 4.9.3
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/regions:
     dependencies:
@@ -105,7 +105,7 @@ importers:
         version: 3.569.0(@aws-sdk/client-dynamodb@3.569.0)
       '@fastify/awilix':
         specifier: ~5
-        version: 5.1.0(awilix@10.0.2)(fastify@4.26.2)
+        version: 5.1.0(awilix@10.0.2)(fastify@4.27.0)
       '@fastify/aws-lambda':
         specifier: ~4
         version: 4.0.0
@@ -147,7 +147,7 @@ importers:
         version: 16.4.5
       fastify:
         specifier: ~4
-        version: 4.26.2
+        version: 4.27.0
       fastify-plugin:
         specifier: ~4
         version: 4.5.1
@@ -187,7 +187,7 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       aws-sdk-client-mock:
         specifier: ~4
         version: 4.0.0
@@ -205,10 +205,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/results:
     dependencies:
@@ -265,7 +265,7 @@ importers:
         version: 3.374.0
       '@fastify/awilix':
         specifier: ~5
-        version: 5.1.0(awilix@10.0.2)(fastify@4.26.2)
+        version: 5.1.0(awilix@10.0.2)(fastify@4.27.0)
       '@fastify/aws-lambda':
         specifier: ~4
         version: 4.0.0
@@ -304,7 +304,7 @@ importers:
         version: 0.1.2
       fastify:
         specifier: ~4
-        version: 4.26.2
+        version: 4.27.0
       fastify-plugin:
         specifier: ~4
         version: 4.5.1
@@ -320,7 +320,7 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -359,10 +359,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/scheduler:
     dependencies:
@@ -398,7 +398,7 @@ importers:
         version: 3.569.0(@aws-sdk/client-dynamodb@3.569.0)
       '@fastify/awilix':
         specifier: ~5
-        version: 5.1.0(awilix@10.0.2)(fastify@4.26.2)
+        version: 5.1.0(awilix@10.0.2)(fastify@4.27.0)
       '@fastify/aws-lambda':
         specifier: ~4
         version: 4.0.0
@@ -437,7 +437,7 @@ importers:
         version: 16.4.5
       fastify:
         specifier: ~4
-        version: 4.26.2
+        version: 4.27.0
       fastify-plugin:
         specifier: ~4
         version: 4.5.1
@@ -465,7 +465,7 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       eslint:
         specifier: 9.0.0
         version: 9.0.0
@@ -480,10 +480,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/integration-tests:
     devDependencies:
@@ -495,7 +495,7 @@ importers:
         version: 20.1.4
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@vitest/ui':
         specifier: ~1
         version: 1.6.0(vitest@1.6.0)
@@ -528,10 +528,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/cdk-common:
     dependencies:
@@ -583,13 +583,13 @@ importers:
         version: 4.2.9
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       aws-cdk:
         specifier: ~2
         version: 2.140.0
       cdk-nag:
         specifier: ~2
-        version: 2.28.109(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0)
+        version: 2.28.110(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0)
       custom-resource-helper:
         specifier: ~1
         version: 1.0.15
@@ -604,10 +604,10 @@ importers:
         version: 4.9.3
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/clients:
     dependencies:
@@ -629,7 +629,7 @@ importers:
         version: 20.1.4
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -662,10 +662,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/dynamodb-utils:
     dependencies:
@@ -693,7 +693,7 @@ importers:
         version: 20.1.4
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       eslint:
         specifier: 9.0.0
         version: 9.0.0
@@ -708,10 +708,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/events:
     dependencies:
@@ -727,7 +727,7 @@ importers:
         version: 20.1.4
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -754,10 +754,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/lambda-invoker:
     dependencies:
@@ -788,7 +788,7 @@ importers:
         version: 2.0.1
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -818,10 +818,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/resource-api-base:
     dependencies:
@@ -857,7 +857,7 @@ importers:
         version: 3.569.0(@aws-sdk/client-dynamodb@3.569.0)
       '@fastify/awilix':
         specifier: ~5
-        version: 5.1.0(awilix@10.0.2)(fastify@4.26.2)
+        version: 5.1.0(awilix@10.0.2)(fastify@4.27.0)
       '@fastify/aws-lambda':
         specifier: ~4
         version: 4.0.0
@@ -887,7 +887,7 @@ importers:
         version: 3.6.0
       fastify:
         specifier: ~4
-        version: 4.26.2
+        version: 4.27.0
       fastify-plugin:
         specifier: ~4
         version: 4.5.1
@@ -902,7 +902,7 @@ importers:
         version: 5.0.0
       vite:
         specifier: ~5
-        version: 5.2.11(@types/node@20.12.9)
+        version: 5.2.11(@types/node@20.12.10)
     devDependencies:
       '@tsconfig/node20':
         specifier: ~20
@@ -912,7 +912,7 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -945,10 +945,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/rest-api-authorizer:
     dependencies:
@@ -960,7 +960,7 @@ importers:
         version: 3.556.0
       '@fastify/awilix':
         specifier: ~5
-        version: 5.1.0(awilix@10.0.2)(fastify@4.26.2)
+        version: 5.1.0(awilix@10.0.2)(fastify@4.27.0)
       awilix:
         specifier: ~10
         version: 10.0.2
@@ -978,7 +978,7 @@ importers:
         version: 16.4.5
       fastify:
         specifier: ~4
-        version: 4.26.2
+        version: 4.27.0
       fastify-plugin:
         specifier: ~4
         version: 4.5.1
@@ -1000,7 +1000,7 @@ importers:
         version: 8.10.137
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       aws-sdk-client-mock:
         specifier: ~4
         version: 4.0.0
@@ -1018,10 +1018,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/validators:
     dependencies:
@@ -1034,7 +1034,7 @@ importers:
         version: 20.1.4
       '@types/node':
         specifier: ~20
-        version: 20.12.9
+        version: 20.12.10
       '@types/prettier':
         specifier: ~3
         version: 3.0.0
@@ -1058,10 +1058,10 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ~1
-        version: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+        version: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0))
 
 packages:
 
@@ -1501,8 +1501,20 @@ packages:
     cpu: [ppc64]
     os: [aix]
 
+  '@esbuild/aix-ppc64@0.21.1':
+    resolution: {integrity: sha512-O7yppwipkXvnEPjzkSXJRk2g4bS8sUx9p9oXHq9MU/U7lxUzZVsnFZMDTmeeX9bfQxrFcvOacl/ENgOh0WP9pA==}
+    engines: {node: '>=12'}
+    cpu: [ppc64]
+    os: [aix]
+
   '@esbuild/android-arm64@0.20.2':
     resolution: {integrity: sha512-mRzjLacRtl/tWU0SvD8lUEwb61yP9cqQo6noDZP/O8VkwafSYwZ4yWy24kan8jE/IMERpYncRt2dw438LP3Xmg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [android]
+
+  '@esbuild/android-arm64@0.21.1':
+    resolution: {integrity: sha512-jXhccq6es+onw7x8MxoFnm820mz7sGa9J14kLADclmiEUH4fyj+FjR6t0M93RgtlI/awHWhtF0Wgfhqgf9gDZA==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [android]
@@ -1513,8 +1525,20 @@ packages:
     cpu: [arm]
     os: [android]
 
+  '@esbuild/android-arm@0.21.1':
+    resolution: {integrity: sha512-hh3jKWikdnTtHCglDAeVO3Oyh8MaH8xZUaWMiCCvJ9/c3NtPqZq+CACOlGTxhddypXhl+8B45SeceYBfB/e8Ow==}
+    engines: {node: '>=12'}
+    cpu: [arm]
+    os: [android]
+
   '@esbuild/android-x64@0.20.2':
     resolution: {integrity: sha512-btzExgV+/lMGDDa194CcUQm53ncxzeBrWJcncOBxuC6ndBkKxnHdFJn86mCIgTELsooUmwUm9FkhSp5HYu00Rg==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [android]
+
+  '@esbuild/android-x64@0.21.1':
+    resolution: {integrity: sha512-NPObtlBh4jQHE01gJeucqEhdoD/4ya2owSIS8lZYS58aR0x7oZo9lB2lVFxgTANSa5MGCBeoQtr+yA9oKCGPvA==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [android]
@@ -1525,8 +1549,20 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@esbuild/darwin-arm64@0.21.1':
+    resolution: {integrity: sha512-BLT7TDzqsVlQRmJfO/FirzKlzmDpBWwmCUlyggfzUwg1cAxVxeA4O6b1XkMInlxISdfPAOunV9zXjvh5x99Heg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [darwin]
+
   '@esbuild/darwin-x64@0.20.2':
     resolution: {integrity: sha512-tBcXp9KNphnNH0dfhv8KYkZhjc+H3XBkF5DKtswJblV7KlT9EI2+jeA8DgBjp908WEuYll6pF+UStUCfEpdysA==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@esbuild/darwin-x64@0.21.1':
+    resolution: {integrity: sha512-D3h3wBQmeS/vp93O4B+SWsXB8HvRDwMyhTNhBd8yMbh5wN/2pPWRW5o/hM3EKgk9bdKd9594lMGoTCTiglQGRQ==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [darwin]
@@ -1537,8 +1573,20 @@ packages:
     cpu: [arm64]
     os: [freebsd]
 
+  '@esbuild/freebsd-arm64@0.21.1':
+    resolution: {integrity: sha512-/uVdqqpNKXIxT6TyS/oSK4XE4xWOqp6fh4B5tgAwozkyWdylcX+W4YF2v6SKsL4wCQ5h1bnaSNjWPXG/2hp8AQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [freebsd]
+
   '@esbuild/freebsd-x64@0.20.2':
     resolution: {integrity: sha512-d+DipyvHRuqEeM5zDivKV1KuXn9WeRX6vqSqIDgwIfPQtwMP4jaDsQsDncjTDDsExT4lR/91OLjRo8bmC1e+Cw==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@esbuild/freebsd-x64@0.21.1':
+    resolution: {integrity: sha512-paAkKN1n1jJitw+dAoR27TdCzxRl1FOEITx3h201R6NoXUojpMzgMLdkXVgCvaCSCqwYkeGLoe9UVNRDKSvQgw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [freebsd]
@@ -1549,8 +1597,20 @@ packages:
     cpu: [arm64]
     os: [linux]
 
+  '@esbuild/linux-arm64@0.21.1':
+    resolution: {integrity: sha512-G65d08YoH00TL7Xg4LaL3gLV21bpoAhQ+r31NUu013YB7KK0fyXIt05VbsJtpqh/6wWxoLJZOvQHYnodRrnbUQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [linux]
+
   '@esbuild/linux-arm@0.20.2':
     resolution: {integrity: sha512-VhLPeR8HTMPccbuWWcEUD1Az68TqaTYyj6nfE4QByZIQEQVWBB8vup8PpR7y1QHL3CpcF6xd5WVBU/+SBEvGTg==}
+    engines: {node: '>=12'}
+    cpu: [arm]
+    os: [linux]
+
+  '@esbuild/linux-arm@0.21.1':
+    resolution: {integrity: sha512-tRHnxWJnvNnDpNVnsyDhr1DIQZUfCXlHSCDohbXFqmg9W4kKR7g8LmA3kzcwbuxbRMKeit8ladnCabU5f2traA==}
     engines: {node: '>=12'}
     cpu: [arm]
     os: [linux]
@@ -1561,8 +1621,20 @@ packages:
     cpu: [ia32]
     os: [linux]
 
+  '@esbuild/linux-ia32@0.21.1':
+    resolution: {integrity: sha512-tt/54LqNNAqCz++QhxoqB9+XqdsaZOtFD/srEhHYwBd3ZUOepmR1Eeot8bS+Q7BiEvy9vvKbtpHf+r6q8hF5UA==}
+    engines: {node: '>=12'}
+    cpu: [ia32]
+    os: [linux]
+
   '@esbuild/linux-loong64@0.20.2':
     resolution: {integrity: sha512-PR7sp6R/UC4CFVomVINKJ80pMFlfDfMQMYynX7t1tNTeivQ6XdX5r2XovMmha/VjR1YN/HgHWsVcTRIMkymrgQ==}
+    engines: {node: '>=12'}
+    cpu: [loong64]
+    os: [linux]
+
+  '@esbuild/linux-loong64@0.21.1':
+    resolution: {integrity: sha512-MhNalK6r0nZD0q8VzUBPwheHzXPr9wronqmZrewLfP7ui9Fv1tdPmg6e7A8lmg0ziQCziSDHxh3cyRt4YMhGnQ==}
     engines: {node: '>=12'}
     cpu: [loong64]
     os: [linux]
@@ -1573,8 +1645,20 @@ packages:
     cpu: [mips64el]
     os: [linux]
 
+  '@esbuild/linux-mips64el@0.21.1':
+    resolution: {integrity: sha512-YCKVY7Zen5rwZV+nZczOhFmHaeIxR4Zn3jcmNH53LbgF6IKRwmrMywqDrg4SiSNApEefkAbPSIzN39FC8VsxPg==}
+    engines: {node: '>=12'}
+    cpu: [mips64el]
+    os: [linux]
+
   '@esbuild/linux-ppc64@0.20.2':
     resolution: {integrity: sha512-rD3KsaDprDcfajSKdn25ooz5J5/fWBylaaXkuotBDGnMnDP1Uv5DLAN/45qfnf3JDYyJv/ytGHQaziHUdyzaAg==}
+    engines: {node: '>=12'}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@esbuild/linux-ppc64@0.21.1':
+    resolution: {integrity: sha512-bw7bcQ+270IOzDV4mcsKAnDtAFqKO0jVv3IgRSd8iM0ac3L8amvCrujRVt1ajBTJcpDaFhIX+lCNRKteoDSLig==}
     engines: {node: '>=12'}
     cpu: [ppc64]
     os: [linux]
@@ -1585,8 +1669,20 @@ packages:
     cpu: [riscv64]
     os: [linux]
 
+  '@esbuild/linux-riscv64@0.21.1':
+    resolution: {integrity: sha512-ARmDRNkcOGOm1AqUBSwRVDfDeD9hGYRfkudP2QdoonBz1ucWVnfBPfy7H4JPI14eYtZruRSczJxyu7SRYDVOcg==}
+    engines: {node: '>=12'}
+    cpu: [riscv64]
+    os: [linux]
+
   '@esbuild/linux-s390x@0.20.2':
     resolution: {integrity: sha512-wcWISOobRWNm3cezm5HOZcYz1sKoHLd8VL1dl309DiixxVFoFe/o8HnwuIwn6sXre88Nwj+VwZUvJf4AFxkyrQ==}
+    engines: {node: '>=12'}
+    cpu: [s390x]
+    os: [linux]
+
+  '@esbuild/linux-s390x@0.21.1':
+    resolution: {integrity: sha512-o73TcUNMuoTZlhwFdsgr8SfQtmMV58sbgq6gQq9G1xUiYnHMTmJbwq65RzMx89l0iya69lR4bxBgtWiiOyDQZA==}
     engines: {node: '>=12'}
     cpu: [s390x]
     os: [linux]
@@ -1597,8 +1693,20 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@esbuild/linux-x64@0.21.1':
+    resolution: {integrity: sha512-da4/1mBJwwgJkbj4fMH7SOXq2zapgTo0LKXX1VUZ0Dxr+e8N0WbS80nSZ5+zf3lvpf8qxrkZdqkOqFfm57gXwA==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [linux]
+
   '@esbuild/netbsd-x64@0.20.2':
     resolution: {integrity: sha512-K8/DhBxcVQkzYc43yJXDSyjlFeHQJBiowJ0uVL6Tor3jGQfSGHNNJcWxNbOI8v5k82prYqzPuwkzHt3J1T1iZQ==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [netbsd]
+
+  '@esbuild/netbsd-x64@0.21.1':
+    resolution: {integrity: sha512-CPWs0HTFe5woTJN5eKPvgraUoRHrCtzlYIAv9wBC+FAyagBSaf+UdZrjwYyTGnwPGkThV4OCI7XibZOnPvONVw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [netbsd]
@@ -1609,8 +1717,20 @@ packages:
     cpu: [x64]
     os: [openbsd]
 
+  '@esbuild/openbsd-x64@0.21.1':
+    resolution: {integrity: sha512-xxhTm5QtzNLc24R0hEkcH+zCx/o49AsdFZ0Cy5zSd/5tOj4X2g3/2AJB625NoadUuc4A8B3TenLJoYdWYOYCew==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [openbsd]
+
   '@esbuild/sunos-x64@0.20.2':
     resolution: {integrity: sha512-2UyFtRC6cXLyejf/YEld4Hajo7UHILetzE1vsRcGL3earZEW77JxrFjH4Ez2qaTiEfMgAXxfAZCm1fvM/G/o8w==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [sunos]
+
+  '@esbuild/sunos-x64@0.21.1':
+    resolution: {integrity: sha512-CWibXszpWys1pYmbr9UiKAkX6x+Sxw8HWtw1dRESK1dLW5fFJ6rMDVw0o8MbadusvVQx1a8xuOxnHXT941Hp1A==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [sunos]
@@ -1621,14 +1741,32 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@esbuild/win32-arm64@0.21.1':
+    resolution: {integrity: sha512-jb5B4k+xkytGbGUS4T+Z89cQJ9DJ4lozGRSV+hhfmCPpfJ3880O31Q1srPCimm+V6UCbnigqD10EgDNgjvjerQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [win32]
+
   '@esbuild/win32-ia32@0.20.2':
     resolution: {integrity: sha512-HfLOfn9YWmkSKRQqovpnITazdtquEW8/SoHW7pWpuEeguaZI4QnCRW6b+oZTztdBnZOS2hqJ6im/D5cPzBTTlQ==}
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [win32]
 
+  '@esbuild/win32-ia32@0.21.1':
+    resolution: {integrity: sha512-PgyFvjJhXqHn1uxPhyN1wZ6dIomKjiLUQh1LjFvjiV1JmnkZ/oMPrfeEAZg5R/1ftz4LZWZr02kefNIQ5SKREQ==}
+    engines: {node: '>=12'}
+    cpu: [ia32]
+    os: [win32]
+
   '@esbuild/win32-x64@0.20.2':
     resolution: {integrity: sha512-N49X4lJX27+l9jbLKSqZ6bKNjzQvHaT8IIFUy+YIqmXQdjYCToGWwOItDrfby14c78aDd5NHQl29xingXfCdLQ==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [win32]
+
+  '@esbuild/win32-x64@0.21.1':
+    resolution: {integrity: sha512-W9NttRZQR5ehAiqHGDnvfDaGmQOm6Fi4vSlce8mjM75x//XKuVAByohlEX6N17yZnVXxQFuh4fDRunP8ca6bfA==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [win32]
@@ -2597,8 +2735,8 @@ packages:
   '@types/mysql@2.15.26':
     resolution: {integrity: sha512-DSLCOXhkvfS5WNNPbfn2KdICAmk8lLc+/PNvnPnF7gOdMZCxopXduqv0OQ13y/yA/zXTSikZZqVgybUxOEg6YQ==}
 
-  '@types/node@20.12.9':
-    resolution: {integrity: sha512-o93r47yu04MHumPBCFg0bMPBMNgtMg3jzbhl7e68z50+BMHmRMGDJv13eBlUgOdc9i/uoJXGMGYLtJV4ReTXEg==}
+  '@types/node@20.12.10':
+    resolution: {integrity: sha512-Eem5pH9pmWBHoGAT8Dr5fdc5rYA+4NAovdM4EktRPVAAiJhmWWfQrA0cFhAbOsQdSfIHjAud6YdkbL69+zSKjw==}
 
   '@types/pg@8.11.6':
     resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
@@ -2848,8 +2986,8 @@ packages:
   aws-sdk-client-mock@4.0.0:
     resolution: {integrity: sha512-/rxo+pzCFaUozK7TyCqo3GYwzdBGn9Ai6EsT8ytXDoUXlD/Q5hw9hj2lOkCAyubECzGJFHMmQg9GZ1GOGlN/qQ==}
 
-  aws-sdk@2.1613.0:
-    resolution: {integrity: sha512-NCBSOa7i/VewoAy6fZIcxJxjKqySREy+bqAG2tKESZo2/DCm0i9XFW0R78LDtxKvjz+mqjmqviAm3r7LBsF0dg==}
+  aws-sdk@2.1615.0:
+    resolution: {integrity: sha512-07xIbWiO8/3gdcTGk4u/gBsts+zLmaXSNjOLHjOyMiLpzyeRJGH269vIYwnl7SymZT89Xl3D17cMbHgoKgeXOw==}
     engines: {node: '>= 10.0.0'}
 
   aws-xray-sdk-core@3.6.0:
@@ -2948,8 +3086,8 @@ packages:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
     engines: {node: '>=6'}
 
-  cdk-nag@2.28.109:
-    resolution: {integrity: sha512-Mow/zg41JTL1x+Gn6ZKbzikxrG4jbTzRAz33O6osG1er6o5at6aNTG/+e6XeiI8/fhwyxV/YskW1cBlnLj1PvA==}
+  cdk-nag@2.28.110:
+    resolution: {integrity: sha512-3rpj5pyA7krFs8OD1e0zqgPdUp3IMsPqgc8Vwn+amZesEB+oxnIQJcoeQeVVjOm43R3Nc6TBBlZo3kvm0UCTVg==}
     peerDependencies:
       aws-cdk-lib: ^2.116.0
       constructs: ^10.0.5
@@ -3161,6 +3299,11 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
+  esbuild@0.21.1:
+    resolution: {integrity: sha512-GPqx+FX7mdqulCeQ4TsGZQ3djBJkx5k7zBGtqt9ycVlWNg8llJ4RO9n2vciu8BN2zAEs6lPbPl0asZsAh7oWzg==}
+    engines: {node: '>=12'}
+    hasBin: true
+
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
@@ -3284,8 +3427,8 @@ packages:
   fastify-plugin@4.5.1:
     resolution: {integrity: sha512-stRHYGeuqpEZTL1Ef0Ovr2ltazUT9g844X5z/zEBFLG8RYlpDiOCIG+ATvYEp+/zmc7sN29mcIMp8gvYplYPIQ==}
 
-  fastify@4.26.2:
-    resolution: {integrity: sha512-90pjTuPGrfVKtdpLeLzND5nyC4woXZN5VadiNQCicj/iJU4viNHKhsAnb7jmv1vu2IzkLXyBiCzdWuzeXgQ5Ug==}
+  fastify@4.27.0:
+    resolution: {integrity: sha512-ci9IXzbigB8dyi0mSy3faa3Bsj0xWAPb9JeT4KRzubdSb6pNhcADRUaXCBml6V1Ss/a05kbtQls5LBmhHydoTA==}
 
   fastq@1.17.1:
     resolution: {integrity: sha512-sRVD3lWVIXWg6By68ZN7vho9a1pQcN/WBFaAAsDDFzlJjvoGx0P8z7V1t72grFJfJhu3YPZBuu25f7Kaw2jN1w==}
@@ -3697,10 +3840,6 @@ packages:
     resolution: {integrity: sha512-9hp3Vp2/hFQUiIwKo8XCeFVnrg8Pk3TYNPIR7tJADKi5YfcF7vEaK7avFHTlSy3kOKYaJQaalfEo6YuXdceBOQ==}
     engines: {node: 14 || >=16.14}
 
-  lru-cache@6.0.0:
-    resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
-    engines: {node: '>=10'}
-
   magic-string@0.30.10:
     resolution: {integrity: sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==}
 
@@ -3951,6 +4090,10 @@ packages:
     resolution: {integrity: sha512-ip4qdzjkAyDDZklUaZkcRFb2iA118H9SgRh8yzTkSQK8HilsOJF7rSY8HoW5+I0M46AZgX/pxbprf2vvzQCE0Q==}
     hasBin: true
 
+  pino@9.0.0:
+    resolution: {integrity: sha512-uI1ThkzTShNSwvsUM6b4ND8ANzWURk9zTELMztFkmnCQeR/4wkomJ+echHee5GMWGovoSfjwdeu80DsFIt7mbA==}
+    hasBin: true
+
   pkg-types@1.1.0:
     resolution: {integrity: sha512-/RpmvKdxKf8uILTtoOhAgf30wYbP2Qw+L9p3Rvshx1JZVX+XQNZQFjlbmGHEGIm4CkVPlSn+NXmIM8+9oWQaSA==}
 
@@ -4138,8 +4281,8 @@ packages:
     resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
     hasBin: true
 
-  semver@7.6.0:
-    resolution: {integrity: sha512-EnwXhrlwXMk9gKu5/flx5sv/an57AkRplG3hTK68W7FRDN+k+OWBj65M7719OkA82XLBxrcX0KSHj+X5COhOVg==}
+  semver@7.6.1:
+    resolution: {integrity: sha512-f/vbBsu+fOiYt+lmwZV0rVwJScl46HppnOA1ZvIuBWKOTlllpyJ3bfVax76/OrhCH38dyxoDIA8K7uB963IYgA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -4537,9 +4680,6 @@ packages:
   xmlbuilder@11.0.1:
     resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
-
-  yallist@4.0.0:
-    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
   yaml@2.4.2:
     resolution: {integrity: sha512-B3VqDZ+JAg1nZpaEmWtTXUlBneoGx6CPM9b0TENK6aoSu5t73dItudwdgmi6tHlIZZId4dZ9skcAQ2UbcyAeVA==}
@@ -6260,70 +6400,139 @@ snapshots:
   '@esbuild/aix-ppc64@0.20.2':
     optional: true
 
+  '@esbuild/aix-ppc64@0.21.1':
+    optional: true
+
   '@esbuild/android-arm64@0.20.2':
+    optional: true
+
+  '@esbuild/android-arm64@0.21.1':
     optional: true
 
   '@esbuild/android-arm@0.20.2':
     optional: true
 
+  '@esbuild/android-arm@0.21.1':
+    optional: true
+
   '@esbuild/android-x64@0.20.2':
+    optional: true
+
+  '@esbuild/android-x64@0.21.1':
     optional: true
 
   '@esbuild/darwin-arm64@0.20.2':
     optional: true
 
+  '@esbuild/darwin-arm64@0.21.1':
+    optional: true
+
   '@esbuild/darwin-x64@0.20.2':
+    optional: true
+
+  '@esbuild/darwin-x64@0.21.1':
     optional: true
 
   '@esbuild/freebsd-arm64@0.20.2':
     optional: true
 
+  '@esbuild/freebsd-arm64@0.21.1':
+    optional: true
+
   '@esbuild/freebsd-x64@0.20.2':
+    optional: true
+
+  '@esbuild/freebsd-x64@0.21.1':
     optional: true
 
   '@esbuild/linux-arm64@0.20.2':
     optional: true
 
+  '@esbuild/linux-arm64@0.21.1':
+    optional: true
+
   '@esbuild/linux-arm@0.20.2':
+    optional: true
+
+  '@esbuild/linux-arm@0.21.1':
     optional: true
 
   '@esbuild/linux-ia32@0.20.2':
     optional: true
 
+  '@esbuild/linux-ia32@0.21.1':
+    optional: true
+
   '@esbuild/linux-loong64@0.20.2':
+    optional: true
+
+  '@esbuild/linux-loong64@0.21.1':
     optional: true
 
   '@esbuild/linux-mips64el@0.20.2':
     optional: true
 
+  '@esbuild/linux-mips64el@0.21.1':
+    optional: true
+
   '@esbuild/linux-ppc64@0.20.2':
+    optional: true
+
+  '@esbuild/linux-ppc64@0.21.1':
     optional: true
 
   '@esbuild/linux-riscv64@0.20.2':
     optional: true
 
+  '@esbuild/linux-riscv64@0.21.1':
+    optional: true
+
   '@esbuild/linux-s390x@0.20.2':
+    optional: true
+
+  '@esbuild/linux-s390x@0.21.1':
     optional: true
 
   '@esbuild/linux-x64@0.20.2':
     optional: true
 
+  '@esbuild/linux-x64@0.21.1':
+    optional: true
+
   '@esbuild/netbsd-x64@0.20.2':
+    optional: true
+
+  '@esbuild/netbsd-x64@0.21.1':
     optional: true
 
   '@esbuild/openbsd-x64@0.20.2':
     optional: true
 
+  '@esbuild/openbsd-x64@0.21.1':
+    optional: true
+
   '@esbuild/sunos-x64@0.20.2':
+    optional: true
+
+  '@esbuild/sunos-x64@0.21.1':
     optional: true
 
   '@esbuild/win32-arm64@0.20.2':
     optional: true
 
+  '@esbuild/win32-arm64@0.21.1':
+    optional: true
+
   '@esbuild/win32-ia32@0.20.2':
     optional: true
 
+  '@esbuild/win32-ia32@0.21.1':
+    optional: true
+
   '@esbuild/win32-x64@0.20.2':
+    optional: true
+
+  '@esbuild/win32-x64@0.21.1':
     optional: true
 
   '@eslint-community/eslint-utils@4.4.0(eslint@8.57.0)':
@@ -6378,11 +6587,11 @@ snapshots:
       ajv-formats: 2.1.1
       fast-uri: 2.3.0
 
-  '@fastify/awilix@5.1.0(awilix@10.0.2)(fastify@4.26.2)':
+  '@fastify/awilix@5.1.0(awilix@10.0.2)(fastify@4.27.0)':
     dependencies:
       awilix: 10.0.2
       awilix-manager: 5.2.1(awilix@10.0.2)
-      fastify: 4.26.2
+      fastify: 4.27.0
       fastify-plugin: 4.5.1
 
   '@fastify/aws-lambda@4.0.0': {}
@@ -7947,23 +8156,23 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
   '@types/btoa-lite@1.0.2': {}
 
   '@types/cls-hooked@4.3.8':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
   '@types/estree@1.0.5': {}
 
   '@types/express-serve-static-core@4.19.0':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
       '@types/qs': 6.9.15
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -7983,7 +8192,7 @@ snapshots:
 
   '@types/jsonwebtoken@9.0.6':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
   '@types/lodash.chunk@4.2.9':
     dependencies:
@@ -7995,15 +8204,15 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
-  '@types/node@20.12.9':
+  '@types/node@20.12.10':
     dependencies:
       undici-types: 5.26.5
 
   '@types/pg@8.11.6':
     dependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
       pg-protocol: 1.6.1
       pg-types: 4.0.2
 
@@ -8020,12 +8229,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.1
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
       '@types/send': 0.17.4
 
   '@types/sinon@10.0.20':
@@ -8051,7 +8260,7 @@ snapshots:
       graphemer: 1.4.0
       ignore: 5.3.1
       natural-compare: 1.4.0
-      semver: 7.6.0
+      semver: 7.6.1
       ts-api-utils: 1.3.0(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -8071,7 +8280,7 @@ snapshots:
       graphemer: 1.4.0
       ignore: 5.3.1
       natural-compare: 1.4.0
-      semver: 7.6.0
+      semver: 7.6.1
       ts-api-utils: 1.3.0(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -8143,7 +8352,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.4
-      semver: 7.6.0
+      semver: 7.6.1
       ts-api-utils: 1.3.0(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -8159,7 +8368,7 @@ snapshots:
       '@typescript-eslint/types': 7.8.0
       '@typescript-eslint/typescript-estree': 7.8.0(typescript@5.4.5)
       eslint: 8.57.0
-      semver: 7.6.0
+      semver: 7.6.1
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -8173,7 +8382,7 @@ snapshots:
       '@typescript-eslint/types': 7.8.0
       '@typescript-eslint/typescript-estree': 7.8.0(typescript@5.4.5)
       eslint: 9.0.0
-      semver: 7.6.0
+      semver: 7.6.1
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -8216,7 +8425,7 @@ snapshots:
       pathe: 1.1.2
       picocolors: 1.0.0
       sirv: 2.0.4
-      vitest: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+      vitest: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
 
   '@vitest/utils@1.6.0':
     dependencies:
@@ -8335,7 +8544,7 @@ snapshots:
 
   aws-lambda@1.0.7:
     dependencies:
-      aws-sdk: 2.1613.0
+      aws-sdk: 2.1615.0
       commander: 3.0.2
       js-yaml: 3.14.1
       watchpack: 2.4.1
@@ -8346,7 +8555,7 @@ snapshots:
       sinon: 16.1.3
       tslib: 2.6.2
 
-  aws-sdk@2.1613.0:
+  aws-sdk@2.1615.0:
     dependencies:
       buffer: 4.9.2
       events: 1.1.1
@@ -8366,7 +8575,7 @@ snapshots:
       '@types/cls-hooked': 4.3.8
       atomic-batcher: 1.0.2
       cls-hooked: 4.2.2
-      semver: 7.6.0
+      semver: 7.6.1
 
   aws-xray-sdk-express@3.6.0(aws-xray-sdk-core@3.6.0):
     dependencies:
@@ -8463,7 +8672,7 @@ snapshots:
 
   camelcase@5.3.1: {}
 
-  cdk-nag@2.28.109(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0):
+  cdk-nag@2.28.110(aws-cdk-lib@2.140.0(constructs@10.3.0))(constructs@10.3.0):
     dependencies:
       aws-cdk-lib: 2.140.0(constructs@10.3.0)
       constructs: 10.3.0
@@ -8698,6 +8907,32 @@ snapshots:
       '@esbuild/win32-ia32': 0.20.2
       '@esbuild/win32-x64': 0.20.2
 
+  esbuild@0.21.1:
+    optionalDependencies:
+      '@esbuild/aix-ppc64': 0.21.1
+      '@esbuild/android-arm': 0.21.1
+      '@esbuild/android-arm64': 0.21.1
+      '@esbuild/android-x64': 0.21.1
+      '@esbuild/darwin-arm64': 0.21.1
+      '@esbuild/darwin-x64': 0.21.1
+      '@esbuild/freebsd-arm64': 0.21.1
+      '@esbuild/freebsd-x64': 0.21.1
+      '@esbuild/linux-arm': 0.21.1
+      '@esbuild/linux-arm64': 0.21.1
+      '@esbuild/linux-ia32': 0.21.1
+      '@esbuild/linux-loong64': 0.21.1
+      '@esbuild/linux-mips64el': 0.21.1
+      '@esbuild/linux-ppc64': 0.21.1
+      '@esbuild/linux-riscv64': 0.21.1
+      '@esbuild/linux-s390x': 0.21.1
+      '@esbuild/linux-x64': 0.21.1
+      '@esbuild/netbsd-x64': 0.21.1
+      '@esbuild/openbsd-x64': 0.21.1
+      '@esbuild/sunos-x64': 0.21.1
+      '@esbuild/win32-arm64': 0.21.1
+      '@esbuild/win32-ia32': 0.21.1
+      '@esbuild/win32-x64': 0.21.1
+
   escape-string-regexp@4.0.0: {}
 
   eslint-scope@7.2.2:
@@ -8890,7 +9125,7 @@ snapshots:
 
   fastify-plugin@4.5.1: {}
 
-  fastify@4.26.2:
+  fastify@4.27.0:
     dependencies:
       '@fastify/ajv-compiler': 3.5.0
       '@fastify/error': 3.4.1
@@ -8901,12 +9136,12 @@ snapshots:
       fast-json-stringify: 5.15.1
       find-my-way: 8.2.0
       light-my-request: 5.13.0
-      pino: 8.21.0
+      pino: 9.0.0
       process-warning: 3.0.0
       proxy-addr: 2.0.7
       rfdc: 1.3.1
       secure-json-parse: 2.7.0
-      semver: 7.6.0
+      semver: 7.6.1
       toad-cache: 3.7.0
     transitivePeerDependencies:
       - supports-color
@@ -9207,7 +9442,7 @@ snapshots:
       lodash.isstring: 4.0.1
       lodash.once: 4.1.1
       ms: 2.1.3
-      semver: 7.6.0
+      semver: 7.6.1
 
   just-clone@6.2.0: {}
 
@@ -9300,10 +9535,6 @@ snapshots:
       tslib: 2.6.2
 
   lru-cache@10.2.2: {}
-
-  lru-cache@6.0.0:
-    dependencies:
-      yallist: 4.0.0
 
   magic-string@0.30.10:
     dependencies:
@@ -9584,6 +9815,20 @@ snapshots:
       sonic-boom: 3.8.1
       thread-stream: 2.7.0
 
+  pino@9.0.0:
+    dependencies:
+      atomic-sleep: 1.0.0
+      fast-redact: 3.5.0
+      on-exit-leak-free: 2.1.2
+      pino-abstract-transport: 1.2.0
+      pino-std-serializers: 6.2.2
+      process-warning: 3.0.0
+      quick-format-unescaped: 4.0.4
+      real-require: 0.2.0
+      safe-stable-stringify: 2.4.3
+      sonic-boom: 3.8.1
+      thread-stream: 2.7.0
+
   pkg-types@1.1.0:
     dependencies:
       confbox: 0.1.7
@@ -9765,9 +10010,7 @@ snapshots:
 
   semver@5.7.2: {}
 
-  semver@7.6.0:
-    dependencies:
-      lru-cache: 6.0.0
+  semver@7.6.1: {}
 
   set-cookie-parser@2.6.0: {}
 
@@ -10012,13 +10255,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@1.6.0(@types/node@20.12.9):
+  vite-node@1.6.0(@types/node@20.12.10):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.11(@types/node@20.12.9)
+      vite: 5.2.11(@types/node@20.12.10)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -10029,22 +10272,22 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11(@types/node@20.12.9):
+  vite@5.2.11(@types/node@20.12.10):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
       fsevents: 2.3.3
 
-  vitest-mock-extended@1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)):
+  vitest-mock-extended@1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)):
     dependencies:
       ts-essentials: 9.4.2(typescript@5.4.5)
       typescript: 5.4.5
-      vitest: 1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0)
+      vitest: 1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0)
 
-  vitest@1.6.0(@types/node@20.12.9)(@vitest/ui@1.6.0):
+  vitest@1.6.0(@types/node@20.12.10)(@vitest/ui@1.6.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -10063,11 +10306,11 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11(@types/node@20.12.9)
-      vite-node: 1.6.0(@types/node@20.12.9)
+      vite: 5.2.11(@types/node@20.12.10)
+      vite-node: 1.6.0(@types/node@20.12.10)
       why-is-node-running: 2.2.2
     optionalDependencies:
-      '@types/node': 20.12.9
+      '@types/node': 20.12.10
       '@vitest/ui': 1.6.0(vitest@1.6.0)
     transitivePeerDependencies:
       - less
@@ -10130,8 +10373,6 @@ snapshots:
       xmlbuilder: 11.0.1
 
   xmlbuilder@11.0.1: {}
-
-  yallist@4.0.0: {}
 
   yaml@2.4.2: {}
 
