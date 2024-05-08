@@ -1,3 +1,4 @@
+import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
@@ -8,7 +9,6 @@ import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { GroupRepository } from './repository.js';
 import { CreateGroup, EditGroup, Group } from './schemas.js';
-import { EventPublisher } from "@arcade/events";
 
 export type GroupListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -55,7 +55,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: saved.id,
-			resourceType: 'groups',
+			resourceType: 'Group',
 			new: saved,
 		});
 
@@ -95,7 +95,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'groups',
+			resourceType: 'Group',
 			old: existing,
 			new: saved,
 		});
@@ -125,7 +125,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: existing.id,
-			resourceType: 'groups',
+			resourceType: 'Group',
 			old: existing,
 		});
 

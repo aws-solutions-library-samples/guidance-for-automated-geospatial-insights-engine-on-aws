@@ -5,10 +5,10 @@ import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
 import { SecurityContext } from '../../common/scopes.js';
+import { PolygonService } from '../polygons/service.js';
 import { RegionService } from '../regions/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
-import { PolygonService } from '../polygons/service.js';
 import { StateRepository } from './repository.js';
 import { CreateState, EditState, State } from './schemas.js';
 
@@ -81,7 +81,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: toSave.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			new: saved,
 		});
 
@@ -128,7 +128,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			old: existing,
 			new: saved,
 		});
@@ -170,7 +170,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: state.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			old: state,
 		});
 

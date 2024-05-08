@@ -60,7 +60,7 @@ export class RegionService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: saved.id,
-			resourceType: 'regions',
+			resourceType: 'Region',
 			new: saved,
 		});
 
@@ -102,7 +102,7 @@ export class RegionService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'regions',
+			resourceType: 'Region',
 			old: existing,
 			new: saved,
 		});
@@ -147,7 +147,7 @@ export class RegionService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: existing.id,
-			resourceType: 'regions',
+			resourceType: 'Region',
 			old: existing,
 		});
 
