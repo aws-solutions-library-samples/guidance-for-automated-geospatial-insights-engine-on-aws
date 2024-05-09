@@ -13,5 +13,17 @@
 
 export interface SecurityContext {
 	email: string;
-	userId: string;
+	sub: string;
+	phoneNumber: string;
+	role: SecurityScope;
 }
+
+export enum SecurityScope {
+	admin = 'admin',
+	contributor = 'contributor',
+	reader = 'reader',
+}
+
+export const atLeastAdmin: SecurityScope[] = [SecurityScope.admin];
+export const atLeastContributor: SecurityScope[] = [...atLeastAdmin, SecurityScope.contributor];
+export const atLeastReader: SecurityScope[] = [...atLeastContributor, SecurityScope.reader];

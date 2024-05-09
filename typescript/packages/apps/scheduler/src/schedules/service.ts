@@ -12,7 +12,7 @@ export class SchedulesService {
 		// validation
 		ow(request, ow.object.nonEmpty);
 		ow(request.id, ow.string.nonEmpty);
-		const scheduleName = `${request.id}-schedule`
+		const scheduleName = `${request.id}-scheduler-schedule`
 		try {
 			await this.schedulerClient.send(new DeleteScheduleCommand({ Name: scheduleName, GroupName: this.schedulerGroup }))
 		} catch (err) {

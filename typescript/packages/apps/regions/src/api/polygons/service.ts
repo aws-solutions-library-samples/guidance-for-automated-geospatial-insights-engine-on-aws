@@ -73,7 +73,7 @@ export class PolygonService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: saved.id,
-			resourceType: 'Polygon',
+			resourceType: 'polygons',
 			new: polygon,
 		});
 
@@ -143,7 +143,7 @@ export class PolygonService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'Polygon',
+			resourceType: 'polygons',
 			old: existing,
 			new: saved,
 		});
@@ -188,7 +188,7 @@ export class PolygonService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: existing.id,
-			resourceType: 'Polygon',
+			resourceType: 'polygons',
 			old: existing,
 		});
 

@@ -103,6 +103,7 @@ export class RegionsClient extends ClientServiceBase {
 			.setRequestContext(requestContext)
 			.setPath(`/states/${id}`);
 
+
 		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as State;
 		this.log.trace(`RegionsClient> getStateById> exit> result: ${JSON.stringify(result)}`);
 		return result;

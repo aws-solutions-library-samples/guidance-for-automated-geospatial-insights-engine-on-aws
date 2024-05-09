@@ -55,7 +55,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: saved.id,
-			resourceType: 'Group',
+			resourceType: 'groups',
 			new: saved,
 		});
 
@@ -95,7 +95,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'Group',
+			resourceType: 'groups',
 			old: existing,
 			new: saved,
 		});
@@ -125,7 +125,7 @@ export class GroupService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: existing.id,
-			resourceType: 'Group',
+			resourceType: 'groups',
 			old: existing,
 		});
 

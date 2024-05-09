@@ -14,6 +14,8 @@
 export interface SecurityContext {
 	email: string;
 	role: SecurityScope;
+	phoneNumber: string;
+	sub: string;
 }
 
 export enum SecurityScope {

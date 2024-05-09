@@ -12,6 +12,7 @@ import { VerifiedPermissionsIdentitySourceCreator } from './verifiedPermissionsI
 export type SharedStackProperties = StackProps & {
 	environment: string;
 	administratorEmail: string;
+	administratorPhoneNumber: string;
 	userPoolEmail?: {
 		fromEmail: string;
 		fromName: string;
@@ -50,6 +51,7 @@ export class SharedInfrastructureStack extends Stack {
 		const cognito = new Cognito(this, 'Cognito', {
 			environment: props.environment,
 			administratorEmail: props.administratorEmail,
+			administratorPhoneNumber: props.administratorPhoneNumber,
 			userPoolEmail: props.userPoolEmail,
 		});
 

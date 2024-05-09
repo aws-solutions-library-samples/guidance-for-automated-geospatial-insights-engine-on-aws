@@ -78,7 +78,9 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent): Promise<
 
 	let identity: ArcadeIdentity;
 	try {
-		identity = apiAuthorizer.extractIdentity(event?.headers?.authorization);
+		// Depending on http1.1 or http2, API Gateway provides different case on the authorization header.
+		const authorizationHeader = event.headers?.Authorization ?? event.headers?.authorization;
+		identity = apiAuthorizer.extractIdentity(authorizationHeader);
 	} catch (e) {
 		// swallow
 	}

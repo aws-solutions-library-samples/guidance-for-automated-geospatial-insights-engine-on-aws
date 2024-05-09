@@ -1,16 +1,14 @@
 import { getLambdaArchitecture } from '@arcade/cdk-common';
 import { REGIONS_EVENT_SOURCE, RESULTS_REGION_CREATED_EVENT, RESULTS_REGION_DELETED_EVENT, RESULTS_REGION_UPDATED_EVENT } from '@arcade/events';
 import { Duration } from 'aws-cdk-lib';
-import { EcsJobDefinition, JobQueue } from 'aws-cdk-lib/aws-batch';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { AnyPrincipal, Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
-import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { CfnScheduleGroup } from 'aws-cdk-lib/aws-scheduler';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
+import { IQueue, Queue } from 'aws-cdk-lib/aws-sqs';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
@@ -22,25 +20,19 @@ const __dirname = path.dirname(__filename);
 export interface ScheduledConstructProperties {
 	environment: string;
 	eventBusName: string;
-	regionsApiFunctionArn: string;
-	jobDefinitionArn: string;
-	jobQueueArn: string;
-	concurrencyLimit: number;
+	bucketName: string;
 }
 
 export class SchedulerModule extends Construct {
+
+	public engineQueue: IQueue;
+
 	constructor(scope: Construct, id: string, props: ScheduledConstructProperties) {
 		super(scope, id);
 
 		const namePrefix = `arcade-${props.environment}`;
 
-		const engineProcessorJobDefinition = EcsJobDefinition.fromJobDefinitionArn(scope, 'EngineProcessJobDefinition', props.jobDefinitionArn);
-
-		const jobQueue = JobQueue.fromJobQueueArn(scope, 'EngineProcessorJobQueueArn', props.jobQueueArn);
-
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName);
-
-		const regionsApiLambda = Function.fromFunctionArn(scope, 'RegionsApiFunction', props.regionsApiFunctionArn);
 
 		const engineDlq = new Queue(this, `taskDlq`, { queueName: `${namePrefix}-engine-dlq` });
 		engineDlq.addToResourcePolicy(
@@ -58,7 +50,7 @@ export class SchedulerModule extends Construct {
 			})
 		);
 
-		const engineQueue = new Queue(this, `taskQueue`, {
+		this.engineQueue = new Queue(this, `taskQueue`, {
 			queueName: `${namePrefix}-engine-queue`,
 			deadLetterQueue: {
 				maxReceiveCount: 10,
@@ -67,13 +59,13 @@ export class SchedulerModule extends Construct {
 			visibilityTimeout: Duration.minutes(15),
 		});
 
-		engineQueue.addToResourcePolicy(
+		this.engineQueue.addToResourcePolicy(
 			new PolicyStatement({
 				sid: 'enforce-ssl',
 				effect: Effect.DENY,
 				principals: [new AnyPrincipal()],
 				actions: ['sqs:*'],
-				resources: [engineQueue.queueArn],
+				resources: [this.engineQueue.queueArn],
 				conditions: {
 					Bool: {
 						'aws:SecureTransport': 'false',
@@ -83,7 +75,7 @@ export class SchedulerModule extends Construct {
 		);
 
 		const cfnScheduleGroup = new CfnScheduleGroup(this, 'ArcadeScheduleGroup', {
-			name: `${namePrefix}-arcade`,
+			name: `${namePrefix}-scheduler`,
 		});
 
 		const arcadeSchedulerRole = new Role(this, 'ArcadeSchedulerRole', {
@@ -95,7 +87,7 @@ export class SchedulerModule extends Construct {
 			new PolicyStatement({
 				actions: ['sqs:SendMessage'],
 				effect: Effect.ALLOW,
-				resources: [engineQueue.queueArn],
+				resources: [this.engineQueue.queueArn],
 			})
 		);
 
@@ -112,7 +104,7 @@ export class SchedulerModule extends Construct {
 			environment: {
 				EVENT_BUS_NAME: props.eventBusName,
 				SCHEDULER_GROUP: cfnScheduleGroup.name,
-				SQS_ARN: engineQueue.queueArn,
+				SQS_ARN: this.engineQueue.queueArn,
 				ROLE_ARN: arcadeSchedulerRole.roleArn,
 			},
 			bundling: {
@@ -148,15 +140,15 @@ export class SchedulerModule extends Construct {
 			})
 		);
 
-		const regionModifiedRuleDlq = new Queue(this, 'RegionModifiedRuleDLQ');
+		const schedulerEventBridgeHandlerDLQ = new Queue(this, 'SchedulerEventBridgeHandlerDLQ');
 
-		regionModifiedRuleDlq.addToResourcePolicy(
+		schedulerEventBridgeHandlerDLQ.addToResourcePolicy(
 			new PolicyStatement({
 				sid: 'enforce-ssl',
 				effect: Effect.DENY,
 				principals: [new AnyPrincipal()],
 				actions: ['sqs:*'],
-				resources: [regionModifiedRuleDlq.queueArn],
+				resources: [schedulerEventBridgeHandlerDLQ.queueArn],
 				conditions: {
 					Bool: {
 						'aws:SecureTransport': 'false',
@@ -175,61 +167,15 @@ export class SchedulerModule extends Construct {
 
 		regionModifiedRule.addTarget(
 			new LambdaFunction(eventbridgeLambda, {
-				deadLetterQueue: regionModifiedRuleDlq,
+				deadLetterQueue: schedulerEventBridgeHandlerDLQ,
 				maxEventAge: Duration.minutes(5),
 				retryAttempts: 2,
 			})
 		);
 
-		// Lambda function that processor schedule queued in SQS
-		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
-			description: 'Scheduler module sqs processor',
-			entry: path.join(__dirname, '../../../typescript/packages/apps/scheduler/src/lambda_sqs.ts'),
-			functionName: `${namePrefix}-scheduler-sqs-processor`,
-			runtime: Runtime.NODEJS_20_X,
-			tracing: Tracing.ACTIVE,
-			memorySize: 512,
-			logRetention: RetentionDays.ONE_WEEK,
-			timeout: Duration.minutes(1),
-			environment: {
-				EVENT_BUS_NAME: props.eventBusName,
-				JOB_DEFINITION_ARN: engineProcessorJobDefinition.jobDefinitionArn,
-				JOB_QUEUE_ARN: jobQueue.jobQueueArn,
-				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
-				REGIONS_API_FUNCTION_NAME: regionsApiLambda.functionName,
-			},
-			bundling: {
-				minify: true,
-				format: OutputFormat.ESM,
-				target: 'node20.1',
-				sourceMap: false,
-				sourcesContent: false,
-				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
-				externalModules: ['aws-sdk', 'pg-native'],
-			},
-			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
-			architecture: getLambdaArchitecture(scope),
-		});
-
-		regionsApiLambda.grantInvoke(sqsProcessorLambda);
-
-		sqsProcessorLambda.addEventSource(
-			new SqsEventSource(engineQueue, {
-				batchSize: 10,
-				reportBatchItemFailures: true,
-			})
-		);
-
-		sqsProcessorLambda.addToRolePolicy(
-			new PolicyStatement({
-				effect: Effect.ALLOW,
-				actions: ['batch:SubmitJob', 'batch:DescribeJobs', 'batch:TerminateJob'],
-				resources: [engineProcessorJobDefinition.jobDefinitionArn, jobQueue.jobQueueArn],
-			})
-		);
 
 		NagSuppressions.addResourceSuppressions(
-			[sqsProcessorLambda, eventbridgeLambda],
+			[eventbridgeLambda],
 			[
 				{
 					id: 'AwsSolutions-IAM4',
@@ -246,19 +192,7 @@ export class SchedulerModule extends Construct {
 		);
 
 		NagSuppressions.addResourceSuppressions(
-			[sqsProcessorLambda],
-			[
-				{
-					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::<regionsApiFunctionArnParameter>:*'],
-					reason: 'SQS processor lambda needs to invoke the regions api to retrieve list of polygons by region.',
-				},
-			],
-			true
-		);
-
-		NagSuppressions.addResourceSuppressions(
-			[engineDlq, regionModifiedRuleDlq],
+			[engineDlq, schedulerEventBridgeHandlerDLQ],
 			[
 				{
 					id: 'AwsSolutions-SQS3',
@@ -267,5 +201,6 @@ export class SchedulerModule extends Construct {
 			],
 			true
 		);
+
 	}
 }

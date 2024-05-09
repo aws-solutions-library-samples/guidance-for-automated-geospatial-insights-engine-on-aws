@@ -1,8 +1,11 @@
+import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
+import { asFunction, Lifetime } from 'awilix';
+import pkg from 'aws-xray-sdk';
+import type { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
 import { RegionsClient, StacServerClient } from '@arcade/clients';
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventPublisher, RESULTS_EVENT_SOURCE } from '@arcade/events';
 import { Invoker } from '@arcade/lambda-invoker';
-import { BaseCradle, registerBaseAwilix } from '@arcade/resource-api-base';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { LambdaClient } from '@aws-sdk/client-lambda';
@@ -10,27 +13,18 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { SNSClient } from '@aws-sdk/client-sns';
 import { SSMClient } from '@aws-sdk/client-ssm';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
-import type { Client, Command } from '@aws-sdk/smithy-client';
-import type { MetadataBearer, RequestPresigningArguments } from '@aws-sdk/types';
-import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
-import { asFunction, Lifetime } from 'awilix';
-import pkg from 'aws-xray-sdk';
-import type { FastifyInstance } from 'fastify';
-import fp from 'fastify-plugin';
 import { EventProcessor } from '../events/eventProcessor.js';
-import { ResultsRepository } from '../events/repository.js';
 import { StacUtil } from '../utils/stacUtil.js';
+import { ResultsService } from "../api/results/service.js";
+import { ResultsRepository } from "../api/results/repository.js";
+import { DynamoDbUtils } from "@arcade/dynamodb-utils";
+import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
+import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
 
 const { captureAWSv3Client } = pkg;
 
-export type GetSignedUrl = <InputTypesUnion extends object, InputType extends InputTypesUnion, OutputType extends MetadataBearer = MetadataBearer>(
-	client: Client<any, InputTypesUnion, MetadataBearer, any>,
-	command: Command<InputType, OutputType, any, InputTypesUnion, MetadataBearer>,
-	options?: RequestPresigningArguments
-) => Promise<string>;
-
 declare module '@fastify/awilix' {
-	interface Cradle extends BaseCradle {
+	interface Cradle {
 		eventProcessor: EventProcessor;
 		eventBridgeClient: EventBridgeClient;
 		dynamoDbUtils: DynamoDbUtils;
@@ -45,6 +39,19 @@ declare module '@fastify/awilix' {
 		eventPublisher: EventPublisher;
 		resultsRepository: ResultsRepository;
 		lambdaInvoker: Invoker;
+		resultsService: ResultsService;
+		apiAuthorizer: ApiAuthorizer;
+		avpClient: VerifiedPermissionsClient;
+	}
+}
+
+class VerifiedPermissionsClientFactory {
+	public static create(region: string): VerifiedPermissionsClient {
+		return captureAWSv3Client(
+			new VerifiedPermissionsClient({
+				region,
+			})
+		);
 	}
 }
 
@@ -111,6 +118,10 @@ const registerContainer = (app?: FastifyInstance) => {
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
 	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
 
+	const userPoolId = process.env['USER_POOL_ID'];
+	const policyStoreId = process.env['POLICY_STORE_ID'];
+	const clientId = process.env['CLIENT_ID'];
+
 	diContainer.register({
 		// Clients
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
@@ -118,6 +129,10 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		dynamoDbUtils: asFunction((c: Cradle) => new DynamoDbUtils(app.log, c.dynamoDBDocumentClient), {
 			...commonInjectionOptions,
 		}),
 
@@ -130,10 +145,6 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		snsClient: asFunction(() => SNSClientFactory.create(awsRegion), {
-			...commonInjectionOptions,
-		}),
-
-		dynamoDbUtils: asFunction((container: Cradle) => new DynamoDbUtils(app.log, container.dynamoDBDocumentClient), {
 			...commonInjectionOptions,
 		}),
 
@@ -165,12 +176,24 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		// Event Processors
-		eventProcessor: asFunction((container) => new EventProcessor(app.log, container.resultsRepository, container.stacServerClient, container.stacUtil), {
+		eventProcessor: asFunction((container) => new EventProcessor(app.log, container.resultsService, container.stacServerClient, container.stacUtil), {
+			...commonInjectionOptions,
+		}),
+
+		resultsService: asFunction((container) => new ResultsService(app.log, container.resultsRepository), {
 			...commonInjectionOptions,
 		}),
 
 		// Repositories
 		resultsRepository: asFunction((container) => new ResultsRepository(app.log, container.dynamoDBDocumentClient, tableName), {
+			...commonInjectionOptions,
+		}),
+
+		avpClient: asFunction(() => VerifiedPermissionsClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
 	});
@@ -182,8 +205,6 @@ export default fp<FastifyAwilixOptions>(async (app: FastifyInstance): Promise<vo
 		disposeOnClose: true,
 		disposeOnResponse: false,
 	});
-
-	registerBaseAwilix(app.log);
 
 	registerContainer(app);
 });

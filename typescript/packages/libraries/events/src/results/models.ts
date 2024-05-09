@@ -274,17 +274,33 @@ export interface Collection {
 	[k: string]: unknown;
 }
 
-export type Status = 'QUEUED' | 'STARTED' | 'FAILED' | 'SUCCEEDED';
+export type Status = 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeeded';
 
-export interface pipelineMetadataDetails {
+export type EngineType = 'aws-batch'
+
+export interface engineJobCreatedDetails {
+	id: string;
+	regionId: string;
+	status: Status;
+	scheduleDateTime: string;
+	engineType: EngineType;
+	executionId?: string;
+	message?: string;
+}
+
+export type engineJobUpdatedDetails = Pick<engineJobCreatedDetails, 'id' | 'regionId' | 'status' | 'message'>
+
+export type engineJobDetails = engineJobCreatedDetails | engineJobUpdatedDetails;
+
+export interface polygonProcessingDetails {
 	/**
 	 * The id of the step function execution that this metadata belongs to
 	 */
-	executionId: string;
+	jobId: string;
 	/**
-	 * The arn of the job arn that this metadata belongs to
+	 * Fields are represented as a polygon
 	 */
-	jobArn: string;
+	polygonId: string;
 	/**
 	 * A grower may own many farms. A grower is represented as a group.
 	 */
@@ -294,22 +310,17 @@ export interface pipelineMetadataDetails {
 	 */
 	regionId: string;
 	/**
-	 * Fields are represented as a polygon
+	 * The id of the resource that this metadata belongs to.
 	 */
-	polygonId: string;
+	resultId: string;
 	/**
-	 * Over time a field will have many different crop seasons. Each of these crop seasons is represented as a state of a polygon
+	 * The schedule datetime that is being used to query the stac item collections.
 	 */
-	stateId: string;
-
-	createdAt?: string;
-	updatedAt?: string;
-	status?: Status;
+	scheduleDateTime: string;
 	/**
 	 * The S3 key of the metadata output of the job
 	 */
-	engineOutPutLocation?: string;
-	message?: string;
+	engineOutputLocation?: string;
 }
 
 export interface groupDetails {
@@ -331,4 +342,11 @@ export interface regionDetails extends groupDetails {
 	regionId: string;
 }
 
-export type { groupDetails as GroupDetails, pipelineMetadataDetails as PipelineMetadataDetails, regionDetails as RegionDetails };
+export type {
+	groupDetails as GroupDetails,
+	polygonProcessingDetails as PipelineMetadataDetails,
+	regionDetails as RegionDetails,
+	engineJobDetails as EngineJobDetails,
+	engineJobCreatedDetails as EngineJobCreatedDetails,
+	engineJobUpdatedDetails as EngineJobUpdatedDetails
+};

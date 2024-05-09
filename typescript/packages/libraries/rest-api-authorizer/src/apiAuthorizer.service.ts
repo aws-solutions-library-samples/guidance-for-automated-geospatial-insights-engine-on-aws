@@ -10,6 +10,7 @@ export type ArcadeIdentity = {
 	sub: string;
 	email: string;
 	role: string;
+	phoneNumber: string;
 };
 
 export type AuthDecision = {
@@ -31,16 +32,19 @@ export class ApiAuthorizer {
 	public async process(event: APIGatewayRequestAuthorizerEvent, actionMap: JSONValue): Promise<Decision> {
 		this.logger.debug(`ApiAuthorizer> process> in> event:${JSON.stringify(event)}`);
 
+		// Depending on http1.1 or http2, API Gateway provides different case on the authorization header.
+		const authorizationHeader = event.headers?.Authorization ?? event.headers?.authorization;
+
 		// Validation
 		ow(event, 'request', ow.object.nonEmpty);
 		ow(event.type, 'request type', ow.string.equals('REQUEST'));
 		ow(event.headers, 'request headers', ow.object.nonEmpty);
-		ow(event.headers.authorization, 'authorization header', ow.string.nonEmpty);
+		ow(authorizationHeader, 'authorization header', ow.string.nonEmpty);
 		ow(event.methodArn, 'request methodArn', ow.string.nonEmpty);
 		ow(event.resource, 'request resource', ow.string.nonEmpty);
 		ow(event.requestContext?.httpMethod, 'request httpMethod', ow.string.nonEmpty);
 
-		const token = event?.headers?.authorization?.replace('Bearer ', '');
+		const token = authorizationHeader.replace('Bearer ', '');
 
 		// Verifier that expects valid access tokens:
 		const verifier = CognitoJwtVerifier.create({
@@ -57,7 +61,7 @@ export class ApiAuthorizer {
 		}
 
 		try {
-			const response = await this._isAuthorizedWithToken(event, actionMap);
+			const response = await this._isAuthorizedWithToken(event, actionMap, token);
 			this.logger.debug(`ApiAuthorizer> process> exit:${response}`);
 			return response;
 		} catch (err) {
@@ -77,6 +81,7 @@ export class ApiAuthorizer {
 			sub: payload?.['sub']?.toString() ?? '?',
 			email: payload?.['email']?.toString() ?? '?',
 			role: payload?.['custom:role']?.toString() ?? '?',
+			phoneNumber: payload?.['phone_number']?.toString() ?? '?',
 		};
 		this.logger.debug(`ApiAuthorizer> extractIdentity> exit: ${JSON.stringify(identity)}`);
 		return identity;
@@ -133,10 +138,8 @@ export class ApiAuthorizer {
 		return action;
 	}
 
-	public async _isAuthorizedWithToken(event: APIGatewayRequestAuthorizerEvent, actionMap: JSONValue): Promise<Decision> {
+	public async _isAuthorizedWithToken(event: APIGatewayRequestAuthorizerEvent, actionMap: JSONValue, token: string): Promise<Decision> {
 		this.logger.debug(`ApiAuthorizer> isAuthorizedWithToken> in>`);
-
-		const token = event.headers.authorization.replace('Bearer ', '');
 
 		const actionId = this._identifyAction(event.requestContext.httpMethod, event.path, actionMap);
 

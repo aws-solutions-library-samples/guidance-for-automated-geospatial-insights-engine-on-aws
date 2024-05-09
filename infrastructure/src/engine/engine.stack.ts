@@ -9,6 +9,7 @@ import { EngineConstruct } from "./engine.construct.js";
 export type EngineStackProperties = StackProps & {
 	environment: string;
 	vpc: IVpc;
+	stacServerUrl: string;
 }
 
 export class EngineStack extends cdk.Stack {
@@ -31,6 +32,7 @@ export class EngineStack extends cdk.Stack {
 				environment: props.environment,
 				eventBusName,
 				bucketName,
+				stacServerUrl: props.stacServerUrl
 			})
 	}
 }
