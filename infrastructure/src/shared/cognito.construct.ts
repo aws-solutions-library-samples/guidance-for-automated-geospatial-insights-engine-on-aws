@@ -13,7 +13,7 @@ import {
 	UserPoolClient,
 	UserPoolClientIdentityProvider,
 	UserPoolDomain,
-	UserPoolEmail,
+	UserPoolEmail
 } from 'aws-cdk-lib/aws-cognito';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
@@ -22,6 +22,7 @@ import { Construct } from 'constructs';
 export interface CognitoConstructProperties {
 	environment: string;
 	administratorEmail: string;
+	administratorPhoneNumber: string;
 	userPoolEmail?: {
 		fromEmail: string;
 		fromName: string;
@@ -65,8 +66,12 @@ export class Cognito extends Construct {
 			signInAliases: {
 				email: true,
 			},
+			standardAttributes: {
+				phoneNumber: { required: true, mutable: true }
+			},
 			autoVerify: {
 				email: true,
+				phone: true
 			},
 			customAttributes: {
 				role: new StringAttribute({ mutable: true }),
@@ -85,6 +90,10 @@ export class Cognito extends Construct {
 		NagSuppressions.addResourceSuppressions(
 			userPool,
 			[
+				{
+					id: 'AwsSolutions-IAM5',
+					reason: 'The CDK generated SMS role need policy to send SMS.',
+				},
 				{
 					id: 'AwsSolutions-COG3',
 					reason: 'User can turn on AdvancedSecurity mode if they want to, the open source solution will not enforce it.',
@@ -136,6 +145,7 @@ export class Cognito extends Construct {
 		const standardCognitoAttributes: StandardAttributesMask = {
 			email: true,
 			emailVerified: true,
+			phoneNumber: true
 		};
 
 		const clientReadAttributes = new ClientAttributes().withStandardAttributes(standardCognitoAttributes).withCustomAttributes('role');
@@ -186,6 +196,10 @@ export class Cognito extends Construct {
 				{
 					name: 'email',
 					value: props.administratorEmail,
+				},
+				{
+					name: 'phone_number',
+					value: props.administratorPhoneNumber,
 				},
 				{
 					name: 'custom:role',

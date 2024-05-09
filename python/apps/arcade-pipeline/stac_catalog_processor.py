@@ -1,15 +1,18 @@
-import json
+import os
 from dataclasses import dataclass, field
 import datetime
+from io import BytesIO
 from logging import Logger
-from typing import List
-import numpy as np
-import pyproj
-import xarray as xr
+from typing import List, Optional, Tuple
+
+import boto3
+import rasterio
+import requests
 from dataclasses_json import DataClassJsonMixin, config
+from numpy import ndarray
 from odc.stac import stac_load
+from pystac import Item
 from pystac_client import Client
-from shapely import Polygon
 from xarray import Dataset
 
 from logger_utils import get_logger
@@ -17,9 +20,6 @@ from pystac.extensions.projection import ProjectionExtension
 from pyproj import CRS
 import shapely.geometry as geom
 import geopandas as gpd
-import rioxarray
-
-from utils.ndvi_processor import calculate_ndvi_percentage_difference, get_previous_tif
 
 STAC_URL = 'https://earth-search.aws.element84.com/v1'
 STAC_COLLECTION = 'sentinel-2-c1-l2a'
@@ -34,6 +34,8 @@ class EngineProcessRequest(DataClassJsonMixin):
 	group_id: str = field(metadata=config(field_name="groupId"), default=None)
 	region_id: str = field(metadata=config(field_name="regionId"), default=None)
 	polygon_id: str = field(metadata=config(field_name="polygonId"), default=None)
+	output_prefix: str = field(metadata=config(field_name="outputPrefix"), default=None)
+	result_id: str = field(metadata=config(field_name="resultId"), default=None)
 
 
 class STACCatalogProcessor:
@@ -42,10 +44,10 @@ class STACCatalogProcessor:
 		self,
 		request: EngineProcessRequest,
 	):
-		self.stac_item = None
-		self.previous_tif_raster = None
-		self.bounding_box = None
 		self.request: EngineProcessRequest = request
+		self.stac_item: Optional[Item] = None
+		self.previous_tif_raster: Optional[ndarray] = None
+		self.bounding_box: Optional[ndarray] = None
 
 	def _load_stac_item(self):
 		five_days_before_schedule = (datetime.datetime.strptime(self.request.schedule_date_time, "%Y-%m-%d") - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
@@ -59,7 +61,7 @@ class STACCatalogProcessor:
 		self.bounding_box = polygon_series.total_bounds
 		# Set the previous tif raster if any
 		# TODO: comment this out for now until result server PRs are merged
-		# self.previous_tif_raster = get_previous_tif(self.request.region_id, self.bounding_box.tolist())
+		self.previous_tif_raster = self._get_previous_tif(self.request.region_id, self.bounding_box.tolist())
 		stac_catalog = Client.open(STAC_URL)
 		stac_query = stac_catalog.search(
 			bbox=self.bounding_box,
@@ -78,12 +80,55 @@ class STACCatalogProcessor:
 		# Get the latest satellite image
 		stac_items = sorted(stac_items, key=lambda x: x.properties['datetime'])
 		latest_stac_item = stac_items.pop()
+		self.stac_item = latest_stac_item
 		return latest_stac_item
 
-	def search_stac_items(self):
-		self.stac_item = self._load_stac_item()
+	@staticmethod
+	def _get_previous_tif(region_id: str, bounding_box_list: List[tuple[float, float]]):
+		arcade_stac_url = os.getenv("ARCADE_STAC_SERVER_URL")
+		# Set the API endpoint URL
+		url = arcade_stac_url
+		# Set the data to be sent in the request body
+		data = {
+			"collections": ["region_{}".format(region_id)],
+			"bbox": bounding_box_list
+		}
+		# Set any required headers
+		headers = {
+			"Content-Type": "application/json",
+		}
+		# Send a POST request to the API
+		stac_api_response = requests.post(url, json=data, headers=headers)
 
-	def calculate_bands_from_stac_item(self) -> Dataset:
+		response_data: Optional[dict] = None
+
+		# Check if the request was successful
+		if stac_api_response.status_code == 200:
+			# Get the response data
+			response_data = stac_api_response.json()
+		else:
+			print(f"Error: {stac_api_response.status_code} - {stac_api_response.text}")
+
+		if response_data is None or response_data.get('features') is None or len(response_data['features']) == 0:
+			return None
+
+		asset = response_data['features'].pop()
+
+		s3 = boto3.client('s3')
+		try:
+			bucket, key = asset['assets']['ndvi']["href"].replace("s3://", "").split("/", 1)
+			s3_get_response = s3.get_object(Bucket=bucket, Key=key)
+			# Access the object's contents
+			object_content = s3_get_response["Body"].read()
+			with rasterio.open(BytesIO(object_content)) as src:
+				# Access the image data and metadata
+				raster_data = src.read()
+				return raster_data
+		except s3.exceptions.NoSuchKey as e:
+			print(f"Error: {e}")
+
+	def load_stac_datasets(self) -> [Dataset, Dataset]:
+		self._load_stac_item()
 		# default to CRS and resolution from first Item
 		sentinel_epsg = ProjectionExtension.ext(self.stac_item).epsg
 		output_crs = CRS.from_epsg(sentinel_epsg)
@@ -97,79 +142,11 @@ class STACCatalogProcessor:
 			groupby="solar_day",  # <-- merge tiles of same day
 		)
 		stac_assets = stac_assets.compute()
-		return stac_assets
 
-	def calculate_cloud_removal_band(self, stac_assets: Dataset) -> Dataset:
-		scl_asset = stac_assets[['scl']]
+		previous_ndvi_raster = None
+		try:
+			previous_ndvi_raster = self._get_previous_tif(self.request.region_id, self.bounding_box.tolist())
+		except Exception as e:
+			print(f"Error: {e}")
 
-		cloud_mask = np.logical_not(scl_asset.isin([0, 1, 2, 3, 7, 8, 9, 10, 11]))
-		cloud_removed = xr.where(cloud_mask, scl_asset, 0)
-
-		# Perform cloud removal
-		stac_assets = stac_assets.assign(scl_cloud_removed=cloud_removed.to_array()[0])
-		return stac_assets
-
-	def calculate_ndvi_raw_band(self, stac_assets: Dataset) -> Dataset:
-		stac_assets = stac_assets.assign(ndvi_raw=lambda x: (x.nir08 - x.red) / (x.nir08 + x.red))
-		return stac_assets
-
-	def fill_cloud_gap(self, stac_assets: Dataset) -> Dataset:
-		scl_cloud_removed_array = stac_assets['scl_cloud_removed'].values.flatten()
-		has_cloud_gap = len(scl_cloud_removed_array[~np.isnan(scl_cloud_removed_array) & (scl_cloud_removed_array == 0)]) > 0
-
-		if has_cloud_gap and self.previous_tif_raster is not None:
-			print('has cloud gap')
-			percentage_diff = calculate_ndvi_percentage_difference(self.previous_tif_raster, stac_assets['ndvi_raw'].values)
-			print("Before calculation : {}".format(stac_assets['ndvi_raw'].values.flatten()[0]))
-			# If a pixel has been removed by the previous cloud removal step, calculate NDVI by multiplying the current NDVI and
-			# average percentage diff between the current and previous TIF
-			stac_assets["ndvi"] = xr.where(stac_assets["scl_cloud_removed"] == 0, stac_assets["ndvi_raw"] * percentage_diff, stac_assets["ndvi_raw"])
-			print("After calculation: {}".format(stac_assets['ndvi'].values.flatten()[0]))
-		else:
-			print('no cloud gap')
-			stac_assets = stac_assets.assign(ndvi=lambda x: x['ndvi_raw'])
-
-		return stac_assets
-
-	def calculate_ndvi_change(self, stac_assets: Dataset) -> Dataset:
-		if self.previous_tif_raster is None:
-			return stac_assets
-
-		print("Previous NDVI for first pixel: {}".format(self.previous_tif_raster.flatten()[0]))
-		print("Current NDVI for first pixel: {}".format(stac_assets['ndvi'].values.flatten()[0]))
-		# Calculate the different between current ndvi and the previous ndvi (stored in variable called raster data)
-		stac_assets = stac_assets.assign(ndvi_change=stac_assets["ndvi"] - self.previous_tif_raster)
-		print("NDVI change: {}".format(stac_assets['ndvi_change'].values.flatten()[0]))
-		return stac_assets
-
-	def calculate_area(self) -> float:
-		in_crs = pyproj.CRS('EPSG:4326')  # WGS84 (latitude/longitude)
-		out_crs = pyproj.CRS('EPSG:3857')  # Web Mercator (meters)
-		polygon = Polygon(self.request.coordinates)
-		# Create a transformer object
-		transformer = pyproj.Transformer.from_crs(in_crs, out_crs, always_xy=True)
-		# Transform the polygon coordinates to a projected CRS
-		projected_coords = [transformer.transform(*xy) for xy in list(polygon.exterior.coords)]
-		# Create a new Shapely Polygon object with the projected coordinates
-		projected_polygon = Polygon(projected_coords)
-		# Calculate the area in square meters
-		area_sq_meters = projected_polygon.area
-		# Convert square meters to acres (1 acre = 4046.856422 square meters)
-		area_acres = area_sq_meters / 4046.856422
-		return area_acres
-
-	def calculate_nitrogen_recommendation(self, yield_target, area_acres) -> object:
-		# Calculate nitrogen recommendation target based on yield target
-		calculated_nitrogen_target = yield_target * 0.8 * area_acres
-		anhydrous_ammonia = calculated_nitrogen_target / 0.82
-		urea = calculated_nitrogen_target / 0.46
-		uan28 = calculated_nitrogen_target / 3
-		monoammonium_phosphate = calculated_nitrogen_target / 0.11
-		diammonium_phosphate = calculated_nitrogen_target / 0.18
-		return {
-			"anhydrous_ammonia": anhydrous_ammonia,
-			"urea": urea,
-			"uan28": uan28,
-			"monoammonium_phosphate": monoammonium_phosphate,
-			"diammonium_phosphate": diammonium_phosphate
-		}
+		return stac_assets, previous_ndvi_raster

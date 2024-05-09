@@ -40,32 +40,37 @@ export class VerifiedPermissions extends Construct {
 
 		/** policies */
 		const loadPolicyFile = (filename: string): string => readFileSync(path.join(__dirname, 'verifiedPermissionsConfig', filename)).toString();
-		new CfnPolicy(this, 'AdminPermissions', {
-			definition: {
-				static: {
-					statement: loadPolicyFile('admin.cedar'),
-					description: 'Admin permissions',
+
+		['Regions', 'Results', 'Notifications'].forEach(module => {
+			new CfnPolicy(this, `${module}AdminPermissions`, {
+				definition: {
+					static: {
+						statement: loadPolicyFile(`${module.toLowerCase()}.admin.cedar`),
+						description: `Admin permissions for ${module}`,
+					},
 				},
-			},
-			policyStoreId: this.policyStoreId,
-		});
-		new CfnPolicy(this, 'ContributorPermissions', {
-			definition: {
-				static: {
-					statement: loadPolicyFile('contributor.cedar'),
-					description: 'Contributor permissions',
+				policyStoreId: this.policyStoreId,
+			});
+			new CfnPolicy(this, `${module}ContributorPermissions`, {
+				definition: {
+					static: {
+						statement: loadPolicyFile(`${module.toLowerCase()}.contributor.cedar`),
+						description: `Contributor permissions for ${module}`,
+					},
 				},
-			},
-			policyStoreId: this.policyStoreId,
-		});
-		new CfnPolicy(this, 'ReaderPermissions', {
-			definition: {
-				static: {
-					statement: loadPolicyFile('reader.cedar'),
-					description: 'Reader permissions',
+				policyStoreId: this.policyStoreId,
+			});
+			new CfnPolicy(this, `${module}ReaderPermissions`, {
+				definition: {
+					static: {
+						statement: loadPolicyFile(`${module.toLowerCase()}.reader.cedar`),
+						description: `Reader permissions for ${module}`,
+					},
 				},
-			},
-			policyStoreId: this.policyStoreId,
-		});
+				policyStoreId: this.policyStoreId,
+			});
+		})
+
+
 	}
 }

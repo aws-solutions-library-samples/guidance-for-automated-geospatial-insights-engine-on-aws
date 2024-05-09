@@ -1,37 +1,35 @@
+import { buildLightApp } from './app.light.js';
 import {
-	ENGINE_EVENT_SOURCE,
+	EXECUTOR_EVENT_SOURCE,
+	EXECUTOR_JOB_CREATED_EVENT,
+	EXECUTOR_JOB_UPDATED_EVENT,
+	EXECUTOR_POLYGON_METADATA_CREATED_EVENT,
 	GroupChangeEvent,
-	REGIONS_EVENT_SOURCE,
-	RESULTS_COMPLETED_EVENT,
-	RESULTS_EVENT_SOURCE,
-	RESULTS_FAILED_EVENT,
-	RESULTS_GROUP_CHANGE_EVENT,
-	RESULTS_QUEUED_EVENT,
-	RESULTS_REGION_CHANGE_EVENT,
-	RESULTS_STARTED_EVENT,
+	PolygonsProcessingEvent,
 	RegionChangeEvent,
+	REGIONS_EVENT_SOURCE,
+	RESULTS_GROUP_CHANGE_EVENT,
+	RESULTS_REGION_CHANGE_EVENT,
 	ResultsChangeEvent,
-	SCHEDULER_EVENT_SOURCE,
 } from '@arcade/events';
-import { validateNotEmpty } from '@arcade/validators';
 import type { AwilixContainer } from 'awilix';
 import type { Callback, Context, EventBridgeHandler } from 'aws-lambda';
 import type { FastifyInstance } from 'fastify';
-import { buildLightApp } from './app.light.js';
 import type { EventProcessor } from './events/eventProcessor.js';
+import ow from 'ow';
 
 const app: FastifyInstance = await buildLightApp();
 const di: AwilixContainer = app.diContainer;
 
 const eventProcessor = di.resolve<EventProcessor>('eventProcessor');
 
+export  type EventDetails = ResultsChangeEvent | GroupChangeEvent | RegionChangeEvent;
+
 export const handler: EventBridgeHandler<string, EventDetails, void> = async (event, _context: Context, _callback: Callback) => {
 	app.log.info(`EventBridgeLambda > handler > event: ${JSON.stringify(event)}`);
-
-	validateNotEmpty(event, 'event');
-	validateNotEmpty(event['detail-type'], 'event.detail-type');
-	validateNotEmpty(event.source, 'event.source');
-
+	ow(event, ow.object.nonEmpty);
+	ow(event["detail-type"], ow.string.nonEmpty);
+	ow(event.source, ow.string.nonEmpty);
 	/**
 	 * Filter the group collection change event received from the regions module
 	 */
@@ -42,32 +40,25 @@ export const handler: EventBridgeHandler<string, EventDetails, void> = async (ev
 	/**
 	 * Filter the region collection change event received from the regions module
 	 */
-	if ((event['detail-type'] as string) === RESULTS_REGION_CHANGE_EVENT && event['source'] === REGIONS_EVENT_SOURCE) {
+	else if ((event['detail-type'] as string) === RESULTS_REGION_CHANGE_EVENT && event['source'] === REGIONS_EVENT_SOURCE) {
 		await eventProcessor.processRegionChangeEvent(event as unknown as RegionChangeEvent);
-	} else if ((event['detail-type'] as string) === RESULTS_QUEUED_EVENT && event['source'] === SCHEDULER_EVENT_SOURCE) {
+	}
+
 	/**
-	 * Filter the queued event received from the schedular
+	 * Filter the polygon metadata created event from executor module
 	 */
-		await eventProcessor.processQueuedEvent(event as unknown as ResultsChangeEvent);
-	} else if ((event['detail-type'] as string) === RESULTS_STARTED_EVENT && event['source'] === ENGINE_EVENT_SOURCE) {
+	else if ((event['detail-type'] as string) === EXECUTOR_POLYGON_METADATA_CREATED_EVENT && event['source'] === EXECUTOR_EVENT_SOURCE) {
+		await eventProcessor.processExecutorPolygonMetadataCreatedEvent(event as unknown as PolygonsProcessingEvent);
+	}
+
 	/**
-	 * Filter the started event
+	 * Filter the job status update from the executor module
 	 */
-		await eventProcessor.processStartedEvent(event as unknown as ResultsChangeEvent);
-	} else if ((event['detail-type'] as string) === RESULTS_COMPLETED_EVENT && [SCHEDULER_EVENT_SOURCE, ENGINE_EVENT_SOURCE, RESULTS_EVENT_SOURCE].includes(event['source'])) {
-	/**
-	 * Filter the Completed event
-	 */
-		await eventProcessor.processCompletedEvent(event as unknown as ResultsChangeEvent);
-	} else if ((event['detail-type'] as string) === RESULTS_FAILED_EVENT && [SCHEDULER_EVENT_SOURCE, ENGINE_EVENT_SOURCE, RESULTS_EVENT_SOURCE].includes(event['source'])) {
-	/**
-	 * Filter the Failed event
-	 */
-		await eventProcessor.processFailedEvent(event as unknown as ResultsChangeEvent);
+	else if ([EXECUTOR_JOB_UPDATED_EVENT, EXECUTOR_JOB_CREATED_EVENT].includes(event['detail-type']) && event['source'] === EXECUTOR_EVENT_SOURCE) {
+		await eventProcessor.processExecutorJobUpdatedEvent(event as unknown as ResultsChangeEvent);
 	} else {
 		app.log.error(`EventBridgeLambda > handler > Unimplemented event: ${JSON.stringify(event)}`);
 	}
 	app.log.info(`EventBridgeLambda > handler >exit`);
 };
 
-type EventDetails = ResultsChangeEvent | GroupChangeEvent | RegionChangeEvent;

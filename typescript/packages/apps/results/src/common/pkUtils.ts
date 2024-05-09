@@ -1,4 +1,4 @@
 export enum PkType {
-	PolygonId = 'zi',
-	ExecutionId = 'ei',
+    RegionId = 'ri',
+    ResultId = 'rs',
 }

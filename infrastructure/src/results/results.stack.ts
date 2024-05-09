@@ -1,16 +1,17 @@
-import { eventBusNameParameter } from '@arcade/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
-import { ResultsConstruct } from './results.construct.js';
+import { bucketNameParameter, eventBusNameParameter } from "@arcade/cdk-common";
+import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
+import { ResultsModule } from './results.construct.js';
+import { userPoolClientIdParameter, userPoolIdParameter } from "../shared/cognito.construct.js";
+import { verifiedPermissionsPolicyStoreIdParameter } from "../shared/verifiedPermissions.construct.js";
 
 export type ResultsStackProperties = StackProps & {
 	moduleName: string;
 	environment: string;
-	bucketName: string;
-	regionsApiFunctionArn: string;
 	stacServerTopicArn: string;
 	stacServerFunctionName: string;
 };
@@ -22,19 +23,48 @@ export class ResultsStack extends Stack {
 	constructor(scope: Construct, id: string, props: ResultsStackProperties) {
 		super(scope, id, props);
 
+		const cognitoUserPoolId = StringParameter.fromStringParameterAttributes(this, 'userPoolId', {
+			parameterName: userPoolIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const bucketName = StringParameter.fromStringParameterAttributes(this, 'bucketName', {
+			parameterName: bucketNameParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
 			parameterName: eventBusNameParameter(props.environment),
 			simpleName: false,
 		}).stringValue;
 
-		const results = new ResultsConstruct(this, 'Results', {
+		const regionsApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'regionsApiFunctionArn', {
+			parameterName: regionsApiFunctionArnParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const policyStoreId = StringParameter.fromStringParameterAttributes(this, 'policyStoreId', {
+			parameterName: verifiedPermissionsPolicyStoreIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const cognitoClientId = StringParameter.fromStringParameterAttributes(this, 'clientId', {
+			parameterName: userPoolClientIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+
+		const results = new ResultsModule(this, 'ResultsModule', {
 			moduleName: props.moduleName,
 			environment: props.environment,
-			bucketName: props.bucketName,
+			bucketName: bucketName,
 			stacServerTopicArn: props.stacServerTopicArn,
 			stacServerFunctionName: props.stacServerFunctionName,
 			eventBusName,
-			regionsApiFunctionArn: props.regionsApiFunctionArn,
+			regionsApiFunctionArn,
+			cognitoUserPoolId,
+			policyStoreId,
+			cognitoClientId
 		});
 
 		new ssm.StringParameter(this, 'tableNameParameter', {
@@ -51,7 +81,7 @@ export class ResultsStack extends Stack {
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,
-			'/ResultsStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource',
+			'/ResultsModule/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource',
 			[
 				{
 					id: 'AwsSolutions-IAM4',

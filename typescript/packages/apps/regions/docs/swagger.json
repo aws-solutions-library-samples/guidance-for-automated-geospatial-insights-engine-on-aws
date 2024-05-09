@@ -771,12 +771,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -1602,12 +1603,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -2543,12 +2545,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {
@@ -3644,12 +3647,13 @@
         "parameters": [
           {
             "schema": {
+              "default": 20,
               "type": "integer"
             },
             "in": "query",
             "name": "count",
-            "required": false,
-            "description": "Count of results to return."
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
           },
           {
             "schema": {

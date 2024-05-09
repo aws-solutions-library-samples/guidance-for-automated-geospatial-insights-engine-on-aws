@@ -16,7 +16,7 @@ import fp from 'fastify-plugin';
 
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventPublisher, REGIONS_EVENT_SOURCE } from '@arcade/events';
-import { registerAuthAwilix } from '@arcade/rest-api-authorizer';
+import { ApiAuthorizer, registerAuthAwilix } from '@arcade/rest-api-authorizer';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
@@ -33,6 +33,7 @@ import { CommonService } from '../api/service.common.js';
 import { StateRepository } from '../api/states/repository.js';
 import { StateService } from '../api/states/service.js';
 import { TagUtils } from '../tags/tags.util.js';
+import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -52,6 +53,8 @@ declare module '@fastify/awilix' {
 		stateRepository: StateRepository;
 		stateService: StateService;
 		tagUtils: TagUtils;
+		apiAuthorizer: ApiAuthorizer;
+		avpClient: VerifiedPermissionsClient;
 	}
 }
 
@@ -66,6 +69,17 @@ class EventBridgeClientFactory {
 		return eventBridge;
 	}
 }
+
+class VerifiedPermissionsClientFactory {
+	public static create(region: string): VerifiedPermissionsClient {
+		return captureAWSv3Client(
+			new VerifiedPermissionsClient({
+				region,
+			})
+		);
+	}
+}
+
 class DynamoDBDocumentClientFactory {
 	public static create(region: string): DynamoDBDocumentClient {
 		const ddb = captureAWSv3Client(new DynamoDBClient({ region }));
@@ -99,6 +113,10 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 	const awsRegion = process.env['AWS_REGION'];
 	const tableName = process.env['TABLE_NAME'];
 	const eventBusName = process.env['EVENT_BUS_NAME'];
+
+	const userPoolId = process.env['USER_POOL_ID'];
+	const policyStoreId = process.env['POLICY_STORE_ID'];
+	const clientId = process.env['CLIENT_ID'];
 
 	// then we can register our classes with the DI container
 	diContainer.register({
@@ -147,7 +165,16 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 				...commonInjectionOptions,
 			}
 		),
+
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, REGIONS_EVENT_SOURCE), {
+			...commonInjectionOptions,
+		}),
+
+		avpClient: asFunction(() => VerifiedPermissionsClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
 	});

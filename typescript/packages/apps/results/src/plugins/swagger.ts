@@ -1,27 +1,41 @@
-import FastifySwagger, { FastifySwaggerOptions } from '@fastify/swagger';
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import fp from 'fastify-plugin';
+
+import FastifySwagger, { FastifySwaggerOptions } from '@fastify/swagger';
+
 import { writeFile } from 'fs';
 
 export default fp<FastifySwaggerOptions>(async (app) => {
 	await app.register(FastifySwagger, {
 		openapi: {
 			info: {
-				title: 'arcade: Results module',
-				description: '\nIs responsible for:\n- managing Stac Items in the Stac Server\n',
-				version: '0.0.1',
+				title: 'ARCADE Results',
+				description: `Manages ARCADE engine execution results.`,
+				version: '1.0.0',
 			},
 			servers: [
 				{
-					url: 'http://localhost',
+					url: 'http://localhost:30001',
 				},
 			],
 			tags: [
 				{
 					name: 'Results',
-					description: 'Results Module',
+					description: 'Results represents collection of engine execution results.',
 				},
 			],
-
 			security: [],
 		},
 	});
@@ -29,7 +43,9 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 	if (process.env['NODE_ENV'] === 'local') {
 		const specFile = './docs/swagger.json';
 
-		app.ready(() => {
+		app.ready((err) => {
+			if (err) throw err;
+
 			const apiSpec = JSON.stringify(app.swagger(), null, 2);
 
 			writeFile(specFile, apiSpec, (err) => {

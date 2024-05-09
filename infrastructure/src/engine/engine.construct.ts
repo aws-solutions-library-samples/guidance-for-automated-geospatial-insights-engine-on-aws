@@ -21,6 +21,7 @@ export interface EngineConstructProperties {
 	environment: string;
 	bucketName: string;
 	eventBusName: string;
+	stacServerUrl: string;
 }
 
 export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
@@ -85,6 +86,7 @@ export class EngineConstruct extends Construct {
 				environment: {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
+					ARCADE_STAC_SERVER_URL: props.stacServerUrl
 				},
 			}),
 		});

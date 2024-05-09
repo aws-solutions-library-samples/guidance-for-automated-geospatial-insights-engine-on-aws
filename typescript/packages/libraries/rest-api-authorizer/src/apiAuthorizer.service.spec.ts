@@ -105,7 +105,7 @@ describe('ApiAuthorizer', () => {
 			httpMethod: undefined,
 			path: '/groups/01hwn3wbd67ntssw5jxmbbdg0e',
 			headers: {
-				authorization: 'Bearer mockedJwt',
+				Authorization: 'Bearer mockedJwt',
 			},
 			methodArn: undefined,
 			resource: undefined,
@@ -134,7 +134,8 @@ describe('ApiAuthorizer', () => {
 			decision: 'ALLOW',
 		});
 
-		const actual = await underTest._isAuthorizedWithToken(event, ACTION_MAP);
+		const token = event.headers.Authorization.replace('Bearer ', '');
+		const actual = await underTest._isAuthorizedWithToken(event, ACTION_MAP, token);
 		expect(actual).toEqual('ALLOW');
 
 		const spy = mockedVerifiedPermissionsClient.commandCalls(IsAuthorizedWithTokenCommand)[0];

@@ -1,8 +1,9 @@
-import type { GroupDetails, PipelineMetadataDetails, RegionDetails } from '../results/models.js';
+import type { GroupDetails, RegionDetails } from '../results/models.js';
+import { EngineJobDetails, polygonProcessingDetails } from "../results/models.js";
 
 type EventType = 'created' | 'updated' | 'deleted';
 
-type ResourceType = 'Polygon' | 'Group' | 'Region' | 'State';
+type ResourceType = 'polygons' | 'groups' | 'regions' | 'states' | 'job';
 
 export interface DomainEvent<T> {
 	resourceType: ResourceType;
@@ -19,16 +20,15 @@ export const RESULTS_EVENT_SOURCE: string = 'com.aws.arcade.results';
 export const ENGINE_EVENT_SOURCE: string = 'com.aws.arcade.engine';
 export const SCHEDULER_EVENT_SOURCE: string = 'com.aws.arcade.scheduler';
 export const REGIONS_EVENT_SOURCE: string = 'com.aws.arcade.regions';
+export const EXECUTOR_EVENT_SOURCE: string = 'com.aws.arcade.executor';
 
 // Results module events
 export const AWS_EVENT_BRIDGE_SCHEDULED_EVENT: string = 'Scheduled Event';
 export const RESULTS_GROUP_CHANGE_EVENT = `${ARCADE_EVENT_SOURCE}>results>group>change`;
 export const RESULTS_REGION_CHANGE_EVENT = `${ARCADE_EVENT_SOURCE}>results>region>change`;
-export const RESULTS_SCHEDULED_EVENT = `${ARCADE_EVENT_SOURCE}>results>scheduled`;
-export const RESULTS_QUEUED_EVENT = `${ARCADE_EVENT_SOURCE}>results>queued`;
-export const RESULTS_STARTED_EVENT = `${ARCADE_EVENT_SOURCE}>results>started`;
-export const RESULTS_FAILED_EVENT = `${ARCADE_EVENT_SOURCE}>results>failed`;
-export const RESULTS_COMPLETED_EVENT = `${ARCADE_EVENT_SOURCE}>results>completed`;
+export const EXECUTOR_JOB_CREATED_EVENT = `${EXECUTOR_EVENT_SOURCE}>job>created`;
+export const EXECUTOR_JOB_UPDATED_EVENT = `${EXECUTOR_EVENT_SOURCE}>job>updated`;
+export const EXECUTOR_POLYGON_METADATA_CREATED_EVENT = `${EXECUTOR_EVENT_SOURCE}>polygonMetadata>created`;
 
 export const RESULTS_POLYGON_CREATED_EVENT = `${REGIONS_EVENT_SOURCE}>polygons>created`;
 export const RESULTS_POLYGON_UPDATED_EVENT = `${REGIONS_EVENT_SOURCE}>polygons>updated`;
@@ -58,7 +58,20 @@ export interface resultsChangeEvent {
 	region: string;
 	source: string;
 	'detail-type': string;
-	detail: PipelineMetadataDetails;
+	detail: DomainEvent<EngineJobDetails>;
 }
 
-export type { groupChangeEvent as GroupChangeEvent, regionChangeEvent as RegionChangeEvent, resultsChangeEvent as ResultsChangeEvent };
+export interface polygonsProcessingEvent {
+	account: string;
+	region: string;
+	source: string;
+	'detail-type': string;
+	detail: polygonProcessingDetails;
+}
+
+export type {
+	groupChangeEvent as GroupChangeEvent,
+	regionChangeEvent as RegionChangeEvent,
+	resultsChangeEvent as ResultsChangeEvent,
+	polygonsProcessingEvent as PolygonsProcessingEvent
+};
