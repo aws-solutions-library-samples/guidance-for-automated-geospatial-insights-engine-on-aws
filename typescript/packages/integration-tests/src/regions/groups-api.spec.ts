@@ -9,6 +9,7 @@ import {
 	update_group_body,
 	updated_group_resource,
 } from './groups.data.js';
+import { getAuthToken } from '../utils/auth.js';
 
 const TEST_PREFIX = 'regions module (groups): ';
 
@@ -17,22 +18,34 @@ const testTags = {
 	[GROUPS_INTEGRATION_TEST_TAG_KEY]: GROUPS_INTEGRATION_TEST_TAG_VALUE,
 };
 
-const expectGroupJsonLike = {
-	...created_group_resource,
-	...{
-		tags: {
-			...created_group_resource['tags'],
-			...testTags,
+const constructCreateGroupJson = (username: string) => {
+	return {
+		...created_group_resource(username),
+		...{
+			tags: {
+				...created_group_resource(username)['tags'],
+				...testTags,
+			},
 		},
-	},
+	};
 };
 
+const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
+const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
+
 const teardown = async () => {
-	await teardownResources('regions', GROUPS_INTEGRATION_TEST_TAG_KEY, GROUPS_INTEGRATION_TEST_TAG_VALUE);
-	await teardownResources('groups', GROUPS_INTEGRATION_TEST_TAG_KEY, GROUPS_INTEGRATION_TEST_TAG_VALUE);
+	const idToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+	await teardownResources('regions', GROUPS_INTEGRATION_TEST_TAG_KEY, GROUPS_INTEGRATION_TEST_TAG_VALUE, idToken);
+	await teardownResources('groups', GROUPS_INTEGRATION_TEST_TAG_KEY, GROUPS_INTEGRATION_TEST_TAG_VALUE, idToken);
 };
 
 describe(TEST_PREFIX + 'creating groups', () => {
+	let userToken;
+	let expectGroupJsonLike;
+	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		expectGroupJsonLike = constructCreateGroupJson(ADMIN_USERNAME);
+	});
 	afterEach(async () => {
 		await teardown();
 	});
@@ -40,6 +53,7 @@ describe(TEST_PREFIX + 'creating groups', () => {
 	test('creating a group - missing name', async () => {
 		await createResource('groups', {
 			withJson: {},
+			withIdToken: userToken,
 			expectStatus: 400,
 		}).toss();
 	});
@@ -47,6 +61,7 @@ describe(TEST_PREFIX + 'creating groups', () => {
 	test('creating a group - happy path', async () => {
 		await createResource('groups', {
 			withJson: create_group_body,
+			withIdToken: userToken,
 			withTags: testTags,
 			expectJsonLike: expectGroupJsonLike,
 			expectStatus: 201,
@@ -56,8 +71,13 @@ describe(TEST_PREFIX + 'creating groups', () => {
 
 describe(TEST_PREFIX + 'retrieving groups', () => {
 	let groupId: string;
+	let userToken;
+	let expectGroupJsonLike;
 	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		expectGroupJsonLike = constructCreateGroupJson(ADMIN_USERNAME);
 		groupId = await createResource('groups', {
+			withIdToken: userToken,
 			withJson: create_group_body,
 			withTags: testTags,
 			expectStatus: 201,
@@ -70,6 +90,7 @@ describe(TEST_PREFIX + 'retrieving groups', () => {
 
 	test('retrieving a group - happy path', async () => {
 		await getResource('groups', {
+			withIdToken: userToken,
 			id: groupId,
 			expectJsonLike: expectGroupJsonLike,
 			expectStatus: 200,
@@ -78,6 +99,7 @@ describe(TEST_PREFIX + 'retrieving groups', () => {
 
 	test('retrieving a group - not found', async () => {
 		await getResource('groups', {
+			withIdToken: userToken,
 			id: 'does-not-exist',
 			expectStatus: 404,
 		}).toss();
@@ -86,8 +108,15 @@ describe(TEST_PREFIX + 'retrieving groups', () => {
 
 describe(TEST_PREFIX + 'updating groups', () => {
 	let groupId: string;
+	let userToken;
+	let expectGroupJsonLike;
+	let expectUpdatedGroupJsonLike;
 	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		expectGroupJsonLike = constructCreateGroupJson(ADMIN_USERNAME);
+		expectUpdatedGroupJsonLike = updated_group_resource(ADMIN_USERNAME);
 		groupId = await createResource('groups', {
+			withIdToken: userToken,
 			withJson: create_group_body,
 			withTags: testTags,
 			expectJsonLike: expectGroupJsonLike,
@@ -101,13 +130,14 @@ describe(TEST_PREFIX + 'updating groups', () => {
 
 	test('updating a group - happy path', async () => {
 		await updateResource('groups', {
+			withIdToken: userToken,
 			id: groupId,
 			withJson: update_group_body,
 			expectJsonLike: {
-				...updated_group_resource,
+				...expectUpdatedGroupJsonLike,
 				...{
 					tags: {
-						...updated_group_resource['tags'],
+						...expectUpdatedGroupJsonLike['tags'],
 						...testTags,
 					},
 				},
@@ -118,6 +148,7 @@ describe(TEST_PREFIX + 'updating groups', () => {
 
 	test('updating a group - not found', async () => {
 		await updateResource('groups', {
+			withIdToken: userToken,
 			id: 'does-not-exist',
 			withJson: update_group_body,
 			expectStatus: 404,
@@ -126,6 +157,7 @@ describe(TEST_PREFIX + 'updating groups', () => {
 
 	test('updating a group - invalid request', async () => {
 		await updateResource('groups', {
+			withIdToken: userToken,
 			id: groupId,
 			withJson: {
 				invalid_attribute: true,
@@ -136,8 +168,13 @@ describe(TEST_PREFIX + 'updating groups', () => {
 });
 
 describe(TEST_PREFIX + 'listing groups', () => {
+	let userToken;
+	let expectGroupJsonLike;
 	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		expectGroupJsonLike = constructCreateGroupJson(ADMIN_USERNAME);
 		await createResource('groups', {
+			withIdToken: userToken,
 			withJson: {
 				...create_group_body,
 				name: 'pagination-group-1',
@@ -147,6 +184,7 @@ describe(TEST_PREFIX + 'listing groups', () => {
 		}).toss();
 
 		await createResource('groups', {
+			withIdToken: userToken,
 			withJson: {
 				...create_group_body,
 				name: 'pagination-group-2',
@@ -156,6 +194,7 @@ describe(TEST_PREFIX + 'listing groups', () => {
 		}).toss();
 
 		await createResource('groups', {
+			withIdToken: userToken,
 			withJson: {
 				...create_group_body,
 				name: 'pagination-group-3',
@@ -174,6 +213,7 @@ describe(TEST_PREFIX + 'listing groups', () => {
 	test('listing groups - pagination', async () => {
 		// test pagination. First page should return requested count of 2 along with pagination details
 		const token = await listResources('groups', {
+			withIdToken: userToken,
 			withCount: 2,
 			withTags: testTags,
 			expectCount: 2,
@@ -198,6 +238,7 @@ describe(TEST_PREFIX + 'listing groups', () => {
 
 		// test pagination. Second page should return requested remaining 1
 		await listResources('groups', {
+			withIdToken: userToken,
 			withCount: 2,
 			withToken: token,
 			withTags: testTags,
@@ -220,8 +261,11 @@ describe(TEST_PREFIX + 'listing groups', () => {
 
 describe(TEST_PREFIX + 'deleting groups', () => {
 	let groupId: string;
+	let userToken;
 	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
 		groupId = await createResource('groups', {
+			withIdToken: userToken,
 			withJson: create_group_body,
 			withTags: testTags,
 			expectStatus: 201,
@@ -234,6 +278,7 @@ describe(TEST_PREFIX + 'deleting groups', () => {
 
 	test('deleting groups - happy path', async () => {
 		await deleteResource('groups', {
+			withIdToken: userToken,
 			id: groupId,
 			expectStatus: 204,
 		}).toss();

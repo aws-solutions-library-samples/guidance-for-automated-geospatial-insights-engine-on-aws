@@ -13,35 +13,42 @@ import {
 	updated_state_resource,
 } from './states.data.js';
 import { create_polygon_body } from './polygons.data.js';
+import { getAuthToken } from '../utils/auth.js';
 
 const TEST_PREFIX = 'regions module (states): ';
+const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
+const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
 
 // tag everything created in this test with the same tags, so can be teared down cleanly
 const testTags = {
 	[STATES_INTEGRATION_TEST_TAG_KEY]: STATES_INTEGRATION_TEST_TAG_VALUE,
 };
 
-const expectStateJsonLike = {
-	...created_state_resource,
-	...{
-		tags: {
-			...created_state_resource['tags'],
-			...testTags,
+const constructStateJson = (username: string): object => {
+	return {
+		...created_state_resource(username),
+		...{
+			tags: {
+				...created_state_resource(username)['tags'],
+				...testTags,
+			},
 		},
-	},
+	};
 };
 
-const createGroup = async (): Promise<string> => {
+const createGroup = async (idToken: string): Promise<string> => {
 	return await createResource('groups', {
+		withIdToken: idToken,
 		withJson: create_group_body,
 		withTags: testTags,
 		expectStatus: 201,
 	}).returns('id');
 };
-const createRegion = async (groupId: string): Promise<string> => {
+const createRegion = async (groupId: string, idToken: string): Promise<string> => {
 	return await createResource(
 		'regions',
 		{
+			withIdToken: idToken,
 			withJson: create_region_body,
 			withTags: testTags,
 			expectStatus: 201,
@@ -50,10 +57,11 @@ const createRegion = async (groupId: string): Promise<string> => {
 		groupId
 	).returns('id');
 };
-const createPolygon = async (regionId: string): Promise<string> => {
+const createPolygon = async (regionId: string, idToken: string): Promise<string> => {
 	return await createResource(
 		'polygons',
 		{
+			withIdToken: idToken,
 			withJson: create_polygon_body,
 			withTags: testTags,
 			expectStatus: 201,
@@ -63,18 +71,23 @@ const createPolygon = async (regionId: string): Promise<string> => {
 	).returns('id');
 };
 const teardown = async () => {
-	await teardownResources('states', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, { latestOnly: false });
-	await teardownResources('polygons', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
-	await teardownResources('regions', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
-	await teardownResources('groups', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE);
+	const idToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+	await teardownResources('states', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, idToken, { latestOnly: false });
+	await teardownResources('polygons', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, idToken);
+	await teardownResources('regions', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, idToken);
+	await teardownResources('groups', STATES_INTEGRATION_TEST_TAG_KEY, STATES_INTEGRATION_TEST_TAG_VALUE, idToken);
 };
 
 describe(TEST_PREFIX + 'creating states', () => {
 	let polygonId: string;
+	let userToken;
+	let expectStateJsonLike;
 	beforeEach(async () => {
-		const groupId = await createGroup();
-		const regionId = await createRegion(groupId);
-		polygonId = await createPolygon(regionId);
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		expectStateJsonLike = constructStateJson(ADMIN_USERNAME);
+		const groupId = await createGroup(userToken);
+		const regionId = await createRegion(groupId, userToken);
+		polygonId = await createPolygon(regionId, userToken);
 	});
 
 	afterEach(async () => {
@@ -85,6 +98,7 @@ describe(TEST_PREFIX + 'creating states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: create_state_body,
 				withTags: testTags,
 				expectStatus: 404,
@@ -98,6 +112,7 @@ describe(TEST_PREFIX + 'creating states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {},
 				expectStatus: 400,
 			},
@@ -110,6 +125,7 @@ describe(TEST_PREFIX + 'creating states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: create_state_body,
 				withTags: testTags,
 				expectJsonLike: expectStateJsonLike,
@@ -125,10 +141,14 @@ describe(
 	TEST_PREFIX + 'creating states updates polygon current state',
 	() => {
 		let polygonId: string;
+		let userToken;
+		let expectStateJsonLike;
 		beforeEach(async () => {
-			const groupId = await createGroup();
-			const regionId = await createRegion(groupId);
-			polygonId = await createPolygon(regionId);
+			expectStateJsonLike = constructStateJson(ADMIN_USERNAME);
+			userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+			const groupId = await createGroup(userToken);
+			const regionId = await createRegion(groupId, userToken);
+			polygonId = await createPolygon(regionId, userToken);
 		});
 
 		afterEach(async () => {
@@ -140,6 +160,7 @@ describe(
 			const firstStateId = await createResource(
 				'states',
 				{
+					withIdToken: userToken,
 					withJson: {
 						...create_state_body,
 						timestamp: '2021-01-01T00:00:00Z',
@@ -156,6 +177,7 @@ describe(
 
 			// ensure its parent polygon has this as its current state
 			let currentState: State = await getResource('polygons', {
+				withIdToken: userToken,
 				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
@@ -165,6 +187,7 @@ describe(
 			const secondStateId = await createResource(
 				'states',
 				{
+					withIdToken: userToken,
 					withJson: {
 						...create_state_body,
 						timestamp: '2023-01-01T00:00:00Z',
@@ -181,6 +204,7 @@ describe(
 
 			// ensure its parent polygon has been updated to this as the current state
 			currentState = await getResource('polygons', {
+				withIdToken: userToken,
 				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
@@ -190,6 +214,7 @@ describe(
 			const thirdStateId = await createResource(
 				'states',
 				{
+					withIdToken: userToken,
 					withJson: {
 						...create_state_body,
 						timestamp: '2022-01-01T00:00:00Z',
@@ -206,6 +231,7 @@ describe(
 
 			// ensure its parent polygon still references the second state
 			currentState = await getResource('polygons', {
+				withIdToken: userToken,
 				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
@@ -213,12 +239,14 @@ describe(
 
 			// delete the second state
 			await deleteResource('states', {
+				withIdToken: userToken,
 				id: secondStateId,
 				expectStatus: 204,
 			});
 
 			// ensure its parent polygon now references the third state due to the second being removed
 			currentState = await getResource('polygons', {
+				withIdToken: userToken,
 				id: polygonId,
 				expectStatus: 200,
 			}).returns('state');
@@ -230,13 +258,18 @@ describe(
 
 describe(TEST_PREFIX + 'retrieving states', () => {
 	let stateId: string;
+	let userToken;
+	let expectStateJsonLike;
 	beforeEach(async () => {
-		const groupId = await createGroup();
-		const regionId = await createRegion(groupId);
-		const polygonId = await createPolygon(regionId);
+		expectStateJsonLike = constructStateJson(ADMIN_USERNAME);
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		const groupId = await createGroup(userToken);
+		const regionId = await createRegion(groupId, userToken);
+		const polygonId = await createPolygon(regionId, userToken);
 		stateId = await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: create_state_body,
 				withTags: testTags,
 				expectJsonLike: expectStateJsonLike,
@@ -253,6 +286,7 @@ describe(TEST_PREFIX + 'retrieving states', () => {
 
 	it('retrieving a state - happy path', async () => {
 		await getResource('states', {
+			withIdToken: userToken,
 			id: stateId,
 			expectJsonLike: expectStateJsonLike,
 			expectStatus: 200,
@@ -261,6 +295,7 @@ describe(TEST_PREFIX + 'retrieving states', () => {
 
 	it('retrieving a state - not found', async () => {
 		await getResource('states', {
+			withIdToken: userToken,
 			id: 'does-not-exist',
 			expectStatus: 404,
 		}).toss();
@@ -269,13 +304,20 @@ describe(TEST_PREFIX + 'retrieving states', () => {
 
 describe(TEST_PREFIX + 'updating states', () => {
 	let stateId: string;
+	let userToken;
+	let expectStateJsonLike;
+	let expectStateUpdateJsonLike;
 	beforeEach(async () => {
-		const groupId = await createGroup();
-		const regionId = await createRegion(groupId);
-		const polygonId = await createPolygon(regionId);
+		expectStateJsonLike = constructStateJson(ADMIN_USERNAME);
+		expectStateUpdateJsonLike = updated_state_resource(ADMIN_USERNAME);
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		const groupId = await createGroup(userToken);
+		const regionId = await createRegion(groupId, userToken);
+		const polygonId = await createPolygon(regionId, userToken);
 		stateId = await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: create_state_body,
 				withTags: testTags,
 				expectJsonLike: expectStateJsonLike,
@@ -292,13 +334,14 @@ describe(TEST_PREFIX + 'updating states', () => {
 
 	it('updating a state - happy path', async () => {
 		await updateResource('states', {
+			withIdToken: userToken,
 			id: stateId,
 			withJson: update_state_body,
 			expectJsonLike: {
-				...updated_state_resource,
+				...expectStateUpdateJsonLike,
 				...{
 					tags: {
-						...updated_state_resource['tags'],
+						...expectStateUpdateJsonLike['tags'],
 						...testTags,
 					},
 				},
@@ -309,6 +352,7 @@ describe(TEST_PREFIX + 'updating states', () => {
 
 	it('updating a state - not found', async () => {
 		await updateResource('states', {
+			withIdToken: userToken,
 			id: 'does-not-exist',
 			withJson: update_state_body,
 			expectStatus: 404,
@@ -317,6 +361,7 @@ describe(TEST_PREFIX + 'updating states', () => {
 
 	it('updating a state - invalid request', async () => {
 		await updateResource('states', {
+			withIdToken: userToken,
 			id: stateId,
 			withJson: {
 				invalid_attribute: true,
@@ -330,13 +375,17 @@ describe(TEST_PREFIX + 'listing states', () => {
 	// need to have multiple polygons, as by design only latest states are returned by default when listing
 	let groupId: string;
 	let polygon1Id: string, polygon2Id: string, polygon3Id: string;
-
+	let userToken;
+	let expectStateJsonLike;
 	beforeEach(async () => {
-		groupId = await createGroup();
-		const regionId = await createRegion(groupId);
+		expectStateJsonLike = constructStateJson(ADMIN_USERNAME);
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		groupId = await createGroup(userToken);
+		const regionId = await createRegion(groupId, userToken);
 		polygon1Id = await createResource(
 			'polygons',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_polygon_body,
 					name: 'pagination-polygon-1',
@@ -350,6 +399,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2021-01-01T00:00:00Z',
@@ -363,6 +413,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2021-02-01T00:00:00Z',
@@ -376,6 +427,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		polygon2Id = await createResource(
 			'polygons',
 			{
+				withIdToken: userToken,
 				expectStatus: 201,
 				withJson: {
 					...create_polygon_body,
@@ -389,6 +441,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2022-01-01T00:00:00Z',
@@ -402,6 +455,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2022-02-01T00:00:00Z',
@@ -415,6 +469,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		polygon3Id = await createResource(
 			'polygons',
 			{
+				withIdToken: userToken,
 				expectStatus: 201,
 				withJson: {
 					...create_polygon_body,
@@ -428,6 +483,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2023-01-01T00:00:00Z',
@@ -441,6 +497,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 		await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: {
 					...create_state_body,
 					timestamp: '2023-02-01T00:00:00Z',
@@ -461,6 +518,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 	it('pagination - latest only', async () => {
 		// test pagination. First page should return requested count of 2 along with pagination details
 		const token = await listResources('states', {
+			withIdToken: userToken,
 			withCount: 2,
 			withGroupId: groupId,
 			withTags: testTags,
@@ -488,6 +546,7 @@ describe(TEST_PREFIX + 'listing states', () => {
 
 		// test pagination. Second page should return requested remaining 1
 		await listResources('states', {
+			withIdToken: userToken,
 			withCount: 2,
 			withToken: token,
 			withGroupId: groupId,
@@ -512,13 +571,16 @@ describe(TEST_PREFIX + 'listing states', () => {
 
 describe(TEST_PREFIX + 'deleting states', () => {
 	let stateId: string;
+	let userToken;
 	beforeEach(async () => {
-		const groupId = await createGroup();
-		const regionId = await createRegion(groupId);
-		const polygonId = await createPolygon(regionId);
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		const groupId = await createGroup(userToken);
+		const regionId = await createRegion(groupId, userToken);
+		const polygonId = await createPolygon(regionId, userToken);
 		stateId = await createResource(
 			'states',
 			{
+				withIdToken: userToken,
 				withJson: create_state_body,
 				expectStatus: 201,
 			},
@@ -533,6 +595,7 @@ describe(TEST_PREFIX + 'deleting states', () => {
 
 	it('deleting states - happy path', async () => {
 		await deleteResource('states', {
+			withIdToken: userToken,
 			id: stateId,
 			expectStatus: 204,
 		}).toss();

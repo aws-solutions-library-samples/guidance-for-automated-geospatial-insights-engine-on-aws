@@ -20,8 +20,8 @@ import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import {
 	AccessLogFormat,
 	AuthorizationType,
@@ -32,8 +32,8 @@ import {
 	LambdaRestApi,
 	LogGroupLogDestination,
 	MethodLoggingLevel,
-	RequestAuthorizer
-} from "aws-cdk-lib/aws-apigateway";
+	RequestAuthorizer,
+} from 'aws-cdk-lib/aws-apigateway';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -141,7 +141,7 @@ export class ResultsModule extends Construct {
 			stringValue: apiLambda.functionArn,
 		});
 
-		table.grantReadWriteData(apiLambda)
+		table.grantReadWriteData(apiLambda);
 		eventBus.grantPutEventsTo(apiLambda);
 
 		/**
@@ -186,7 +186,6 @@ export class ResultsModule extends Construct {
 			parameterName: resultsApiAuthorizerFunctionArnParameter(props.environment),
 			stringValue: authorizerLambda.functionArn,
 		});
-
 
 		/**
 		 * Define the API Gateway
@@ -238,7 +237,6 @@ export class ResultsModule extends Construct {
 			parameterName: resultsApiNameParameter(props.environment),
 			stringValue: apigw.restApiName,
 		});
-
 
 		// EvenProcessor Lambda function
 		const eventProcessorLambda = new NodejsFunction(this, 'EventProcessorLambda', {
@@ -363,7 +361,6 @@ export class ResultsModule extends Construct {
 						'Action::s3:GetObject*',
 						'Action::s3:List*',
 						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
-						'Resource::<ResultsImageProcessorLambda0378B9F4.Arn>:*',
 						'Resource::<regionsApiFunctionArnParameter>:*',
 						'Resource::<ResultsModuleTable200422C7.Arn>/index/*',
 					],
@@ -372,7 +369,6 @@ export class ResultsModule extends Construct {
 			],
 			true
 		);
-
 
 		NagSuppressions.addResourceSuppressions(
 			[apigw],

@@ -10,6 +10,11 @@
 	},
 	"devDependencies": {
 		"@arcade/regions": "workspace:*",
+		"@aws-amplify/core": "6.1.0",
+		"@aws-amplify/auth": "6.2.2",
+		"aws-amplify": "6.2.0",
+		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-cognito-identity-provider": "~3",
 		"@tsconfig/node20": "~20",
 		"@types/node": "~20",
 		"@vitest/ui": "~1",
@@ -23,7 +28,8 @@
 		"tsx": "~4",
 		"typescript": "~5",
 		"vitest-mock-extended": "~1",
-		"vitest": "~1"
+		"vitest": "~1",
+		"ulid": "~2"
 	},
 	"private": false
 }

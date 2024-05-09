@@ -1,5 +1,4 @@
 import path from 'path';
-import { JWT_EMAIL } from '../utils/auth.js';
 import { initializeConfig } from '../utils/config.js';
 import { ID_PATTERN, ISO8601_DATE_TIME_MS_PATTERN } from '../utils/regex.js';
 
@@ -20,11 +19,13 @@ export const create_region_body: object = {
 	},
 };
 
-export const created_region_resource: object = {
-	id: ID_PATTERN,
-	...create_region_body,
-	createdAt: ISO8601_DATE_TIME_MS_PATTERN,
-	createdBy: JWT_EMAIL,
+export const created_region_resource = (username: string): object => {
+	return {
+		id: ID_PATTERN,
+		...create_region_body,
+		createdAt: ISO8601_DATE_TIME_MS_PATTERN,
+		createdBy: username,
+	};
 };
 
 export const update_region_body: object = {
@@ -37,9 +38,11 @@ export const update_region_body: object = {
 	},
 };
 
-export const updated_region_resource: object = {
-	...created_region_resource,
-	...update_region_body,
-	updatedAt: ISO8601_DATE_TIME_MS_PATTERN,
-	updatedBy: JWT_EMAIL,
+export const updated_region_resource = (username: string): object => {
+	return {
+		...created_region_resource,
+		...update_region_body,
+		updatedAt: ISO8601_DATE_TIME_MS_PATTERN,
+		updatedBy: username,
+	};
 };

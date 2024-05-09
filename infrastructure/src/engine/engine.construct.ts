@@ -164,6 +164,7 @@ export class EngineConstruct extends Construct {
 						'Action::s3:GetObject*',
 						'Action::s3:List*',
 						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
+						'Resource::arn:<AWS::Partition>:logs:<AWS::Region>:<AWS::AccountId>:log-group:/aws/batch/job:*',
 					],
 					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
 				},
