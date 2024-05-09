@@ -109,7 +109,6 @@ export class VerifiedPermissionsIdentitySourceCreator extends Construct {
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: [`Resource::arn:aws:ssm:${region}:${accountId}:parameter/arcade/${props.environment}/*`],
-
 					reason: 'The resource condition allows performing GetSSMParameter calls locked down to environment specific parameters.',
 				},
 				{

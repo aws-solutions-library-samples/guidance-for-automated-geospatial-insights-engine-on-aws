@@ -30,23 +30,28 @@ type IdExpectArgs = {
 type ParentIdExpectArgs = {
 	parentId: string;
 };
-
-export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs;
-export type CreateArgsWithParent = CreateArgs & ParentIdExpectArgs;
-export type UpdateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & IdExpectArgs;
-export type GetArgs = BaseExpectArgs & ResponseBodyExpectArgs & IdExpectArgs;
-export type ListExpectArgs = BaseExpectArgs & {
-	withCount?: number;
-	withToken?: string;
-	withPolygonId?: string;
-	withRegionId?: string;
-	withGroupId?: string;
-	withTags?: Tags;
-	expectCount?: number;
-	expectJsonLike: object;
+type AuthExpectArgs = {
+	withIdToken: string;
 };
+
+export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & AuthExpectArgs;
+export type CreateArgsWithParent = CreateArgs & ParentIdExpectArgs;
+export type UpdateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
+export type GetArgs = BaseExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
+export type ListExpectArgs = BaseExpectArgs &
+	AuthExpectArgs & {
+		withCount?: number;
+		withToken?: string;
+		withPolygonId?: string;
+		withRegionId?: string;
+		withGroupId?: string;
+		withTags?: Tags;
+		expectCount?: number;
+		expectJsonLike: object;
+	};
 export type DeleteArgs = Omit<BaseExpectArgs, 'expectStatus'> &
-	IdExpectArgs & {
+	IdExpectArgs &
+	AuthExpectArgs & {
 		expectStatus?: number;
 	};
 
@@ -64,8 +69,7 @@ export const initializeCommonDataStash = () => {
 
 export const createResource = (resourcePlural: string, args: CreateArgs, parentResourcePlural?: string, parentId?: string): Spec => {
 	const url = parentId ? `${BASE_URL}/${parentResourcePlural}/${parentId}/${resourcePlural}` : `${BASE_URL}/${resourcePlural}`;
-
-	let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS).expectStatus(args.expectStatus);
+	let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 
 	let requestBody = args.withJson;
 	if (args.withTags) {
@@ -83,7 +87,12 @@ export const createResource = (resourcePlural: string, args: CreateArgs, parentR
 };
 
 export const updateResource = (resourcePlural: string, args: UpdateArgs): Spec => {
-	let s = spec().patch(`${BASE_URL}/${resourcePlural}/{id}`).withPathParams('id', args.id).withJson(args.withJson).withHeaders(COMMON_HEADERS).expectStatus(args.expectStatus);
+	let s = spec()
+		.patch(`${BASE_URL}/${resourcePlural}/{id}`)
+		.withPathParams('id', args.id)
+		.withJson(args.withJson)
+		.withHeaders(COMMON_HEADERS(args.withIdToken))
+		.expectStatus(args.expectStatus);
 	if (args.expectJsonLike) {
 		s = s.expectJsonLike(args.expectJsonLike);
 	}
@@ -94,7 +103,7 @@ export const updateResource = (resourcePlural: string, args: UpdateArgs): Spec =
 };
 
 export const getResource = (resourcePlural: string, args: GetArgs): Spec => {
-	let s = spec().get(`${BASE_URL}/${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS).expectStatus(args.expectStatus);
+	let s = spec().get(`${BASE_URL}/${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 	if (args.expectJsonLike) {
 		s = s.expectJsonLike(args.expectJsonLike);
 	}
@@ -105,7 +114,7 @@ export const getResource = (resourcePlural: string, args: GetArgs): Spec => {
 };
 
 export const listResources = (resourcePlural: string, args: ListExpectArgs): Spec => {
-	let s = spec().get(`${BASE_URL}/${resourcePlural}`).withHeaders(COMMON_HEADERS).expectStatus(args.expectStatus);
+	let s = spec().get(`${BASE_URL}/${resourcePlural}`).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 	if (args.withCount) {
 		s = s.withQueryParams('count', args.withCount);
 	}
@@ -140,17 +149,17 @@ export const listResources = (resourcePlural: string, args: ListExpectArgs): Spe
 };
 
 export const deleteResource = (resourcePlural: string, args: DeleteArgs): Spec => {
-	let s = spec().delete(`${BASE_URL}/${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS);
+	let s = spec().delete(`${BASE_URL}/${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken));
 	if (args.expectStatus) {
 		s = s.expectStatus(args.expectStatus);
 	}
 	return s;
 };
 
-export const teardownResources = async <T>(resourcePlural: string, tagKey: string, tagValue: string, queryString?: Record<string, unknown>) => {
+export const teardownResources = async <T>(resourcePlural: string, tagKey: string, tagValue: string, idToken: string, queryString?: Record<string, unknown>) => {
 	let token: string;
 	do {
-		let s = spec().get(`${BASE_URL}/${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS);
+		let s = spec().get(`${BASE_URL}/${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS(idToken));
 
 		if (queryString) {
 			s = s.withQueryParams(queryString);
@@ -163,7 +172,7 @@ export const teardownResources = async <T>(resourcePlural: string, tagKey: strin
 		// console.log(`Deleting ${resourcePlural} ${resources.map((r) => r['id'])}`);
 
 		for (const r of resources) {
-			await deleteResource(resourcePlural, { id: r['id'] }).toss();
+			await deleteResource(resourcePlural, { id: r['id'], withIdToken: idToken }).toss();
 		}
 	} while (token);
 };
