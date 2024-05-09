@@ -10,5 +10,5 @@ class CloudRemovalProcessor(AbstractProcessor):
 		if stac_assets.get('scl') is None:
 			raise ValueError('scl value is missing from Dataset')
 
-		stac_assets['scl_cloud_removed'] = XarrayUtils.remove_cloud(stac_assets[['scl']])
+		stac_assets['scl_surface'] = XarrayUtils.remove_cloud(stac_assets[['scl']])
 		return super().process(stac_assets)

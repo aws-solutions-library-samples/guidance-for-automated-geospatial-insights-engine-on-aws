@@ -8,8 +8,12 @@ import {
 	PolygonsProcessingEvent,
 	RegionChangeEvent,
 	REGIONS_EVENT_SOURCE,
-	RESULTS_GROUP_CHANGE_EVENT,
-	RESULTS_REGION_CHANGE_EVENT,
+	REGIONS_GROUP_CREATED_EVENT,
+	REGIONS_GROUP_DELETED_EVENT,
+	REGIONS_GROUP_UPDATED_EVENT,
+	REGIONS_REGION_CREATED_EVENT,
+	REGIONS_REGION_DELETED_EVENT,
+	REGIONS_REGION_UPDATED_EVENT,
 	ResultsChangeEvent,
 } from '@arcade/events';
 import type { AwilixContainer } from 'awilix';
@@ -33,14 +37,14 @@ export const handler: EventBridgeHandler<string, EventDetails, void> = async (ev
 	/**
 	 * Filter the group collection change event received from the regions module
 	 */
-	if ((event['detail-type'] as string) === RESULTS_GROUP_CHANGE_EVENT && event['source'] === REGIONS_EVENT_SOURCE) {
+	if ([REGIONS_GROUP_CREATED_EVENT, REGIONS_GROUP_UPDATED_EVENT, REGIONS_GROUP_DELETED_EVENT].includes(event["detail-type"]) && event['source'] === REGIONS_EVENT_SOURCE) {
 		await eventProcessor.processGroupChangeEvent(event as unknown as GroupChangeEvent);
 	}
 
 	/**
 	 * Filter the region collection change event received from the regions module
 	 */
-	else if ((event['detail-type'] as string) === RESULTS_REGION_CHANGE_EVENT && event['source'] === REGIONS_EVENT_SOURCE) {
+	else if ([REGIONS_REGION_CREATED_EVENT, REGIONS_REGION_UPDATED_EVENT, REGIONS_REGION_DELETED_EVENT].includes(event["detail-type"]) && event['source'] === REGIONS_EVENT_SOURCE) {
 		await eventProcessor.processRegionChangeEvent(event as unknown as RegionChangeEvent);
 	}
 

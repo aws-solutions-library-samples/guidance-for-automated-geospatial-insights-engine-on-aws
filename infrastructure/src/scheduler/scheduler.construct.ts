@@ -1,5 +1,5 @@
 import { getLambdaArchitecture } from '@arcade/cdk-common';
-import { REGIONS_EVENT_SOURCE, RESULTS_REGION_CREATED_EVENT, RESULTS_REGION_DELETED_EVENT, RESULTS_REGION_UPDATED_EVENT } from '@arcade/events';
+import { REGIONS_EVENT_SOURCE, REGIONS_REGION_CREATED_EVENT, REGIONS_REGION_DELETED_EVENT, REGIONS_REGION_UPDATED_EVENT } from '@arcade/events';
 import { Duration } from 'aws-cdk-lib';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
@@ -160,7 +160,12 @@ export class SchedulerModule extends Construct {
 		const regionModifiedRule = new Rule(this, 'RegionModifiedRule', {
 			eventBus: eventBus,
 			eventPattern: {
-				detailType: [RESULTS_REGION_CREATED_EVENT, RESULTS_REGION_UPDATED_EVENT, RESULTS_REGION_DELETED_EVENT],
+				detailType: [
+					// These events will trigger the creation/deletion of schedule for a region
+					REGIONS_REGION_CREATED_EVENT,
+					REGIONS_REGION_UPDATED_EVENT,
+					REGIONS_REGION_DELETED_EVENT
+				],
 				source: [REGIONS_EVENT_SOURCE],
 			},
 		});
