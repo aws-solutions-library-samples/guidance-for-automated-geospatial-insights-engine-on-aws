@@ -152,21 +152,17 @@ export class StacUtil {
 		this.log.debug(`StacUtil > constructGroupCollection > in ${JSON.stringify(groupDetail)}`);
 		// validation
 		ow(groupDetail, ow.object.nonEmpty);
-		ow(groupDetail.groupId, ow.string.nonEmpty);
-		ow(groupDetail.extent, ow.object.nonEmpty);
-		ow(groupDetail.links, ow.object.nonEmpty);
+		ow(groupDetail.id, ow.string.nonEmpty);
 
 		const collection = new DefaultStacRecords().defaultCollection;
-		const group = await this.regionsClient.getGroupById(groupDetail.groupId, this.context);
+		const group = await this.regionsClient.getGroupById(groupDetail.id, this.context);
 
 		collection.id = `group_${group.id}`;
 		collection.title = group.name;
 		collection.description = group.name;
-		collection.extent = groupDetail.extent;
 
 		// Update links
 		collection.links = [
-			...groupDetail.links,
 			{
 				rel: 'self',
 				href: `./group_${group.id}.json`,
@@ -195,27 +191,23 @@ export class StacUtil {
 		this.log.debug(`StacUtil > constructRegionCollection > in ${JSON.stringify(regionDetail)}`);
 		// validation
 		ow(regionDetail, ow.object.nonEmpty);
-		ow(regionDetail.regionId, ow.string.nonEmpty);
+		ow(regionDetail.id, ow.string.nonEmpty);
 		ow(regionDetail.groupId, ow.string.nonEmpty);
-		ow(regionDetail.extent, ow.object.nonEmpty);
-		ow(regionDetail.links, ow.object.nonEmpty);
 
 		const collection = new DefaultStacRecords().defaultCollection;
 		const [group, region] = await Promise.all([
 			// get Group Collection
 			this.regionsClient.getGroupById(regionDetail.groupId, this.context),
 			// get Region Collection
-			this.regionsClient.getRegionById(regionDetail.regionId, this.context),
+			this.regionsClient.getRegionById(regionDetail.id, this.context),
 		]);
 
-		collection.id = `region${region.id}`;
+		collection.id = `region_${region.id}`;
 		collection.title = region.name;
 		collection.description = region.name;
-		collection.extent = regionDetail.extent;
 
 		// Update links
 		collection.links = [
-			...regionDetail.links,
 			{
 				rel: 'self',
 				href: `./region_${region.id}.json`,

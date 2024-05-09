@@ -11,5 +11,5 @@ class TifImageProcessor(AbstractProcessor):
 		super().__init__(previous_tif_raster)
 
 	def process(self, stac_assets: Dataset) -> Dataset:
-		MetadataUtils.generate_tif_files(stac_assets, self.temp_dir, ['red', 'green', 'blue', 'scl', 'nir08', 'ndvi', 'ndvi_raw', 'scl_cloud_removed', 'ndvi_change'])
+		MetadataUtils.generate_tif_files(stac_assets, self.temp_dir, ['red', 'green', 'blue', 'scl', 'nir08', 'ndvi', 'ndvi_raw', 'scl_surface', 'ndvi_change'])
 		return super().process(stac_assets)

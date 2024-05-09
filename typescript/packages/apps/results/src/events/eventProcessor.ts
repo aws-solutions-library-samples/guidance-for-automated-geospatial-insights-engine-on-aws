@@ -1,6 +1,6 @@
 import type { StacServerClient } from '@arcade/clients';
-import type { GroupChangeEvent, RegionChangeEvent } from '@arcade/events';
-import { EngineJobCreatedDetails, EngineJobUpdatedDetails, PolygonsProcessingEvent, ResultsChangeEvent } from "@arcade/events";
+import type { RegionChangeEvent } from '@arcade/events';
+import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from "@arcade/events";
 import { StacUtil } from '../utils/stacUtil.js';
 import { ResultsService } from "../api/results/service.js";
 import { FastifyBaseLogger } from "fastify";
@@ -16,8 +16,8 @@ export class EventProcessor {
 	public async processGroupChangeEvent(event: GroupChangeEvent): Promise<void> {
 		this.log.info(`EventProcessor > processGroupChangeEvent >in  event: ${JSON.stringify(event)}`);
 		// Construct stac items
-		if (!event.detail?.deleted) {
-			const groupCollection = await this.stacUtil.constructGroupCollection(event.detail);
+		if (event.detail.new) {
+			const groupCollection = await this.stacUtil.constructGroupCollection(event.detail.new);
 			await this.stacServerClient.publishCollection(groupCollection);
 		} else {
 			// Delete event is to be implemented
@@ -29,8 +29,8 @@ export class EventProcessor {
 	public async processRegionChangeEvent(event: RegionChangeEvent): Promise<void> {
 		this.log.info(`EventProcessor > processRegionChangeEvent >in  event: ${JSON.stringify(event)}`);
 		// Construct stac items
-		if (!event.detail?.deleted) {
-			const groupCollection = await this.stacUtil.constructRegionCollection(event.detail);
+		if (event.detail?.new) {
+			const groupCollection = await this.stacUtil.constructRegionCollection(event.detail.new);
 			await this.stacServerClient.publishCollection(groupCollection);
 		} else {
 			// Delete event is to be implemented

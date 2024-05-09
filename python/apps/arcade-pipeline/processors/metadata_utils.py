@@ -69,7 +69,7 @@ class MetadataUtils:
 				if file.endswith('.tif'):
 					band = file.replace('.tif', "")
 					metadata["assets"][band] = {
-						"href": "{}/{}".format(bucket_name, s3_key),
+						"href": "s3://{}/{}".format(bucket_name, s3_key),
 						"type": "image/tiff; application=geotiff; profile=cloud-optimized",
 						"title": band,
 						"file:checksum": MetadataUtils.calculate_checksum(file_path),
@@ -81,13 +81,13 @@ class MetadataUtils:
 					}
 
 					# if the band exists, generate the histogram based on our whitelist
-					if band in ['scl', 'ndvi', 'ndvi_change', 'scl_cloud_removed'] and stac_assets.get(band) is not None:
+					if band in ['scl', 'ndvi', 'ndvi_change', 'scl_surface'] and stac_assets.get(band) is not None:
 						metadata["assets"][band]['raster:band'] = [MetadataUtils.generate_histogram(stac_assets[band])]
 
 				# generate metadata for nitrogen recommendation
 				elif file == 'nitrogen.json':
 					metadata["assets"]['nitrogen_metadata'] = {
-						"href": "{}/{}".format(bucket_name, s3_key),
+						"href": "s3://{}/{}".format(bucket_name, s3_key),
 						"type": "application/json",
 						"file:checksum": MetadataUtils.calculate_checksum(file_path),
 						"file:size": os.path.getsize(file_path),

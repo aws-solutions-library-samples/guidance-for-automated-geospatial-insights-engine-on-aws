@@ -39,14 +39,14 @@ class XarrayUtils:
 		return percentage_diff
 
 	@staticmethod
-	def fill_cloud_gap(scl_cloud_removed: DataArray, current_ndvi: DataArray, previous_ndvi: Optional[np.ndarray]) -> DataArray:
-		scl_cloud_removed_array = scl_cloud_removed.values.flatten()
-		has_cloud_gap = len(scl_cloud_removed_array[~np.isnan(scl_cloud_removed_array) & (scl_cloud_removed_array == 0)]) > 0
+	def fill_cloud_gap(scl_surface: DataArray, current_ndvi: DataArray, previous_ndvi: Optional[np.ndarray]) -> DataArray:
+		scl_surface_array = scl_surface.values.flatten()
+		has_cloud_gap = len(scl_surface_array[~np.isnan(scl_surface_array) & (scl_surface_array == 0)]) > 0
 
 		cloud_gap_filled_ndvi: DataArray = current_ndvi.copy()
 
 		if has_cloud_gap and previous_ndvi is not None:
 			percentage_diff = XarrayUtils.calculate_ndvi_percentage_difference(previous_ndvi, current_ndvi)
-			cloud_gap_filled_ndvi = xr.where(scl_cloud_removed == 0, current_ndvi * percentage_diff, current_ndvi)
+			cloud_gap_filled_ndvi = xr.where(scl_surface == 0, current_ndvi * percentage_diff, current_ndvi)
 
 		return cloud_gap_filled_ndvi

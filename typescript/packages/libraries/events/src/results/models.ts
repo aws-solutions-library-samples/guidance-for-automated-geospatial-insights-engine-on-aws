@@ -327,19 +327,27 @@ export interface groupDetails {
 	/**
 	 * The id of the group the collection belongs to
 	 */
-	groupId: string;
-	extent: Extent;
-	links: Link[];
-	createdAt?: string;
+	id: string;
+	name: string;
+	attributes?: Record<string, any>,
+	createdAt: string;
+	createdBy: string;
+	updatedBy: string;
 	updatedAt?: string;
-	deleted?: boolean;
 }
 
-export interface regionDetails extends groupDetails {
+export interface regionDetails {
 	/**
 	 * The id of the group the collection belongs to
 	 */
-	regionId: string;
+	id: string;
+	groupId: string;
+	name: string;
+	attributes?: Record<string, any>,
+	createdAt: string;
+	createdBy: string;
+	updatedBy: string;
+	updatedAt?: string;
 }
 
 export type {
