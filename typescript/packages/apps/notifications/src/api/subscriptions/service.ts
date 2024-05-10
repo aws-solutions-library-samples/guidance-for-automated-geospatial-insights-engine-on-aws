@@ -7,6 +7,7 @@ import { CreateTopicCommand, GetTopicAttributesCommand, SNSClient, SubscribeComm
 import ow from 'ow';
 import { SnsUtil } from "../../common/snsUtil.js";
 import { ConflictError } from "../../common/errors.js";
+import { EventPublisher } from "@arcade/events";
 
 export class SubscriptionsService {
 
@@ -17,6 +18,7 @@ export class SubscriptionsService {
 		readonly subscriptionsRepository: SubscriptionsRepository,
 		readonly snsClient: SNSClient,
 		readonly snsUtil: SnsUtil,
+		readonly eventPublisher: EventPublisher
 	) {
 	}
 
@@ -64,6 +66,15 @@ export class SubscriptionsService {
 		}
 
 		await this.subscriptionsRepository.create(subscription);
+
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: subscription.id,
+			resourceType: 'Subscription',
+			new: subscription,
+		});
+
 		this.log.debug(`SubscriptionsService> create> exit>`);
 		return subscription
 	}
@@ -81,6 +92,15 @@ export class SubscriptionsService {
 		this.log.debug(`SubscriptionsService> delete> subscriptionId: ${subscriptionId}`);
 		const subscription = await this.subscriptionsRepository.get(securityContext.sub, subscriptionId);
 		await Promise.all([this.subscriptionsRepository.delete(securityContext.sub, subscriptionId), this.snsClient.send(new UnsubscribeCommand({ SubscriptionArn: subscription.subscriptionArn }))])
+
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'deleted',
+			id: subscription.id,
+			resourceType: 'Subscription',
+			old: subscription
+		});
+
 		this.log.debug(`SubscriptionsService> delete> exit>`);
 	}
 }

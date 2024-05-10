@@ -81,7 +81,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'created',
 			id: toSave.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			new: saved,
 		});
 
@@ -128,7 +128,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: merged.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			old: existing,
 			new: saved,
 		});
@@ -170,7 +170,7 @@ export class StateService {
 		await this.eventPublisher.publishEvent({
 			eventType: 'updated',
 			id: state.id,
-			resourceType: 'states',
+			resourceType: 'State',
 			old: state,
 		});
 

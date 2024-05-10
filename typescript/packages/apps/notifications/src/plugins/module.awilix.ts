@@ -14,6 +14,8 @@ import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
+import { EventPublisher, NOTIFICATIONS_EVENT_SOURCE } from "@arcade/events";
+import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
 
 const { captureAWSv3Client } = pkg;
 
@@ -28,6 +30,8 @@ declare module '@fastify/awilix' {
 		schedulerClient: SchedulerClient;
 		apiAuthorizer: ApiAuthorizer;
 		avpClient: VerifiedPermissionsClient;
+		eventBridgeClient: EventBridgeClient;
+		eventPublisher: EventPublisher;
 	}
 }
 
@@ -60,6 +64,13 @@ class DynamoDBDocumentClientFactory {
 	}
 }
 
+class EventBridgeClientFactory {
+	public static create(region: string | undefined): EventBridgeClient {
+		const eb = captureAWSv3Client(new EventBridgeClient({ region }));
+		return eb;
+	}
+}
+
 class VerifiedPermissionsClientFactory {
 	public static create(region: string): VerifiedPermissionsClient {
 		return captureAWSv3Client(
@@ -89,12 +100,16 @@ const registerContainer = (app?: FastifyInstance) => {
 	const userPoolId = process.env['USER_POOL_ID'];
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
-
+	const eventBusName = process.env['EVENT_BUS_NAME'];
 
 	diContainer.register({
 		// Clients
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
 			...commonInjectionOptions
+		}),
+
+		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
 		}),
 
 		schedulerClient: asFunction(() => SchedulerClientFactory.create(awsRegion), {
@@ -113,7 +128,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		subscriptionsService: asFunction((container) => new SubscriptionsService(app.log, container.subscriptionsRepository, container.snsClient, container.snsUtil), {
+		subscriptionsService: asFunction((container) => new SubscriptionsService(app.log, container.subscriptionsRepository, container.snsClient, container.snsUtil, container.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 
@@ -129,6 +144,9 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
+		eventPublisher: asFunction((container: Cradle) => new EventPublisher(app.log, container.eventBridgeClient, eventBusName, NOTIFICATIONS_EVENT_SOURCE), {
+			...commonInjectionOptions,
+		}),
 	});
 };
 

@@ -140,6 +140,7 @@ export class NotificationsModule extends Construct {
 				'sns:GetTopicAttributes',
 				'sns:ListSubscriptionsByTopic',
 				'sns:Subscribe',
+				'sns:Unsubscribe',
 			],
 			effect: Effect.ALLOW,
 			resources: ['*'],
