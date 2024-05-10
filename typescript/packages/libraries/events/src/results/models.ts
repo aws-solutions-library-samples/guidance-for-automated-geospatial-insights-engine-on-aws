@@ -211,6 +211,38 @@ export interface Extent {
 	temporal: Temporal;
 }
 
+export interface Catalog {
+	/**
+	 * Identifier for the Catalog that is unique across the provider.
+	 */
+	id: string;
+	/**
+	 *  Set to Catalog if this Catalog only implements the Catalog spec.
+	 */
+	type: string;
+	/**
+	 * The STAC version the Catalog implements.
+	 */
+	stac_version: string;
+
+	/**
+	 * A list of extension identifiers the Catalog implements.
+	 */
+	stac_extensions?: string[];
+	/**
+	 * A short descriptive one-line title for the Catalog.
+	 */
+	title?: string;
+	/**
+	 * Detailed multi-line description to fully explain the Catalog. CommonMark 0.29 syntax MAY be used for rich text representation.
+	 */
+	description: string;
+	/**
+	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
+	 */
+	links: Link[];
+}
+
 export interface Collection {
 	/**
 	 * Identifier for the Collection that is unique across the provider.
@@ -276,7 +308,7 @@ export interface Collection {
 
 export type Status = 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeeded';
 
-export type EngineType = 'aws-batch'
+export type EngineType = 'aws-batch';
 
 export interface engineJobCreatedDetails {
 	id: string;
@@ -288,7 +320,7 @@ export interface engineJobCreatedDetails {
 	message?: string;
 }
 
-export type engineJobUpdatedDetails = Pick<engineJobCreatedDetails, 'id' | 'regionId' | 'status' | 'message'>
+export type engineJobUpdatedDetails = Pick<engineJobCreatedDetails, 'id' | 'regionId' | 'status' | 'message'>;
 
 export type engineJobDetails = engineJobCreatedDetails | engineJobUpdatedDetails;
 
@@ -323,13 +355,19 @@ export interface polygonProcessingDetails {
 	engineOutputLocation?: string;
 }
 
+export interface catalogDetails {
+	id: string;
+	title: string;
+	description: string;
+}
+
 export interface groupDetails {
 	/**
 	 * The id of the group the collection belongs to
 	 */
 	id: string;
 	name: string;
-	attributes?: Record<string, any>,
+	attributes?: Record<string, any>;
 	createdAt: string;
 	createdBy: string;
 	updatedBy: string;
@@ -343,7 +381,7 @@ export interface regionDetails {
 	id: string;
 	groupId: string;
 	name: string;
-	attributes?: Record<string, any>,
+	attributes?: Record<string, any>;
 	createdAt: string;
 	createdBy: string;
 	updatedBy: string;
@@ -351,10 +389,11 @@ export interface regionDetails {
 }
 
 export type {
+	catalogDetails as CatalogDetails,
 	groupDetails as GroupDetails,
 	polygonProcessingDetails as PipelineMetadataDetails,
 	regionDetails as RegionDetails,
 	engineJobDetails as EngineJobDetails,
 	engineJobCreatedDetails as EngineJobCreatedDetails,
-	engineJobUpdatedDetails as EngineJobUpdatedDetails
+	engineJobUpdatedDetails as EngineJobUpdatedDetails,
 };

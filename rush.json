@@ -373,6 +373,18 @@
 			"projectFolder": "typescript/packages/integration-tests",
 			"reviewCategory": "production",
 			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/cli",
+			"projectFolder": "typescript/packages/apps/cli",
+			"reviewCategory": "production",
+			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/helpers",
+			"projectFolder": "typescript/packages/libraries/helpers",
+			"reviewCategory": "production",
+			"shouldPublish": true
 		}
 		// {
 		//   /**

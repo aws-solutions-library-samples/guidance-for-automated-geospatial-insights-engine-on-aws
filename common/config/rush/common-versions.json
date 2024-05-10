@@ -2,16 +2,19 @@
 	"$schema": "https://developer.microsoft.com/json-schemas/rush/v5/common-versions.schema.json",
 
 	"preferredVersions": {
+		"@aws-sdk/client-cloudformation": "3.556.0",
 		"@aws-sdk/client-cognito-identity-provider": "3.556.0",
 		"@aws-sdk/client-dynamodb": "3.556.0",
 		"@aws-sdk/client-eventbridge": "3.556.0",
 		"@aws-sdk/client-s3": "3.556.0",
+		"@aws-sdk/client-secrets-manager": "3.556.0",
 		"@aws-sdk/client-ssm": "3.556.0",
 		"@aws-sdk/client-sso-admin": "3.556.0",
 		"@aws-sdk/client-sso-oidc": "3.556.0",
 		"@aws-sdk/client-sts": "3.556.0",
 		"@aws-sdk/client-sqs": "3.556.0",
 		"@aws-sdk/client-lambda": "3.556.0",
+		"@aws-sdk/client-opensearch": "3.556.0",
 		"@aws-sdk/lib-dynamodb": "3.556.0",
 		"@aws-sdk/types": "3.535.0",
 		"@aws-sdk/util-dynamodb": "3.556.0",
@@ -82,6 +85,5 @@
 		"vitest": "1.5.3"
 	},
 
-	"allowedAlternativeVersions": {
-	}
+	"allowedAlternativeVersions": {}
 }

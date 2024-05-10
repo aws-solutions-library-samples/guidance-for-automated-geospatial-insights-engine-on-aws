@@ -10,26 +10,30 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { S3Client } from '@aws-sdk/client-s3';
+import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { SNSClient } from '@aws-sdk/client-sns';
 import { SSMClient } from '@aws-sdk/client-ssm';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { EventProcessor } from '../events/eventProcessor.js';
 import { StacUtil } from '../utils/stacUtil.js';
-import { ResultsService } from "../api/results/service.js";
-import { ResultsRepository } from "../api/results/repository.js";
-import { DynamoDbUtils } from "@arcade/dynamodb-utils";
-import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
-import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
+import { StacServerInitializer } from '../events/stacServerInitializer.js';
+import { ResultsService } from '../api/results/service.js';
+import { ResultsRepository } from '../api/results/repository.js';
+import { DynamoDbUtils } from '@arcade/dynamodb-utils';
+import { ApiAuthorizer } from '@arcade/rest-api-authorizer';
+import { VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
 
 const { captureAWSv3Client } = pkg;
 
 declare module '@fastify/awilix' {
 	interface Cradle {
 		eventProcessor: EventProcessor;
+		stacServerInitializer: StacServerInitializer;
 		eventBridgeClient: EventBridgeClient;
 		dynamoDbUtils: DynamoDbUtils;
 		dynamoDBDocumentClient: DynamoDBDocumentClient;
 		s3Client: S3Client;
+		secretsManagerClient: SecretsManagerClient;
 		ssmClient: SSMClient;
 		lambdaClient: LambdaClient;
 		snsClient: SNSClient;
@@ -93,6 +97,13 @@ class SSMClientFactory {
 	}
 }
 
+class SecretsManagerClientFactory {
+	public static create(region: string): SecretsManagerClient {
+		const sm = captureAWSv3Client(new SecretsManagerClient({ region }));
+		return sm;
+	}
+}
+
 class LambdaClientFactory {
 	public static create(region: string): LambdaClient {
 		return captureAWSv3Client(new LambdaClient({ region }));
@@ -117,6 +128,8 @@ const registerContainer = (app?: FastifyInstance) => {
 	const stacServerFunctionName = process.env['STAC_SERVER_FUNCTION_NAME'];
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
 	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
+	const openSearchEndPoint = process.env['OPEN_SEARCH_ENDPOINT'];
+	const openSearchSecret = process.env['OPEN_SEARCH_SECRET'];
 
 	const userPoolId = process.env['USER_POOL_ID'];
 	const policyStoreId = process.env['POLICY_STORE_ID'];
@@ -144,6 +157,10 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
+		secretsManagerClient: asFunction(() => SecretsManagerClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
 		snsClient: asFunction(() => SNSClientFactory.create(awsRegion), {
 			...commonInjectionOptions,
 		}),
@@ -157,7 +174,17 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		stacServerClient: asFunction(
-			(container: Cradle) => new StacServerClient(app.log, container.snsClient, container.lambdaClient, stacServerTopicArn, stacServerFunctionName),
+			(container: Cradle) =>
+				new StacServerClient(
+					app.log,
+					container.snsClient,
+					container.lambdaClient,
+					container.secretsManagerClient,
+					stacServerTopicArn,
+					stacServerFunctionName,
+					openSearchEndPoint,
+					openSearchSecret
+				),
 			{
 				...commonInjectionOptions,
 			}
@@ -181,6 +208,10 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		resultsService: asFunction((container) => new ResultsService(app.log, container.resultsRepository, container.eventPublisher), {
+			...commonInjectionOptions,
+		}),
+
+		stacServerInitializer: asFunction((container) => new StacServerInitializer(app.log, container.stacServerClient), {
 			...commonInjectionOptions,
 		}),
 

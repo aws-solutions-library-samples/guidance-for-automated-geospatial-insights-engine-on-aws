@@ -1,6 +1,11 @@
 {
 	"name": "@arcade/infrastructure",
 	"version": "0.0.1",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
