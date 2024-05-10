@@ -13,6 +13,7 @@ import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
 import { NotificationsStack } from './notifications/notifications.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
+import { StacServerStack } from './stacServer/stacServer.stack.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,9 +36,11 @@ const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 
-// Optional stac server
-const stacServerTopicArn = app.node.tryGetContext('stacServerTopicArn') as string;
-const stacServerFunctionName = app.node.tryGetContext('stacServerFunctionName') as string;
+// Stac server parameters
+const stacServerTopicArn = getOrThrow(app, 'stacServerTopicArn') as string;
+const stacServerFunctionName = getOrThrow(app, 'stacServerFunctionName') as string;
+const stacServerOpenSearchEndpoint = app.node.tryGetContext('stacServerOpenSearchEndpoint') as string;
+const stacServerOpenSearchSecret = app.node.tryGetContext('stacServerOpenSearchSecret') as string;
 const stacServerUrl = app.node.tryGetContext('stacServerUrl') as string;
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
@@ -56,11 +59,11 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-					fromEmail: cognitoFromEmail,
-					fromName: cognitoFromName,
-					replyTo: cognitoReplyToEmail,
-					sesVerifiedDomain: cognitoVerifiedDomain,
-				}
+						fromEmail: cognitoFromEmail,
+						fromName: cognitoFromName,
+						replyTo: cognitoReplyToEmail,
+						sesVerifiedDomain: cognitoVerifiedDomain,
+				  }
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -94,7 +97,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		stackName: stackName('scheduler'),
 		description: stackDescription('Scheduler'),
 		environment,
-		concurrencyLimit
+		concurrencyLimit,
 	});
 
 	schedulerStack.addDependency(sharedStack);
@@ -104,7 +107,6 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	const resultStack = new ResultsStack(app, 'ResultsModule', {
 		stackName: stackName('results'),
 		description: stackDescription('Results module stack'),
-		moduleName: 'results',
 		environment,
 		env: {
 			region: callerEnvironment?.region,
@@ -116,6 +118,22 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 
 	resultStack.addDependency(sharedStack);
 	resultStack.addDependency(regionsStack);
+
+	// Only deploy when openSearch endpoint has been supplied
+	if (stacServerOpenSearchEndpoint) {
+		new StacServerStack(app, 'StacServerStack', {
+			stackName: stackName('stac-server-init'),
+			description: stackDescription('StacServer initializer'),
+			environment,
+			openSearchEndpoint: stacServerOpenSearchEndpoint,
+			openSearchSecret: stacServerOpenSearchSecret,
+			env: {
+				// The ARCADE_REGION domain variable
+				region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
+				account: callerEnvironment?.accountId,
+			},
+		});
+	}
 
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),
@@ -130,9 +148,9 @@ const getCallerEnvironment = (): { accountId?: string; region?: string } | undef
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-			'EXAMPLE\n' +
-			'$ npm run cdk deploy -- -e sampleEnvironment'
+				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+				'EXAMPLE\n' +
+				'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));

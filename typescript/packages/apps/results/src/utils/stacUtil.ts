@@ -1,12 +1,12 @@
 import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import { Collection, GroupDetails, polygonProcessingDetails, RegionDetails, StacItem } from '@arcade/events';
+import { Catalog, CatalogDetails, Collection, GroupDetails, polygonProcessingDetails, RegionDetails, StacItem } from '@arcade/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import type { BaseLogger } from 'pino';
 import { DefaultStacRecords } from './defaultStacRecords.js';
-import { EngineMetadata } from "../events/models.js";
+import { EngineMetadata } from '../events/models.js';
 import ow from 'ow';
 
 dayjs.extend(utc);
@@ -45,7 +45,7 @@ export class StacUtil {
 				resultId: ow.string.nonEmpty,
 				createdAt: ow.string.nonEmpty,
 				scheduleDateTime: ow.string.nonEmpty,
-				engineOutputLocation: ow.string.nonEmpty
+				engineOutputLocation: ow.string.nonEmpty,
 			})
 		);
 		const stacItem = new DefaultStacRecords().defaultStacItem;
@@ -146,6 +146,40 @@ export class StacUtil {
 
 		this.log.debug(`StacUtil > constructStacItems > exit ${JSON.stringify(stacItem)}`);
 		return stacItem;
+	}
+
+	public async constructCatalog(detail: CatalogDetails): Promise<Catalog> {
+		this.log.debug(`StacUtil > constructCatalog > in ${JSON.stringify(detail)}`);
+
+		// Validate catalog
+		ow(detail, ow.object.nonEmpty);
+		ow(
+			detail,
+			ow.object.exactShape({
+				id: ow.string.nonEmpty,
+				title: ow.string.nonEmpty,
+				description: ow.string.nonEmpty,
+			})
+		);
+
+		const catalog = new DefaultStacRecords().defaultCatalog;
+
+		catalog.id = `catalog_${detail.id}`;
+		catalog.title = catalog.title;
+		catalog.description = catalog.description;
+
+		// Update links
+		catalog.links = [
+			{
+				rel: 'self',
+				href: '../catalog.json',
+				type: 'application/json',
+				title: catalog.title,
+			},
+		];
+
+		this.log.debug(`StacUtil > constructCatalog > exit ${JSON.stringify(catalog)}`);
+		return catalog;
 	}
 
 	public async constructGroupCollection(groupDetail: GroupDetails): Promise<Collection> {

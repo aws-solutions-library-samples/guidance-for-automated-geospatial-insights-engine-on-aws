@@ -1,23 +1,53 @@
-import type { Collection, StacItem } from '@arcade/events';
+import type { Catalog, Collection, StacItem } from '@arcade/events';
 import { InvokeCommand, InvokeCommandInput, LambdaClient } from '@aws-sdk/client-lambda';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
+import axios from 'axios';
 
 export class StacServerClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
 	private readonly snsClient: SNSClient;
 	private readonly lambdaClient: LambdaClient;
+	private readonly secretsManagerClient: SecretsManagerClient;
 	private readonly stacServerIngestSnsTopicArn: string;
 	private readonly stacServerApiFunctionName: string;
+	private readonly stacServerOpenSearchEndpoint: string;
+	private readonly openSearchMasterCredentials: string;
 
-	constructor(log: BaseLogger, snsClient: SNSClient, lambdaClient: LambdaClient, stacServerIngestSnsTopicArn: string, stacServerApiFunctionName: string) {
+	constructor(
+		log: BaseLogger,
+		snsClient: SNSClient,
+		lambdaClient: LambdaClient,
+		secretsManagerClient: SecretsManagerClient,
+		stacServerIngestSnsTopicArn: string,
+		stacServerApiFunctionName: string,
+		stacServerOpenSearchEndpoint: string,
+		openSearchMasterCredentials: string
+	) {
 		super();
 		this.log = log;
 		this.snsClient = snsClient;
 		this.stacServerIngestSnsTopicArn = stacServerIngestSnsTopicArn;
 		this.lambdaClient = lambdaClient;
+		this.secretsManagerClient = secretsManagerClient;
 		this.stacServerApiFunctionName = stacServerApiFunctionName;
+		this.stacServerOpenSearchEndpoint = stacServerOpenSearchEndpoint;
+		this.openSearchMasterCredentials = openSearchMasterCredentials;
+	}
+
+	public async publishCatalog(req: Catalog): Promise<void> {
+		this.log.trace(`StacServerClient > publishCatalog > in > request: ${JSON.stringify(req)}`);
+
+		await this.snsClient.send(
+			new PublishCommand({
+				Message: JSON.stringify(req),
+				TopicArn: this.stacServerIngestSnsTopicArn,
+			})
+		);
+
+		this.log.trace(`StacServerClient > publishCatalog > exit`);
 	}
 
 	public async publishCollection(req: Collection): Promise<void> {
@@ -61,5 +91,75 @@ export class StacServerClient extends ClientServiceBase {
 
 		this.log.trace(`StacServerClient > search > exit payload:${JSON.stringify(payload)}`);
 		return payload;
+	}
+
+	public async createOpenSearchRole(): Promise<void> {
+		this.log.trace(`StacServerClient >createOpenSearchRole > in`);
+		//get the master credentials from secretsManager
+		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
+		const credentials = JSON.parse(masterCredentials.SecretString);
+
+		const payload = {
+			cluster_permissions: ['cluster_composite_ops', 'cluster:monitor/health'],
+			index_permissions: [
+				{
+					index_patterns: ['*'],
+					allowed_actions: ['indices_all'],
+				},
+			],
+			tenant_permissions: [
+				{
+					tenant_patterns: ['global_tenant'],
+					allowed_actions: ['kibana_all_read'],
+				},
+			],
+		};
+		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/roles/stac_server_role` as string, payload, {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			auth: {
+				username: credentials.username,
+				password: credentials.password,
+			},
+		});
+		this.log.trace(`StacServerClient >createOpenSearchRole > exit`);
+	}
+
+	public async createOpenSearchUser(password: string): Promise<void> {
+		this.log.trace(`StacServerClient > createOpenSearchUser > in`);
+
+		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
+		const credentials = JSON.parse(masterCredentials.SecretString);
+		const payload = { password };
+		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/internalusers/stac_server` as string, payload, {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			auth: {
+				username: credentials.username,
+				password: credentials.password,
+			},
+		});
+		this.log.trace(`StacServerClient > createOpenSearchUser > exit`);
+	}
+
+	public async LinkRoleToUser(): Promise<void> {
+		this.log.trace(`StacServerClient > LinkRoleToUser> in`);
+
+		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
+		const credentials = JSON.parse(masterCredentials.SecretString);
+
+		const payload = { users: ['stac_server'] };
+		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/rolesmapping/stac_server_role` as string, payload, {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			auth: {
+				username: credentials.username,
+				password: credentials.password,
+			},
+		});
+		this.log.trace(`StacServerClient > LinkRoleToUser> exit`);
 	}
 }

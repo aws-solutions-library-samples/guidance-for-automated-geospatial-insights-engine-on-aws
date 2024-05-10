@@ -19,7 +19,9 @@
 		"@arcade/events": "workspace:*",
 		"@arcade/lambda-invoker": "workspace:*",
 		"@aws-sdk/client-lambda": "~3",
-		"@aws-sdk/client-sns": "~3"
+		"@aws-sdk/client-sns": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
+		"axios": "~1"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",

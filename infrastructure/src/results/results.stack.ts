@@ -3,14 +3,13 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
-import { bucketNameParameter, eventBusNameParameter } from "@arcade/cdk-common";
-import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
+import { bucketNameParameter, eventBusNameParameter } from '@arcade/cdk-common';
+import { regionsApiFunctionArnParameter } from '../regions/regions.construct.js';
 import { ResultsModule } from './results.construct.js';
-import { userPoolClientIdParameter, userPoolIdParameter } from "../shared/cognito.construct.js";
-import { verifiedPermissionsPolicyStoreIdParameter } from "../shared/verifiedPermissions.construct.js";
+import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
+import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPermissions.construct.js';
 
 export type ResultsStackProperties = StackProps & {
-	moduleName: string;
 	environment: string;
 	stacServerTopicArn: string;
 	stacServerFunctionName: string;
@@ -53,9 +52,7 @@ export class ResultsStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
-
 		const results = new ResultsModule(this, 'ResultsModule', {
-			moduleName: props.moduleName,
 			environment: props.environment,
 			bucketName: bucketName,
 			stacServerTopicArn: props.stacServerTopicArn,
@@ -64,7 +61,7 @@ export class ResultsStack extends Stack {
 			regionsApiFunctionArn,
 			cognitoUserPoolId,
 			policyStoreId,
-			cognitoClientId
+			cognitoClientId,
 		});
 
 		new ssm.StringParameter(this, 'tableNameParameter', {

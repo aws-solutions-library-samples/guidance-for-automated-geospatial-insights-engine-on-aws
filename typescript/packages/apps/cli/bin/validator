@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+import conf from 'conf';
+import rushlib from '@microsoft/rush-lib';
+import fs from 'fs';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const loadValidatorFunction = () => {
+	const config = new conf({
+		projectName: 'arcade',
+		schema: {
+			stacServerPath: {
+				type: 'string',
+			},
+			stacServerApiLambdaFunctionName: {
+				type: 'string',
+			},
+			stacServerIngestionLambdaFunctionName: {
+				type: 'string',
+			},
+			stacServerIngestionTopicArn: {
+				type: 'string',
+			},
+			stacServerOpenSearchEndPoint: {
+				type: 'string',
+			},
+			stacServerOpenSearchAccessPolicy: {
+				type: 'string',
+			},
+			arcadePath: {
+				type: 'string',
+			},
+		},
+	});
+	let arcadePath = config.get('arcadePath');
+	if (!arcadePath) {
+		arcadePath = path.join(__dirname, '../../../../../');
+	}
+
+	const rushConfiguration = rushlib.RushConfiguration.loadFromDefaultLocation({
+		startingFolder: arcadePath,
+	});
+	const modules = ['@arcade/infrastructure'];
+	const [arcadePackage] = modules.map((m) => {
+		const moduleConfiguration = rushConfiguration.findProjectByShorthandName(m);
+		const validatorLocation = `${moduleConfiguration.projectFolder}/dist/cjs/${process.env.VALIDATOR_MODULE_FILENAME}`;
+		if (!fs.existsSync(validatorLocation)) {
+			return {};
+		}
+		return require(validatorLocation);
+	});
+
+	global.arcadePackage = arcadePackage;
+};
+
+export default loadValidatorFunction;

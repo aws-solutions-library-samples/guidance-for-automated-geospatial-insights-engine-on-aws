@@ -1,9 +1,9 @@
 import type { StacServerClient } from '@arcade/clients';
-import type { RegionChangeEvent } from '@arcade/events';
-import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from "@arcade/events";
+import type { CatalogCreateEvent, RegionChangeEvent } from '@arcade/events';
+import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
 import { StacUtil } from '../utils/stacUtil.js';
-import { ResultsService } from "../api/results/service.js";
-import { FastifyBaseLogger } from "fastify";
+import { ResultsService } from '../api/results/service.js';
+import { FastifyBaseLogger } from 'fastify';
 
 export class EventProcessor {
 	constructor(
@@ -13,6 +13,15 @@ export class EventProcessor {
 		private readonly stacUtil: StacUtil
 	) {}
 
+	public async processCatalogCreationEvent(event: CatalogCreateEvent): Promise<void> {
+		this.log.info(`EventProcessor > processCatalogCreationEvent >in  event: ${JSON.stringify(event)}`);
+
+		// Construct the catalog
+		const catalog = await this.stacUtil.constructCatalog(event.detail);
+		await this.stacServerClient.publishCatalog(catalog);
+
+		this.log.info(`EventProcessor > processCatalogCreationEvent >exit`);
+	}
 	public async processGroupChangeEvent(event: GroupChangeEvent): Promise<void> {
 		this.log.info(`EventProcessor > processGroupChangeEvent >in  event: ${JSON.stringify(event)}`);
 		// Construct stac items
@@ -53,9 +62,9 @@ export class EventProcessor {
 		this.log.info(`EventProcessor > processQueuedEvent >in  event: ${JSON.stringify(event)}`);
 		const resultDetails = event.detail?.new;
 		if (event.detail.eventType === 'created') {
-			await this.service.create(resultDetails as EngineJobCreatedDetails)
+			await this.service.create(resultDetails as EngineJobCreatedDetails);
 		} else {
-			await this.service.update(resultDetails as EngineJobUpdatedDetails)
+			await this.service.update(resultDetails as EngineJobUpdatedDetails);
 		}
 		this.log.info(`EventProcessor > processQueuedEvent >exit`);
 	}

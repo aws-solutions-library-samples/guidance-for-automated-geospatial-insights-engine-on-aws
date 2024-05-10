@@ -1,9 +1,18 @@
-import { Collection, StacItem } from '@arcade/events';
+import { Collection, StacItem, Catalog } from '@arcade/events';
 
 export class DefaultStacRecords {
+	public defaultCatalog: Catalog;
 	public defaultCollection: Collection;
 	public defaultStacItem: StacItem;
 	public constructor() {
+		this.defaultCatalog = {
+			id: '',
+			type: 'Catalog',
+			stac_version: '1.0.0',
+			links: [],
+			description: '',
+			title: '',
+		};
 		this.defaultCollection = {
 			id: '',
 			type: 'Collection',

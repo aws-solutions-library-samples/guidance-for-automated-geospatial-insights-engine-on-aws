@@ -9,6 +9,7 @@ import {
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
+	CLI_CATALOG_CREATE_EVENT,
 } from '@arcade/events';
 import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
@@ -43,7 +44,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export interface ResultsConstructProperties {
-	readonly moduleName: string;
 	readonly environment: string;
 	readonly eventBusName: string;
 	readonly bucketName: string;
@@ -68,7 +68,7 @@ export class ResultsModule extends Construct {
 		super(scope, id);
 
 		const account = Stack.of(this).account;
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `arcade-results-${props.environment}`;
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const bucket = Bucket.fromBucketName(this, 'Bucket', props.bucketName);
 		const regionsApiLambda = Function.fromFunctionAttributes(scope, 'RegionsApiFunction', { functionArn: props.regionsApiFunctionArn, skipPermissions: true });
@@ -76,7 +76,7 @@ export class ResultsModule extends Construct {
 
 		// DynamoDb Table
 		const table = new Table(this, 'Table', {
-			tableName: `${namePrefix}-${props.moduleName}`,
+			tableName: `${namePrefix}`,
 			partitionKey: {
 				name: 'pk',
 				type: AttributeType.STRING,
@@ -246,7 +246,7 @@ export class ResultsModule extends Construct {
 		const eventProcessorLambda = new NodejsFunction(this, 'EventProcessorLambda', {
 			description: 'Results module event processor',
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_eventbridge.ts'),
-			functionName: `${namePrefix}-${props.moduleName}-event-processor`,
+			functionName: `${namePrefix}-event-processor`,
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
 			memorySize: 256,
@@ -322,7 +322,9 @@ export class ResultsModule extends Construct {
 					// These events will trigger the creation/deletion of region stac item
 					REGIONS_REGION_CREATED_EVENT,
 					REGIONS_REGION_UPDATED_EVENT,
-					REGIONS_REGION_DELETED_EVENT
+					REGIONS_REGION_DELETED_EVENT,
+					// This events will trigger the creation of the catalog
+					CLI_CATALOG_CREATE_EVENT,
 				],
 			},
 		});
