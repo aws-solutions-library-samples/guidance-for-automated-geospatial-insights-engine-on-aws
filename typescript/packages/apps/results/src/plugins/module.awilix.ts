@@ -180,7 +180,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		resultsService: asFunction((container) => new ResultsService(app.log, container.resultsRepository), {
+		resultsService: asFunction((container) => new ResultsService(app.log, container.resultsRepository, container.eventPublisher), {
 			...commonInjectionOptions,
 		}),
 

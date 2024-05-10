@@ -4,12 +4,14 @@ import { CreateResult, Result, ResultId, ResultListOptions, UpdateResult } from 
 import ow from 'ow';
 import { SecurityContext } from "../../common/scopes.js";
 import { NotFoundError } from "../../common/errors.js";
+import { EventPublisher } from "@arcade/events";
 
 export class ResultsService {
 
 	public constructor(
 		readonly log: FastifyBaseLogger,
 		readonly resultsRepository: ResultsRepository,
+		readonly eventPublisher: EventPublisher
 	) {
 	}
 
@@ -54,6 +56,16 @@ export class ResultsService {
 		}
 		// save
 		await this.resultsRepository.put(updated);
+
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'updated',
+			id: updated.id,
+			resourceType: 'Result',
+			new: updated,
+			old: existing
+		});
+
 		// return
 		this.log.debug(`RegionService> create> exit:${JSON.stringify(updated)}`);
 		return updated;
@@ -83,6 +95,14 @@ export class ResultsService {
 		}
 		// save
 		await this.resultsRepository.put(saved);
+
+		// publish the event
+		await this.eventPublisher.publishEvent({
+			eventType: 'created',
+			id: saved.id,
+			resourceType: 'Result',
+			new: saved,
+		});
 
 		// return
 		this.log.debug(`RegionService> create> exit:${JSON.stringify(saved)}`);

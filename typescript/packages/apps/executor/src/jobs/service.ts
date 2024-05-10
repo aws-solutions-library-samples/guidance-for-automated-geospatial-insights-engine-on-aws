@@ -149,7 +149,7 @@ export class JobsService {
 			eventDetail = {
 				eventType: 'created',
 				id: resultId,
-				resourceType: 'job',
+				resourceType: 'Job',
 				new: {
 					regionId: regionId,
 					id: resultId,
@@ -164,7 +164,7 @@ export class JobsService {
 			eventDetail = {
 				eventType: 'updated',
 				id: resultId,
-				resourceType: 'job',
+				resourceType: 'Job',
 				new: {
 					regionId: regionId,
 					id: resultId,
@@ -200,7 +200,7 @@ export class JobsService {
 			await this.eventPublisher.publishEvent<EngineJobDetails>({
 				eventType: 'created',
 				id: resultId,
-				resourceType: 'job',
+				resourceType: 'Job',
 				new: {
 					regionId: request.id,
 					id: resultId,
