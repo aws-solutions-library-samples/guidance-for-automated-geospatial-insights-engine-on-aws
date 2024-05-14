@@ -1,20 +1,23 @@
 import { afterEach, beforeEach, describe, test } from 'vitest';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
-import { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } from './common.utils.js';
 import { create_group_body } from './groups.data.js';
 import {
-	REGIONS_INTEGRATION_TEST_TAG_KEY,
-	REGIONS_INTEGRATION_TEST_TAG_VALUE,
 	create_region_body,
 	created_region_resource,
+	REGIONS_INTEGRATION_TEST_TAG_KEY,
+	REGIONS_INTEGRATION_TEST_TAG_VALUE,
 	update_region_body,
 	updated_region_resource,
 } from './regions.data.js';
 import { getAuthToken } from '../utils/auth.js';
+import { createResourcesMethodForModules } from "../utils/common.utils.js";
 
 const TEST_PREFIX = 'regions module (regions): ';
 const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
 const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
+
+
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
 
 // tag everything created in this test with the same tags, so can be teared down cleanly
 const testTags = {

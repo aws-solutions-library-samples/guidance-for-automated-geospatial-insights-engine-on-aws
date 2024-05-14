@@ -49,6 +49,7 @@ export class JobsService {
 				polygonId: polygon.id,
 				regionId: request.id,
 				resultId: resultId,
+				state: polygon.state,
 				outputPrefix: `${keyPrefix}/output/polygon=${polygon.id}`
 			};
 
@@ -187,7 +188,7 @@ export class JobsService {
 		ow(request.id, ow.string.nonEmpty);
 
 		// get list of polygons for this particular region
-		const polygonListResource = await this.regionsClient.listPolygons({ regionId: request.id }, this.context);
+		const polygonListResource = await this.regionsClient.listPolygons({ regionId: request.id, includeLatestState: true }, this.context);
 		if (polygonListResource.polygons.length === 0) {
 			this.log.warn(`JobsService> start> no polygon associated with the region ${request.name}}`);
 			return;

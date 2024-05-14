@@ -1,19 +1,19 @@
 import { State } from '@arcade/regions';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
-import { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } from './common.utils.js';
 import { create_group_body } from './groups.data.js';
 import { create_region_body } from './regions.data.js';
 import {
-	STATES_INTEGRATION_TEST_TAG_KEY,
-	STATES_INTEGRATION_TEST_TAG_VALUE,
 	create_state_body,
 	created_state_resource,
+	STATES_INTEGRATION_TEST_TAG_KEY,
+	STATES_INTEGRATION_TEST_TAG_VALUE,
 	update_state_body,
 	updated_state_resource,
 } from './states.data.js';
 import { create_polygon_body } from './polygons.data.js';
 import { getAuthToken } from '../utils/auth.js';
+import { createResourcesMethodForModules } from "../utils/common.utils.js";
 
 const TEST_PREFIX = 'regions module (states): ';
 const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
@@ -23,6 +23,7 @@ const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
 const testTags = {
 	[STATES_INTEGRATION_TEST_TAG_KEY]: STATES_INTEGRATION_TEST_TAG_VALUE,
 };
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
 
 const constructStateJson = (username: string): object => {
 	return {

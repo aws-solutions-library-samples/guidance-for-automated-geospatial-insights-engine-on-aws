@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import datetime
 from io import BytesIO
 from logging import Logger
-from typing import List, Optional, Tuple
+from typing import List, Optional, Dict
 
 import boto3
 import rasterio
@@ -28,6 +28,19 @@ logger: Logger = get_logger()
 
 
 @dataclass
+class State(DataClassJsonMixin):
+	attributes: Dict[str, str] = field(metadata=config(field_name="attributes"), default=None)
+	tags: Dict[str, str] = field(metadata=config(field_name="tags"), default=None)
+	id: str = field(metadata=config(field_name="id"), default=None)
+	polygon_id: str = field(metadata=config(field_name="polygonId"), default=None)
+	timestamp: str = field(metadata=config(field_name="timestamp"), default=None)
+	created_by: str = field(metadata=config(field_name="createdBy"), default=None)
+	created_at: str = field(metadata=config(field_name="createdAt"), default=None)
+	updated_by: str = field(metadata=config(field_name="updatedBy"), default=None)
+	updated_at: str = field(metadata=config(field_name="updatedAt"), default=None)
+
+
+@dataclass
 class EngineProcessRequest(DataClassJsonMixin):
 	schedule_date_time: str = field(metadata=config(field_name="scheduleDateTime"))
 	coordinates: List[tuple[float, float]] = field(metadata=config(field_name="coordinates"), default=None)
@@ -36,6 +49,7 @@ class EngineProcessRequest(DataClassJsonMixin):
 	polygon_id: str = field(metadata=config(field_name="polygonId"), default=None)
 	output_prefix: str = field(metadata=config(field_name="outputPrefix"), default=None)
 	result_id: str = field(metadata=config(field_name="resultId"), default=None)
+	state: State = field(metadata=config(field_name="state"), default=None)
 
 
 class STACCatalogProcessor:

@@ -1,3 +1,4 @@
+import { State } from '@arcade/clients';
 import { RegionResource } from '@arcade/events';
 
 export type StartJobRequest = RegionResource & { scheduleDateTime: string };
@@ -13,6 +14,7 @@ export interface BatchEngineInput {
 	exclusions?: [[[number, number]]];
 	scheduleDateTime: string;
 	outputPrefix: string;
+	state: State;
 }
 
 export interface AwsBatchJobStateChange {

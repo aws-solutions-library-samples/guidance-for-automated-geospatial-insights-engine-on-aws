@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { EventBus, Rule } from "aws-cdk-lib/aws-events";
 import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import path from "path";
-import { Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
+import { Function, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Aspects, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { getLambdaArchitecture } from "@arcade/cdk-common";
@@ -44,6 +44,7 @@ export interface NotificationsConstructProperties {
 	cognitoUserPoolId: string;
 	eventBusName: string;
 	bucketName: string;
+	regionsApiFunctionArn: string;
 	readonly cognitoClientId: string;
 	readonly policyStoreId: string;
 }
@@ -56,6 +57,8 @@ export class NotificationsModule extends Construct {
 		const namePrefix = `arcade-${props.environment}`;
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const accountId = Stack.of(this).account;
+
+		const regionsApiLambda = Function.fromFunctionArn(scope, 'RegionsApiFunction', props.regionsApiFunctionArn);
 
 		// DynamoDb Table
 		const table = new Table(this, 'Table', {
@@ -116,7 +119,8 @@ export class NotificationsModule extends Construct {
 				ENVIRONMENT: props.environment,
 				NODE_ENV: 'cloud',
 				TABLE_NAME: table.tableName,
-				AWS_ACCOUNT_ID: accountId
+				AWS_ACCOUNT_ID: accountId,
+				REGIONS_API_FUNCTION_NAME: regionsApiLambda.functionName,
 			},
 
 			bundling: {
@@ -132,6 +136,7 @@ export class NotificationsModule extends Construct {
 			architecture: getLambdaArchitecture(scope),
 		});
 
+		regionsApiLambda.grantInvoke(apiLambda);
 		table.grantReadWriteData(apiLambda)
 		eventBus.grantPutEventsTo(apiLambda);
 		apiLambda.addToRolePolicy(new PolicyStatement({
@@ -141,6 +146,8 @@ export class NotificationsModule extends Construct {
 				'sns:ListSubscriptionsByTopic',
 				'sns:Subscribe',
 				'sns:Unsubscribe',
+				'sns:ListSubscriptionsByTopic',
+				'sns:DeleteTopic',
 			],
 			effect: Effect.ALLOW,
 			resources: ['*'],
@@ -385,7 +392,7 @@ export class NotificationsModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::<NotificationsModuleTableEF0736FF.Arn>/index/*'],
+					appliesTo: ['Resource::<NotificationsModuleTableEF0736FF.Arn>/index/*', 'Resource::<regionsApiFunctionArnParameter>:*'],
 					reason: 'Lambda needs to query the DynamoDB table.',
 				}
 			],

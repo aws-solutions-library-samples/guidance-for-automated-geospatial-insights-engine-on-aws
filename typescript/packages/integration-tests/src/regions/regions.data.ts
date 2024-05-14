@@ -18,7 +18,6 @@ export const create_region_body: object = {
 		tag2: 'tag-two',
 	},
 };
-
 export const created_region_resource = (username: string): object => {
 	return {
 		id: ID_PATTERN,

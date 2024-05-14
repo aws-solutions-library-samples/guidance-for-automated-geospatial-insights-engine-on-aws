@@ -77,11 +77,11 @@ importers:
         specifier: ~4
         version: 4.9.4
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/cli:
     dependencies:
@@ -367,11 +367,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/notifications:
     dependencies:
@@ -500,11 +500,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/regions:
     dependencies:
@@ -630,11 +630,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/results:
     dependencies:
@@ -790,11 +790,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/scheduler:
     dependencies:
@@ -911,11 +911,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/apps/ui:
     dependencies:
@@ -1003,7 +1003,14 @@ importers:
         version: 5.2.0(@types/node@20.12.7)
 
   ../../typescript/packages/integration-tests:
+    dependencies:
+      p-wait-for:
+        specifier: ~5.0.2
+        version: 5.0.2
     devDependencies:
+      '@arcade/clients':
+        specifier: workspace:*
+        version: link:../libraries/clients
       '@arcade/regions':
         specifier: workspace:*
         version: link:../apps/regions
@@ -1013,12 +1020,24 @@ importers:
       '@aws-amplify/core':
         specifier: 6.1.0
         version: 6.1.0
+      '@aws-sdk/client-cloudformation':
+        specifier: ~3
+        version: 3.572.0
       '@aws-sdk/client-cognito-identity-provider':
+        specifier: ~3
+        version: 3.572.0
+      '@aws-sdk/client-eventbridge':
+        specifier: ~3
+        version: 3.572.0
+      '@aws-sdk/client-secrets-manager':
         specifier: ~3
         version: 3.572.0
       '@aws-sdk/client-ssm':
         specifier: ~3
         version: 3.572.0
+      '@opensearch-project/opensearch':
+        specifier: ~2
+        version: 2.8.0
       '@tsconfig/node20':
         specifier: ~20
         version: 20.1.4
@@ -1027,7 +1046,7 @@ importers:
         version: 20.12.7
       '@vitest/ui':
         specifier: ~1
-        version: 1.6.0(vitest@1.6.0)
+        version: 1.6.0(vitest@0.34.6)
       aws-amplify:
         specifier: 6.2.0
         version: 6.2.0
@@ -1062,11 +1081,11 @@ importers:
         specifier: ~2
         version: 2.3.0
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: ~0
+        version: 0.34.6(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@0.34.6(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/cdk-common:
     dependencies:
@@ -1138,11 +1157,11 @@ importers:
         specifier: ~4
         version: 4.9.4
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/clients:
     dependencies:
@@ -1164,6 +1183,9 @@ importers:
       axios:
         specifier: ~1
         version: 1.6.8
+      ow:
+        specifier: 1.1.1
+        version: 1.1.1
     devDependencies:
       '@tsconfig/node20':
         specifier: ~20
@@ -1202,11 +1224,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/dynamodb-utils:
     dependencies:
@@ -1248,11 +1270,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/events:
     dependencies:
@@ -1294,11 +1316,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/helpers:
     dependencies:
@@ -1413,11 +1435,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/resource-api-base:
     dependencies:
@@ -1540,11 +1562,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
   ../../typescript/packages/libraries/rest-api-authorizer:
     dependencies:
@@ -1613,11 +1635,11 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vitest:
-        specifier: ~1
-        version: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+        specifier: 1.5.3
+        version: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
       vitest-mock-extended:
         specifier: ~1
-        version: 1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0))
+        version: 1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0))
 
 packages:
 
@@ -3181,6 +3203,10 @@ packages:
     resolution: {integrity: sha512-CyuLJ0/P7bKZ+kIYw+fnkeVdhUzNuDKgNSI7pU/m7Nod0T7kP+s4s2f0pNmG9HL8/RZN1S0ZWTDll3VTMrFLAw==}
     engines: {node: '>= 18'}
 
+  '@opensearch-project/opensearch@2.8.0':
+    resolution: {integrity: sha512-VgYq5WQCHHotUlk8fUXAkisCjeiw6eNKg/z9elBHuFnNVEUEhSzl3UAuPS3Y9TUd9uTvUbAZ8kkuA5y3Te9rsw==}
+    engines: {node: '>=10', yarn: ^1.22.10}
+
   '@opentelemetry/api@1.8.0':
     resolution: {integrity: sha512-I/s6F7yKUDdtMsoBWXJe8Qz40Tui5vsuKCWJEWVL+5q9sSWRzzx6v2KeNsOBEwd94j0eWkpWCH4yB6rZg9Mf0w==}
     engines: {node: '>=8.0.0'}
@@ -4235,6 +4261,9 @@ packages:
   '@types/btoa-lite@1.0.2':
     resolution: {integrity: sha512-ZYbcE2x7yrvNFJiU7xJGrpF/ihpkM7zKgw8bha3LNJSesvTtUNxbpzaT7WXBIryf6jovisrxTBvymxMeLLj1Mg==}
 
+  '@types/chai-subset@1.3.5':
+    resolution: {integrity: sha512-c2mPnw+xHtXDoHmdtcCXGwyLMiauiAyxWMzhGpqHC4nqI/Y5G2XhTampslK2rb59kpcuHon03UH8W6iYUzw88A==}
+
   '@types/chai@4.3.16':
     resolution: {integrity: sha512-PatH4iOdyh3MyWtmHVFXLWCCIhUbopaltqddG9BzB+gMIzee2MJrvd+jouii9Z3wzQJruGWAm7WOMjgfG8hQlQ==}
 
@@ -4699,22 +4728,40 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0
 
-  '@vitest/expect@1.6.0':
-    resolution: {integrity: sha512-ixEvFVQjycy/oNgHjqsL6AZCDduC+tflRluaHIzKIsdbzkLn2U/iBnVeJwB6HsIjQBdfMR8Z0tRxKUsvFJEeWQ==}
+  '@vitest/expect@0.34.6':
+    resolution: {integrity: sha512-QUzKpUQRc1qC7qdGo7rMK3AkETI7w18gTCUrsNnyjjJKYiuUB9+TQK3QnR1unhCnWRC0AbKv2omLGQDF/mIjOw==}
 
-  '@vitest/runner@1.6.0':
-    resolution: {integrity: sha512-P4xgwPjwesuBiHisAVz/LSSZtDjOTPYZVmNAnpHHSR6ONrf8eCJOFRvUwdHn30F5M1fxhqtl7QZQUk2dprIXAg==}
+  '@vitest/expect@1.5.3':
+    resolution: {integrity: sha512-y+waPz31pOFr3rD7vWTbwiLe5+MgsMm40jTZbQE8p8/qXyBX3CQsIXRx9XK12IbY7q/t5a5aM/ckt33b4PxK2g==}
 
-  '@vitest/snapshot@1.6.0':
-    resolution: {integrity: sha512-+Hx43f8Chus+DCmygqqfetcAZrDJwvTj0ymqjQq4CvmpKFSTVteEOBzCusu1x2tt4OJcvBflyHUE0DZSLgEMtQ==}
+  '@vitest/runner@0.34.6':
+    resolution: {integrity: sha512-1CUQgtJSLF47NnhN+F9X2ycxUP0kLHQ/JWvNHbeBfwW8CzEGgeskzNnHDyv1ieKTltuR6sdIHV+nmR6kPxQqzQ==}
 
-  '@vitest/spy@1.6.0':
-    resolution: {integrity: sha512-leUTap6B/cqi/bQkXUu6bQV5TZPx7pmMBKBQiI0rJA8c3pB56ZsaTbREnF7CJfmvAS4V2cXIBAh/3rVwrrCYgw==}
+  '@vitest/runner@1.5.3':
+    resolution: {integrity: sha512-7PlfuReN8692IKQIdCxwir1AOaP5THfNkp0Uc4BKr2na+9lALNit7ub9l3/R7MP8aV61+mHKRGiqEKRIwu6iiQ==}
+
+  '@vitest/snapshot@0.34.6':
+    resolution: {integrity: sha512-B3OZqYn6k4VaN011D+ve+AA4whM4QkcwcrwaKwAbyyvS/NB1hCWjFIBQxAQQSQir9/RtyAAGuq+4RJmbn2dH4w==}
+
+  '@vitest/snapshot@1.5.3':
+    resolution: {integrity: sha512-K3mvIsjyKYBhNIDujMD2gfQEzddLe51nNOAf45yKRt/QFJcUIeTQd2trRvv6M6oCBHNVnZwFWbQ4yj96ibiDsA==}
+
+  '@vitest/spy@0.34.6':
+    resolution: {integrity: sha512-xaCvneSaeBw/cz8ySmF7ZwGvL0lBjfvqc1LpQ/vcdHEvpLn3Ff1vAvjw+CoGn0802l++5L/pxb7whwcWAw+DUQ==}
+
+  '@vitest/spy@1.5.3':
+    resolution: {integrity: sha512-Llj7Jgs6lbnL55WoshJUUacdJfjU2honvGcAJBxhra5TPEzTJH8ZuhI3p/JwqqfnTr4PmP7nDmOXP53MS7GJlg==}
 
   '@vitest/ui@1.6.0':
     resolution: {integrity: sha512-k3Lyo+ONLOgylctiGovRKy7V4+dIN2yxstX3eY5cWFXH6WP+ooVX79YSyi0GagdTQzLmT43BF27T0s6dOIPBXA==}
     peerDependencies:
       vitest: 1.6.0
+
+  '@vitest/utils@0.34.6':
+    resolution: {integrity: sha512-IG5aDD8S6zlvloDsnzHw0Ut5xczlF+kv2BOTo+iXfPr54Yhi5qbVOgGB1hZaVq4iJ4C/MZ2J0y15IlsV/ZcI0A==}
+
+  '@vitest/utils@1.5.3':
+    resolution: {integrity: sha512-rE9DTN1BRhzkzqNQO+kw8ZgfeEBCLXiHJwetk668shmNBpSagQxneT5eSqEBLP+cqSiAeecvQmbpFfdMyLcIQA==}
 
   '@vitest/utils@1.6.0':
     resolution: {integrity: sha512-21cPiuGMoMZwiOHa2i4LXkMkMkCGzA+MVFV70jRwHo95dL4x/ts5GZhML1QWuy7yfp3WzK3lRvZi3JnXTYqrBw==}
@@ -5047,6 +5094,9 @@ packages:
   aws-xray-sdk@3.6.0:
     resolution: {integrity: sha512-ID2R0U94wEMPLAkmQ7+TZuzvMjp2fe0dqqUQb6BniIDWXdvV5bphrMhsHzp/0PDRjGqsVSrZ1V1qRmq8bhEl1A==}
     engines: {node: '>= 14.x'}
+
+  aws4@1.12.0:
+    resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
 
   axios@0.21.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
@@ -6587,6 +6637,10 @@ packages:
     resolution: {integrity: sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
+  hpagent@1.2.0:
+    resolution: {integrity: sha512-A91dYTeIB6NoXG+PxTQpCCDDnfHsW9kc06Lvpu1TEe9gnd6ZFeiBoRO9JvzEv6xK7EX97/dUE8g/vBMTqTS3CA==}
+    engines: {node: '>=14'}
+
   http-cache-semantics@4.1.1:
     resolution: {integrity: sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==}
 
@@ -7166,6 +7220,10 @@ packages:
   load-yaml-file@0.2.0:
     resolution: {integrity: sha512-OfCBkGEw4nN6JLtgRidPX6QxjBQGQf72q3si2uvqyFEMbycSFFHwAZeXx6cJgFM9wmLrf9zBwCP3Ivqa+LLZPw==}
     engines: {node: '>=6'}
+
+  local-pkg@0.4.3:
+    resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
+    engines: {node: '>=14'}
 
   local-pkg@0.5.0:
     resolution: {integrity: sha512-ok6z3qlYyCDS4ZEU27HaU6x/xZa9Whf8jD4ptH5UZTQYZVYeb9bnZ3ojVhiJNLiXK1Hfc0GNbLXcmZ5plLDDBg==}
@@ -7798,9 +7856,17 @@ packages:
     resolution: {integrity: sha512-6THGh13mt3gypcNMm0ADqVNCcYa3BK6DWsuJWFCuEKP1rpY+OKGp7gaZwVmLspmic01+fsg/fN57MfvDzZ/PuQ==}
     engines: {node: '>=10'}
 
+  p-timeout@6.1.2:
+    resolution: {integrity: sha512-UbD77BuZ9Bc9aABo74gfXhNvzC9Tx7SxtHSh1fxvx3jTLLYvmVhiQZZrJzqqU0jKbN32kb5VOKiLEQI/3bIjgQ==}
+    engines: {node: '>=14.16'}
+
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
+
+  p-wait-for@5.0.2:
+    resolution: {integrity: sha512-lwx6u1CotQYPVju77R+D0vFomni/AqRfqLmqQ8hekklqZ6gAY9rONh7lBQ0uxWMkC2AuX9b2DVAl8To0NyP1JA==}
+    engines: {node: '>=12'}
 
   package-json@6.5.0:
     resolution: {integrity: sha512-k3bdm2n25tkyxcjSKzB5x8kfVxlMdgsbPr0GkZcwHsLpba6cBjqCt1KlcChKEvxHIcTB1FVMuwoijZ26xex5MQ==}
@@ -8794,6 +8860,9 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+  strip-literal@1.3.0:
+    resolution: {integrity: sha512-PugKzOsyXpArk0yWmUwqOZecSO0GH0bPoctLcqNDH9J04pVW3lflYE0ujElBGTloevcxF5MofAOZ7C5l2b+wLg==}
+
   strip-literal@2.1.0:
     resolution: {integrity: sha512-Op+UycaUt/8FbN/Z2TWPBLge3jWrP3xj10f3fnYxf052bKuS3EKs1ZQcVGjnEMdsNVAM+plXRdmjrZ/KgG3Skw==}
 
@@ -8874,6 +8943,10 @@ packages:
 
   tinycolor2@1.6.0:
     resolution: {integrity: sha512-XPaBkWQJdsf3pLKJV9p4qN/S+fm2Oj8AIPo1BTUhg5oxkvm9+SVEGFdhyOz7tTdUTfvxMiAs4sp6/eZO2Ew+pw==}
+
+  tinypool@0.7.0:
+    resolution: {integrity: sha512-zSYNUlYSMhJ6Zdou4cJwo/p7w5nmAH17GRfU/ui3ctvjXFErXXkruT4MWW6poDeXgCaIBlGLrfU6TbTXxyGMww==}
+    engines: {node: '>=14.0.0'}
 
   tinypool@0.8.4:
     resolution: {integrity: sha512-i11VH5gS6IFeLY3gMBQ00/MmLncVP7JLXOw1vlgkytLmJK7QnEr7NXf0LBdxfmNPAeyetukOk0bOYrJrFGjYJQ==}
@@ -9355,8 +9428,13 @@ packages:
     peerDependencies:
       react: '>=16.6.0'
 
-  vite-node@1.6.0:
-    resolution: {integrity: sha512-de6HJgzC+TFzOu0NTC4RAIsyf/DY/ibWDYQUcuEA84EMHhcefTUGkjFHKKEJhQN4A+6I0u++kr3l36ZF2d7XRw==}
+  vite-node@0.34.6:
+    resolution: {integrity: sha512-nlBMJ9x6n7/Amaz6F3zJ97EBwR2FkzhBRxF5e+jE6LA3yi6Wtc2lyTij1OnDMIr34v5g/tVQtsVAzhT0jc5ygA==}
+    engines: {node: '>=v14.18.0'}
+    hasBin: true
+
+  vite-node@1.5.3:
+    resolution: {integrity: sha512-axFo00qiCpU/JLd8N1gu9iEYL3xTbMbMrbe5nDp9GL0nb6gurIdZLkkFogZXWnE8Oyy5kfSLwNVIcVsnhE7lgQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
@@ -9422,15 +9500,46 @@ packages:
       typescript: 3.x || 4.x || 5.x
       vitest: '>=0.31.1'
 
-  vitest@1.6.0:
-    resolution: {integrity: sha512-H5r/dN06swuFnzNFhq/dnz37bPXnq8xB2xB5JOVk8K09rUtoeNN+LHWkoQ0A/i3hvbUKKcCei9KpbxqHMLhLLA==}
+  vitest@0.34.6:
+    resolution: {integrity: sha512-+5CALsOvbNKnS+ZHMXtuUC7nL8/7F1F2DnHGjSsszX8zCjWSSviphCb/NuS9Nzf4Q03KyyDRBAXhF/8lffME4Q==}
+    engines: {node: '>=v14.18.0'}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@vitest/browser': '*'
+      '@vitest/ui': '*'
+      happy-dom: '*'
+      jsdom: '*'
+      playwright: '*'
+      safaridriver: '*'
+      webdriverio: '*'
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@vitest/browser':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+      playwright:
+        optional: true
+      safaridriver:
+        optional: true
+      webdriverio:
+        optional: true
+
+  vitest@1.5.3:
+    resolution: {integrity: sha512-2oM7nLXylw3mQlW6GXnRriw+7YvZFk/YNV8AxIC3Z3MfFbuziLGWP9GPxxu/7nRlXhqyxBikpamr+lEEj1sUEw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/node': ^18.0.0 || >=20.0.0
-      '@vitest/browser': 1.6.0
-      '@vitest/ui': 1.6.0
+      '@vitest/browser': 1.5.3
+      '@vitest/ui': 1.5.3
       happy-dom: '*'
       jsdom: '*'
     peerDependenciesMeta:
@@ -13700,6 +13809,16 @@ snapshots:
       '@octokit/webhooks-types': 7.4.0
       aggregate-error: 3.1.0
 
+  '@opensearch-project/opensearch@2.8.0':
+    dependencies:
+      aws4: 1.12.0
+      debug: 4.3.4(supports-color@8.1.1)
+      hpagent: 1.2.0
+      ms: 2.1.3
+      secure-json-parse: 2.7.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@opentelemetry/api@1.8.0': {}
 
   '@pkgjs/parseargs@0.11.0':
@@ -15566,6 +15685,10 @@ snapshots:
 
   '@types/btoa-lite@1.0.2': {}
 
+  '@types/chai-subset@1.3.5':
+    dependencies:
+      '@types/chai': 4.3.16
+
   '@types/chai@4.3.16': {}
 
   '@types/cli-progress@3.11.5':
@@ -16232,29 +16355,51 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@1.6.0':
+  '@vitest/expect@0.34.6':
     dependencies:
-      '@vitest/spy': 1.6.0
-      '@vitest/utils': 1.6.0
+      '@vitest/spy': 0.34.6
+      '@vitest/utils': 0.34.6
       chai: 4.4.1
 
-  '@vitest/runner@1.6.0':
+  '@vitest/expect@1.5.3':
     dependencies:
-      '@vitest/utils': 1.6.0
+      '@vitest/spy': 1.5.3
+      '@vitest/utils': 1.5.3
+      chai: 4.4.1
+
+  '@vitest/runner@0.34.6':
+    dependencies:
+      '@vitest/utils': 0.34.6
+      p-limit: 4.0.0
+      pathe: 1.1.2
+
+  '@vitest/runner@1.5.3':
+    dependencies:
+      '@vitest/utils': 1.5.3
       p-limit: 5.0.0
       pathe: 1.1.2
 
-  '@vitest/snapshot@1.6.0':
+  '@vitest/snapshot@0.34.6':
     dependencies:
       magic-string: 0.30.10
       pathe: 1.1.2
       pretty-format: 29.7.0
 
-  '@vitest/spy@1.6.0':
+  '@vitest/snapshot@1.5.3':
+    dependencies:
+      magic-string: 0.30.10
+      pathe: 1.1.2
+      pretty-format: 29.7.0
+
+  '@vitest/spy@0.34.6':
     dependencies:
       tinyspy: 2.2.1
 
-  '@vitest/ui@1.6.0(vitest@1.6.0)':
+  '@vitest/spy@1.5.3':
+    dependencies:
+      tinyspy: 2.2.1
+
+  '@vitest/ui@1.6.0(vitest@0.34.6)':
     dependencies:
       '@vitest/utils': 1.6.0
       fast-glob: 3.3.2
@@ -16263,7 +16408,32 @@ snapshots:
       pathe: 1.1.2
       picocolors: 1.0.0
       sirv: 2.0.4
-      vitest: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+      vitest: 0.34.6(@vitest/ui@1.6.0)
+
+  '@vitest/ui@1.6.0(vitest@1.5.3)':
+    dependencies:
+      '@vitest/utils': 1.6.0
+      fast-glob: 3.3.2
+      fflate: 0.8.2
+      flatted: 3.3.1
+      pathe: 1.1.2
+      picocolors: 1.0.0
+      sirv: 2.0.4
+      vitest: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
+    optional: true
+
+  '@vitest/utils@0.34.6':
+    dependencies:
+      diff-sequences: 29.6.3
+      loupe: 2.3.7
+      pretty-format: 29.7.0
+
+  '@vitest/utils@1.5.3':
+    dependencies:
+      diff-sequences: 29.6.3
+      estree-walker: 3.0.3
+      loupe: 2.3.7
+      pretty-format: 29.7.0
 
   '@vitest/utils@1.6.0':
     dependencies:
@@ -16659,6 +16829,8 @@ snapshots:
       aws-xray-sdk-express: 3.6.0(aws-xray-sdk-core@3.6.0)
       aws-xray-sdk-mysql: 3.6.0(aws-xray-sdk-core@3.6.0)
       aws-xray-sdk-postgres: 3.6.0(aws-xray-sdk-core@3.6.0)
+
+  aws4@1.12.0: {}
 
   axios@0.21.4:
     dependencies:
@@ -18515,6 +18687,8 @@ snapshots:
     dependencies:
       lru-cache: 10.2.2
 
+  hpagent@1.2.0: {}
+
   http-cache-semantics@4.1.1: {}
 
   http-call@5.3.0:
@@ -19070,6 +19244,8 @@ snapshots:
       js-yaml: 3.13.1
       pify: 4.0.1
       strip-bom: 3.0.0
+
+  local-pkg@0.4.3: {}
 
   local-pkg@0.5.0:
     dependencies:
@@ -19740,7 +19916,13 @@ snapshots:
       p-limit: 2.3.0
       p-reflect: 2.1.0
 
+  p-timeout@6.1.2: {}
+
   p-try@2.2.0: {}
+
+  p-wait-for@5.0.2:
+    dependencies:
+      p-timeout: 6.1.2
 
   package-json@6.5.0:
     dependencies:
@@ -20806,6 +20988,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
+  strip-literal@1.3.0:
+    dependencies:
+      acorn: 8.11.3
+
   strip-literal@2.1.0:
     dependencies:
       js-tokens: 9.0.0
@@ -20896,6 +21082,8 @@ snapshots:
   tinybench@2.8.0: {}
 
   tinycolor2@1.6.0: {}
+
+  tinypool@0.7.0: {}
 
   tinypool@0.8.4: {}
 
@@ -21452,7 +21640,25 @@ snapshots:
       victory-voronoi-container: 37.0.2(react@18.2.0)
       victory-zoom-container: 37.0.2(react@18.2.0)
 
-  vite-node@1.6.0(@types/node@20.12.7):
+  vite-node@0.34.6(@types/node@20.12.7):
+    dependencies:
+      cac: 6.7.14
+      debug: 4.3.4(supports-color@8.1.1)
+      mlly: 1.7.0
+      pathe: 1.1.2
+      picocolors: 1.0.0
+      vite: 5.2.10(@types/node@20.12.7)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
+  vite-node@1.5.3(@types/node@20.12.7):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4(supports-color@8.1.1)
@@ -21487,19 +21693,62 @@ snapshots:
       '@types/node': 20.12.7
       fsevents: 2.3.3
 
-  vitest-mock-extended@1.3.1(typescript@5.4.5)(vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)):
+  vitest-mock-extended@1.3.1(typescript@5.4.5)(vitest@0.34.6(@vitest/ui@1.6.0)):
     dependencies:
       ts-essentials: 9.4.2(typescript@5.4.5)
       typescript: 5.4.5
-      vitest: 1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0)
+      vitest: 0.34.6(@vitest/ui@1.6.0)
 
-  vitest@1.6.0(@types/node@20.12.7)(@vitest/ui@1.6.0):
+  vitest-mock-extended@1.3.1(typescript@5.4.5)(vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)):
     dependencies:
-      '@vitest/expect': 1.6.0
-      '@vitest/runner': 1.6.0
-      '@vitest/snapshot': 1.6.0
-      '@vitest/spy': 1.6.0
-      '@vitest/utils': 1.6.0
+      ts-essentials: 9.4.2(typescript@5.4.5)
+      typescript: 5.4.5
+      vitest: 1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0)
+
+  vitest@0.34.6(@vitest/ui@1.6.0):
+    dependencies:
+      '@types/chai': 4.3.16
+      '@types/chai-subset': 1.3.5
+      '@types/node': 20.12.7
+      '@vitest/expect': 0.34.6
+      '@vitest/runner': 0.34.6
+      '@vitest/snapshot': 0.34.6
+      '@vitest/spy': 0.34.6
+      '@vitest/utils': 0.34.6
+      acorn: 8.11.3
+      acorn-walk: 8.3.2
+      cac: 6.7.14
+      chai: 4.4.1
+      debug: 4.3.4(supports-color@8.1.1)
+      local-pkg: 0.4.3
+      magic-string: 0.30.10
+      pathe: 1.1.2
+      picocolors: 1.0.0
+      std-env: 3.7.0
+      strip-literal: 1.3.0
+      tinybench: 2.8.0
+      tinypool: 0.7.0
+      vite: 5.2.10(@types/node@20.12.7)
+      vite-node: 0.34.6(@types/node@20.12.7)
+      why-is-node-running: 2.2.2
+    optionalDependencies:
+      '@vitest/ui': 1.6.0(vitest@0.34.6)
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
+  vitest@1.5.3(@types/node@20.12.7)(@vitest/ui@1.6.0):
+    dependencies:
+      '@vitest/expect': 1.5.3
+      '@vitest/runner': 1.5.3
+      '@vitest/snapshot': 1.5.3
+      '@vitest/spy': 1.5.3
+      '@vitest/utils': 1.5.3
       acorn-walk: 8.3.2
       chai: 4.4.1
       debug: 4.3.4(supports-color@8.1.1)
@@ -21513,11 +21762,11 @@ snapshots:
       tinybench: 2.8.0
       tinypool: 0.8.4
       vite: 5.2.10(@types/node@20.12.7)
-      vite-node: 1.6.0(@types/node@20.12.7)
+      vite-node: 1.5.3(@types/node@20.12.7)
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.7
-      '@vitest/ui': 1.6.0(vitest@1.6.0)
+      '@vitest/ui': 1.6.0(vitest@1.5.3)
     transitivePeerDependencies:
       - less
       - lightningcss

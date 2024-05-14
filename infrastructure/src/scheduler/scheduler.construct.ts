@@ -13,6 +13,7 @@ import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +23,8 @@ export interface ScheduledConstructProperties {
 	eventBusName: string;
 	bucketName: string;
 }
+
+const schedulerGroupNameParameter = (environment: string) => `/arcade/${environment}/scheduler/groupName`;
 
 export class SchedulerModule extends Construct {
 
@@ -80,6 +83,11 @@ export class SchedulerModule extends Construct {
 
 		const arcadeSchedulerRole = new Role(this, 'ArcadeSchedulerRole', {
 			assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
+		});
+
+		new StringParameter(this, 'schedulerGroupNameParameter', {
+			parameterName: schedulerGroupNameParameter(props.environment),
+			stringValue: cfnScheduleGroup.name,
 		});
 
 		// This role will be used by scheduled to push message to SQS

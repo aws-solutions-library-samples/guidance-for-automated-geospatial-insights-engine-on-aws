@@ -12,7 +12,7 @@ import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPer
 export type ResultsStackProperties = StackProps & {
 	environment: string;
 	stacServerTopicArn: string;
-	stacServerFunctionName: string;
+	stacServerUrl: string;
 };
 
 export const resultsTableNameParameter = (environment: string) => `/arcade/${environment}/results/tableName`;
@@ -56,7 +56,7 @@ export class ResultsStack extends Stack {
 			environment: props.environment,
 			bucketName: bucketName,
 			stacServerTopicArn: props.stacServerTopicArn,
-			stacServerFunctionName: props.stacServerFunctionName,
+			stacServerUrl: props.stacServerUrl,
 			eventBusName,
 			regionsApiFunctionArn,
 			cognitoUserPoolId,
