@@ -45,6 +45,8 @@ export function handleError(error, _request, reply) {
 				return reply.badRequest(error.message);
 			case 'NotFoundError':
 				return reply.notFound(error.message);
+			case 'ConflictError':
+				return reply.conflict(error.message);
 			case 'UnauthorizedError':
 				return reply.unauthorized(error.message);
 			case 'InvalidTokenError':

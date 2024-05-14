@@ -2,15 +2,17 @@ import hashlib
 import json
 import os
 import shutil
-from typing import Any, Dict, List, Set, Tuple
-
+from typing import List, Dict, Any, Set, Tuple, Optional
 import boto3
 import numpy as np
 import pyproj
-# This import is required to extend DataArray functionality with rioxarray
-import rioxarray
 from shapely import Polygon
 from xarray import DataArray, Dataset
+
+# This import is required to extend DataArray functionality with rioxarray
+import rioxarray
+
+from stac_catalog_processor import EngineProcessRequest
 
 
 class MetadataUtils:
@@ -41,8 +43,11 @@ class MetadataUtils:
 		return hash_obj.hexdigest()
 
 	@staticmethod
-	def generate_metadata(sentinel_link: Dict[str, Any], bounding_box: List[tuple[float, float]], coordinates: List[Tuple[float, float]], stac_assets: Dataset, temp_dir: str,
-						  bucket_name: str, output_prefix: str):
+	def generate_metadata(sentinel_link: Dict[str, Any], bounding_box: List[tuple[float, float]], stac_assets: Dataset, temp_dir: str, bucket_name: str,
+						  request: EngineProcessRequest):
+
+		coordinates = request.coordinates
+
 		area_acres = MetadataUtils.calculate_area(coordinates)
 		metadata = {
 			"bounding_box": bounding_box,
@@ -53,18 +58,22 @@ class MetadataUtils:
 			"properties": {
 				'area_size': area_acres,
 				'area_unit_of_measure': 'acres',
-				# 'crop_type': crop,
-				# 'crop_planted_at': planted_at
 			},
 			"links": [sentinel_link],
 			"assets": {
 			}
 		}
 
+		if request.state is not None and request.state.tags is not None:
+			if request.state.tags.get('crop') is not None:
+				metadata['properties']['crop_type'] = request.state.tags['crop']
+			if request.state.tags.get('plantedAt') is not None:
+				metadata['properties']['planted_at'] = request.state.tags['plantedAt']
+
 		for root, dirs, files in os.walk(temp_dir):
 			for file in files:
 				file_path = os.path.join(root, file)
-				s3_key = "{}/{}".format(output_prefix, file_path.replace("{}/".format(temp_dir), ''))
+				s3_key = "{}/{}".format(request.output_prefix, file_path.replace("{}/".format(temp_dir), ''))
 				# generate metadata for all band tif file(s)
 				if file.endswith('.tif'):
 					band = file.replace('.tif', "")
@@ -134,18 +143,22 @@ class MetadataUtils:
 		return area_acres
 
 	@staticmethod
-	def generate_nitrogen_metadata(temp_dir, yield_target: float, coordinates: List[Tuple[float, float]]) -> None:
+	def generate_nitrogen_metadata(temp_dir: str, yield_target: Optional[float], coordinates: List[Tuple[float, float]]) -> None:
+		# If there is no yield target, we cannot process nitrogen recommendation
+		if yield_target is None:
+			return
+
 		area_acres = MetadataUtils.calculate_area(coordinates)
 		rotation_list = [{"name": "corn_to_bean", "value": 0.8}, {"name": "bean_to_corn", "value": 0.8}, {"name": "corn_to_corn", "value": 1}]
 		nitrogen_metadata = {}
 		for rotation in rotation_list:
-			calculated_nitrogen_target = yield_target * rotation.get('value') * area_acres
+			calculated_nitrogen_target = yield_target * rotation['value'] * area_acres
 			anhydrous_ammonia = calculated_nitrogen_target / 0.82
 			urea = calculated_nitrogen_target / 0.46
 			uan28 = calculated_nitrogen_target / 3
 			monoammonium_phosphate = calculated_nitrogen_target / 0.11
 			diammonium_phosphate = calculated_nitrogen_target / 0.18
-			nitrogen_metadata[rotation.get('name')] = {
+			nitrogen_metadata[rotation['name']] = {
 				"anhydrous_ammonia": anhydrous_ammonia,
 				"urea": urea,
 				"uan28": uan28,

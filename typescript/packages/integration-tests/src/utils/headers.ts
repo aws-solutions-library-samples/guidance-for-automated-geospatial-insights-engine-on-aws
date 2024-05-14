@@ -3,6 +3,6 @@ export const COMMON_HEADERS = (idToken) => {
 		'Content-Type': 'application/json',
 		Accept: 'application/json',
 		'Accept-Version': '1.0.0',
-		Authorization: `Bearer: ${idToken}`,
+		Authorization: `Bearer ${idToken}`,
 	};
 };

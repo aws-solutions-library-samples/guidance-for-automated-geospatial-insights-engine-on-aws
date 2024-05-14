@@ -57,6 +57,17 @@ export interface PolygonListResource {
 	};
 }
 
+export interface ListStatesOptions {
+	regionId?: string;
+	groupId?: string;
+	polygonId?: string;
+	name?: string;
+	paginationToken?: string;
+	count?: number;
+	includeLatestState?: boolean;
+	tags?: string[];
+}
+
 export interface ListPolygonsOptions {
 	regionId?: string;
 	groupId?: string;

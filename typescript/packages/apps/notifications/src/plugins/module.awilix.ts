@@ -16,6 +16,8 @@ import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
 import { EventPublisher, NOTIFICATIONS_EVENT_SOURCE } from "@arcade/events";
 import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
+import { RegionsClient } from "@arcade/clients";
+import { Invoker } from "@arcade/lambda-invoker";
 
 const { captureAWSv3Client } = pkg;
 
@@ -32,6 +34,9 @@ declare module '@fastify/awilix' {
 		avpClient: VerifiedPermissionsClient;
 		eventBridgeClient: EventBridgeClient;
 		eventPublisher: EventPublisher;
+		lambdaInvoker: Invoker;
+		lambdaClient: LambdaClient;
+		regionsClient: RegionsClient;
 	}
 }
 
@@ -101,6 +106,7 @@ const registerContainer = (app?: FastifyInstance) => {
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
 	const eventBusName = process.env['EVENT_BUS_NAME'];
+	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
 
 	diContainer.register({
 		// Clients
@@ -128,7 +134,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		subscriptionsService: asFunction((container) => new SubscriptionsService(app.log, container.subscriptionsRepository, container.snsClient, container.snsUtil, container.eventPublisher), {
+		subscriptionsService: asFunction((container) => new SubscriptionsService(app.log, container.subscriptionsRepository, container.snsClient, container.snsUtil, container.eventPublisher, container.regionsClient), {
 			...commonInjectionOptions,
 		}),
 
@@ -147,6 +153,20 @@ const registerContainer = (app?: FastifyInstance) => {
 		eventPublisher: asFunction((container: Cradle) => new EventPublisher(app.log, container.eventBridgeClient, eventBusName, NOTIFICATIONS_EVENT_SOURCE), {
 			...commonInjectionOptions,
 		}),
+
+		lambdaClient: asFunction(() => LambdaClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		lambdaInvoker: asFunction((container: Cradle) => new Invoker(app.log, container.lambdaClient), {
+			...commonInjectionOptions,
+		}),
+
+		regionsClient: asFunction((c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName),
+			{
+				...commonInjectionOptions,
+			}
+		),
 	});
 };
 

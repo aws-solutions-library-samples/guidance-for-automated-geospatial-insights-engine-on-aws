@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, test } from 'vitest';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
-import { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } from './common.utils.js';
+import { createResourcesMethodForModules } from "../utils/common.utils.js";
 import { create_group_body } from './groups.data.js';
 import { create_region_body } from './regions.data.js';
 import {
-	POLYGONS_INTEGRATION_TEST_TAG_KEY,
-	POLYGONS_INTEGRATION_TEST_TAG_VALUE,
 	create_polygon_body,
 	created_polygon_resource,
+	POLYGONS_INTEGRATION_TEST_TAG_KEY,
+	POLYGONS_INTEGRATION_TEST_TAG_VALUE,
 	update_polygon_body,
 	updated_polygon_resource,
 } from './polygons.data.js';
@@ -22,7 +22,10 @@ const testTags = {
 	[POLYGONS_INTEGRATION_TEST_TAG_KEY]: POLYGONS_INTEGRATION_TEST_TAG_VALUE,
 };
 
-const constructExpectedPolygonJson = (username: string): object => {
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
+
+
+export const constructExpectedPolygonJson = (username: string): object => {
 	return {
 		...created_polygon_resource(username),
 		...{

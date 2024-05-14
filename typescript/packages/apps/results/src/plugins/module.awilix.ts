@@ -125,8 +125,8 @@ const registerContainer = (app?: FastifyInstance) => {
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 	const bucketName = process.env['BUCKET_NAME'];
 	const tableName = process.env['TABLE_NAME'];
-	const stacServerFunctionName = process.env['STAC_SERVER_FUNCTION_NAME'];
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
+	const stacServerUrl = process.env['STAC_SERVER_URL'];
 	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
 	const openSearchEndPoint = process.env['OPEN_SEARCH_ENDPOINT'];
 	const openSearchSecret = process.env['OPEN_SEARCH_SECRET'];
@@ -179,9 +179,9 @@ const registerContainer = (app?: FastifyInstance) => {
 					app.log,
 					container.snsClient,
 					container.lambdaClient,
-					container.secretsManagerClient,
 					stacServerTopicArn,
-					stacServerFunctionName,
+					stacServerUrl,
+					container.secretsManagerClient,
 					openSearchEndPoint,
 					openSearchSecret
 				),

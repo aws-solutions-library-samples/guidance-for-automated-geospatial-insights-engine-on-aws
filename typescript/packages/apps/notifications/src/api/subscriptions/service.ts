@@ -3,11 +3,20 @@ import { SubscriptionsRepository } from "./repository.js";
 import { SecurityContext } from "../../common/scopes.js";
 import { Subscription, SubscriptionId, SubscriptionListOptions, SubscriptionWithUserId } from "./schemas.js";
 import { ulid } from "ulid";
-import { CreateTopicCommand, GetTopicAttributesCommand, SNSClient, SubscribeCommand, UnsubscribeCommand, } from "@aws-sdk/client-sns";
+import {
+	CreateTopicCommand,
+	DeleteTopicCommand,
+	GetTopicAttributesCommand,
+	ListSubscriptionsByTopicCommand,
+	SNSClient,
+	SubscribeCommand,
+	UnsubscribeCommand
+} from "@aws-sdk/client-sns";
 import ow from 'ow';
 import { SnsUtil } from "../../common/snsUtil.js";
 import { ConflictError } from "../../common/errors.js";
 import { EventPublisher } from "@arcade/events";
+import { RegionsClient } from "@arcade/clients";
 
 export class SubscriptionsService {
 
@@ -18,8 +27,18 @@ export class SubscriptionsService {
 		readonly subscriptionsRepository: SubscriptionsRepository,
 		readonly snsClient: SNSClient,
 		readonly snsUtil: SnsUtil,
-		readonly eventPublisher: EventPublisher
+		readonly eventPublisher: EventPublisher,
+		readonly regionsClient: RegionsClient
 	) {
+	}
+
+	private async deleteSnsTopic(topicArn: string): Promise<void> {
+		this.log.debug(`SubscriptionsService> deleteSnsTopic> topicArn: ${topicArn}`);
+		const listSubscriptionResponse = await this.snsClient.send(new ListSubscriptionsByTopicCommand({ TopicArn: topicArn }))
+		if (listSubscriptionResponse.Subscriptions.length === 0) {
+			await this.snsClient.send(new DeleteTopicCommand({ TopicArn: topicArn }))
+		}
+		this.log.debug(`SubscriptionsService> deleteSnsTopic> exit`);
 	}
 
 	private async createSnsSubscription(regionId: string, phoneNumber: string): Promise<string> {
@@ -51,6 +70,17 @@ export class SubscriptionsService {
 		ow(createSubscription, ow.object.nonEmpty);
 		ow(createSubscription.regionId, ow.string.nonEmpty);
 
+		// this will throw exception if region does not exist
+		await this.regionsClient.getRegionById(createSubscription.regionId, {
+				authorizer: {
+					claims: {
+						email: securityContext.email,
+						'custom:role': `/|||${securityContext.role}}`,
+					},
+				},
+			}
+		);
+
 		const existingSubscription = await this.subscriptionsRepository.getByRegionId(securityContext.sub, createSubscription.regionId);
 		if (existingSubscription) {
 			throw new ConflictError(`Subscription exists to region ${createSubscription.regionId} for user: ${securityContext.email}`)
@@ -80,7 +110,7 @@ export class SubscriptionsService {
 	}
 
 	public async list(securityContext: SecurityContext, options: SubscriptionListOptions): Promise<[Subscription[], SubscriptionId]> {
-		this.log.debug(`SubscriptionsService> list>  options: ${options}`);
+		this.log.debug(`SubscriptionsService> list> options: ${JSON.stringify(options)}`);
 		let listResponse: [Subscription[], SubscriptionId];
 		listResponse = await this.subscriptionsRepository.list(securityContext.sub, options);
 		this.log.debug(`SubscriptionsService> list> exit>`);
@@ -91,7 +121,14 @@ export class SubscriptionsService {
 		ow(subscriptionId, ow.string.nonEmpty);
 		this.log.debug(`SubscriptionsService> delete> subscriptionId: ${subscriptionId}`);
 		const subscription = await this.subscriptionsRepository.get(securityContext.sub, subscriptionId);
-		await Promise.all([this.subscriptionsRepository.delete(securityContext.sub, subscriptionId), this.snsClient.send(new UnsubscribeCommand({ SubscriptionArn: subscription.subscriptionArn }))])
+		// delete subscription information from DynamoDB and also from SNS
+		await Promise.all([
+			this.subscriptionsRepository.delete(securityContext.sub, subscriptionId),
+			this.snsClient.send(new UnsubscribeCommand({ SubscriptionArn: subscription.subscriptionArn }))
+		])
+
+		// delete the topic is no user is subscribing to it
+		await this.deleteSnsTopic(this.snsUtil.topicArn(subscription.regionId))
 
 		// publish the event
 		await this.eventPublisher.publishEvent({
@@ -100,7 +137,6 @@ export class SubscriptionsService {
 			resourceType: 'Subscription',
 			old: subscription
 		});
-
 		this.log.debug(`SubscriptionsService> delete> exit>`);
 	}
 }

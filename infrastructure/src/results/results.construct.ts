@@ -48,7 +48,7 @@ export interface ResultsConstructProperties {
 	readonly eventBusName: string;
 	readonly bucketName: string;
 	readonly stacServerTopicArn: string;
-	readonly stacServerFunctionName: string;
+	readonly stacServerUrl: string;
 	readonly regionsApiFunctionArn: string;
 	readonly cognitoUserPoolId: string;
 	readonly cognitoClientId: string;
@@ -256,7 +256,7 @@ export class ResultsModule extends Construct {
 				EVENT_BUS_NAME: props.eventBusName,
 				TABLE_NAME: table.tableName,
 				STAC_SERVER_TOPIC_ARN: topic.topicArn,
-				STAC_SERVER_FUNCTION_NAME: props.stacServerFunctionName,
+				STAC_SERVER_URL: props.stacServerUrl,
 				REGIONS_FUNCTION_NAME: regionsApiLambda.functionName,
 				BUCKET_NAME: bucket.bucketName,
 			},

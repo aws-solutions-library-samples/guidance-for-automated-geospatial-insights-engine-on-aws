@@ -1,10 +1,8 @@
-import sign from 'jwt-encode';
 import { Amplify } from 'aws-amplify';
 import { signIn } from '@aws-amplify/auth';
 import { fetchAuthSession } from '@aws-amplify/core';
-import { CognitoIdentityProviderClient, AdminSetUserPasswordCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminSetUserPasswordCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 import { error } from 'console';
-import { ulid } from 'ulid';
 
 // use https://jwt.io/ to manually encode/decode tokens for testing
 // export const CONTRIBUTOR_TOKEN =
@@ -76,8 +74,7 @@ export async function authorizeUser(username: string, password: string, newPassw
 	} catch (err) {
 		if (err.name === 'UserAlreadyAuthenticatedException') {
 			const tokens = (await fetchAuthSession({})).tokens;
-			const idToken = tokens?.idToken?.toString();
-			return idToken;
+			return tokens?.idToken?.toString();
 		} else {
 			// swallow errors but log incase of false positive
 			console.log(`authorizeUser: err: ${JSON.stringify(err)}`);
@@ -90,20 +87,7 @@ export async function authorizeUser(username: string, password: string, newPassw
 
 export async function getAuthToken(username?: string, password?: string, token?: string): Promise<string> {
 	if (!token || token === 'NotAuthorizedException') {
-		if (process.env.NODE_ENV === 'local') {
-			// Create a claims JSON object.
-			const claims = {
-				sub: ulid(),
-				name: username,
-				iat: Math.floor(Date.now() / 1000),
-				exp: Math.floor(Date.now() / 1000) + 60 * 60, // expires in 1 hour
-				email: username,
-				'custom:role': 'contributor',
-			};
-			token = sign(claims, 'secret');
-		} else {
-			token = await authorizeUser(username, password);
-		}
+		token = await authorizeUser(username, password);
 	}
 	return token;
 }

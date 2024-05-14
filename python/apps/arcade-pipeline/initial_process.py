@@ -65,16 +65,19 @@ def start_task(
 		cloud_gap_fill_processor = CloudGapFillProcessor(previous_ndvi_raster)
 		ndvi_change_processor = NdviChangeProcessor(previous_ndvi_raster)
 		tif_image_processor = TifImageProcessor(temp_dir, previous_ndvi_raster)
-		nitrogen_processor = NitrogenProcessor(temp_dir, 20, request.coordinates, previous_ndvi_raster)
+		last_processor = cloud_removal_processor.set_next(ndvi_raw_processor).set_next(cloud_gap_fill_processor).set_next(ndvi_change_processor).set_next(tif_image_processor)
 
-		cloud_removal_processor.set_next(ndvi_raw_processor).set_next(cloud_gap_fill_processor).set_next(ndvi_change_processor).set_next(tif_image_processor).set_next(
-			nitrogen_processor)
+		# only run the nitrogen processor if we have the yield target
+		if request.state is not None and request.state.attributes is not None and request.state.attributes.get('estimatedYield') is not None:
+			estimated_yield = float(request.state.attributes['estimatedYield'])
+			nitrogen_processor = NitrogenProcessor(temp_dir, estimated_yield, request.coordinates, previous_ndvi_raster)
+			last_processor.set_next(nitrogen_processor)
 
 		stac_assets = cloud_removal_processor.process(stac_assets)
 
 		sentinel_link = [{"rel": "derived_from", "href": link.href, "type": link.media_type} for link in processor.stac_item.links if link.rel == 'self'].pop()
 
-		MetadataUtils.generate_metadata(sentinel_link, processor.bounding_box.tolist(), request.coordinates, stac_assets, temp_dir, output_bucket, request.output_prefix)
+		MetadataUtils.generate_metadata(sentinel_link, processor.bounding_box.tolist(), stac_assets, temp_dir, output_bucket, request)
 
 		MetadataUtils.upload_assets(output_bucket, request.output_prefix, temp_dir)
 

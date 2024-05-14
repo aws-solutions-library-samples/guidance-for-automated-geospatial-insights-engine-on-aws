@@ -1,9 +1,9 @@
 import type { CatalogDetails, GroupDetails, RegionDetails } from '../results/models.js';
 import { EngineJobDetails, polygonProcessingDetails } from '../results/models.js';
 
-type EventType = 'created' | 'updated' | 'deleted';
+export type EventType = 'created' | 'updated' | 'deleted';
 
-type ResourceType = 'Polygon' | 'Group' | 'Region' | 'State' | 'Job' | 'Result' | 'Subscription';
+export type ResourceType = 'Polygon' | 'Group' | 'Region' | 'State' | 'Job' | 'Result' | 'Subscription';
 
 export interface DomainEvent<T> {
 	resourceType: ResourceType;

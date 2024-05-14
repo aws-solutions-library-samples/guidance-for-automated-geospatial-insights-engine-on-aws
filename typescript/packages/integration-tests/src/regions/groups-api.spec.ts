@@ -1,15 +1,18 @@
 import { afterEach, beforeEach, describe, test } from 'vitest';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
-import { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } from './common.utils.js';
+import { createResourcesMethodForModules } from "../utils/common.utils.js";
 import {
-	GROUPS_INTEGRATION_TEST_TAG_KEY,
-	GROUPS_INTEGRATION_TEST_TAG_VALUE,
 	create_group_body,
 	created_group_resource,
+	GROUPS_INTEGRATION_TEST_TAG_KEY,
+	GROUPS_INTEGRATION_TEST_TAG_VALUE,
 	update_group_body,
 	updated_group_resource,
 } from './groups.data.js';
 import { getAuthToken } from '../utils/auth.js';
+
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
+
 
 const TEST_PREFIX = 'regions module (groups): ';
 
