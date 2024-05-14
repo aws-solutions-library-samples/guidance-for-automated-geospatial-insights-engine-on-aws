@@ -7,13 +7,13 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EngineStack } from './engine/engine.stack.js';
+import { NotificationsStack } from './notifications/notifications.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
-import { ResultsStack } from './results/results.stack.js';
 import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
-import { NotificationsStack } from './notifications/notifications.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 import { StacServerStack } from './stacServer/stacServer.stack.js';
+import { UIApiStack } from './ui/ui.stack.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,8 +37,8 @@ const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 
 // Stac server parameters
-const stacServerTopicArn = getOrThrow(app, 'stacServerTopicArn') as string;
-const stacServerFunctionName = getOrThrow(app, 'stacServerFunctionName') as string;
+// const stacServerTopicArn = getOrThrow(app, 'stacServerTopicArn') as string;
+// const stacServerFunctionName = getOrThrow(app, 'stacServerFunctionName') as string;
 const stacServerOpenSearchEndpoint = app.node.tryGetContext('stacServerOpenSearchEndpoint') as string;
 const stacServerOpenSearchSecret = app.node.tryGetContext('stacServerOpenSearchSecret') as string;
 const stacServerUrl = app.node.tryGetContext('stacServerUrl') as string;
@@ -104,20 +104,20 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	schedulerStack.addDependency(engineStack);
 	schedulerStack.addDependency(regionsStack);
 
-	const resultStack = new ResultsStack(app, 'ResultsModule', {
-		stackName: stackName('results'),
-		description: stackDescription('Results module stack'),
-		environment,
-		env: {
-			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
-		stacServerTopicArn,
-		stacServerFunctionName,
-	});
+	// const resultStack = new ResultsStack(app, 'ResultsModule', {
+	// 	stackName: stackName('results'),
+	// 	description: stackDescription('Results module stack'),
+	// 	environment,
+	// 	env: {
+	// 		region: callerEnvironment?.region,
+	// 		account: callerEnvironment?.accountId,
+	// 	},
+	// 	stacServerTopicArn,
+	// 	stacServerFunctionName,
+	// });
 
-	resultStack.addDependency(sharedStack);
-	resultStack.addDependency(regionsStack);
+	// resultStack.addDependency(sharedStack);
+	// resultStack.addDependency(regionsStack);
 
 	// Only deploy when openSearch endpoint has been supplied
 	if (stacServerOpenSearchEndpoint) {
@@ -142,6 +142,13 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	});
 
 	notificationsStack.addDependency(sharedStack);
+
+	const uiStack = new UIApiStack(app, 'UIModule', {
+		stackName: stackName('ui'),
+		description: stackDescription('UI'),
+		environment,
+	});
+	uiStack.addDependency(sharedStack);
 };
 
 const getCallerEnvironment = (): { accountId?: string; region?: string } | undefined => {

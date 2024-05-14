@@ -1,13 +1,13 @@
 import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import { Catalog, CatalogDetails, Collection, GroupDetails, polygonProcessingDetails, RegionDetails, StacItem } from '@arcade/events';
+import { Catalog, CatalogDetails, Collection, GroupDetails, RegionDetails, StacItem, polygonProcessingDetails } from '@arcade/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import type { BaseLogger } from 'pino';
-import { DefaultStacRecords } from './defaultStacRecords.js';
-import { EngineMetadata } from '../events/models.js';
 import ow from 'ow';
+import type { BaseLogger } from 'pino';
+import { EngineMetadata } from '../events/models.js';
+import { DefaultStacRecords } from './defaultStacRecords.js';
 
 dayjs.extend(utc);
 

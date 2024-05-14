@@ -1,8 +1,7 @@
 import numpy as np
-from xarray import Dataset
-
 from processors.base_processors import AbstractProcessor
 from processors.metadata_utils import MetadataUtils
+from xarray import Dataset
 
 
 class TifImageProcessor(AbstractProcessor):

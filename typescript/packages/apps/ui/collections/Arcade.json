@@ -1,0 +1,398 @@
+{
+  "name": "Arcade",
+  "version": "1",
+  "items": [
+    {
+      "type": "json",
+      "name": "bruno",
+      "seq": 1
+    },
+    {
+      "type": "folder",
+      "name": "TileJSON",
+      "items": [
+        {
+          "type": "http",
+          "name": "Sentinel TileJSON",
+          "seq": 2,
+          "request": {
+            "url": "{{tiler_endpoint}}stac/WebMercatorQuad/tilejson.json?url={{sentinel_stac_endpoint}}/collections/{{sentinel_collection_id}}/items/{{sentinel_item_id}}&assets=B04&assets=B03&assets=B02&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "url",
+                "value": "{{sentinel_stac_endpoint}}/collections/{{sentinel_collection_id}}/items/{{sentinel_item_id}}",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "B04",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "B03",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "B02",
+                "enabled": true
+              },
+              {
+                "name": "color_formula",
+                "value": "Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+                "enabled": true
+              }
+            ]
+          }
+        },
+        {
+          "type": "http",
+          "name": "Arcade TileJSON",
+          "seq": 2,
+          "request": {
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/WebMercatorQuad/tilejson.json?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "url",
+                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "red",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "green",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "blue",
+                "enabled": true
+              },
+              {
+                "name": "color_formula",
+                "value": "Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Tiles",
+      "items": [
+        {
+          "type": "http",
+          "name": "Arcade Tile",
+          "seq": 2,
+          "request": {
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "url",
+                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "red",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "green",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "blue",
+                "enabled": true
+              },
+              {
+                "name": "color_formula",
+                "value": "Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+                "enabled": true
+              },
+              {
+                "name": "colormap_name",
+                "value": "cfastie",
+                "enabled": false
+              },
+              {
+                "name": "rescale",
+                "value": "-1,1",
+                "enabled": false
+              }
+            ]
+          }
+        },
+        {
+          "type": "http",
+          "name": "Arcade NVDI Tile",
+          "seq": 2,
+          "request": {
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=ndvi&colormap_name=viridis&rescale=-1,1",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "url",
+                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "enabled": true
+              },
+              {
+                "name": "assets",
+                "value": "ndvi",
+                "enabled": true
+              },
+              {
+                "name": "colormap_name",
+                "value": "viridis",
+                "enabled": true
+              },
+              {
+                "name": "rescale",
+                "value": "-1,1",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "STAC",
+      "items": [
+        {
+          "type": "http",
+          "name": "Sentinel Features Query",
+          "seq": 1,
+          "request": {
+            "url": "{{sentinel_stac_endpoint}}/search",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/geo+json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "json": "{\n  \"collections\": [\n    \"sentinel-s2-l2a-cogs\"\n  ],\n  \"intersects\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [\n      [\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ]\n      ]\n    ]\n  },\n  \"limit\": 2,\n  \"fields\": {\n    \"include\": [\n      \"id\",\n      \"properties.datetime\"\n    ],\n    \"exclude\": [\n      \"assets\",\n      \"links\"\n    ]\n  },\n  \"sortBy\": [\n    {\n      \"field\": \"properties.datetime\",\n      \"direction\": \"desc\"\n    }\n  ]\n}",
+              "text": "{\n  \"collections\": [\n    \"sentinel-s2-l2a-cogs\"\n  ],\n  \"intersects\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [\n      [\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ]\n      ]\n    ]\n  },\n  \"limit\": 2,\n  \"fields\": {\n    \"include\": [\n      \"id\",\n      \"properties.datetime\"\n    ],\n    \"exclude\": [\n      \"assets\"\n    ]\n  },\n  \"sortBy\": [\n    {\n      \"field\": \"properties.datetime\",\n      \"direction\": \"desc\"\n    }\n  ]\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Arcade Features Query",
+          "seq": 2,
+          "request": {
+            "url": "{{arcade_stac_endpoint}}/search",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/geo+json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"intersects\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [\n      [\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.884511781509104\n        ],\n        [\n          -104.4111718274535,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.95415751015051\n        ],\n        [\n          -104.56764117254625,\n          39.884511781509104\n        ]\n      ]\n    ]\n  },\n  \"limit\": 20,\n  \"fields\": {\n    \"include\": [\n      \"id\",\n      \"properties\",\n      \"assets.ndvi\"\n    ],\n    \"exclude\": [\n      \"assets.blue\",\n      \"assets.green\",\n      \"assets.ndvi_change\",\n      \"assets.nir08\",\n      \"assets.red\",\n      \"assets.scl\"\n    ]\n  },\n  \"sortBy\": [\n    {\n      \"field\": \"properties.datetime\",\n      \"direction\": \"desc\"\n    }\n  ]\n}",
+              "text": "{\n    \"intersects\": {\n        \"type\": \"Polygon\",\n        \"coordinates\": [\n            [\n                [\n                    -104.56764117254625,\n                    39.884511781509104\n                ],\n                [\n                    -104.4111718274535,\n                    39.884511781509104\n                ],\n                [\n                    -104.4111718274535,\n                    39.95415751015051\n                ],\n                [\n                    -104.56764117254625,\n                    39.95415751015051\n                ],\n                [\n                    -104.56764117254625,\n                    39.884511781509104\n                ]\n            ]\n        ]\n    },\n    \"limit\": 20,\n    \"fields\": {\n        \"include\": [\n            \"id\",\n            \"properties\",\n            \"assets.ndvi\"\n        ],\n        \"exclude\": [\n            \"links\",\n            \"assets.blue\",\n            \"assets.green\",\n            \"assets.ndvi_change\",\n            \"assets.nir08\",\n            \"assets.red\",\n            \"assets.scl\"\n        ]\n    },\n    \"sortBy\": [\n        {\n            \"field\": \"properties.datetime\",\n            \"direction\": \"desc\"\n        }\n    ]\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        }
+      ]
+    }
+  ],
+  "activeEnvironmentUid": "Hm2eTadm6WgaENB4ilYMV",
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "arcade_stac_endpoint",
+          "value": "https://494srbp0ae.execute-api.us-west-2.amazonaws.com/dev/",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "tiler_endpoint",
+          "value": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "sentinel_stac_endpoint",
+          "value": "https://earth-search.aws.element84.com/v0/",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "sentinel_collection_id",
+          "value": "sentinel-s2-l2a-cogs",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "arcade_collection_id",
+          "value": "region_01hwcet7zyhy0xe31mmfwh6qgk",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "sentinel_item_id",
+          "value": "S2B_10SFJ_20230325_0_L2A",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "arcade_item_id",
+          "value": "01hwcf5s2s1h49jpf8s58qhrkb_20230725_000000",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "auth_token",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "Dev"
+    }
+  ]
+}
