@@ -1,9 +1,9 @@
 import type { StacServerClient } from '@arcade/clients';
 import type { CatalogCreateEvent, RegionChangeEvent } from '@arcade/events';
 import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
-import { StacUtil } from '../utils/stacUtil.js';
-import { ResultsService } from '../api/results/service.js';
 import { FastifyBaseLogger } from 'fastify';
+import { ResultsService } from '../api/results/service.js';
+import { StacUtil } from '../utils/stacUtil.js';
 
 export class EventProcessor {
 	constructor(

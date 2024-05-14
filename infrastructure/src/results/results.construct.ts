@@ -1,5 +1,6 @@
 import { getLambdaArchitecture } from '@arcade/cdk-common';
 import {
+	CLI_CATALOG_CREATE_EVENT,
 	EXECUTOR_JOB_CREATED_EVENT,
 	EXECUTOR_JOB_UPDATED_EVENT,
 	EXECUTOR_POLYGON_METADATA_CREATED_EVENT,
@@ -9,24 +10,8 @@ import {
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
-	CLI_CATALOG_CREATE_EVENT,
 } from '@arcade/events';
 import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
-import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
-import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
-import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { NagSuppressions } from 'cdk-nag';
-import { Construct } from 'constructs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Topic } from 'aws-cdk-lib/aws-sns';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import {
 	AccessLogFormat,
 	AuthorizationType,
@@ -39,6 +24,21 @@ import {
 	MethodLoggingLevel,
 	RequestAuthorizer,
 } from 'aws-cdk-lib/aws-apigateway';
+import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

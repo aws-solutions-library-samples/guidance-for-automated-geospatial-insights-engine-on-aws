@@ -110,7 +110,7 @@ export interface polygonsProcessingEvent {
 export type {
 	catalogCreateEvent as CatalogCreateEvent,
 	groupChangeEvent as GroupChangeEvent,
+	polygonsProcessingEvent as PolygonsProcessingEvent,
 	regionChangeEvent as RegionChangeEvent,
 	resultsChangeEvent as ResultsChangeEvent,
-	polygonsProcessingEvent as PolygonsProcessingEvent,
 };

@@ -1,7 +1,6 @@
-from xarray import Dataset
-
 from processors.base_processors import AbstractProcessor
 from processors.xarray_utils import XarrayUtils
+from xarray import Dataset
 
 
 class CloudRemovalProcessor(AbstractProcessor):

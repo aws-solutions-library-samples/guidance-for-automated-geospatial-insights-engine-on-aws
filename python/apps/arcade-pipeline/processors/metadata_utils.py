@@ -2,15 +2,15 @@ import hashlib
 import json
 import os
 import shutil
-from typing import List, Dict, Any, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
+
 import boto3
 import numpy as np
 import pyproj
-from shapely import Polygon
-from xarray import DataArray, Dataset
-
 # This import is required to extend DataArray functionality with rioxarray
 import rioxarray
+from shapely import Polygon
+from xarray import DataArray, Dataset
 
 
 class MetadataUtils:

@@ -385,6 +385,12 @@
 			"projectFolder": "typescript/packages/libraries/helpers",
 			"reviewCategory": "production",
 			"shouldPublish": true
+		},
+		{
+			"packageName": "@arcade/ui",
+			"projectFolder": "typescript/packages/apps/ui",
+			"reviewCategory": "production",
+			"shouldPublish": true
 		}
 		// {
 		//   /**

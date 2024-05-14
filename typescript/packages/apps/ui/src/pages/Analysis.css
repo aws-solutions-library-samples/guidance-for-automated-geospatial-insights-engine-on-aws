@@ -1,0 +1,30 @@
+.maplibregl-popup-content {
+	background-color: green;
+	border-radius: 30px;
+	padding: 0;
+}
+.maplibregl-popup-tip {
+	border-top-color: var(--color-border-divider-default-j74lyz, #b6bec9) !important;
+}
+.close-button-container {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.control-panel-container {
+	position: absolute;
+	bottom: 1rem;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: white;
+	border-radius: 30px;
+	padding: 5px 9px;
+	border-color: var(--color-border-divider-default-j74lyz, #b6bec9);
+	border-width: 2px;
+	border-style: solid;
+}
+
+.awsui_title_k5dlb_d6w6r_228:not(#\9) {
+	overflow: visible;
+}

@@ -1,4 +1,3 @@
-import { buildLightApp } from './app.light.js';
 import {
 	CatalogCreateEvent,
 	CLI_CATALOG_CREATE_EVENT,
@@ -22,8 +21,9 @@ import {
 import type { AwilixContainer } from 'awilix';
 import type { Callback, Context, EventBridgeHandler } from 'aws-lambda';
 import type { FastifyInstance } from 'fastify';
-import type { EventProcessor } from './events/eventProcessor.js';
 import ow from 'ow';
+import { buildLightApp } from './app.light.js';
+import type { EventProcessor } from './events/eventProcessor.js';
 
 const app: FastifyInstance = await buildLightApp();
 const di: AwilixContainer = app.diContainer;
@@ -44,9 +44,9 @@ export const handler: EventBridgeHandler<string, EventDetails, void> = async (ev
 	if ((event['detail-type'] as string) === CLI_CATALOG_CREATE_EVENT && event['source'] === CLI_EVENT_SOURCE) {
 		await eventProcessor.processCatalogCreationEvent(event as unknown as CatalogCreateEvent);
 	} else if ([REGIONS_GROUP_CREATED_EVENT, REGIONS_GROUP_UPDATED_EVENT, REGIONS_GROUP_DELETED_EVENT].includes(event['detail-type']) && event['source'] === REGIONS_EVENT_SOURCE) {
-	/**
-	 * Filter the group collection change event received from the regions module
-	 */
+		/**
+		 * Filter the group collection change event received from the regions module
+		 */
 		await eventProcessor.processGroupChangeEvent(event as unknown as GroupChangeEvent);
 	} else if (
 		/**

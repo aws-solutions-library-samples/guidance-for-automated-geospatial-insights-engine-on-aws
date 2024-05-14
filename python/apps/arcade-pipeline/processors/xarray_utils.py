@@ -2,7 +2,7 @@ from typing import Optional
 
 import numpy as np
 import xarray as xr
-from xarray import Dataset, DataArray
+from xarray import DataArray, Dataset
 
 
 class XarrayUtils:
