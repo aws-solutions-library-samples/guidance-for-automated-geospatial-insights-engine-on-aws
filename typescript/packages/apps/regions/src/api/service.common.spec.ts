@@ -13,7 +13,7 @@
 
 import pino from 'pino';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MockProxy, mock } from 'vitest-mock-extended';
+import { mock, MockProxy } from 'vitest-mock-extended';
 import { PkType } from '../common/pkTypes.js';
 import { Tags } from '../common/schemas.js';
 import { TagUtils } from '../tags/tags.util.js';
@@ -87,6 +87,8 @@ describe('CommonService', () => {
 		const existing: Group = {
 			id: 'some-id',
 			name: 'group 1',
+			totalArea: 100,
+			totalRegions: 2,
 			attributes: {
 				attr1: 'attr-one',
 				attr2: 'attr-two',

@@ -24,6 +24,8 @@ export const regionResourceExample1: Region = {
 	...regionPostRequestExample,
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
+	totalArea: 100,
+	totalPolygons: 2
 };
 
 export const regionResourceExample2: Region = {
@@ -34,6 +36,8 @@ export const regionResourceExample2: Region = {
 	createdBy: 'someone@somewhere.com',
 	updatedAt: '2022-08-12T07:34:23.132Z',
 	updatedBy: 'someoneelse@somewhere.com',
+	totalArea: 100,
+	totalPolygons: 2
 };
 
 export const regionResourceExample3: Region = {
@@ -42,6 +46,8 @@ export const regionResourceExample3: Region = {
 	name: 'Bashirian Paddock',
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
+	totalArea: 100,
+	totalPolygons: 2
 };
 
 export const regionListResource: RegionList = {

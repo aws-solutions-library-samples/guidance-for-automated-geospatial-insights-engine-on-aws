@@ -34,6 +34,7 @@ import { StateRepository } from '../api/states/repository.js';
 import { StateService } from '../api/states/service.js';
 import { TagUtils } from '../tags/tags.util.js';
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
+import { SQSClient } from "@aws-sdk/client-sqs";
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -43,6 +44,7 @@ declare module '@fastify/awilix' {
 		dynamoDBDocumentClient: DynamoDBDocumentClient;
 		dynamoDbUtils: DynamoDbUtils;
 		eventBridgeClient: EventBridgeClient;
+		sqsClient: SQSClient;
 		eventPublisher: EventPublisher;
 		groupRepository: GroupRepository;
 		groupService: GroupService;
@@ -61,12 +63,21 @@ declare module '@fastify/awilix' {
 // factories for instantiation of 3rd party objects
 class EventBridgeClientFactory {
 	public static create(region: string): EventBridgeClient {
-		const eventBridge = captureAWSv3Client(
+		return captureAWSv3Client(
 			new EventBridgeClient({
 				region,
 			})
 		);
-		return eventBridge;
+	}
+}
+
+class SQSClientFactory {
+	public static create(region: string): SQSClient {
+		return captureAWSv3Client(
+			new SQSClient({
+				region,
+			})
+		);
 	}
 }
 
@@ -121,6 +132,9 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 	// then we can register our classes with the DI container
 	diContainer.register({
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+		sqsClient: asFunction(() => SQSClientFactory.create(awsRegion), {
 			...commonInjectionOptions,
 		}),
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {

@@ -26,8 +26,8 @@ import {
 	RequestAuthorizer,
 } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
-import { EventBus } from 'aws-cdk-lib/aws-events';
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -36,6 +36,17 @@ import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+	REGIONS_POLYGON_CREATED_EVENT,
+	REGIONS_POLYGON_DELETED_EVENT,
+	REGIONS_POLYGON_UPDATED_EVENT,
+	REGIONS_REGION_CREATED_EVENT,
+	REGIONS_REGION_DELETED_EVENT,
+	REGIONS_REGION_UPDATED_EVENT
+} from "@arcade/events";
+import { Queue } from "aws-cdk-lib/aws-sqs";
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -300,8 +311,181 @@ export class RegionsModule extends Construct {
 			stringValue: apigw.restApiName,
 		});
 
+		/**
+		 * Defines the lambda that will update aggregated data into resources attribute
+		 */
+		const resourcesModifiedRule = new Rule(this, 'ResourcesModifiedRule', {
+			eventBus: eventBus,
+			eventPattern: {
+				detailType: [
+					// These events will trigger the creation/deletion of region stac item
+					REGIONS_REGION_CREATED_EVENT,
+					REGIONS_REGION_UPDATED_EVENT,
+					REGIONS_REGION_DELETED_EVENT,
+					// This events will trigger the creation of the catalog
+					REGIONS_POLYGON_CREATED_EVENT,
+					REGIONS_POLYGON_UPDATED_EVENT,
+					REGIONS_POLYGON_DELETED_EVENT,
+				],
+			},
+		});
+
+
+		const resourcesModifiedDlq = new Queue(this, `ResourcesModifiedDLQ`,
+			{ queueName: `${namePrefix}-resources-modified-dlq.fifo`, fifo: true });
+
+		resourcesModifiedDlq.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [resourcesModifiedDlq.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
+
+		const resourcesModifiedFifoQueue = new Queue(this, 'ResourcesModifiedFifoQueue', {
+			queueName: `${namePrefix}-resources-modified-queue.fifo`,
+			contentBasedDeduplication: true,
+			fifo: true,
+			deadLetterQueue: {
+				maxReceiveCount: 10,
+				queue: resourcesModifiedDlq,
+			},
+			visibilityTimeout: Duration.minutes(15),
+		});
+
+		resourcesModifiedFifoQueue.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [resourcesModifiedFifoQueue.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
+
+		// Lambda function that processor schedule queued in SQS
+		const eventbridgeLambda = new NodejsFunction(this, 'EventBridgeProcessorLambda', {
+			description: 'Regions module eventbridge processor',
+			entry: path.join(__dirname, '../../../typescript/packages/apps/regions/src/lambda_eventbridge.ts'),
+			functionName: `${namePrefix}-regions-eventbridge-processor`,
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 512,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.minutes(1),
+			environment: {
+				EVENT_BUS_NAME: props.eventBusName,
+				SQS_QUEUE_URL: resourcesModifiedFifoQueue.queueUrl,
+			},
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20.1',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk', 'pg-native'],
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
+		});
+
+		resourcesModifiedFifoQueue.grantSendMessages(eventbridgeLambda);
+
+		const resourcesModifiedEventBridgeDLQ = new Queue(this, `ResourcesModifiedEventBridgeDLQ`,
+			{ queueName: `${namePrefix}-resources-modified-eventbridge-dlq` });
+
+		resourcesModifiedEventBridgeDLQ.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [resourcesModifiedEventBridgeDLQ.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
+
+		resourcesModifiedRule.addTarget(new LambdaFunction(eventbridgeLambda, {
+			deadLetterQueue: resourcesModifiedEventBridgeDLQ,
+			maxEventAge: Duration.minutes(5),
+			retryAttempts: 2,
+		}));
+
+		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
+			description: 'Regions module sqs processor',
+			entry: path.join(__dirname, '../../../typescript/packages/apps/regions/src/lambda_sqs.ts'),
+			functionName: `${namePrefix}-regions-sqs-processor`,
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 512,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.minutes(1),
+			environment: {
+				EVENT_BUS_NAME: props.eventBusName,
+				ENVIRONMENT: props.environment,
+				NODE_ENV: 'cloud',
+				TABLE_NAME: this.tableName,
+			},
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20.1',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk', 'pg-native'],
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
+		});
+
+		table.grantReadWriteData(sqsProcessorLambda);
+		eventBus.grantPutEventsTo(sqsProcessorLambda);
+
+		// deny apiLambda accidental full table scans on table seeing as PartiQL is used
+		sqsProcessorLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['dynamodb:Scan'],
+				effect: Effect.DENY,
+				resources: [table.tableArn],
+			})
+		);
+
+		// Grant partiSQLSelect access
+		sqsProcessorLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['dynamodb:PartiQLSelect'],
+				effect: Effect.ALLOW,
+				resources: [table.tableArn, `${table.tableArn}/index/*`],
+			})
+		);
+
+		sqsProcessorLambda.addEventSource(
+			new SqsEventSource(resourcesModifiedFifoQueue, {
+				batchSize: 10,
+				reportBatchItemFailures: true,
+			})
+		);
+
 		NagSuppressions.addResourceSuppressions(
-			[apiLambda],
+			[apiLambda, sqsProcessorLambda, eventbridgeLambda],
 			[
 				{
 					id: 'AwsSolutions-IAM4',
@@ -371,6 +555,32 @@ export class RegionsModule extends Construct {
 					id: 'AwsSolutions-COG4',
 					reason: 'OPTIONS does not use Cognito auth.',
 				},
+			],
+			true
+		);
+
+		NagSuppressions.addResourceSuppressions(
+			[resourcesModifiedDlq, resourcesModifiedEventBridgeDLQ],
+			[
+				{
+					id: 'AwsSolutions-SQS3',
+					reason: 'This is the dead letter queue.',
+				},
+			],
+			true
+		);
+
+		NagSuppressions.addResourceSuppressions(
+			[resourcesModifiedFifoQueue],
+			[
+				{
+					id: 'AwsSolutions-SQS4',
+					reason: 'This is the dead letter queue.',
+				},
+				{
+					id: 'AwsSolutions-SQS2',
+					reason: 'This is the dead letter queue.',
+				}
 			],
 			true
 		);

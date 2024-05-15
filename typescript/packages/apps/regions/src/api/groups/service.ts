@@ -8,7 +8,7 @@ import { SecurityContext } from '../../common/scopes.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { GroupRepository } from './repository.js';
-import { CreateGroup, EditGroup, Group } from './schemas.js';
+import { CreateGroup, EditGroup, Group, UpdateAggregatedRegionsParameter } from './schemas.js';
 
 export type GroupListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -40,8 +40,9 @@ export class GroupService {
 		);
 
 		// TODO: perform more detailed validation on attributes and tags
-
 		const toSave = this.commonService.prepareResourceForCreate<CreateGroup, Group>(group, RESERVED_AS_TAGS, { createdBy: securityContext.email });
+		toSave.totalRegions = 0;
+		toSave.totalArea = 0;
 
 		// save
 		await this.groupRepository.create(toSave);
@@ -62,6 +63,31 @@ export class GroupService {
 		// return
 		this.log.debug(`GroupService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
+	}
+
+	public async updateAggregatedRegionsAttributes(id: string, updateParameter: UpdateAggregatedRegionsParameter): Promise<void> {
+		this.log.debug(`RegionService> updateAggregatedRegionsAttributes> id:${id}, updateParameter:${JSON.stringify(updateParameter)}`);
+		ow(
+			updateParameter,
+			ow.object.exactShape({
+				totalAreaDelta: ow.number.not.infinite,
+				totalRegionsDelta: ow.number.not.infinite
+			})
+		);
+		// retrieve existing
+		const existing = await this.groupRepository.get(id);
+		if (existing) {
+			const updated = await this.groupRepository.updateAggregatedAttribute(id, updateParameter)
+			// publish the event
+			await this.eventPublisher.publishEvent({
+				eventType: 'updated',
+				id: updated.id,
+				resourceType: 'Group',
+				old: existing,
+				new: updated,
+			});
+		}
+		this.log.debug(`RegionService> updateAggregatedRegionsAttributes> exit>`);
 	}
 
 	public async update(securityContext: SecurityContext, id: string, group: EditGroup): Promise<Group> {

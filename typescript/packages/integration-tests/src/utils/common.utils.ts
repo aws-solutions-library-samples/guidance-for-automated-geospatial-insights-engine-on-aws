@@ -7,6 +7,7 @@ import { COMMON_HEADERS } from '../utils/headers.js';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { Client } from "@opensearch-project/opensearch";
+import pWaitFor from "p-wait-for";
 
 
 request.setDefaultTimeout(5000)
@@ -41,7 +42,12 @@ type AuthExpectArgs = {
 
 export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & AuthExpectArgs;
 export type CreateArgsWithParent = CreateArgs & ParentIdExpectArgs;
-export type UpdateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
+export type UpdateArgs =
+	BaseExpectArgs
+	& RequestBodyExpectArgs
+	& ResponseBodyExpectArgs
+	& IdExpectArgs
+	& AuthExpectArgs;
 export type GetArgs = BaseExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
 export type ListExpectArgs = BaseExpectArgs &
 	AuthExpectArgs & {
@@ -133,6 +139,24 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 		return s;
 	};
 
+	const waitForGetResource = async (resourcePlural: string, args: GetArgs, waitConfiguration?: {
+		interval: number,
+		timeout: number
+	}): Promise<void> => {
+		await pWaitFor(async (): Promise<any> => {
+			try {
+				await getResource(resourcePlural, args).toss();
+				return true;
+			} catch (e) {
+				if (e.code === 'ERR_ASSERTION') {
+					return false;
+				} else {
+					throw e;
+				}
+			}
+		}, { interval: waitConfiguration?.interval ?? 1000, timeout: waitConfiguration?.timeout ?? 5000 });
+	}
+
 	const getResource = (resourcePlural: string, args: GetArgs): Spec => {
 		let s = spec().get(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 		if (args.expectJsonLike) {
@@ -219,7 +243,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	return {
-		createResource, deleteResource, updateResource, listResources, teardownResources, getResource
+		createResource, deleteResource, updateResource, listResources, teardownResources, getResource, waitForGetResource
 	}
 
 }

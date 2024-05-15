@@ -9,7 +9,7 @@ import { GroupService } from '../groups/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { RegionRepository } from './repository.js';
-import { CreateRegion, EditRegion, Region } from './schemas.js';
+import { CreateRegion, EditRegion, Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
 
 export type RegionListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -51,6 +51,8 @@ export class RegionService {
 		await this.groupService.get(securityContext, groupId);
 
 		const toSave = this.commonService.prepareResourceForCreate<CreateRegion, Region>(region, RESERVED_FIELDS_AS_TAGS, { groupId, createdBy: securityContext.email });
+		toSave.totalArea = 0;
+		toSave.totalPolygons = 0;
 
 		// save
 		await this.regionRepository.create(toSave);
@@ -67,6 +69,31 @@ export class RegionService {
 		// return
 		this.log.debug(`RegionService> create> exit:${JSON.stringify(saved)}`);
 		return saved;
+	}
+
+	public async updateAggregatedPolygonsAttributes(id: string, updateParameter: UpdateAggregatedPolygonsParameter): Promise<void> {
+		this.log.debug(`RegionService> updateAggregatedPolygonsAttributes> id:${id}, updateParameter:${JSON.stringify(updateParameter)}`);
+		ow(
+			updateParameter,
+			ow.object.exactShape({
+				totalAreaDelta: ow.number.not.infinite,
+				totalPolygonsDelta: ow.number.not.infinite
+			})
+		);
+		// retrieve existing
+		const existing = await this.regionRepository.get(id);
+		if (existing) {
+			const updated = await this.regionRepository.updateAggregatedAttribute(id, updateParameter)
+			// publish the event
+			await this.eventPublisher.publishEvent({
+				eventType: 'updated',
+				id: updated.id,
+				resourceType: 'Region',
+				old: existing,
+				new: updated,
+			});
+		}
+		this.log.debug(`RegionService> updateAggregatedPolygonsAttributes> exit>`);
 	}
 
 	public async update(securityContext: SecurityContext, id: string, region: EditRegion): Promise<Region> {

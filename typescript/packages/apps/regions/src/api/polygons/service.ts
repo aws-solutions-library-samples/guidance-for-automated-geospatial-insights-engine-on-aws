@@ -74,7 +74,7 @@ export class PolygonService {
 			eventType: 'created',
 			id: saved.id,
 			resourceType: 'Polygon',
-			new: polygon,
+			new: toSave,
 		});
 
 		this.log.debug(`PolygonService> create> exit:${JSON.stringify(saved)}`);
