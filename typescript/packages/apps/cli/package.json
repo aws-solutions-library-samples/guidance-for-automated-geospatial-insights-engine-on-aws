@@ -68,6 +68,7 @@
 		}
 	},
 	"dependencies": {
+		"@arcade/infrastructure": "workspace:*",
 		"@arcade/helpers": "workspace:*",
 		"@arcade/lambda-invoker": "workspace:*",
 		"@arcade/events": "workspace:*",

@@ -6,9 +6,8 @@ import { StacCommand } from '../../types/stacCommand.js';
 import { validateMasterPassword } from '../../utils/validator.js';
 import { createSecret } from '../../utils/secretManager.js';
 import replace from 'replace-in-file';
-import { GetParameterCommand } from '@aws-sdk/client-ssm';
-import { getSSMClient } from '../../utils/awsClient.js';
 import { replaceLine } from '../../utils/file.js';
+import { authorizerFunctionName } from '@arcade/infrastructure';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : true;
@@ -46,6 +45,10 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 			char: 's',
 			description: 'The size of volumes for Open Search instances (GiB)',
 		}),
+		role: Flags.string({
+			description: 'The RoleArn for the CLI to assume for deployment',
+			char: 'l',
+		}),
 	};
 
 	public async runChild(): Promise<void> {
@@ -64,31 +67,25 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 
 		// 3 - replace instance type
 		flags?.volumeSize ? await replace({ files: `${location}/serverless.yml`, from: 'VolumeSize: 35', to: `VolumeSize: ${flags?.volumeSize}` }) : '';
-
 		// 4 - update the pre hook config
-		const ssmClient = await getSSMClient(flags?.role);
-		const arnParam = await ssmClient.send(
-			new GetParameterCommand({
-				Name: `/arcade/${flags.environment}/stacServer/authorizerFunctionArn`,
-				WithDecryption: true,
-			}),
-		);
-		const nameParam = await ssmClient.send(
-			new GetParameterCommand({
-				Name: `/arcade/${flags.environment}/stacServer/authorizerFunctionName`,
-				WithDecryption: true,
-			}),
-		);
+		const authFunctionName = authorizerFunctionName(flags.environment);
+		// Get the accountId
+		const accountId = await shelljs
+			.exec(`aws sts get-caller-identity|jq -r ".Account" ${flags?.role ? '--profile ' + flags.role : ''}`, {
+				silent: isSilent,
+			})
+			.trim();
+		const authFunctionArn = `arn:aws:lambda:${flags.region}:${accountId}:function:${authFunctionName}`;
 
 		await replace({
 			files: `${location}/serverless.yml`,
 			from: '# PRE_HOOK: ${self:service}-${self:provider.stage}-preHook',
-			to: `PRE_HOOK: ${nameParam.Parameter.Value}`,
+			to: `PRE_HOOK: ${authFunctionName}`,
 		});
 
 		await replaceLine(`${location}/serverless.yml`, 60, '        - Effect: Allow');
 		await replaceLine(`${location}/serverless.yml`, 61, '          Action: lambda:InvokeFunction');
-		await replaceLine(`${location}/serverless.yml`, 62, `          Resource: ${arnParam.Parameter.Value}`);
+		await replaceLine(`${location}/serverless.yml`, 62, `          Resource: ${authFunctionArn}`);
 
 		try {
 			await getDeployedStacServerMetaData(flags.environment, flags?.role);
@@ -103,7 +100,7 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 			});
 
 			this.log(`Deploying STAC server to ${flags.region}`);
-			await shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
+			await shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region} ${flags?.role ? '--aws-profile ' + flags.role : ''}`, {
 				silent: isSilent,
 			});
 
@@ -120,11 +117,15 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 				}
 
 				this.log(`Deploying STAC server to ${flags.region}`);
-				await shelljs.exec(`OPENSEARCH_MASTER_USER_PASSWORD='${flags.masterPassword}' npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
-					silent: isSilent,
-				});
+
+				await shelljs.exec(
+					`OPENSEARCH_MASTER_USER_PASSWORD='${flags.masterPassword}' npm run deploy -- --stage ${flags.environment} --region ${flags.region} ${flags?.role ? '--aws-profile ' + flags.role : ''}`,
+					{
+						silent: isSilent,
+					},
+				);
 				// Store the master password in secretManager after a successfull deployment
-				createSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ user: 'admin', password: flags.masterPassword }));
+				createSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ username: 'admin', password: flags.masterPassword }));
 			}
 		}
 		this.log(`Finished Deployment of STAC server to ${flags.region}`);

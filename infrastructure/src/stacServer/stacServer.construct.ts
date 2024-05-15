@@ -21,6 +21,8 @@ export interface StacServerConstructProperties {
 	readonly cognitoUserPoolId: string;
 	readonly cognitoClientId: string;
 	readonly policyStoreId: string;
+	readonly namePrefix: string;
+	readonly authorizerFunctionName: string;
 }
 
 export class StacServerConstruct extends Construct {
@@ -30,7 +32,6 @@ export class StacServerConstruct extends Construct {
 	constructor(scope: Construct, id: string, props: StacServerConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}-stac-server`;
 		const account = Stack.of(this).account;
 
 		const secret = Secret.fromSecretNameV2(this, 'openSearchSecret', props.openSearchSecret);
@@ -39,7 +40,7 @@ export class StacServerConstruct extends Construct {
 		const stacServerInitializerLambda = new NodejsFunction(this, 'StacServerInitializerLambda', {
 			description: 'Results module event processor',
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_stacserver_init.ts'),
-			functionName: `${namePrefix}-initializer`,
+			functionName: `${props.namePrefix}-initializer`,
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
 			memorySize: 256,
@@ -70,7 +71,7 @@ export class StacServerConstruct extends Construct {
 		 * Define the Authorizer
 		 */
 		const authorizerLambda = new NodejsFunction(this, 'StacServerPreHookAuthorizerLambda', {
-			functionName: `${namePrefix}-prehook-authorizer`,
+			functionName: `${props.authorizerFunctionName}`,
 			description: `ARCADE: STAC server Prehook Authorizer: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_stacServer_authorizer.ts'),
 			runtime: Runtime.NODEJS_20_X,

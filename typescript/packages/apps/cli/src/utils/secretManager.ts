@@ -17,8 +17,10 @@ const putSecret = async (name: string, value: string, roleArn?: string): Promise
 	try {
 		await smClient.send(new PutSecretValueCommand({ SecretId: name, SecretString: value }));
 	} catch (error) {
-		if (error.name !== 'ResourceExistsException') {
+		if (error.name !== 'ResourceNotFoundException') {
 			throw new error();
+		} else {
+			await smClient.send(new CreateSecretCommand({ Name: name, SecretString: value }));
 		}
 	}
 };
