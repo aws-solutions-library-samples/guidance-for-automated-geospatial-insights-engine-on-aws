@@ -91,6 +91,9 @@ importers:
       '@arcade/helpers':
         specifier: workspace:*
         version: link:../../libraries/helpers
+      '@arcade/infrastructure':
+        specifier: workspace:*
+        version: link:../../../../infrastructure
       '@arcade/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker

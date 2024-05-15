@@ -36,6 +36,10 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 			required: true,
 			description: 'The region of the stac server',
 		}),
+		role: Flags.string({
+			description: 'The RoleArn for the CLI to assume for deployment',
+			char: 'l',
+		}),
 	};
 
 	public async runChild(): Promise<void> {
@@ -69,7 +73,6 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 			 * 6- enable the collection index
 			 * 7- Create the catalog
 			 */
-
 			// 1- Create the role
 			await createOpenSearchRole();
 			// 2- Create the user
@@ -80,7 +83,7 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 			await putSecret(`stac-server-${flags.environment}-opensearch-user-creds`, JSON.stringify({ username: 'stac_server', password: flags.password }));
 			// 5- Redeploy the stac server
 			this.log(`Re-deploying stac-server to ${flags.region}`);
-			shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
+			shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region} ${flags?.role ? '--aws-profile ' + flags.role : ''}`, {
 				silent: isSilent,
 			});
 			this.log(`Finished deploying stac-server to ${flags.region}`);

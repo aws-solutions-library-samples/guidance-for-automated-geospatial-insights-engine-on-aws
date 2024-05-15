@@ -35,7 +35,7 @@ export class SharedInfrastructureStack extends Stack {
 		const accountId = Stack.of(this).account;
 		const region = Stack.of(this).region;
 
-		const bucketName = `arcade-${accountId}-${region}-shared`;
+		const bucketName = `arcade-${props.environment}-${accountId}-${region}-shared`;
 		const s3 = new S3(this, 'S3', {
 			environment: props.environment,
 			bucketName,
@@ -64,7 +64,7 @@ export class SharedInfrastructureStack extends Stack {
 		vpIdentitySourceCreator.node.addDependency(vp);
 		vpIdentitySourceCreator.node.addDependency(cognito);
 
-		const eventBusName = `arcade-${accountId}-${region}`;
+		const eventBusName = `arcade-${props.environment}-${accountId}-${region}`;
 		const bus = new Bus(this, 'EventBus', {
 			environment: props.environment,
 			eventBusName,

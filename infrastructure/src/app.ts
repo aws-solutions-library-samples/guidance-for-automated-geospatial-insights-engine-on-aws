@@ -121,7 +121,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 
 	// Only deploy when openSearch endpoint has been supplied
 	if (stacServerOpenSearchEndpoint) {
-		new StacServerStack(app, 'StacServerStack', {
+		const stacServerStack = new StacServerStack(app, 'StacServerStack', {
 			stackName: stackName('stac-server-init'),
 			description: stackDescription('StacServer initializer'),
 			environment,
@@ -133,6 +133,8 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 				account: callerEnvironment?.accountId,
 			},
 		});
+		stacServerStack.addDependency(sharedStack);
+		stacServerStack.addDependency(resultStack);
 	}
 
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {

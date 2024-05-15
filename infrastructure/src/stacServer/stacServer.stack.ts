@@ -15,6 +15,8 @@ export type StacServerProperties = StackProps & {
 export const initializerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/initializerFunctionName`;
 export const authorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionArn`;
 export const authorizerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionName`;
+const namePrefix = (environment: string) => `arcade-${environment}-stac-server`;
+export const authorizerFunctionName = (environment: string) => `${namePrefix(environment)}-prehook-authorizer`;
 
 export class StacServerStack extends Stack {
 	constructor(scope: Construct, id: string, props: StacServerProperties) {
@@ -39,6 +41,8 @@ export class StacServerStack extends Stack {
 			environment: props.environment,
 			openSearchEndpoint: props.openSearchEndpoint,
 			openSearchSecret: props.openSearchSecret,
+			namePrefix: namePrefix(props.environment),
+			authorizerFunctionName: authorizerFunctionName(props.environment),
 			cognitoUserPoolId,
 			policyStoreId,
 			cognitoClientId,

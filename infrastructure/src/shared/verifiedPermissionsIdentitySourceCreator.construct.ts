@@ -27,7 +27,7 @@ export class VerifiedPermissionsIdentitySourceCreator extends Construct {
 	constructor(scope: Construct, id: string, props: VerifiedPermissionsIdentitySourceCreatorConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade`;
+		const namePrefix = `arcade-${props.environment}`;
 		const accountId = Stack.of(this).account;
 		const region = Stack.of(this).region;
 

@@ -34,7 +34,7 @@ export class EngineConstruct extends Construct {
 		const namePrefix = `arcade-${props.environment}`;
 
 		const accessLogBucket = new Bucket(this, 's3AccessLog', {
-			bucketName: `arcade-${Stack.of(this).account}-${Stack.of(this).region}-access-log`,
+			bucketName: `${namePrefix}-${Stack.of(this).account}-${Stack.of(this).region}-access-log`,
 			encryption: BucketEncryption.S3_MANAGED,
 			intelligentTieringConfigurations: [
 				{
@@ -86,7 +86,7 @@ export class EngineConstruct extends Construct {
 				environment: {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
-					ARCADE_STAC_SERVER_URL: props.stacServerUrl
+					ARCADE_STAC_SERVER_URL: props.stacServerUrl,
 				},
 			}),
 		});
