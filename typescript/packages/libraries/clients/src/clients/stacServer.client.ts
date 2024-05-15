@@ -4,19 +4,20 @@ import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
-import axios from "axios";
+import axios from 'axios';
 import ow from 'ow';
 
 export class StacServerClient extends ClientServiceBase {
-
-	constructor(readonly log: BaseLogger,
-				readonly snsClient: SNSClient,
-				readonly lambdaClient: LambdaClient,
-				readonly stacServerIngestSnsTopicArn: string,
-				readonly stacServerUrl: string,
-				readonly secretsManagerClient: SecretsManagerClient,
-				readonly stacServerOpenSearchEndpoint: string,
-				readonly openSearchMasterCredentials: string) {
+	constructor(
+		readonly log: BaseLogger,
+		readonly snsClient: SNSClient,
+		readonly lambdaClient: LambdaClient,
+		readonly stacServerIngestSnsTopicArn: string,
+		readonly stacServerUrl: string,
+		readonly secretsManagerClient: SecretsManagerClient,
+		readonly stacServerOpenSearchEndpoint: string,
+		readonly openSearchMasterCredentials: string
+	) {
 		super();
 	}
 
@@ -55,7 +56,7 @@ export class StacServerClient extends ClientServiceBase {
 		this.log.trace(`StacServerClient > publishStacItem > exit`);
 	}
 
-	public async getCollection(request: { id: string, type: ResourceType }): Promise<Collection> {
+	public async getCollection(token: string, request: { id: string; type: ResourceType }): Promise<Collection> {
 		this.log.trace(`StacServerClient > getCollection > in > request: ${JSON.stringify(JSON.stringify(request))} `);
 		let result: Collection;
 
@@ -64,8 +65,12 @@ export class StacServerClient extends ClientServiceBase {
 		ow(request.id, ow.string.nonEmpty);
 
 		try {
-			const collectionId = `${request.type.toLowerCase()}_${request.id}`
-			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${collectionId}`)
+			const collectionId = `${request.type.toLowerCase()}_${request.id}`;
+			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${collectionId}`, {
+				headers: {
+					'Authorization-Type': `Bearer ${token}`,
+				},
+			});
 			result = response.data;
 		} catch (err) {
 			this.log.error(`StacServerClient> getCollection> error: ${JSON.stringify(err)}`);
@@ -75,7 +80,7 @@ export class StacServerClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async getCollectionItem(request: { id: string, collectionId: string, collectionType: ResourceType }): Promise<StacItem> {
+	public async getCollectionItem(token: string, request: { id: string; collectionId: string; collectionType: ResourceType }): Promise<StacItem> {
 		this.log.trace(`StacServerClient > getCollectionItem > in > request: ${JSON.stringify(request)} `);
 
 		ow(request, ow.object.nonEmpty);
@@ -85,9 +90,13 @@ export class StacServerClient extends ClientServiceBase {
 
 		let result: StacItem;
 		try {
-			const collectionId = `${request.collectionType.toLowerCase()}_${request.id}`
-			const itemId = `${request.collectionId}_${request.id}`
-			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${itemId}`)
+			const collectionId = `${request.collectionType.toLowerCase()}_${request.id}`;
+			const itemId = `${request.collectionId}_${request.id}`;
+			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${itemId}`, {
+				headers: {
+					'Authorization-Type': `Bearer ${token}`,
+				},
+			});
 			result = response.data;
 		} catch (err) {
 			this.log.error(`StacServerClient> getCollectionItem> error: ${JSON.stringify(err)}`);

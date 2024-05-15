@@ -9,6 +9,8 @@ export default class StacServerBuild extends StacCommand<typeof StacServerBuild>
 	public static examples = ['<%= config.bin %> <%= command.id %>'];
 
 	public async runChild(): Promise<void> {
+		// temporary fix for the stac server pre-hook functionality until a PR canbe merged into the repo
+		shell.exec('cp ../src/stac-server-replacements/lambdas-api-index.txt src/lambdas/api/index.js', { silent: isSilent });
 		const commands = ['. ~/.nvm/nvm.sh', 'nvm use v20.11.1', 'npm install', 'npm run build'];
 		shell.exec(commands.join(this.bashAndOperator), { silent: isSilent });
 	}

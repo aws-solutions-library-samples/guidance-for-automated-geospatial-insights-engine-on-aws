@@ -20,7 +20,7 @@ import { StacServerInitializer } from '../events/stacServerInitializer.js';
 import { ResultsService } from '../api/results/service.js';
 import { ResultsRepository } from '../api/results/repository.js';
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { ApiAuthorizer } from '@arcade/rest-api-authorizer';
+import { ApiAuthorizer, StacServerAuthorizer } from '@arcade/rest-api-authorizer';
 import { VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
 
 const { captureAWSv3Client } = pkg;
@@ -45,6 +45,7 @@ declare module '@fastify/awilix' {
 		lambdaInvoker: Invoker;
 		resultsService: ResultsService;
 		apiAuthorizer: ApiAuthorizer;
+		stacServerAuthorizer: StacServerAuthorizer;
 		avpClient: VerifiedPermissionsClient;
 	}
 }
@@ -225,6 +226,9 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
+			...commonInjectionOptions,
+		}),
+		stacServerAuthorizer: asFunction((c: Cradle) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
 	});

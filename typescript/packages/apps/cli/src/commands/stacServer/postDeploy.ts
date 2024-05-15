@@ -7,14 +7,16 @@ import config from '../../utils/config.js';
 import { createOpenSearchRole, createOpenSearchUser, createStacServerCatalog, enableCollectionIndex, linkOpenSearchUserToRole } from '../../utils/stacServer.js';
 import { getSSMClient } from '../../utils/awsClient.js';
 import { GetParameterCommand } from '@aws-sdk/client-ssm';
-import { saveSecret } from '../../utils/secretManager.js';
+import { putSecret } from '../../utils/secretManager.js';
+import { validateUserPassword } from '../../utils/validator.js';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : true;
 
 export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeploy> {
 	public static description = 'collect the stac server metadata for use in arcade';
-	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r use-west-2 -p samplePassword'];
+	public static examples = ["$ <%= config.bin %> <%= command.id %> -e stage -r use-west-2 -p 'samplePassword'"];
+
 	public static enableJsonFlag = true;
 
 	public static flags = {
@@ -26,6 +28,7 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 		password: Flags.string({
 			char: 'p',
 			required: true,
+			parse: async (input) => validateUserPassword(input),
 			description: 'The user password for the stac-server user',
 		}),
 		region: Flags.string({
@@ -74,15 +77,17 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 			// 3- Link the user and role
 			await linkOpenSearchUserToRole();
 			// 4- Create the user credentials in secret manager
-			await saveSecret(`stac-server-${flags.environment}-opensearch-user-creds`, JSON.stringify({ username: 'stac-server', password: flags.password }));
+			await putSecret(`stac-server-${flags.environment}-opensearch-user-creds`, JSON.stringify({ username: 'stac_server', password: flags.password }));
 			// 5- Redeploy the stac server
 			this.log(`Re-deploying stac-server to ${flags.region}`);
 			shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
 				silent: isSilent,
 			});
 			this.log(`Finished deploying stac-server to ${flags.region}`);
+
 			// 6- enable the collection index
 			await enableCollectionIndex();
+
 			// 7- Create the catalog
 			const eventBridgeNameParam = await ssmClient.send(
 				new GetParameterCommand({
@@ -99,6 +104,6 @@ export class StacServerPostDeploy extends StacCommand<typeof StacServerPostDeplo
 				return;
 			}
 		}
-		this.log(`Finished updating stac-server-${flags.environment}`);
+		this.log(`Finished updating configuration for stac-server-${flags.environment}`);
 	}
 }

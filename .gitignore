@@ -101,6 +101,10 @@ assets/**
 **/.DS_Store
 # **/.vscode
 
+## Stac Server cloned repository
+**/stac-server-repo
+
+
 **/build
 **/nyc_output
 .idea

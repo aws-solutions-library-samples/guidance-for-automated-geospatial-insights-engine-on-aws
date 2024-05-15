@@ -5,4 +5,11 @@ const validateMasterPassword = (password: string): string => {
 	return password;
 };
 
-export { validateMasterPassword };
+const validateUserPassword = (password: string): string => {
+	if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/)) {
+		throw new Error(`Password must be at least 10  characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.`);
+	}
+	return password;
+};
+
+export { validateMasterPassword, validateUserPassword };
