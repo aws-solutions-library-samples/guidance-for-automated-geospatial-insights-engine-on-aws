@@ -1,5 +1,14 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, groupId, paginationToken, tags, updatedAt, updatedBy } from '../../common/schemas.js';
+import {
+	attributes,
+	createdAt,
+	createdBy,
+	groupId,
+	paginationToken,
+	tags,
+	updatedAt,
+	updatedBy
+} from '../../common/schemas.js';
 
 /**
  * Group specific path parameters
@@ -13,6 +22,8 @@ import { attributes, createdAt, createdBy, groupId, paginationToken, tags, updat
  * Group specific resource parameters
  */
 const name = Type.String({ description: 'The name of the Group.' });
+const totalArea = Type.Number({ description: 'The area of the Group.' });
+const totalRegions = Type.Number({ description: 'The total number of regions under this group.' });
 
 /**
  * Group specific resources
@@ -38,10 +49,16 @@ export const editGroupRequestBody = Type.Object(
 );
 export type EditGroup = Static<typeof editGroupRequestBody>;
 
+export type UpdateAggregatedRegionsParameter = {
+	totalAreaDelta: number,
+	totalRegionsDelta: number
+}
 export const groupResource = Type.Object(
 	{
 		id: groupId,
 		name,
+		totalArea,
+		totalRegions,
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 		createdBy: createdBy,

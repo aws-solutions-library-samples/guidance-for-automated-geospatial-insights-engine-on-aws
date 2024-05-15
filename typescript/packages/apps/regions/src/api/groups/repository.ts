@@ -1,11 +1,16 @@
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { DynamoDBDocumentClient, TransactWriteCommandInput } from '@aws-sdk/lib-dynamodb';
+import {
+	DynamoDBDocumentClient,
+	TransactWriteCommandInput,
+	UpdateCommand,
+	UpdateCommandInput
+} from '@aws-sdk/lib-dynamodb';
 import { FastifyBaseLogger } from 'fastify';
 import { createDelimitedAttribute } from '../../common/ddbAttributes.util.js';
 import { PkType } from '../../common/pkTypes.js';
 import { Tags } from '../../common/schemas.js';
 import { CommonRepository, DynamoDBItems } from '../repository.common.js';
-import { Group } from './schemas.js';
+import { Group, UpdateAggregatedRegionsParameter } from './schemas.js';
 
 export class GroupRepository {
 	public constructor(
@@ -63,12 +68,36 @@ export class GroupRepository {
 							createdBy: g.createdBy,
 							updatedAt: g.updatedAt,
 							updatedBy: g.updatedBy,
+							totalArea: g.totalArea,
+							totalRegions: g.totalRegions
 						},
 					},
 				},
 			],
 		};
 		return command;
+	}
+
+	public async updateAggregatedAttribute(id: string, aggregatedAttribute: UpdateAggregatedRegionsParameter): Promise<Group> {
+		this.log.debug(`RegionRepository> updateAggregatedAttribute> id: ${id}, aggregatedAttribute: ${JSON.stringify(aggregatedAttribute)}`);
+		const groupDbId = createDelimitedAttribute(PkType.Group, id);
+		const params: UpdateCommandInput = {
+			UpdateExpression: "SET totalArea = totalArea + :totalAreaDelta, totalRegions = totalRegions + :totalRegionsDelta",
+			ExpressionAttributeValues: {
+				':totalAreaDelta': aggregatedAttribute.totalAreaDelta,
+				':totalRegionsDelta': aggregatedAttribute.totalRegionsDelta
+			},
+			Key: {
+				pk: groupDbId,
+				sk: groupDbId
+			},
+			TableName: this.tableName,
+			ReturnValues: "ALL_NEW"
+		}
+		const updateResponse = await this.dc.send(new UpdateCommand(params));
+		const group = this.assembleGroup([updateResponse.Attributes])
+		this.log.debug(`RegionRepository> updateAggregatedAttribute> group: ${JSON.stringify(group)}`);
+		return group;
 	}
 
 	public async delete(id: string): Promise<void> {
@@ -123,6 +152,8 @@ export class GroupRepository {
 			createdAt: groupItem.createdAt,
 			updatedBy: groupItem.updatedBy,
 			updatedAt: groupItem.updatedAt,
+			totalArea: groupItem.totalArea,
+			totalRegions: groupItem.totalRegions
 		};
 
 		this.commonRepository.assembleTags(items, group.tags);

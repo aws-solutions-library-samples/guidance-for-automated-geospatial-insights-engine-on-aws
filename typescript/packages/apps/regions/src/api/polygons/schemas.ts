@@ -52,7 +52,6 @@ export const editPolygonRequestBody = Type.Object(
 	{ $id: 'editPolygonRequestBody' }
 );
 export type EditPolygon = Static<typeof editPolygonRequestBody>;
-
 export const polygonResource = Type.Object(
 	{
 		id: polygonId,

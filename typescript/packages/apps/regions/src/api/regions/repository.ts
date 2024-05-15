@@ -1,11 +1,16 @@
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { DynamoDBDocumentClient, TransactWriteCommandInput } from '@aws-sdk/lib-dynamodb';
+import {
+	DynamoDBDocumentClient,
+	TransactWriteCommandInput,
+	UpdateCommand,
+	UpdateCommandInput
+} from '@aws-sdk/lib-dynamodb';
 import { FastifyBaseLogger } from 'fastify';
 import { createDelimitedAttribute } from '../../common/ddbAttributes.util.js';
 import { PkType } from '../../common/pkTypes.js';
 import { Tags } from '../../common/schemas.js';
 import { CommonRepository, DynamoDBItems } from '../repository.common.js';
-import { Region } from './schemas.js';
+import { Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
 
 export class RegionRepository {
 	public constructor(
@@ -29,6 +34,28 @@ export class RegionRepository {
 		await this.commonRepository.executeTransaction(transaction);
 
 		this.log.debug(`RegionRepository> create> exit>`);
+	}
+
+	public async updateAggregatedAttribute(id: string, aggregatedAttribute: UpdateAggregatedPolygonsParameter): Promise<Region> {
+		this.log.debug(`RegionRepository> updateAggregatedAttribute> id: ${id}, aggregatedAttribute: ${JSON.stringify(aggregatedAttribute)}`);
+		const regionDbId = createDelimitedAttribute(PkType.Region, id);
+		const params: UpdateCommandInput = {
+			UpdateExpression: "SET totalArea = totalArea + :totalAreaDelta, totalPolygons = totalPolygons + :totalPolygonsDelta",
+			ExpressionAttributeValues: {
+				':totalAreaDelta': aggregatedAttribute.totalAreaDelta,
+				':totalPolygonsDelta': aggregatedAttribute.totalPolygonsDelta
+			},
+			Key: {
+				pk: regionDbId,
+				sk: regionDbId
+			},
+			TableName: this.tableName,
+			ReturnValues: "ALL_NEW"
+		}
+		const updateResponse = await this.dc.send(new UpdateCommand(params));
+		const region = this.assembleRegion([updateResponse.Attributes])
+		this.log.debug(`RegionRepository> updateAggregatedAttribute> region: ${JSON.stringify(region)}`);
+		return region;
 	}
 
 	public async update(r: Region, tagsToAdd: Tags, tagsToDelete: string[]): Promise<void> {
@@ -66,6 +93,8 @@ export class RegionRepository {
 							createdBy: r.createdBy,
 							updatedAt: r.updatedAt,
 							updatedBy: r.updatedBy,
+							totalArea: r.totalArea,
+							totalPolygons: r.totalPolygons
 						},
 					},
 				},
@@ -127,6 +156,8 @@ export class RegionRepository {
 				id: regionItem.id,
 				groupId: regionItem.groupId,
 				name: regionItem.name,
+				totalArea: regionItem.totalArea,
+				totalPolygons: regionItem.totalPolygons,
 				attributes: regionItem.attributes,
 				tags: {},
 				scheduleExpressionTimezone: regionItem.scheduleExpressionTimezone,

@@ -23,6 +23,7 @@
 		"@arcade/rest-api-authorizer": "workspace:*",
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-sqs": "~3",
 		"@aws-sdk/client-verifiedpermissions": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",
 		"@fastify/awilix": "~5",

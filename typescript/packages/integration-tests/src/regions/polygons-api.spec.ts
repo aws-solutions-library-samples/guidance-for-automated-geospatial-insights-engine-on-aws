@@ -22,7 +22,7 @@ const testTags = {
 	[POLYGONS_INTEGRATION_TEST_TAG_KEY]: POLYGONS_INTEGRATION_TEST_TAG_VALUE,
 };
 
-const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource, waitForGetResource } = createResourcesMethodForModules('regions');
 
 
 export const constructExpectedPolygonJson = (username: string): object => {
@@ -121,6 +121,8 @@ describe(TEST_PREFIX + 'creating polygons', () => {
 			'regions',
 			regionId
 		).toss();
+
+
 	});
 
 	// TODO: test that area calculated correctly
@@ -128,13 +130,16 @@ describe(TEST_PREFIX + 'creating polygons', () => {
 
 describe(TEST_PREFIX + 'retrieving polygons', () => {
 	let polygonId: string;
-	let userToken;
-	let expectPolygonJsonLike;
+	let userToken: string;
+	let regionId: string;
+	let groupId: string;
+	let expectPolygonJsonLike: object;
+
 	beforeEach(async () => {
 		expectPolygonJsonLike = constructExpectedPolygonJson(ADMIN_USERNAME);
 		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
-		const groupId = await createGroup(userToken);
-		const regionId = await createRegion(groupId, userToken);
+		groupId = await createGroup(userToken);
+		regionId = await createRegion(groupId, userToken);
 		polygonId = await createResource(
 			'polygons',
 			{
@@ -154,12 +159,34 @@ describe(TEST_PREFIX + 'retrieving polygons', () => {
 	});
 
 	test('retrieving a polygon - happy path', async () => {
+
 		await getResource('polygons', {
 			withIdToken: userToken,
 			id: polygonId,
 			expectJsonLike: expectPolygonJsonLike,
 			expectStatus: 200,
 		}).toss();
+
+
+		await waitForGetResource('regions', {
+			withIdToken: userToken,
+			id: regionId,
+			expectJsonLike: {
+				totalPolygons: 1,
+				totalArea: 304660968.06245893
+			},
+			expectStatus: 200,
+		})
+
+		await waitForGetResource('groups', {
+			withIdToken: userToken,
+			id: groupId,
+			expectJsonLike: {
+				totalRegions: 1,
+				totalArea: 304660968.06245893
+			},
+			expectStatus: 200,
+		})
 	});
 
 	test('retrieving a polygon - not found', async () => {
@@ -169,6 +196,8 @@ describe(TEST_PREFIX + 'retrieving polygons', () => {
 			expectStatus: 404,
 		}).toss();
 	});
+
+
 });
 
 describe(TEST_PREFIX + 'updating polygons', () => {
@@ -347,7 +376,6 @@ describe(TEST_PREFIX + 'listing polygons', () => {
 	});
 
 	// TODO: test the different filtering options
-
 	test('listing polygons - pagination', async () => {
 		// test pagination. First page should return requested count of 2 along with pagination details
 		const token = await listResources('polygons', {
@@ -399,42 +427,105 @@ describe(TEST_PREFIX + 'listing polygons', () => {
 			},
 			expectStatus: 200,
 		}).toss();
+
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 913982904.1873767,
+				totalRegions: 3
+			}
+		})
+
+		await waitForGetResource('regions', {
+			expectStatus: 200,
+			id: region1Id,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 304660968.06245893,
+				totalPolygons: 1
+			}
+		})
 	});
 });
 
-// describe(TEST_PREFIX + 'deleting polygons', () => {
-// 	let polygonId: string;
-// 	let userToken;
-// 	beforeEach(async () => {
-// 		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
-// 		const groupId = await createGroup(userToken);
-// 		const regionId = await createRegion(groupId, userToken);
-// 		polygonId = await createResource(
-// 			'polygons',
-// 			{
-// 				withIdToken: userToken,
-// 				withJson: create_polygon_body,
-// 				withTags: testTags,
-// 				expectStatus: 201,
-// 			},
-// 			'regions',
-// 			regionId
-// 		).returns('id');
-// 	});
+describe(TEST_PREFIX + 'deleting polygons', () => {
+	let polygonId: string;
+	let groupId: string;
+	let regionId: string;
+	let userToken: string;
+	beforeEach(async () => {
+		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		groupId = await createGroup(userToken);
+		regionId = await createRegion(groupId, userToken);
+		polygonId = await createResource(
+			'polygons',
+			{
+				withIdToken: userToken,
+				withJson: create_polygon_body,
+				withTags: testTags,
+				expectStatus: 201,
+			},
+			'regions',
+			regionId
+		).returns('id');
+	});
 
-// 	afterEach(async () => {
-// 		await teardown();
-// 	});
+	afterEach(async () => {
+		await teardown();
+	});
 
-// 	test('deleting polygons - happy path', async () => {
-// 		await deleteResource('polygons', {
-// 			withIdToken: userToken,
-// 			id: polygonId,
-// 			expectStatus: 204,
-// 		}).toss();
-// 	});
+	test('deleting polygons - happy path', async () => {
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 304660968.06245893,
+				totalRegions: 1
+			}
+		})
+
+		await waitForGetResource('regions', {
+			expectStatus: 200,
+			id: regionId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 304660968.06245893,
+				totalPolygons: 1
+			}
+		})
+
+		await deleteResource('polygons', {
+			withIdToken: userToken,
+			id: polygonId,
+			expectStatus: 204,
+		}).toss();
+
+		// verify that polygon is removed from the region
+		await waitForGetResource('regions', {
+			expectStatus: 200,
+			id: regionId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalPolygons: 0
+			}
+		})
+
+		// verify that polygon area is removed from the group
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalRegions: 1
+			}
+		})
+	});
 
 // 	// TODO: test unable to delete polygon if it has states
-
 // 	// TODO: test able to delete polygon with states if override provided
-// });
+});

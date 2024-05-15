@@ -17,7 +17,7 @@ const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
 const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
 
 
-const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource } = createResourcesMethodForModules('regions');
+const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource, waitForGetResource } = createResourcesMethodForModules('regions');
 
 // tag everything created in this test with the same tags, so can be teared down cleanly
 const testTags = {
@@ -110,12 +110,13 @@ describe(TEST_PREFIX + 'creating regions', () => {
 
 describe(TEST_PREFIX + 'retrieving regions', () => {
 	let regionId: string;
-	let userToken;
-	let expectRegionJsonLike;
+	let userToken: string;
+	let expectRegionJsonLike: object;
+	let groupId: string;
 	beforeEach(async () => {
 		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
 		expectRegionJsonLike = constructExpectedRegionJson(ADMIN_USERNAME);
-		const groupId = await createGroup(userToken);
+		groupId = await createGroup(userToken);
 		regionId = await createResource(
 			'regions',
 			{
@@ -140,6 +141,17 @@ describe(TEST_PREFIX + 'retrieving regions', () => {
 			expectJsonLike: expectRegionJsonLike,
 			expectStatus: 200,
 		}).toss();
+
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalRegions: 1
+			}
+		})
+
 	});
 
 	test('retrieving a region - not found', async () => {
@@ -276,7 +288,6 @@ describe(TEST_PREFIX + 'listing regions', () => {
 	});
 
 	// TODO: test the different filtering options
-
 	test('listing regions - pagination', async () => {
 		// test pagination. First page should return requested count of 2 along with pagination details
 		const token = await listResources('regions', {
@@ -328,15 +339,27 @@ describe(TEST_PREFIX + 'listing regions', () => {
 			},
 			expectStatus: 200,
 		}).toss();
+
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalRegions: 3
+			}
+		})
 	});
 });
 
 describe(TEST_PREFIX + 'deleting regions', () => {
 	let regionId: string;
-	let userToken;
+	let userToken: string;
+	let groupId: string;
+
 	beforeEach(async () => {
 		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
-		const groupId = await createGroup(userToken);
+		groupId = await createGroup(userToken);
 		regionId = await createResource(
 			'regions',
 			{
@@ -355,11 +378,32 @@ describe(TEST_PREFIX + 'deleting regions', () => {
 	});
 
 	test('deleting regions - happy path', async () => {
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalRegions: 1
+			}
+		})
+
 		await deleteResource('regions', {
 			withIdToken: userToken,
 			id: regionId,
 			expectStatus: 204,
 		}).toss();
+
+		// verify that the region is removed from the parent group
+		await waitForGetResource('groups', {
+			expectStatus: 200,
+			id: groupId,
+			withIdToken: userToken,
+			expectJsonLike: {
+				totalArea: 0,
+				totalRegions: 0
+			}
+		})
 	});
 
 	// TODO: test unable to delete region if it has polygons

@@ -1,5 +1,15 @@
 import { Static, Type } from '@sinclair/typebox';
-import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, tags, updatedAt, updatedBy } from '../../common/schemas.js';
+import {
+	attributes,
+	createdAt,
+	createdBy,
+	groupId,
+	paginationToken,
+	regionId,
+	tags,
+	updatedAt,
+	updatedBy
+} from '../../common/schemas.js';
 
 /**
  * Region specific path parameters
@@ -31,7 +41,9 @@ const scheduleExpression = Type.String({
 		'\n' +
 		'A rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ',
 });
+const totalArea = Type.Number({ description: 'The total area covered by all polygons under this region.' });
 
+const totalPolygons = Type.Number({ description: 'The total number of polygons under this region.' });
 /**
  * Region specific resources
  */
@@ -60,11 +72,18 @@ export const editRegionRequestBody = Type.Object(
 );
 export type EditRegion = Static<typeof editRegionRequestBody>;
 
+export type UpdateAggregatedPolygonsParameter = {
+	totalAreaDelta: number
+	totalPolygonsDelta: number;
+}
+
 export const regionResource = Type.Object(
 	{
 		id: regionId,
 		groupId,
 		name,
+		totalArea,
+		totalPolygons,
 		scheduleExpression: Type.Optional(scheduleExpression),
 		scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
 		attributes: Type.Optional(Type.Ref(attributes)),
