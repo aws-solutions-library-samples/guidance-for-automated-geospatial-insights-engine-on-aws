@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { Duration } from 'aws-cdk-lib';
+import { Duration, Stack } from 'aws-cdk-lib';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -9,6 +9,7 @@ import { getLambdaArchitecture } from '@arcade/cdk-common';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { NagSuppressions } from 'cdk-nag';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,14 +18,20 @@ export interface StacServerConstructProperties {
 	readonly environment: string;
 	readonly openSearchEndpoint: string;
 	readonly openSearchSecret: string;
+	readonly cognitoUserPoolId: string;
+	readonly cognitoClientId: string;
+	readonly policyStoreId: string;
 }
 
 export class StacServerConstruct extends Construct {
 	functionName: string;
+	authorizerFunctionArn: string;
+	authorizerFunctionName: string;
 	constructor(scope: Construct, id: string, props: StacServerConstructProperties) {
 		super(scope, id);
 
 		const namePrefix = `arcade-${props.environment}-stac-server`;
+		const account = Stack.of(this).account;
 
 		const secret = Secret.fromSecretNameV2(this, 'openSearchSecret', props.openSearchSecret);
 
@@ -59,8 +66,49 @@ export class StacServerConstruct extends Construct {
 
 		this.functionName = stacServerInitializerLambda.functionName;
 
+		/**
+		 * Define the Authorizer
+		 */
+		const authorizerLambda = new NodejsFunction(this, 'StacServerPreHookAuthorizerLambda', {
+			functionName: `${namePrefix}-prehook-authorizer`,
+			description: `ARCADE: STAC server Prehook Authorizer: ${props.environment}`,
+			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_stacServer_authorizer.ts'),
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 256,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.seconds(5),
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['pg-native'],
+			},
+			environment: {
+				NODE_ENV: 'cloud',
+				POLICY_STORE_ID: props.policyStoreId,
+				USER_POOL_ID: props.cognitoUserPoolId,
+				CLIENT_ID: props.cognitoClientId,
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
+		});
+
+		authorizerLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['verifiedpermissions:IsAuthorizedWithToken'],
+				resources: [`arn:aws:verifiedpermissions::${account}:policy-store/${props.policyStoreId}`],
+			})
+		);
+
+		this.authorizerFunctionName = authorizerLambda.functionName;
+		this.authorizerFunctionArn = authorizerLambda.functionArn;
+
 		NagSuppressions.addResourceSuppressions(
-			[stacServerInitializerLambda],
+			[stacServerInitializerLambda, authorizerLambda],
 			[
 				{
 					id: 'AwsSolutions-L1',

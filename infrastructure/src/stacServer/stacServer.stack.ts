@@ -2,7 +2,9 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
 import { StacServerConstruct } from './stacServer.construct.js';
 import { NagSuppressions } from 'cdk-nag';
-import * as ssm from 'aws-cdk-lib/aws-ssm';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPermissions.construct.js';
+import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
 
 export type StacServerProperties = StackProps & {
 	environment: string;
@@ -11,21 +13,53 @@ export type StacServerProperties = StackProps & {
 };
 
 export const initializerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/initializerFunctionName`;
+export const authorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionArn`;
+export const authorizerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionName`;
 
 export class StacServerStack extends Stack {
 	constructor(scope: Construct, id: string, props: StacServerProperties) {
 		super(scope, id, props);
 
+		const cognitoUserPoolId = StringParameter.fromStringParameterAttributes(this, 'userPoolId', {
+			parameterName: userPoolIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const policyStoreId = StringParameter.fromStringParameterAttributes(this, 'policyStoreId', {
+			parameterName: verifiedPermissionsPolicyStoreIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const cognitoClientId = StringParameter.fromStringParameterAttributes(this, 'clientId', {
+			parameterName: userPoolClientIdParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
 		const init = new StacServerConstruct(this, 'StacServerInitializer', {
 			environment: props.environment,
 			openSearchEndpoint: props.openSearchEndpoint,
 			openSearchSecret: props.openSearchSecret,
+			cognitoUserPoolId,
+			policyStoreId,
+			cognitoClientId,
 		});
 
-		new ssm.StringParameter(this, 'tableNameParameter', {
+		new StringParameter(this, 'functionNameParameter', {
 			parameterName: initializerFunctionNameParameter(props.environment),
 			description: 'function Name of ARCADE Stac server initializer',
 			stringValue: init.functionName,
+		});
+
+		new StringParameter(this, 'authorizerFunctionArnParameter', {
+			parameterName: authorizerFunctionArnParameter(props.environment),
+			description: 'function Arn of ARCADE Stac server authorizer',
+			stringValue: init.authorizerFunctionArn,
+		});
+
+		new StringParameter(this, 'authorizerFunctionNameParameter', {
+			parameterName: authorizerFunctionNameParameter(props.environment),
+			description: 'function Name of ARCADE Stac server authorizer',
+			stringValue: init.authorizerFunctionName,
 		});
 
 		NagSuppressions.addResourceSuppressionsByPath(

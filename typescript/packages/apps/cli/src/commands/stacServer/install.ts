@@ -4,15 +4,18 @@ import { switchToStacServerLocation } from '../../utils/shell.js';
 import { getDeployedStacServerMetaData } from '../../utils/cloudformation.js';
 import { StacCommand } from '../../types/stacCommand.js';
 import { validateMasterPassword } from '../../utils/validator.js';
-import { saveSecret } from '../../utils/secretManager.js';
+import { createSecret } from '../../utils/secretManager.js';
 import replace from 'replace-in-file';
+import { GetParameterCommand } from '@aws-sdk/client-ssm';
+import { getSSMClient } from '../../utils/awsClient.js';
+import { replaceLine } from '../../utils/file.js';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : true;
 
 export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 	public static description = 'Install STAC server for the specified environment';
-	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -m samplePassword'];
+	public static examples = ["$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -m 'samplePassword'"];
 	public static enableJsonFlag = true;
 
 	public static flags = {
@@ -23,7 +26,6 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 		}),
 		region: Flags.string({
 			char: 'r',
-			required: true,
 			description: 'The region the STAC server is deployed to',
 		}),
 		masterPassword: Flags.string({
@@ -42,7 +44,7 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 		}),
 		volumeSize: Flags.integer({
 			char: 's',
-			description: 'The size of volumes for Open Search instances',
+			description: 'The size of volumes for Open Search instances (GiB)',
 		}),
 	};
 
@@ -50,10 +52,10 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 		const { flags } = await this.parse(StacServerInstall);
 		const location = await switchToStacServerLocation();
 
-		// setup the serveless.yaml
+		// copy the serveless.yaml for a fresh install
 		shelljs.exec('cp serverless.example.yml serverless.yml', { silent: isSilent });
-		// Update Open Search instance details in serverless.yaml
 
+		// Update Open Search instance details in serverless.yaml
 		// 1 - replace instance type
 		flags?.instanceType ? await replace({ files: `${location}/serverless.yml`, from: 'InstanceType: t3.small.search', to: `InstanceType: ${flags?.instanceType}` }) : '';
 
@@ -63,17 +65,51 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 		// 3 - replace instance type
 		flags?.volumeSize ? await replace({ files: `${location}/serverless.yml`, from: 'VolumeSize: 35', to: `VolumeSize: ${flags?.volumeSize}` }) : '';
 
+		// 4 - update the pre hook config
+		const ssmClient = await getSSMClient(flags?.role);
+		const arnParam = await ssmClient.send(
+			new GetParameterCommand({
+				Name: `/arcade/${flags.environment}/stacServer/authorizerFunctionArn`,
+				WithDecryption: true,
+			}),
+		);
+		const nameParam = await ssmClient.send(
+			new GetParameterCommand({
+				Name: `/arcade/${flags.environment}/stacServer/authorizerFunctionName`,
+				WithDecryption: true,
+			}),
+		);
+
+		await replace({
+			files: `${location}/serverless.yml`,
+			from: '# PRE_HOOK: ${self:service}-${self:provider.stage}-preHook',
+			to: `PRE_HOOK: ${nameParam.Parameter.Value}`,
+		});
+
+		await replaceLine(`${location}/serverless.yml`, 60, '        - Effect: Allow');
+		await replaceLine(`${location}/serverless.yml`, 61, '          Action: lambda:InvokeFunction');
+		await replaceLine(`${location}/serverless.yml`, 62, `          Resource: ${arnParam.Parameter.Value}`);
+
 		try {
 			await getDeployedStacServerMetaData(flags.environment, flags?.role);
-			this.log(`Deploying STAC server to ${flags.region}`);
 
-			await shelljs.exec(`OPENSEARCH_MASTER_USER_PASSWORD='${flags.masterPassword}' npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
+			//Disable master password settings
+			await replace({ files: `${location}/serverless.yml`, from: 'MasterUserOptions:', to: `# MasterUserOptions:` });
+			await replace({ files: `${location}/serverless.yml`, from: 'MasterUserName: admin', to: `# MasterUserName: admin` });
+			await replace({
+				files: `${location}/serverless.yml`,
+				from: 'MasterUserPassword: ${env:OPENSEARCH_MASTER_USER_PASSWORD}',
+				to: '#MasterUserPassword: ${env:OPENSEARCH_MASTER_USER_PASSWORD}',
+			});
+
+			this.log(`Deploying STAC server to ${flags.region}`);
+			await shelljs.exec(`npm run deploy -- --stage ${flags.environment} --region ${flags.region}`, {
 				silent: isSilent,
 			});
 
 			// Store the master password in secretManager after a successful deployment
 			// We only store on first creation, recurring runs will not update the password
-			saveSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ username: 'admin', password: flags.masterPassword }));
+			createSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ username: 'admin', password: flags.masterPassword }));
 		} catch (error) {
 			if ((error as Error).message === `Stack with id stac-server-${flags.environment} does not exist`) {
 				if (!flags?.masterPassword) {
@@ -88,7 +124,7 @@ export class StacServerInstall extends StacCommand<typeof StacServerInstall> {
 					silent: isSilent,
 				});
 				// Store the master password in secretManager after a successfull deployment
-				saveSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ user: 'admin', password: flags.masterPassword }));
+				createSecret(`arcade/stacServer/${flags.environment}/credentials`, JSON.stringify({ user: 'admin', password: flags.masterPassword }));
 			}
 		}
 		this.log(`Finished Deployment of STAC server to ${flags.region}`);
