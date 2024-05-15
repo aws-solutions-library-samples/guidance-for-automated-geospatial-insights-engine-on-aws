@@ -87,6 +87,14 @@
             "description": "The name of the Group.",
             "type": "string"
           },
+          "totalArea": {
+            "description": "The area of the Group.",
+            "type": "number"
+          },
+          "totalRegions": {
+            "description": "The total number of regions under this group.",
+            "type": "number"
+          },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
           },
@@ -115,6 +123,8 @@
         "required": [
           "id",
           "name",
+          "totalArea",
+          "totalRegions",
           "createdBy",
           "createdAt"
         ],
@@ -213,6 +223,14 @@
             "description": "The name of the Region.",
             "type": "string"
           },
+          "totalArea": {
+            "description": "The total area covered by all polygons under this region.",
+            "type": "number"
+          },
+          "totalPolygons": {
+            "description": "The total number of polygons under this region.",
+            "type": "number"
+          },
           "scheduleExpression": {
             "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
             "type": "string"
@@ -250,6 +268,8 @@
           "id",
           "groupId",
           "name",
+          "totalArea",
+          "totalPolygons",
           "createdBy",
           "createdAt"
         ],
@@ -640,6 +660,14 @@
                       "description": "The name of the Group.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The area of the Group.",
+                      "type": "number"
+                    },
+                    "totalRegions": {
+                      "description": "The total number of regions under this group.",
+                      "type": "number"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -668,6 +696,8 @@
                   "required": [
                     "id",
                     "name",
+                    "totalArea",
+                    "totalRegions",
                     "createdBy",
                     "createdAt"
                   ]
@@ -679,7 +709,9 @@
                       "id": "03d66e78d",
                       "name": "Berkshire & West LLC",
                       "createdAt": "2022-08-10T23:55:20.322Z",
-                      "createdBy": "someone@somewhere.com"
+                      "createdBy": "someone@somewhere.com",
+                      "totalArea": 100,
+                      "totalRegions": 2
                     }
                   }
                 }
@@ -877,7 +909,9 @@
                           "id": "03d66e78d",
                           "name": "Berkshire & West LLC",
                           "createdAt": "2022-08-10T23:55:20.322Z",
-                          "createdBy": "someone@somewhere.com"
+                          "createdBy": "someone@somewhere.com",
+                          "totalArea": 100,
+                          "totalRegions": 2
                         },
                         {
                           "id": "jduuye683",
@@ -885,13 +919,17 @@
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
                           "updatedAt": "2022-08-12T07:34:23.132Z",
-                          "updatedBy": "someoneelse@somewhere.com"
+                          "updatedBy": "someoneelse@somewhere.com",
+                          "totalArea": 100,
+                          "totalRegions": 2
                         },
                         {
                           "id": "jf836sd23",
                           "name": "Boondock Manor",
                           "createdAt": "2022-08-10T23:55:20.322Z",
-                          "createdBy": "someone@somewhere.com"
+                          "createdBy": "someone@somewhere.com",
+                          "totalArea": 100,
+                          "totalRegions": 2
                         }
                       ],
                       "pagination": {
@@ -968,6 +1006,14 @@
                       "description": "The name of the Group.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The area of the Group.",
+                      "type": "number"
+                    },
+                    "totalRegions": {
+                      "description": "The total number of regions under this group.",
+                      "type": "number"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -996,6 +1042,8 @@
                   "required": [
                     "id",
                     "name",
+                    "totalArea",
+                    "totalRegions",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1007,7 +1055,9 @@
                       "id": "03d66e78d",
                       "name": "Berkshire & West LLC",
                       "createdAt": "2022-08-10T23:55:20.322Z",
-                      "createdBy": "someone@somewhere.com"
+                      "createdBy": "someone@somewhere.com",
+                      "totalArea": 100,
+                      "totalRegions": 2
                     }
                   }
                 }
@@ -1213,6 +1263,14 @@
                       "description": "The name of the Group.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The area of the Group.",
+                      "type": "number"
+                    },
+                    "totalRegions": {
+                      "description": "The total number of regions under this group.",
+                      "type": "number"
+                    },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
                     },
@@ -1241,6 +1299,8 @@
                   "required": [
                     "id",
                     "name",
+                    "totalArea",
+                    "totalRegions",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1254,7 +1314,9 @@
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
                       "updatedAt": "2022-08-12T07:34:23.132Z",
-                      "updatedBy": "someoneelse@somewhere.com"
+                      "updatedBy": "someoneelse@somewhere.com",
+                      "totalArea": 100,
+                      "totalRegions": 2
                     }
                   }
                 }
@@ -1458,6 +1520,14 @@
                       "description": "The name of the Region.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The total area covered by all polygons under this region.",
+                      "type": "number"
+                    },
+                    "totalPolygons": {
+                      "description": "The total number of polygons under this region.",
+                      "type": "number"
+                    },
                     "scheduleExpression": {
                       "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
                       "type": "string"
@@ -1495,6 +1565,8 @@
                     "id",
                     "groupId",
                     "name",
+                    "totalArea",
+                    "totalPolygons",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1509,7 +1581,9 @@
                       "scheduleExpression": "rate(5 days)",
                       "scheduleExpressionTimezone": "Australia/Perth",
                       "createdAt": "2022-08-10T23:55:20.322Z",
-                      "createdBy": "someone@somewhere.com"
+                      "createdBy": "someone@somewhere.com",
+                      "totalArea": 100,
+                      "totalPolygons": 2
                     }
                   }
                 }
@@ -1724,7 +1798,9 @@
                           "scheduleExpression": "rate(5 days)",
                           "scheduleExpressionTimezone": "Australia/Perth",
                           "createdAt": "2022-08-10T23:55:20.322Z",
-                          "createdBy": "someone@somewhere.com"
+                          "createdBy": "someone@somewhere.com",
+                          "totalArea": 100,
+                          "totalPolygons": 2
                         },
                         {
                           "id": "0980yht42",
@@ -1733,14 +1809,18 @@
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
                           "updatedAt": "2022-08-12T07:34:23.132Z",
-                          "updatedBy": "someoneelse@somewhere.com"
+                          "updatedBy": "someoneelse@somewhere.com",
+                          "totalArea": 100,
+                          "totalPolygons": 2
                         },
                         {
                           "id": "rrwth876d",
                           "groupId": "sjduwydjd",
                           "name": "Bashirian Paddock",
                           "createdAt": "2022-08-10T23:55:20.322Z",
-                          "createdBy": "someone@somewhere.com"
+                          "createdBy": "someone@somewhere.com",
+                          "totalArea": 100,
+                          "totalPolygons": 2
                         }
                       ],
                       "pagination": {
@@ -1821,6 +1901,14 @@
                       "description": "The name of the Region.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The total area covered by all polygons under this region.",
+                      "type": "number"
+                    },
+                    "totalPolygons": {
+                      "description": "The total number of polygons under this region.",
+                      "type": "number"
+                    },
                     "scheduleExpression": {
                       "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
                       "type": "string"
@@ -1858,6 +1946,8 @@
                     "id",
                     "groupId",
                     "name",
+                    "totalArea",
+                    "totalPolygons",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1872,7 +1962,9 @@
                       "scheduleExpression": "rate(5 days)",
                       "scheduleExpressionTimezone": "Australia/Perth",
                       "createdAt": "2022-08-10T23:55:20.322Z",
-                      "createdBy": "someone@somewhere.com"
+                      "createdBy": "someone@somewhere.com",
+                      "totalArea": 100,
+                      "totalPolygons": 2
                     }
                   }
                 }
@@ -2086,6 +2178,14 @@
                       "description": "The name of the Region.",
                       "type": "string"
                     },
+                    "totalArea": {
+                      "description": "The total area covered by all polygons under this region.",
+                      "type": "number"
+                    },
+                    "totalPolygons": {
+                      "description": "The total number of polygons under this region.",
+                      "type": "number"
+                    },
                     "scheduleExpression": {
                       "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
                       "type": "string"
@@ -2123,6 +2223,8 @@
                     "id",
                     "groupId",
                     "name",
+                    "totalArea",
+                    "totalPolygons",
                     "createdBy",
                     "createdAt"
                   ]
@@ -2137,7 +2239,9 @@
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
                       "updatedAt": "2022-08-12T07:34:23.132Z",
-                      "updatedBy": "someoneelse@somewhere.com"
+                      "updatedBy": "someoneelse@somewhere.com",
+                      "totalArea": 100,
+                      "totalPolygons": 2
                     }
                   }
                 }

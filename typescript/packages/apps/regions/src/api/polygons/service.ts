@@ -130,7 +130,7 @@ export class PolygonService {
 		const existing = await this.get(securityContext, id);
 
 		// merge the existing and to be updated
-		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditPolygon, Polygon>(existing, polygon, RESERVED_FIELDS_AS_TAGS, securityContext.email);
+		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditPolygon, Polygon>(existing, polygon, ['name'], securityContext.email);
 
 		this.calculateArea(merged);
 

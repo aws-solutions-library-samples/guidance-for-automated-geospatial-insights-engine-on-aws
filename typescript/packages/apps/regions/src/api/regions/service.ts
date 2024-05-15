@@ -119,7 +119,7 @@ export class RegionService {
 		const existing = await this.get(securityContext, id);
 
 		// merge the existing and to be updated
-		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditRegion, Region>(existing, region, RESERVED_FIELDS_AS_TAGS, securityContext.email);
+		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditRegion, Region>(existing, region, ['name'], securityContext.email);
 
 		// save
 		await this.regionRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);

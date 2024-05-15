@@ -1,0 +1,36 @@
+{
+  "name": "@arcade/seeder",
+  "version": "0.0.1",
+  "description": "Tools to seed ARCADE deployment with some data.",
+  "type": "module",
+  "scripts": {
+    "clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+    "build": "npx tsc -b",
+    "seed": "npx tsx src/seedData.ts"
+  },
+  "devDependencies": {
+    "@aws-amplify/core": "~6",
+    "@aws-amplify/auth": "~6",
+    "aws-amplify": "~6",
+    "@arcade/clients": "workspace:*",
+    "fast-glob": "~3",
+    "@aws-sdk/client-ssm": "~3",
+    "@aws-sdk/client-cognito-identity-provider": "~3",
+    "@tsconfig/node20": "~20",
+    "@types/node": "~20",
+    "@vitest/ui": "~1",
+    "dayjs": "~1",
+    "dotenv": "~16",
+    "eslint": "~9",
+    "shx": "~0",
+    "tsx": "~4",
+    "typescript": "~5",
+    "vitest-mock-extended": "~1",
+    "vitest": "~0",
+    "ulid": "~2",
+    "axios": "~1"
+  },
+  "private": false,
+  "dependencies": {
+  }
+}
