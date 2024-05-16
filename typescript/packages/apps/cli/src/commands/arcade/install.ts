@@ -3,6 +3,7 @@ import { switchToArcadeLocation } from '../../utils/shell.js';
 import { getDeployedStacServerMetaData, getDeployedStackByName } from '../../utils/cloudformation.js';
 import { StacCommand } from '../../types/stacCommand.js';
 import shell from 'shelljs';
+import { validateMasterPassword } from '../../utils/validator.js';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : false;

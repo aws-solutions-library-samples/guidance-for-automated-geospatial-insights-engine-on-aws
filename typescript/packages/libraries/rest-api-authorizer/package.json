@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@arcade/resource-api-base": "workspace:*",
 		"@aws-sdk/client-verifiedpermissions": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
 		"@fastify/awilix": "~5",
 		"awilix": "~10",
 		"aws-jwt-verify": "~4",

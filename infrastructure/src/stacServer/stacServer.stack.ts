@@ -10,6 +10,7 @@ export type StacServerProperties = StackProps & {
 	environment: string;
 	openSearchEndpoint: string;
 	openSearchSecret: string;
+	authorizerSecretId: string;
 };
 
 export const initializerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/initializerFunctionName`;
@@ -46,6 +47,7 @@ export class StacServerStack extends Stack {
 			cognitoUserPoolId,
 			policyStoreId,
 			cognitoClientId,
+			authorizerSecretId: props.authorizerSecretId,
 		});
 
 		new StringParameter(this, 'functionNameParameter', {

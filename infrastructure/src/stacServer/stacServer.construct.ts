@@ -23,6 +23,7 @@ export interface StacServerConstructProperties {
 	readonly policyStoreId: string;
 	readonly namePrefix: string;
 	readonly authorizerFunctionName: string;
+	readonly authorizerSecretId: string;
 }
 
 export class StacServerConstruct extends Construct {
@@ -34,7 +35,8 @@ export class StacServerConstruct extends Construct {
 
 		const account = Stack.of(this).account;
 
-		const secret = Secret.fromSecretNameV2(this, 'openSearchSecret', props.openSearchSecret);
+		const openSearchSecret = Secret.fromSecretNameV2(this, 'openSearchSecret', props.openSearchSecret);
+		const backendAuthorizerSecret = Secret.fromSecretNameV2(this, 'authorizerSecretId', props.authorizerSecretId);
 
 		// Stac server initializer Lambda
 		const stacServerInitializerLambda = new NodejsFunction(this, 'StacServerInitializerLambda', {
@@ -48,7 +50,7 @@ export class StacServerConstruct extends Construct {
 			timeout: Duration.minutes(5),
 			environment: {
 				OPEN_SEARCH_ENDPOINT: props.openSearchEndpoint,
-				OPEN_SEARCH_SECRET: secret.secretName,
+				OPEN_SEARCH_SECRET: openSearchSecret.secretName,
 			},
 			bundling: {
 				minify: true,
@@ -63,7 +65,7 @@ export class StacServerConstruct extends Construct {
 			architecture: getLambdaArchitecture(scope),
 		});
 
-		secret.grantRead(stacServerInitializerLambda);
+		openSearchSecret.grantRead(stacServerInitializerLambda);
 
 		this.functionName = stacServerInitializerLambda.functionName;
 
@@ -93,10 +95,12 @@ export class StacServerConstruct extends Construct {
 				POLICY_STORE_ID: props.policyStoreId,
 				USER_POOL_ID: props.cognitoUserPoolId,
 				CLIENT_ID: props.cognitoClientId,
+				BACKEND_AUTHORIZER_SECRET_ID: props.authorizerSecretId,
 			},
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
 			architecture: getLambdaArchitecture(scope),
 		});
+		backendAuthorizerSecret.grantRead(authorizerLambda);
 
 		authorizerLambda.addToRolePolicy(
 			new PolicyStatement({
