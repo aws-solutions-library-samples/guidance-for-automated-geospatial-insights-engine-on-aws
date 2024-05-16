@@ -51,6 +51,9 @@ importers:
       source-map-support:
         specifier: ~0
         version: 0.5.21
+      ulid:
+        specifier: ~2
+        version: 2.3.0
     devDependencies:
       '@tsconfig/node20':
         specifier: ~20
@@ -1579,6 +1582,9 @@ importers:
       '@arcade/resource-api-base':
         specifier: workspace:*
         version: link:../resource-api-base
+      '@aws-sdk/client-secrets-manager':
+        specifier: ~3
+        version: 3.572.0
       '@aws-sdk/client-verifiedpermissions':
         specifier: 3.556.0
         version: 3.556.0

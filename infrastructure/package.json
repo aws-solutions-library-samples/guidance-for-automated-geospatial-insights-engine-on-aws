@@ -27,7 +27,8 @@
 		"@aws-cdk/aws-cognito-identitypool-alpha": "2.140.0-alpha.0",
 		"aws-lambda": "~1",
 		"cdk-nag": "~2",
-		"constructs": "~10"
+		"constructs": "~10",
+		"ulid": "~2"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",

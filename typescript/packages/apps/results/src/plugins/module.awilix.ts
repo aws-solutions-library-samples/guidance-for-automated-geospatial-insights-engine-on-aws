@@ -131,10 +131,10 @@ const registerContainer = (app?: FastifyInstance) => {
 	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
 	const openSearchEndPoint = process.env['OPEN_SEARCH_ENDPOINT'];
 	const openSearchSecret = process.env['OPEN_SEARCH_SECRET'];
-
 	const userPoolId = process.env['USER_POOL_ID'];
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
+	const backEndAuthorizerSecret = process.env['BACKEND_AUTHORIZER_SECRET_ID'];
 
 	diContainer.register({
 		// Clients
@@ -228,9 +228,12 @@ const registerContainer = (app?: FastifyInstance) => {
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
-		stacServerAuthorizer: asFunction((c: Cradle) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId), {
-			...commonInjectionOptions,
-		}),
+		stacServerAuthorizer: asFunction(
+			(container) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId, backEndAuthorizerSecret, container.secretsManagerClient),
+			{
+				...commonInjectionOptions,
+			}
+		),
 	});
 };
 

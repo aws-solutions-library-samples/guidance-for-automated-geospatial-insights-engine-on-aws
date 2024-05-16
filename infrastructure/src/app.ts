@@ -127,6 +127,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 			environment,
 			openSearchEndpoint: stacServerOpenSearchEndpoint,
 			openSearchSecret: stacServerOpenSearchSecret,
+			authorizerSecretId: sharedStack.apiKeySecretName,
 			env: {
 				// The ARCADE_REGION domain variable
 				region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
