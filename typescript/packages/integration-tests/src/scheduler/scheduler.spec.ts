@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc.js';
 import pWaitFor from 'p-wait-for';
 import { ResultResource } from "@arcade/clients";
-import { ID_PATTERN, UUID_PATTERN } from "../utils/regex.js";
+import { ID_PATTERN, ISO8601_DATE_TIME_MS_PATTERN, UUID_PATTERN } from "../utils/regex.js";
 import { createResourcesMethodForModules } from "../utils/common.utils.js";
 
 dayjs.extend(utc)
@@ -61,14 +61,28 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		const resultListResource = await waitForSuccessfulEngineExecution(regionId, userToken);
 		// verify that the polygon stac item is published
 		await listStacItems(regionId, resultListResource[0].id, polygonId, create_state_body['tags']['crop'], create_state_body['tags']['plantedAt'])
-	})
+		// ensure that results status is propagated to the region resource
+		await regions.waitForGetResource('regions', {
+			withIdToken: userToken,
+			id: regionId,
+			expectJsonLike: {
+				tags: {
+					'arcade:results:id': resultListResource[0].id,
+					'arcade:results:status': 'succeeded',
+					"arcade:results:message": "Essential container in task exited",
+					"arcade:results:updatedAt": ISO8601_DATE_TIME_MS_PATTERN,
+				}
+			},
+			expectStatus: 200,
+		})
+	}, { timeout: 5 * 60 * 6000 })
 
 	afterEach(async () => {
 		await Promise.all([
 			teardown(),
 		])
 	})
-}, { timeout: 5 * 60 * 6000 });
+});
 
 const waitForStacCollection = async (id: string, title: string): Promise<void> => {
 	await pWaitFor(async (): Promise<any> => {

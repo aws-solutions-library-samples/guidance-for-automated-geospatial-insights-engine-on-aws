@@ -21,6 +21,12 @@ export interface Region {
 	updatedAt?: string;
 }
 
+export interface UpdateRegionParams {
+	name?: string;
+	attributes?: Record<string, any>
+	tags?: Record<string, string | null>
+}
+
 export interface State {
 	id: string;
 	polygonId: string;

@@ -434,7 +434,7 @@ export class RegionsModule extends Construct {
 			functionName: `${namePrefix}-regions-sqs-processor`,
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
-			memorySize: 512,
+			memorySize: 256,
 			logRetention: RetentionDays.ONE_WEEK,
 			timeout: Duration.minutes(1),
 			environment: {
