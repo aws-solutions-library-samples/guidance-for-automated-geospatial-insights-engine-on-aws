@@ -1,11 +1,24 @@
 import { LambdaRequestContext, Polygon, RegionsClient } from '@arcade/clients';
-import { BatchClient, ListTagsForResourceCommand, SubmitJobCommand, SubmitJobCommandInput } from '@aws-sdk/client-batch';
+import {
+	BatchClient,
+	ListTagsForResourceCommand,
+	SubmitJobCommand,
+	SubmitJobCommandInput
+} from '@aws-sdk/client-batch';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import pLimit from 'p-limit';
-import { BatchEngineInput, FinishJobRequest, StartJobRequest } from './model.js';
+import { BatchEngineInput, FinishJobRequest, JobQueueArn, StartJobRequest } from './model.js';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { ARCADE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, Status } from "@arcade/events";
+import {
+	ARCADE_EVENT_SOURCE,
+	DomainEvent,
+	EngineJobDetails,
+	EngineType,
+	EventPublisher,
+	Priority,
+	Status
+} from "@arcade/events";
 import { ulid } from 'ulid';
 
 const filename = 'metadata.json'
@@ -16,13 +29,13 @@ export class JobsService {
 
 	constructor(
 		readonly log: FastifyBaseLogger,
-		private readonly batchClient: BatchClient,
-		private readonly regionsClient: RegionsClient,
-		private readonly jobDefinitionArn: string,
-		private readonly jobQueueName: string,
-		private readonly concurrencyLimit: number,
-		private readonly bucketName: string,
-		private readonly s3Client: S3Client,
+		readonly batchClient: BatchClient,
+		readonly regionsClient: RegionsClient,
+		readonly jobDefinitionArn: string,
+		readonly queuePriorityMap: Record<Priority, JobQueueArn>,
+		readonly concurrencyLimit: number,
+		readonly bucketName: string,
+		readonly s3Client: S3Client,
 		readonly eventPublisher: EventPublisher
 	) {
 		this.engineType = 'aws-batch';
@@ -36,7 +49,12 @@ export class JobsService {
 		};
 	}
 
-	private async uploadFileForBatchJob(params: { resultId: string, polygons: Polygon[], request: StartJobRequest, keyPrefix: string }) {
+	private async uploadFileForBatchJob(params: {
+		resultId: string,
+		polygons: Polygon[],
+		request: StartJobRequest,
+		keyPrefix: string
+	}) {
 		this.log.debug(`JobsService> uploadFileForBatchJob> params: ${JSON.stringify(params)}`);
 		const { request, resultId, keyPrefix, polygons } = params
 		const limit = pLimit(this.concurrencyLimit);
@@ -63,7 +81,12 @@ export class JobsService {
 		this.log.debug(`JobsService> uploadFileForBatchJob> exit>`);
 	}
 
-	private async submitBatchJob(params: { resultId: string, polygons: Polygon[], request: StartJobRequest, keyPrefix: string }) {
+	private async submitBatchJob(params: {
+		resultId: string,
+		polygons: Polygon[],
+		request: StartJobRequest,
+		keyPrefix: string
+	}) {
 		this.log.debug(`JobsService> submitBatchJob> params: ${JSON.stringify(params)}`);
 		const { request, resultId, keyPrefix, polygons } = params
 
@@ -84,7 +107,7 @@ export class JobsService {
 			},
 			jobName: `${request.id}-${request.scheduleDateTime}`,
 			jobDefinition: this.jobDefinitionArn,
-			jobQueue: this.jobQueueName,
+			jobQueue: this.queuePriorityMap[request.processingConfig.priority],
 			tags: {
 				regionId: request.id,
 				resultId: resultId,
@@ -186,6 +209,8 @@ export class JobsService {
 		ow(request.scheduleDateTime, ow.string.nonEmpty);
 		ow(request.groupId, ow.string.nonEmpty);
 		ow(request.id, ow.string.nonEmpty);
+		ow(request.processingConfig, ow.object.nonEmpty);
+		ow(request.processingConfig.priority, ow.string.nonEmpty);
 
 		// get list of polygons for this particular region
 		const polygonListResource = await this.regionsClient.listPolygons({ regionId: request.id, includeLatestState: true }, this.context);

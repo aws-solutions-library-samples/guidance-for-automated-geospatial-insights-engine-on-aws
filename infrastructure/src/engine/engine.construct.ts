@@ -1,6 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import { Duration, RemovalPolicy, Size, Stack } from 'aws-cdk-lib';
-import { EcsFargateContainerDefinition, EcsJobDefinition, FargateComputeEnvironment, JobQueue } from 'aws-cdk-lib/aws-batch';
+import {
+	EcsFargateContainerDefinition,
+	EcsJobDefinition,
+	FargateComputeEnvironment,
+	JobQueue
+} from 'aws-cdk-lib/aws-batch';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import { ContainerImage, CpuArchitecture, OperatingSystemFamily } from 'aws-cdk-lib/aws-ecs';
@@ -25,7 +30,9 @@ export interface EngineConstructProperties {
 }
 
 export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
-export const engineProcessorJobQueueArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobQueueArn`;
+export const engineProcessorHighPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorHighPriorityQueueArn`;
+export const engineProcessorStandardPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorStandardPriorityQueueArn`;
+export const engineProcessorLowPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorLowPriorityQueueArn`;
 
 export class EngineConstruct extends Construct {
 	constructor(scope: Construct, id: string, props: EngineConstructProperties) {
@@ -103,21 +110,53 @@ export class EngineConstruct extends Construct {
 			ManagedPolicy.fromManagedPolicyArn(this, 'AmazonECSTaskExecutionRolePolicy', 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy')
 		);
 
-		const queue = new JobQueue(this, 'JobQueue', {
+		const computeEnvironment = new FargateComputeEnvironment(this, 'FargateComputeEnvironment', {
+			vpc: props.vpc,
+		});
+
+		const highPriorityQueue = new JobQueue(this, 'HighPriorityQueue', {
 			computeEnvironments: [
 				{
-					computeEnvironment: new FargateComputeEnvironment(this, 'FargateComputeEnvironment', {
-						vpc: props.vpc,
-					}),
+					computeEnvironment,
 					order: 1,
 				},
 			],
 			priority: 10,
 		});
 
-		new StringParameter(this, 'EngineProcessorJobQueueArnParameter', {
-			parameterName: engineProcessorJobQueueArnParameter(props.environment),
-			stringValue: queue.jobQueueArn,
+		const standardPriorityQueue = new JobQueue(this, 'StandardPriorityQueue', {
+			computeEnvironments: [
+				{
+					computeEnvironment,
+					order: 1,
+				},
+			],
+			priority: 5,
+		});
+
+		const lowPriorityQueue = new JobQueue(this, 'LowPriorityQueue', {
+			computeEnvironments: [
+				{
+					computeEnvironment,
+					order: 1,
+				},
+			],
+			priority: 1,
+		});
+
+		new StringParameter(this, 'engineProcessorHighPriorityQueueArn', {
+			parameterName: engineProcessorHighPriorityQueueArn(props.environment),
+			stringValue: highPriorityQueue.jobQueueArn,
+		});
+
+		new StringParameter(this, 'engineProcessorStandardPriorityQueueArn', {
+			parameterName: engineProcessorStandardPriorityQueueArn(props.environment),
+			stringValue: standardPriorityQueue.jobQueueArn,
+		});
+
+		new StringParameter(this, 'engineProcessorLowPriorityQueueArn', {
+			parameterName: engineProcessorLowPriorityQueueArn(props.environment),
+			stringValue: lowPriorityQueue.jobQueueArn,
 		});
 
 		const account = cdk.Stack.of(this).account;
