@@ -3,7 +3,14 @@ import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
-import { Group, ListPolygonsOptions, Polygon, PolygonListResource, Region } from './regions.models.js';
+import {
+	Group,
+	ListPolygonsOptions,
+	Polygon,
+	PolygonListResource,
+	Region,
+	UpdateRegionParams
+} from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -17,7 +24,7 @@ export class RegionsClient extends ClientServiceBase {
 		this.regionsApiFunctionName = regionsApiFunctionName;
 	}
 
-	public async getGroupById(id: string, requestContext?: LambdaRequestContext): Promise<Group | undefined> {
+	public async getGroupById(id: string, requestContext: LambdaRequestContext): Promise<Group | undefined> {
 		this.log.trace(`RegionsClient> getGroupById> in: id:${id}}`);
 		const additionalHeaders = {};
 
@@ -29,6 +36,22 @@ export class RegionsClient extends ClientServiceBase {
 
 		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as Group;
 		this.log.trace(`RegionsClient> getGroupById> exit> result: ${JSON.stringify(result)}`);
+		return result;
+	}
+
+	public async updateRegion(id: string, updateRegionParams: UpdateRegionParams, requestContext: LambdaRequestContext): Promise<Region> {
+		this.log.trace(`RegionsClient> updateRegion> in: updateRegionParams:${updateRegionParams}}`);
+		const additionalHeaders = {};
+
+		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
+			.setMethod('PATCH')
+			.setHeaders(super.buildHeaders(additionalHeaders))
+			.setRequestContext(requestContext)
+			.setBody(updateRegionParams)
+			.setPath(`/regions/${id}`);
+
+		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as Region;
+		this.log.trace(`RegionsClient> updateRegion> exit> result: ${JSON.stringify(result)}`);
 		return result;
 	}
 
@@ -47,7 +70,7 @@ export class RegionsClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async listPolygons(options?: ListPolygonsOptions, requestContext?: LambdaRequestContext): Promise<PolygonListResource | undefined> {
+	public async listPolygons(options: ListPolygonsOptions | undefined, requestContext: LambdaRequestContext): Promise<PolygonListResource | undefined> {
 		this.log.trace(`RegionsClient> listPolygons> in: options:${options}}`);
 
 		const additionalHeaders = {};
@@ -78,7 +101,7 @@ export class RegionsClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async getPolygonById(id: string, requestContext?: LambdaRequestContext): Promise<Polygon | undefined> {
+	public async getPolygonById(id: string, requestContext: LambdaRequestContext): Promise<Polygon | undefined> {
 		this.log.trace(`RegionsClient> getPolygonById> in: id:${id}}`);
 		const additionalHeaders = {};
 

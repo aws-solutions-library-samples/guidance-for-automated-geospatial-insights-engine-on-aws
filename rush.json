@@ -369,6 +369,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@arcade/regions-extension",
+      "projectFolder": "typescript/packages/apps/regions-extension",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@arcade/integration-tests",
       "projectFolder": "typescript/packages/integration-tests",
       "reviewCategory": "production",

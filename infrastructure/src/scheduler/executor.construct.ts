@@ -161,7 +161,7 @@ export class ExecutorModule extends Construct {
 
 		awsBatchStateChangeRule.addTarget(
 			new LambdaFunction(eventbridgeLambda, {
-				deadLetterQueue: executorEventBridgeHandlerDLQ,
+			deadLetterQueue: executorEventBridgeHandlerDLQ,
 				maxEventAge: Duration.minutes(5),
 				retryAttempts: 2,
 			})
