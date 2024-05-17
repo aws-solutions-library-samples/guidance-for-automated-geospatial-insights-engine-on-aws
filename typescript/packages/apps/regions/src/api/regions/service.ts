@@ -9,7 +9,7 @@ import { GroupService } from '../groups/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { RegionRepository } from './repository.js';
-import { CreateRegion, EditRegion, Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
+import { CreateRegion, EditRegion, ProcessingConfig, Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
 
 export type RegionListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -38,14 +38,17 @@ export class RegionService {
 			region,
 			ow.object.exactShape({
 				name: ow.string.nonEmpty,
-				scheduleExpression: ow.optional.string,
-				scheduleExpressionTimezone: ow.optional.string,
+				processingConfig: ow.object.nonEmpty,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
 		);
 
 		// TODO: perform more detailed validation on attributes and tags
+		// validate the processing configuration
+		if (region.processingConfig) {
+			this.validateProcessingConfig(region.processingConfig)
+		}
 
 		// ensure parent group exists (will throw error if not exist or insufficient privileges)
 		await this.groupService.get(securityContext, groupId);
@@ -106,8 +109,7 @@ export class RegionService {
 			region,
 			ow.object.exactShape({
 				name: ow.optional.string,
-				scheduleExpression: ow.optional.string,
-				scheduleExpressionTimezone: ow.optional.string,
+				processingConfig: ow.optional.object,
 				attributes: ow.optional.object,
 				tags: ow.optional.object,
 			})
@@ -117,6 +119,10 @@ export class RegionService {
 
 		// retrieve existing
 		const existing = await this.get(securityContext, id);
+
+		if (region.processingConfig) {
+			this.validateProcessingConfig(region.processingConfig)
+		}
 
 		// merge the existing and to be updated
 		const [merged, tagDiff] = this.commonService.prepareResourceForUpdate<EditRegion, Region>(existing, region, ['name'], securityContext.email);
@@ -151,6 +157,30 @@ export class RegionService {
 
 		this.log.debug(`RegionService> get> exit:${JSON.stringify(region)}`);
 		return region;
+	}
+
+	private validateProcessingConfig(config: ProcessingConfig) {
+		switch (config.mode) {
+			case 'scheduled':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty,
+					scheduleExpression: ow.string.nonEmpty,
+					scheduleExpressionTimezone: ow.optional.string,
+					priority: ow.string.nonEmpty
+				})
+				break;
+			case 'onNewScene':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty,
+					priority: ow.string.nonEmpty
+				})
+				break;
+			case 'disabled':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty,
+				})
+				break;
+		}
 	}
 
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {

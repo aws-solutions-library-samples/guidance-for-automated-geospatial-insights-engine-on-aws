@@ -1,9 +1,16 @@
 import { State } from '@arcade/clients';
 import { RegionResource } from '@arcade/events';
 
-export type StartJobRequest = RegionResource & { scheduleDateTime: string };
+export type StartJobRequest = RegionResource & {
+	scheduleDateTime: string
+};
 
-export type FinishJobRequest = { jobArn: string, status: string, statusReason: string, jobId: string }
+export type FinishJobRequest = {
+	jobArn: string,
+	status: string,
+	statusReason: string,
+	jobId: string
+}
 
 export interface BatchEngineInput {
 	polygonId: string;
@@ -63,3 +70,6 @@ export interface ResourceRequirement {
 export interface Tags {
 	resourceArn: string
 }
+
+
+export type JobQueueArn = string;

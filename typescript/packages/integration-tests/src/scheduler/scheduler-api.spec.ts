@@ -215,8 +215,12 @@ const updateRegionWithSchedule = async (regionId: string, idToken: string): Prom
 		id: regionId,
 		withTags: testTags,
 		withJson: {
-			scheduleExpression: `at(${dayjs(timeInOneMinute).local().format('YYYY-MM-DDThh:mm:ss')})`,
-			scheduleExpressionTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+			processingConfig: {
+				scheduleExpression: `at(${dayjs(timeInOneMinute).local().format('YYYY-MM-DDThh:mm:ss')})`,
+				scheduleExpressionTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				priority: 'high',
+				mode: 'scheduled'
+			}
 		}
 	});
 }

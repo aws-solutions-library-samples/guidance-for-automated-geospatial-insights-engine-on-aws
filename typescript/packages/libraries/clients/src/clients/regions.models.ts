@@ -9,6 +9,17 @@ export interface Group {
 	updatedAt?: string;
 }
 
+export type Priority = 'low' | 'standard' | 'high';
+
+export type Mode = 'scheduled' | 'disabled' | 'onNewScene';
+
+export interface ProcessingConfig {
+	mode: Mode,
+	priority: Priority,
+	scheduleExpression: string,
+	scheduleExpressionTimezone: string
+}
+
 export interface Region {
 	id: string;
 	groupId: string;
@@ -19,6 +30,7 @@ export interface Region {
 	createdAt: string;
 	updatedBy?: string;
 	updatedAt?: string;
+	processingConfig: ProcessingConfig
 }
 
 export interface UpdateRegionParams {

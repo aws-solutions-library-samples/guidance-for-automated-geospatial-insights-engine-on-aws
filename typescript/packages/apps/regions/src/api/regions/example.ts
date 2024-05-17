@@ -2,14 +2,21 @@ import { CreateRegion, EditRegion, Region, RegionList } from './schemas.js';
 
 export const regionPostRequestExample: CreateRegion = {
 	name: 'Abshire Harvest',
-	scheduleExpression: 'rate(5 days)',
-	scheduleExpressionTimezone: 'Australia/Perth',
+	processingConfig: {
+		scheduleExpression: 'rate(5 days)',
+		scheduleExpressionTimezone: 'Australia/Perth',
+		mode: 'scheduled',
+	}
 };
 
 export const regionPatchRequestExample1: EditRegion = regionPostRequestExample;
 export const regionPatchRequestExample2: EditRegion = {
-	scheduleExpression: 'rate(5 days)',
-	scheduleExpressionTimezone: 'Australia/Perth',
+	processingConfig: {
+		mode: 'scheduled',
+		scheduleExpression: 'rate(5 days)',
+		scheduleExpressionTimezone: 'Australia/Perth',
+		priority: 'high'
+	},
 	tags: {
 		tier: 'GOLD',
 	},
@@ -37,7 +44,12 @@ export const regionResourceExample2: Region = {
 	updatedAt: '2022-08-12T07:34:23.132Z',
 	updatedBy: 'someoneelse@somewhere.com',
 	totalArea: 100,
-	totalPolygons: 2
+	totalPolygons: 2,
+	processingConfig: {
+		scheduleExpression: 'rate(5 days)',
+		scheduleExpressionTimezone: 'Australia/Perth',
+		mode: 'scheduled',
+	}
 };
 
 export const regionResourceExample3: Region = {
@@ -47,7 +59,10 @@ export const regionResourceExample3: Region = {
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',
 	totalArea: 100,
-	totalPolygons: 2
+	totalPolygons: 2,
+	processingConfig: {
+		mode: 'disabled',
+	}
 };
 
 export const regionListResource: RegionList = {

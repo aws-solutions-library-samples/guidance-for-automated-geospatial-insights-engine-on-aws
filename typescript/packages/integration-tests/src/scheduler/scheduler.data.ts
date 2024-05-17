@@ -12,6 +12,9 @@ export const create_region_body_without_schedule: object = {
 	tags: {
 		tag2: 'tag-two',
 	},
+	processingConfig: {
+		mode: 'disabled'
+	}
 };
 export const create_group_body: object = {
 	name: 'test-group-1',

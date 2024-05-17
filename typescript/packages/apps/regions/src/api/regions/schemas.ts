@@ -24,10 +24,35 @@ import {
  */
 const name = Type.String({ description: 'The name of the Region.' });
 
+const processingMode = Type.Enum(
+	{
+		scheduled: 'scheduled',
+		disabled: 'disabled',
+		onNewScene: 'onNewScene'
+	},
+	{
+		description: 'The region processing mode.',
+		default: 'disabled'
+	}
+);
+
+const processingPriority = Type.Enum(
+	{
+		low: 'low',
+		standard: 'standard',
+		high: 'high'
+	},
+	{
+		description: `The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'`,
+		default: 'standard'
+	}
+);
+
 const scheduleExpressionTimezone = Type.String({ description: 'The timezone in which the scheduling expression is evaluated.' });
+
 const scheduleExpression = Type.String({
 	description:
-		'The expression that defines when the schedule runs. The following formats are supported.\n' +
+		'The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n' +
 		'\n' +
 		'    at expression - at(yyyy-mm-ddThh:mm:ss)\n' +
 		'\n' +
@@ -41,6 +66,15 @@ const scheduleExpression = Type.String({
 		'\n' +
 		'A rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ',
 });
+
+const processingConfig = Type.Object({
+	mode: processingMode,
+	scheduleExpression: Type.Optional(scheduleExpression),
+	scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
+	priority: Type.Optional(processingPriority)
+
+}, { description: 'The processing configuration for the region.' })
+
 const totalArea = Type.Number({ description: 'The total area covered by all polygons under this region.' });
 
 const totalPolygons = Type.Number({ description: 'The total number of polygons under this region.' });
@@ -51,8 +85,7 @@ const totalPolygons = Type.Number({ description: 'The total number of polygons u
 export const createRegionRequestBody = Type.Object(
 	{
 		name,
-		scheduleExpression: Type.Optional(scheduleExpression),
-		scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
+		processingConfig,
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
@@ -63,8 +96,7 @@ export type CreateRegion = Static<typeof createRegionRequestBody>;
 export const editRegionRequestBody = Type.Object(
 	{
 		name: Type.Optional(name),
-		scheduleExpression: Type.Optional(scheduleExpression),
-		scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
+		processingConfig: Type.Optional(processingConfig),
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 	},
@@ -84,8 +116,7 @@ export const regionResource = Type.Object(
 		name,
 		totalArea,
 		totalPolygons,
-		scheduleExpression: Type.Optional(scheduleExpression),
-		scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
+		processingConfig,
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 		createdBy: createdBy,
@@ -110,3 +141,5 @@ export const regionList = Type.Object(
 	{ $id: 'regionList' }
 );
 export type RegionList = Static<typeof regionList>;
+
+export type ProcessingConfig = Static<typeof processingConfig>;

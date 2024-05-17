@@ -12,7 +12,8 @@ import { RegionsClient } from "@arcade/clients";
 import { Invoker } from "@arcade/lambda-invoker";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { S3Client } from "@aws-sdk/client-s3";
-import { EventPublisher, EXECUTOR_EVENT_SOURCE } from "@arcade/events";
+import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from "@arcade/events";
+import { JobQueueArn } from "../jobs/model.js";
 
 const { captureAWSv3Client } = pkg;
 
@@ -81,10 +82,19 @@ const registerContainer = (app?: FastifyInstance) => {
 	const awsRegion = process.env['AWS_REGION'];
 	const bucketName = process.env['BUCKET_NAME'];
 	const jobDefinitionArn = process.env['JOB_DEFINITION_ARN'];
-	const jobQueueArn = process.env['JOB_QUEUE_ARN'];
+	const highPriorityQueueArn = process.env['HIGH_PRIORITY_QUEUE_ARN'];
+	const lowPriorityQueueArn = process.env['LOW_PRIORITY_QUEUE_ARN'];
+	const standardPriorityQueueArn = process.env['STANDARD_PRIORITY_QUEUE_ARN'];
+
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 	const eventBusName = process.env['EVENT_BUS_NAME'];
+
+	const queuePriorityMap: Record<Priority, JobQueueArn> = {
+		high: highPriorityQueueArn,
+		standard: standardPriorityQueueArn,
+		low: lowPriorityQueueArn,
+	}
 
 	diContainer.register({
 		// Clients
@@ -109,7 +119,7 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, jobQueueArn, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher),
+			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher),
 			{
 				...commonInjectionOptions,
 			}

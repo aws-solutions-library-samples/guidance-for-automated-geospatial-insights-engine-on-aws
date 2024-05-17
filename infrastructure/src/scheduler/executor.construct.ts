@@ -17,11 +17,13 @@ import { fileURLToPath } from "url";
 
 export interface ExecutorConstructProperties {
 	environment: string
-	jobQueueArn: string;
 	eventBusName: string;
 	bucketName: string;
-	regionsApiFunctionArn: string;
 	jobDefinitionArn: string;
+	regionsApiFunctionArn: string;
+	highPriorityQueueArn: string;
+	standardPriorityQueueArn: string;
+	lowPriorityQueueArn: string;
 	concurrencyLimit: number;
 	engineQueue: IQueue;
 }
@@ -38,7 +40,9 @@ export class ExecutorModule extends Construct {
 
 		const engineProcessorJobDefinition = EcsJobDefinition.fromJobDefinitionArn(scope, 'EngineProcessJobDefinition', props.jobDefinitionArn);
 
-		const jobQueue = JobQueue.fromJobQueueArn(scope, 'EngineProcessorJobQueueArn', props.jobQueueArn);
+		const highPriorityQueue = JobQueue.fromJobQueueArn(scope, 'HighPriorityQueue', props.highPriorityQueueArn);
+		const standardPriorityQueue = JobQueue.fromJobQueueArn(scope, 'StandardPriorityQueue', props.standardPriorityQueueArn);
+		const lowPriorityQueue = JobQueue.fromJobQueueArn(scope, 'LowPriorityQueue', props.lowPriorityQueueArn);
 
 		const bucket = Bucket.fromBucketName(scope, 'Bucket', props.bucketName);
 
@@ -59,7 +63,9 @@ export class ExecutorModule extends Construct {
 			environment: {
 				EVENT_BUS_NAME: props.eventBusName,
 				JOB_DEFINITION_ARN: engineProcessorJobDefinition.jobDefinitionArn,
-				JOB_QUEUE_ARN: jobQueue.jobQueueArn,
+				HIGH_PRIORITY_QUEUE_ARN: highPriorityQueue.jobQueueArn,
+				LOW_PRIORITY_QUEUE_ARN: lowPriorityQueue.jobQueueArn,
+				STANDARD_PRIORITY_QUEUE_ARN: standardPriorityQueue.jobQueueArn,
 				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
 				REGIONS_API_FUNCTION_NAME: regionsApiLambda.functionName,
 				BUCKET_NAME: props.bucketName
@@ -92,7 +98,7 @@ export class ExecutorModule extends Construct {
 			new PolicyStatement({
 				effect: Effect.ALLOW,
 				actions: ['batch:SubmitJob', 'batch:DescribeJobs', 'batch:TerminateJob', 'batch:TagResource'],
-				resources: [engineProcessorJobDefinition.jobDefinitionArn, jobQueue.jobQueueArn],
+				resources: [engineProcessorJobDefinition.jobDefinitionArn, highPriorityQueue.jobQueueArn, lowPriorityQueue.jobQueueArn, standardPriorityQueue.jobQueueArn],
 			})
 		);
 

@@ -17,6 +17,9 @@ export const create_region_body: object = {
 	tags: {
 		tag2: 'tag-two',
 	},
+	processingConfig: {
+		mode: 'disabled'
+	}
 };
 export const created_region_resource = (username: string): object => {
 	return {
@@ -35,6 +38,10 @@ export const update_region_body: object = {
 	tags: {
 		tag2: 'tag-two-updated',
 	},
+	processingConfig: {
+		mode: 'onNewScene',
+		priority: 'low'
+	}
 };
 
 export const updated_region_resource = (username: string): object => {
