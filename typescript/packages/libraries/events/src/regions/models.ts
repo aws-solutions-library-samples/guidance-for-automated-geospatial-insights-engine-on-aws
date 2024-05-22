@@ -14,4 +14,6 @@ export interface RegionResource {
 	groupId: string;
 	name: string;
 	processingConfig: ProcessingConfig
+	tags?: Record<string, string>;
+	attributes?: Record<string, string>;
 }

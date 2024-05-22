@@ -3,7 +3,7 @@ import { request, spec, stash } from 'pactum';
 import Spec from 'pactum/src/models/Spec.js';
 import path from 'path';
 import { initializeConfig } from '../utils/config.js';
-import { COMMON_HEADERS } from '../utils/headers.js';
+import { AuthenticationType, COMMON_HEADERS } from '../utils/headers.js';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { Client } from "@opensearch-project/opensearch";
@@ -37,7 +37,8 @@ type ParentIdExpectArgs = {
 	parentId: string;
 };
 type AuthExpectArgs = {
-	withIdToken: string;
+	withIdToken?: string;
+	withApiKey?: string;
 };
 
 export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & AuthExpectArgs;
@@ -104,9 +105,21 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			break;
 	}
 
+	const constructAuth = (args: AuthExpectArgs): {
+		type: AuthenticationType,
+		secret: string
+	} => {
+		if (args.withIdToken) {
+			return { type: 'token', secret: args.withIdToken }
+		}
+		if (args.withApiKey) {
+			return { type: 'apiKey', secret: args.withApiKey }
+		}
+	}
+
 	const createResource = (resourcePlural: string, args: CreateArgs, parentResourcePlural?: string, parentId?: string): Spec => {
 		const url = parentId ? `${baseUrl}${parentResourcePlural}/${parentId}/${resourcePlural}` : `${BASE_URL}${resourcePlural}`;
-		let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
+		let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
 
 		let requestBody = args.withJson;
 		if (args.withTags) {
@@ -128,7 +141,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			.patch(`${baseUrl}${resourcePlural}/{id}`)
 			.withPathParams('id', args.id)
 			.withJson(args.withJson)
-			.withHeaders(COMMON_HEADERS(args.withIdToken))
+			.withHeaders(COMMON_HEADERS(constructAuth(args)))
 			.expectStatus(args.expectStatus);
 		if (args.expectJsonLike) {
 			s = s.expectJsonLike(args.expectJsonLike);
@@ -158,7 +171,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	}
 
 	const getResource = (resourcePlural: string, args: GetArgs): Spec => {
-		let s = spec().get(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
+		let s = spec().get(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
 		if (args.expectJsonLike) {
 			s = s.expectJsonLike(args.expectJsonLike);
 		}
@@ -169,7 +182,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	const listResources = (resourcePlural: string, args: ListExpectArgs): Spec => {
-		let s = spec().get(`${baseUrl}${resourcePlural}`).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
+		let s = spec().get(`${baseUrl}${resourcePlural}`).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
 
 		if (args.withCount) {
 			s = s.withQueryParams('count', args.withCount);
@@ -205,7 +218,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	const deleteResource = (resourcePlural: string, args: DeleteArgs): Spec => {
-		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken));
+		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(constructAuth(args)));
 		if (args.expectStatus) {
 			s = s.expectStatus(args.expectStatus);
 		}
@@ -215,7 +228,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	const teardownResources = async <T>(resourcePlural: string, tagKey: string, tagValue: string, idToken: string, queryString?: Record<string, unknown>) => {
 		let token: string;
 		do {
-			let s = spec().get(`${baseUrl}${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS(idToken));
+			let s = spec().get(`${baseUrl}${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS(constructAuth({ withIdToken: idToken })));
 
 			if (queryString) {
 				s = s.withQueryParams(queryString);

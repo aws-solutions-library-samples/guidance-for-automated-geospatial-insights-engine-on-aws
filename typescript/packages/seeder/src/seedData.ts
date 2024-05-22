@@ -172,6 +172,20 @@ async function seedGroups(entries: SeedEntry[], endpoint: string, token: string)
 	}
 }
 
+async function seedStates(entries: SeedEntry[], endpoint: string, token: string): Promise<void> {
+	const seedEntries = entries.filter(e => e.resourceType === 'states');
+	for (const se of seedEntries) {
+		const stateDefinition = fs.readFileSync(se.filePath, 'utf-8');
+		const stateDefinitionJson = JSON.parse(stateDefinition);
+		stateDefinitionJson.timestamp = new Date().toISOString();
+		stateDefinitionJson.tags.plantedAt = new Date().toISOString();
+		const getPolygonByName = await apiGet(endpoint, `/polygons?name=${se.resourceName}`, token);
+		const currentPolygon = getPolygonByName.response.polygons[0];
+		console.log(`Creating state for polygon ${currentPolygon.name} with id ${currentPolygon.id}`)
+		await apiPost(endpoint, `/polygons/${currentPolygon.id}/states`, token, stateDefinitionJson);
+	}
+}
+
 async function seedRegions(entries: SeedEntry[], endpoint: string, token: string): Promise<void> {
 	const seedEntries = entries.filter(e => e.resourceType === 'regions');
 	for (const se of seedEntries) {
@@ -283,6 +297,8 @@ if (operation === 'seed') {
 		await seedRegions(seedEntries, endPoints['regions'], token);
 		console.log(`=========== Seeding polygons ===========`);
 		await seedPolygons(seedEntries, endPoints['regions'], token);
+		console.log(`=========== Seeding states ===========`);
+		await seedStates(seedEntries, endPoints['regions'], token);
 		console.log(`Done`);
 	})();
 }

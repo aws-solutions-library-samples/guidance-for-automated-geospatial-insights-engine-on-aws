@@ -30,6 +30,7 @@ export class StacServerConstruct extends Construct {
 	functionName: string;
 	authorizerFunctionArn: string;
 	authorizerFunctionName: string;
+
 	constructor(scope: Construct, id: string, props: StacServerConstructProperties) {
 		super(scope, id);
 
@@ -40,7 +41,7 @@ export class StacServerConstruct extends Construct {
 
 		// Stac server initializer Lambda
 		const stacServerInitializerLambda = new NodejsFunction(this, 'StacServerInitializerLambda', {
-			description: 'Results module event processor',
+			description: 'Stac Server initializer',
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_stacserver_init.ts'),
 			functionName: `${props.namePrefix}-initializer`,
 			runtime: Runtime.NODEJS_20_X,

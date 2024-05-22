@@ -68,7 +68,7 @@ export class ResultsModule extends Construct {
 		super(scope, id);
 
 		const account = Stack.of(this).account;
-		const namePrefix = `arcade-results-${props.environment}`;
+		const namePrefix = `arcade-staging`;
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const bucket = Bucket.fromBucketName(this, 'Bucket', props.bucketName);
 		const regionsApiLambda = Function.fromFunctionAttributes(scope, 'RegionsApiFunction', { functionArn: props.regionsApiFunctionArn, skipPermissions: true });
@@ -76,7 +76,7 @@ export class ResultsModule extends Construct {
 
 		// DynamoDb Table
 		const table = new Table(this, 'Table', {
-			tableName: `${namePrefix}`,
+			tableName: `${namePrefix}-results`,
 			partitionKey: {
 				name: 'pk',
 				type: AttributeType.STRING,

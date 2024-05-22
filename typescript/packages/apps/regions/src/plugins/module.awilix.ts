@@ -35,6 +35,7 @@ import { StateService } from '../api/states/service.js';
 import { TagUtils } from '../tags/tags.util.js';
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
 import { SQSClient } from "@aws-sdk/client-sqs";
+import { AggregatorService } from "../aggregator/service.js";
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -57,6 +58,7 @@ declare module '@fastify/awilix' {
 		tagUtils: TagUtils;
 		apiAuthorizer: ApiAuthorizer;
 		avpClient: VerifiedPermissionsClient;
+		aggregatorService: AggregatorService;
 	}
 }
 
@@ -179,7 +181,12 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 				...commonInjectionOptions,
 			}
 		),
-
+		aggregatorService: asFunction(
+			(c: Cradle) => new AggregatorService(app.log, c.regionService, c.groupService),
+			{
+				...commonInjectionOptions,
+			}
+		),
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, REGIONS_EVENT_SOURCE), {
 			...commonInjectionOptions,
 		}),

@@ -103,17 +103,6 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 
 	engineStack.addDependency(sharedStack);
 
-	const schedulerStack = new SchedulerStack(app, 'SchedulerModule', {
-		stackName: stackName('scheduler'),
-		description: stackDescription('Scheduler'),
-		environment,
-		concurrencyLimit,
-	});
-
-	schedulerStack.addDependency(sharedStack);
-	schedulerStack.addDependency(engineStack);
-	schedulerStack.addDependency(regionsStack);
-
 	const resultStack = new ResultsStack(app, 'ResultsModule', {
 		stackName: stackName('results'),
 		description: stackDescription('Results module stack'),
@@ -128,6 +117,18 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 
 	resultStack.addDependency(sharedStack);
 	resultStack.addDependency(regionsStack);
+
+	const schedulerStack = new SchedulerStack(app, 'SchedulerModule', {
+		stackName: stackName('scheduler'),
+		description: stackDescription('Scheduler'),
+		environment,
+		concurrencyLimit,
+	});
+
+	schedulerStack.addDependency(sharedStack);
+	schedulerStack.addDependency(engineStack);
+	schedulerStack.addDependency(regionsStack);
+	schedulerStack.addDependency(resultStack);
 
 	// Only deploy when openSearch endpoint has been supplied
 	if (stacServerOpenSearchEndpoint) {

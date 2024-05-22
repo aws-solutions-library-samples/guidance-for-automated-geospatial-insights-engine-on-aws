@@ -1,4 +1,4 @@
-import { State } from '@arcade/clients';
+import { ResultResource, State } from '@arcade/clients';
 import { RegionResource } from '@arcade/events';
 
 export type StartJobRequest = RegionResource & {
@@ -22,6 +22,7 @@ export interface BatchEngineInput {
 	scheduleDateTime: string;
 	outputPrefix: string;
 	state: State;
+	latestSuccessfulResult?: ResultResource;
 }
 
 export interface AwsBatchJobStateChange {

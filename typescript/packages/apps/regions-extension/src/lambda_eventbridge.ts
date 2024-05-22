@@ -4,12 +4,11 @@ import type { FastifyInstance } from 'fastify';
 import { buildLightApp } from './app.light.js';
 import {
 	DomainEvent,
-	EngineJobDetails,
 	RESULTS_EVENT_SOURCE,
 	RESULTS_RESULT_CREATED_EVENT,
 	RESULTS_RESULT_UPDATED_EVENT
 } from "@arcade/events";
-import { RegionsClient } from "@arcade/clients";
+import { RegionsClient, ResultResource } from "@arcade/clients";
 import ow from 'ow';
 
 const app: FastifyInstance = await buildLightApp();
@@ -17,7 +16,7 @@ const di: AwilixContainer = app.diContainer;
 
 const regionsClient = di.resolve<RegionsClient>('regionsClient');
 
-export const handler: EventBridgeHandler<any, DomainEvent<EngineJobDetails>, any> = async (event, _context: Context, _callback: Callback) => {
+export const handler: EventBridgeHandler<any, DomainEvent<ResultResource>, any> = async (event, _context: Context, _callback: Callback) => {
 	app.log.info(`EventBridgeLambda > handler > event: ${JSON.stringify(event)}`);
 
 	if ([RESULTS_RESULT_UPDATED_EVENT, RESULTS_RESULT_CREATED_EVENT].includes(event["detail-type"]) && event['source'] === RESULTS_EVENT_SOURCE) {
@@ -28,7 +27,8 @@ export const handler: EventBridgeHandler<any, DomainEvent<EngineJobDetails>, any
 			{
 				id: ow.string.nonEmpty,
 				status: ow.string.nonEmpty,
-				message: ow.string.nonEmpty
+				createdAt: ow.string.nonEmpty,
+				message: ow.optional.string
 			}
 		))
 
@@ -48,7 +48,8 @@ export const handler: EventBridgeHandler<any, DomainEvent<EngineJobDetails>, any
 				'arcade:results:id': result.id,
 				'arcade:results:status': result.status,
 				'arcade:results:message': result.message,
-				'arcade:results:updatedAt': new Date(Date.now()).toISOString(),
+				'arcade:results:createdAt': result.createdAt,
+				'arcade:results:updatedAt': result.updatedAt,
 			}
 		}, securityContext);
 	}

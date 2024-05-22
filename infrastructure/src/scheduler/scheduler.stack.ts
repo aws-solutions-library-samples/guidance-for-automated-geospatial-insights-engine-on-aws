@@ -12,6 +12,7 @@ import {
 } from "../engine/engine.construct.js";
 import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
 import { ExecutorModule } from "./executor.construct.js";
+import { resultsApiFunctionArnParameter } from "../results/results.construct.js";
 
 export type SchedulerStackProperties = StackProps & {
 	environment: string;
@@ -33,6 +34,10 @@ export class SchedulerStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
+		const resultsApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'resultsApiFunctionArn', {
+			parameterName: resultsApiFunctionArnParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
 
 		const jobDefinitionArn = StringParameter.fromStringParameterAttributes(this, 'jobDefinitionArn', {
 			parameterName: engineProcessorJobDefinitionArnParameter(props.environment),
@@ -74,6 +79,7 @@ export class SchedulerStack extends Stack {
 			highPriorityQueueArn,
 			standardPriorityQueueArn,
 			regionsApiFunctionArn,
+			resultsApiFunctionArn,
 			bucketName,
 			engineQueue: schedulerModule.engineQueue
 		})

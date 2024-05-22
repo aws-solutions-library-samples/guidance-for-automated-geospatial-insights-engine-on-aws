@@ -59,7 +59,7 @@ export class SchedulerModule extends Construct {
 				maxReceiveCount: 10,
 				queue: engineDlq,
 			},
-			visibilityTimeout: Duration.minutes(15),
+			visibilityTimeout: Duration.minutes(2),
 		});
 
 		this.engineQueue.addToResourcePolicy(

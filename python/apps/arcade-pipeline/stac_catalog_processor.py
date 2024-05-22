@@ -1,10 +1,11 @@
+import base64
+import json
 import os
 from dataclasses import dataclass, field
-import datetime
 from io import BytesIO
 from logging import Logger
 from typing import List, Optional, Dict
-
+from datetime import datetime, timedelta
 import boto3
 import rasterio
 import requests
@@ -36,12 +37,20 @@ class State(DataClassJsonMixin):
 	timestamp: str = field(metadata=config(field_name="timestamp"), default=None)
 	created_by: str = field(metadata=config(field_name="createdBy"), default=None)
 	created_at: str = field(metadata=config(field_name="createdAt"), default=None)
-	updated_by: str = field(metadata=config(field_name="updatedBy"), default=None)
-	updated_at: str = field(metadata=config(field_name="updatedAt"), default=None)
+	updated_by: Optional[str] = field(metadata=config(field_name="updatedBy"), default=None)
+	updated_at: Optional[str] = field(metadata=config(field_name="updatedAt"), default=None)
 
 
 @dataclass
-class EngineProcessRequest(DataClassJsonMixin):
+class Result(DataClassJsonMixin):
+	id: str = field(metadata=config(field_name="id"), default=None)
+	status: str = field(metadata=config(field_name="status"), default=None)
+	created_at: str = field(metadata=config(field_name="createdAt"), default=None)
+	updated_at: Optional[str] = field(metadata=config(field_name="updatedAt"), default=None)
+
+
+@dataclass
+class EngineRequest(DataClassJsonMixin):
 	schedule_date_time: str = field(metadata=config(field_name="scheduleDateTime"))
 	coordinates: List[tuple[float, float]] = field(metadata=config(field_name="coordinates"), default=None)
 	group_id: str = field(metadata=config(field_name="groupId"), default=None)
@@ -50,22 +59,30 @@ class EngineProcessRequest(DataClassJsonMixin):
 	output_prefix: str = field(metadata=config(field_name="outputPrefix"), default=None)
 	result_id: str = field(metadata=config(field_name="resultId"), default=None)
 	state: State = field(metadata=config(field_name="state"), default=None)
+	latest_successful_result: Optional[Result] = field(metadata=config(field_name="latestSuccessfulResult"), default=None)
 
 
 class STACCatalogProcessor:
 
 	def __init__(
 		self,
-		request: EngineProcessRequest,
+		request: EngineRequest,
 	):
-		self.request: EngineProcessRequest = request
+		self.request: EngineRequest = request
 		self.stac_item: Optional[Item] = None
 		self.previous_tif_raster: Optional[ndarray] = None
 		self.bounding_box: Optional[ndarray] = None
 
 	def _load_stac_item(self):
-		five_days_before_schedule = (datetime.datetime.strptime(self.request.schedule_date_time, "%Y-%m-%d") - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
-		time_filter = "{}/{}".format(five_days_before_schedule, self.request.schedule_date_time)
+
+		# get the last successful run from region resource tags
+		if self.request.latest_successful_result is not None and self.request.latest_successful_result.created_at is not None:
+			last_successful_run = datetime.fromisoformat(self.request.latest_successful_result.created_at).strftime("%Y-%m-%d")
+		else:
+			# default to 5 days ago if we don't have a previous successful run
+			last_successful_run = (datetime.strptime(self.request.schedule_date_time, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
+
+		time_filter = "{}/{}".format(last_successful_run, self.request.schedule_date_time)
 		CRS = 'epsg:4326'
 		polygon = geom.Polygon(self.request.coordinates)
 		max_cloud_cover = 10
@@ -73,9 +90,6 @@ class STACCatalogProcessor:
 		polygon_series = gpd.GeoSeries(polygon_array, crs=CRS)
 		# Store the bounding box
 		self.bounding_box = polygon_series.total_bounds
-		# Set the previous tif raster if any
-		# TODO: comment this out for now until result server PRs are merged
-		self.previous_tif_raster = self._get_previous_tif(self.request.region_id, self.bounding_box.tolist())
 		stac_catalog = Client.open(STAC_URL)
 		stac_query = stac_catalog.search(
 			bbox=self.bounding_box,
@@ -91,6 +105,9 @@ class STACCatalogProcessor:
 		stac_items = list(stac_query.items())
 		print(f"Found: {len(stac_items):d} items")
 
+		if len(stac_items) == 0:
+			raise Exception("No items found")
+
 		# Get the latest satellite image
 		stac_items = sorted(stac_items, key=lambda x: x.properties['datetime'])
 		latest_stac_item = stac_items.pop()
@@ -98,39 +115,29 @@ class STACCatalogProcessor:
 		return latest_stac_item
 
 	@staticmethod
-	def _get_previous_tif(region_id: str, bounding_box_list: List[tuple[float, float]]):
+	def get_previous_tif(region_id: str, result_id: str, polygon_id: str) -> Optional[Item]:
 		arcade_stac_url = os.getenv("ARCADE_STAC_SERVER_URL")
-		# Set the API endpoint URL
-		url = arcade_stac_url
-		# Set the data to be sent in the request body
-		data = {
-			"collections": ["region_{}".format(region_id)],
-			"bbox": bounding_box_list
-		}
+
+		api_key = STACCatalogProcessor.get_api_key()
+
+		# Retrieve the previous result stac item
+		url = "{}/collections/region_{}/items/{}_{}".format(arcade_stac_url, region_id, result_id, polygon_id)
+
 		# Set any required headers
 		headers = {
 			"Content-Type": "application/json",
+			"X-API-KEY": api_key
 		}
-		# Send a POST request to the API
-		stac_api_response = requests.post(url, json=data, headers=headers)
+		stac_api_response = requests.get(url, headers=headers)
 
-		response_data: Optional[dict] = None
-
-		# Check if the request was successful
-		if stac_api_response.status_code == 200:
-			# Get the response data
-			response_data = stac_api_response.json()
-		else:
-			print(f"Error: {stac_api_response.status_code} - {stac_api_response.text}")
-
-		if response_data is None or response_data.get('features') is None or len(response_data['features']) == 0:
+		if stac_api_response.status_code != 200:
 			return None
 
-		asset = response_data['features'].pop()
+		response_data = stac_api_response.json()
 
 		s3 = boto3.client('s3')
 		try:
-			bucket, key = asset['assets']['ndvi']["href"].replace("s3://", "").split("/", 1)
+			bucket, key = response_data['assets']['ndvi']["href"].replace("s3://", "").split("/", 1)
 			s3_get_response = s3.get_object(Bucket=bucket, Key=key)
 			# Access the object's contents
 			object_content = s3_get_response["Body"].read()
@@ -140,6 +147,16 @@ class STACCatalogProcessor:
 				return raster_data
 		except s3.exceptions.NoSuchKey as e:
 			print(f"Error: {e}")
+
+	@staticmethod
+	def get_api_key():
+		arcade_stac_api_secret_name = os.getenv("ARCADE_STAC_API_SECRET_NAME")
+		secret_manager = boto3.client('secretsmanager')
+		secret_value_response = secret_manager.get_secret_value(SecretId=arcade_stac_api_secret_name)
+		secret = json.loads(secret_value_response['SecretString'])
+		base64_bytes = base64.b64encode(secret['apiKey'].encode("utf-8"))
+		api_key = base64_bytes.decode("utf-8")
+		return api_key
 
 	def load_stac_datasets(self) -> [Dataset, Dataset]:
 		self._load_stac_item()
@@ -158,9 +175,11 @@ class STACCatalogProcessor:
 		stac_assets = stac_assets.compute()
 
 		previous_ndvi_raster = None
-		try:
-			previous_ndvi_raster = self._get_previous_tif(self.request.region_id, self.bounding_box.tolist())
-		except Exception as e:
-			print(f"Error: {e}")
+
+		if self.request.latest_successful_result is not None and self.request.latest_successful_result.id is not None:
+			try:
+				previous_ndvi_raster = self.get_previous_tif(self.request.region_id, self.request.latest_successful_result.id, self.request.polygon_id)
+			except Exception as e:
+				print(f"Error: {e}")
 
 		return stac_assets, previous_ndvi_raster

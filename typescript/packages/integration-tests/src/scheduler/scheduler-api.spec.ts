@@ -78,9 +78,7 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 	}, { timeout: 5 * 60 * 6000 })
 
 	afterEach(async () => {
-		await Promise.all([
-			teardown(),
-		])
+		await Promise.all([teardown()])
 	})
 });
 
@@ -132,7 +130,7 @@ const waitForSuccessfulEngineExecution = async (regionId: string, userToken: str
 
 const getStacItem = async (id: string, title: string): Promise<any> => {
 	await stacs.listResources(`collections/${id}`, {
-		withIdToken: '',
+		withApiKey: process.env['STAC_API_KEY'],
 		withContentHeader: 'application/json; charset=utf-8',
 		expectJsonLike: {
 			title,
@@ -144,7 +142,7 @@ const getStacItem = async (id: string, title: string): Promise<any> => {
 
 const listStacItems = async (regionId: string, resultId: string, polygonId: string, crop: string, plantedAt: string): Promise<any> => {
 	await stacs.listResources(`collections/region_${regionId}/items`, {
-		withIdToken: '',
+		withApiKey: process.env['STAC_API_KEY'],
 		withContentHeader: 'application/geo+json; charset=utf-8',
 		expectJsonLike: {
 			features: [{

@@ -21,6 +21,7 @@ export interface ExecutorConstructProperties {
 	bucketName: string;
 	jobDefinitionArn: string;
 	regionsApiFunctionArn: string;
+	resultsApiFunctionArn: string;
 	highPriorityQueueArn: string;
 	standardPriorityQueueArn: string;
 	lowPriorityQueueArn: string;
@@ -49,6 +50,7 @@ export class ExecutorModule extends Construct {
 		const eventBus = EventBus.fromEventBusName(scope, 'Bus', props.eventBusName)
 
 		const regionsApiLambda = Function.fromFunctionArn(scope, 'RegionsApiFunction', props.regionsApiFunctionArn);
+		const resultsApiLambda = Function.fromFunctionArn(scope, 'ResultsApiFunction', props.resultsApiFunctionArn);
 
 		// Lambda function that processor schedule queued in SQS
 		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
@@ -68,6 +70,7 @@ export class ExecutorModule extends Construct {
 				STANDARD_PRIORITY_QUEUE_ARN: standardPriorityQueue.jobQueueArn,
 				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
 				REGIONS_API_FUNCTION_NAME: regionsApiLambda.functionName,
+				RESULTS_API_FUNCTION_NAME: resultsApiLambda.functionName,
 				BUCKET_NAME: props.bucketName
 			},
 			bundling: {
@@ -84,6 +87,7 @@ export class ExecutorModule extends Construct {
 		});
 
 		regionsApiLambda.grantInvoke(sqsProcessorLambda);
+		resultsApiLambda.grantInvoke(sqsProcessorLambda);
 		bucket.grantReadWrite(sqsProcessorLambda);
 		eventBus.grantPutEventsTo(sqsProcessorLambda);
 
@@ -167,7 +171,7 @@ export class ExecutorModule extends Construct {
 
 		awsBatchStateChangeRule.addTarget(
 			new LambdaFunction(eventbridgeLambda, {
-			deadLetterQueue: executorEventBridgeHandlerDLQ,
+				deadLetterQueue: executorEventBridgeHandlerDLQ,
 				maxEventAge: Duration.minutes(5),
 				retryAttempts: 2,
 			})
@@ -188,7 +192,7 @@ export class ExecutorModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::<regionsApiFunctionArnParameter>:*'],
+					appliesTo: ['Resource::<regionsApiFunctionArnParameter>:*', 'Resource::<resultsApiFunctionArnParameter>:*'],
 					reason: 'SQS processor lambda needs to invoke the regions api to retrieve list of polygons by region.',
 				},
 				{

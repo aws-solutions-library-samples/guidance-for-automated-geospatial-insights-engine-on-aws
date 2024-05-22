@@ -56,7 +56,10 @@ export class StacServerClient extends ClientServiceBase {
 		this.log.trace(`StacServerClient > publishStacItem > exit`);
 	}
 
-	public async getCollection(token: string, request: { id: string; type: ResourceType }): Promise<Collection> {
+	public async getCollection(token: string, request: {
+		id: string;
+		type: ResourceType
+	}): Promise<Collection> {
 		this.log.trace(`StacServerClient > getCollection > in > request: ${JSON.stringify(JSON.stringify(request))} `);
 		let result: Collection;
 
@@ -68,7 +71,7 @@ export class StacServerClient extends ClientServiceBase {
 			const collectionId = `${request.type.toLowerCase()}_${request.id}`;
 			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${collectionId}`, {
 				headers: {
-					'Authorization-Type': `Bearer ${token}`,
+					'X-API-KEY': `${token}`,
 				},
 			});
 			result = response.data;
@@ -80,7 +83,11 @@ export class StacServerClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async getCollectionItem(token: string, request: { id: string; collectionId: string; collectionType: ResourceType }): Promise<StacItem> {
+	public async getCollectionItem(token: string, request: {
+		id: string;
+		collectionId: string;
+		collectionType: ResourceType
+	}): Promise<StacItem> {
 		this.log.trace(`StacServerClient > getCollectionItem > in > request: ${JSON.stringify(request)} `);
 
 		ow(request, ow.object.nonEmpty);
@@ -94,7 +101,7 @@ export class StacServerClient extends ClientServiceBase {
 			const itemId = `${request.collectionId}_${request.id}`;
 			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${itemId}`, {
 				headers: {
-					'Authorization-Type': `Bearer ${token}`,
+					'X-API-KEY': `${token}`,
 				},
 			});
 			result = response.data;

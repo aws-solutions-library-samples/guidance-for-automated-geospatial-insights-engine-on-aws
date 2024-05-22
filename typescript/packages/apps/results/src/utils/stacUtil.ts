@@ -1,5 +1,13 @@
 import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import { Catalog, CatalogDetails, Collection, GroupDetails, RegionDetails, StacItem, polygonProcessingDetails } from '@arcade/events';
+import {
+	Catalog,
+	CatalogDetails,
+	Collection,
+	GroupDetails,
+	polygonProcessingDetails,
+	RegionDetails,
+	StacItem
+} from '@arcade/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
@@ -8,6 +16,7 @@ import ow from 'ow';
 import type { BaseLogger } from 'pino';
 import { EngineMetadata } from '../events/models.js';
 import { DefaultStacRecords } from './defaultStacRecords.js';
+import { bboxPolygon } from "@turf/turf";
 
 dayjs.extend(utc);
 
@@ -165,8 +174,8 @@ export class StacUtil {
 		const catalog = new DefaultStacRecords().defaultCatalog;
 
 		catalog.id = `catalog_${detail.id}`;
-		catalog.title = catalog.title;
-		catalog.description = catalog.description;
+		catalog.title = detail.title;
+		catalog.description = detail.description;
 
 		// Update links
 		catalog.links = [
@@ -194,6 +203,7 @@ export class StacUtil {
 		collection.id = `group_${group.id}`;
 		collection.title = group.name;
 		collection.description = group.name;
+		collection.extent.temporal.interval = [[groupDetail.createdAt, null]]
 
 		// Update links
 		collection.links = [
@@ -221,6 +231,30 @@ export class StacUtil {
 		return collection;
 	}
 
+	public async constructRegionStacItem(regionDetail: RegionDetails): Promise<StacItem> {
+		this.log.debug(`StacUtil > constructRegionStacItem > in ${JSON.stringify(regionDetail)}`);
+		// validation
+		ow(regionDetail, ow.object.nonEmpty);
+		ow(regionDetail.id, ow.string.nonEmpty);
+		ow(regionDetail.groupId, ow.string.nonEmpty);
+		ow(regionDetail.boundingBox, ow.array.nonEmpty);
+
+		const stacItem = new DefaultStacRecords().defaultStacItem;
+		const { id, groupId } = regionDetail;
+		stacItem.id = id;
+		stacItem.collection = `group_${groupId}`;
+		stacItem.bbox = regionDetail.boundingBox;
+		// for region stac item the bbox and the polygon covers the same area
+		stacItem.geometry = bboxPolygon(regionDetail.boundingBox).geometry
+		stacItem.properties = {
+			datetime: regionDetail.createdAt,
+			createdAt: regionDetail.createdAt,
+			updatedAt: regionDetail.updatedAt
+
+		}
+		return stacItem;
+	}
+
 	public async constructRegionCollection(regionDetail: RegionDetails): Promise<Collection> {
 		this.log.debug(`StacUtil > constructRegionCollection > in ${JSON.stringify(regionDetail)}`);
 		// validation
@@ -240,6 +274,11 @@ export class StacUtil {
 		collection.title = region.name;
 		collection.description = region.name;
 
+		if (regionDetail.boundingBox) {
+			collection.extent.spatial.bbox = [regionDetail.boundingBox]
+		}
+
+		collection.extent.temporal.interval = [[regionDetail.createdAt, null]]
 		// Update links
 		collection.links = [
 			{

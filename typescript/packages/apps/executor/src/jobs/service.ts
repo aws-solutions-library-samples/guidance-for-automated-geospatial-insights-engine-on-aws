@@ -1,4 +1,4 @@
-import { LambdaRequestContext, Polygon, RegionsClient } from '@arcade/clients';
+import { LambdaRequestContext, Polygon, RegionsClient, ResultResource, ResultsClient } from '@arcade/clients';
 import {
 	BatchClient,
 	ListTagsForResourceCommand,
@@ -36,7 +36,8 @@ export class JobsService {
 		readonly concurrencyLimit: number,
 		readonly bucketName: string,
 		readonly s3Client: S3Client,
-		readonly eventPublisher: EventPublisher
+		readonly eventPublisher: EventPublisher,
+		readonly resultsClient: ResultsClient
 	) {
 		this.engineType = 'aws-batch';
 		this.context = {
@@ -50,13 +51,14 @@ export class JobsService {
 	}
 
 	private async uploadFileForBatchJob(params: {
+		request: StartJobRequest,
 		resultId: string,
 		polygons: Polygon[],
-		request: StartJobRequest,
-		keyPrefix: string
+		keyPrefix: string,
+		latestSuccessfulResult?: ResultResource
 	}) {
 		this.log.debug(`JobsService> uploadFileForBatchJob> params: ${JSON.stringify(params)}`);
-		const { request, resultId, keyPrefix, polygons } = params
+		const { request, resultId, keyPrefix, polygons, latestSuccessfulResult } = params
 		const limit = pLimit(this.concurrencyLimit);
 		// run engine processing for each polygon
 		const createInputFilesForBatchProcessorFutures = polygons.map((polygon, index) => {
@@ -68,6 +70,7 @@ export class JobsService {
 				regionId: request.id,
 				resultId: resultId,
 				state: polygon.state,
+				latestSuccessfulResult,
 				outputPrefix: `${keyPrefix}/output/polygon=${polygon.id}`
 			};
 
@@ -84,13 +87,15 @@ export class JobsService {
 	private async submitBatchJob(params: {
 		resultId: string,
 		polygons: Polygon[],
+		latestSuccessfulResult?: ResultResource
 		request: StartJobRequest,
-		keyPrefix: string
 	}) {
 		this.log.debug(`JobsService> submitBatchJob> params: ${JSON.stringify(params)}`);
-		const { request, resultId, keyPrefix, polygons } = params
+		const { request, resultId, polygons } = params
 
-		await this.uploadFileForBatchJob(params);
+		const keyPrefix = `region=${request.id}/result=${resultId}`
+
+		await this.uploadFileForBatchJob({ ...params, keyPrefix });
 
 		const command: SubmitJobCommandInput = {
 			containerOverrides: {
@@ -218,10 +223,29 @@ export class JobsService {
 			this.log.warn(`JobsService> start> no polygon associated with the region ${request.name}}`);
 			return;
 		}
+
+		let keepGoing = true, token: string, latestSuccessfulResult: ResultResource;
+		while (keepGoing) {
+			const response = await this.resultsClient.listResults(request.id, { paginationToken: token }, this.context)
+			for (const result of response.results) {
+				if (result.status === 'succeeded') {
+					latestSuccessfulResult = result;
+					keepGoing = false;
+					break;
+				}
+			}
+			token = response.pagination?.lastEvaluatedToken
+			keepGoing = token !== undefined;
+		}
+
 		const resultId = ulid().toLowerCase();
 		try {
-			const keyPrefix = `region=${request.id}/result=${resultId}`
-			await this.submitBatchJob({ resultId, polygons: polygonListResource.polygons, request, keyPrefix });
+			await this.submitBatchJob({
+				resultId,
+				request,
+				latestSuccessfulResult,
+				polygons: polygonListResource.polygons
+			});
 		} catch (exception) {
 			await this.eventPublisher.publishEvent<EngineJobDetails>({
 				eventType: 'created',

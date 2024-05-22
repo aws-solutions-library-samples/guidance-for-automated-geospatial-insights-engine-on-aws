@@ -75,7 +75,7 @@ export class SubscriptionsService {
 				authorizer: {
 					claims: {
 						email: securityContext.email,
-						'custom:role': `/|||${securityContext.role}}`,
+						'custom:role': `/|||${securityContext.role}`,
 					},
 				},
 			}

@@ -8,7 +8,7 @@ import { DynamoDBDocumentClient, TranslateConfig } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { BatchClient } from "@aws-sdk/client-batch";
 import { JobsService } from "../jobs/service.js";
-import { RegionsClient } from "@arcade/clients";
+import { RegionsClient, ResultsClient } from "@arcade/clients";
 import { Invoker } from "@arcade/lambda-invoker";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { S3Client } from "@aws-sdk/client-s3";
@@ -28,6 +28,7 @@ declare module '@fastify/awilix' {
 		lambdaClient: LambdaClient;
 		s3Client: S3Client;
 		eventPublisher: EventPublisher;
+		resultsClient: ResultsClient;
 	}
 }
 
@@ -87,6 +88,7 @@ const registerContainer = (app?: FastifyInstance) => {
 	const standardPriorityQueueArn = process.env['STANDARD_PRIORITY_QUEUE_ARN'];
 
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
+	const resultsApiFunctionName = process.env['RESULTS_API_FUNCTION_NAME'];
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 
@@ -119,7 +121,7 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher),
+			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher, c.resultsClient),
 			{
 				...commonInjectionOptions,
 			}
@@ -134,6 +136,12 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		regionsClient: asFunction((c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName),
+			{
+				...commonInjectionOptions,
+			}
+		),
+
+		resultsClient: asFunction((c: Cradle) => new ResultsClient(app.log, c.lambdaInvoker, resultsApiFunctionName),
 			{
 				...commonInjectionOptions,
 			}

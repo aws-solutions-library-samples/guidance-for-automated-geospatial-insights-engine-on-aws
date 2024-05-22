@@ -10,6 +10,7 @@ import { VerifiedPermissions } from './verifiedPermissions.construct.js';
 import { VerifiedPermissionsIdentitySourceCreator } from './verifiedPermissionsIdentitySourceCreator.construct.js';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { ulid } from 'ulid';
+import * as ssm from "aws-cdk-lib/aws-ssm";
 
 export type SharedStackProperties = StackProps & {
 	environment: string;
@@ -23,6 +24,8 @@ export type SharedStackProperties = StackProps & {
 	};
 	deleteBucket?: boolean;
 };
+
+export const stacApiSecretNameParameter = (environment: string) => `/arcade/${environment}/shared/stacApiSecretName`;
 
 export class SharedInfrastructureStack extends Stack {
 	vpc: IVpc;
@@ -85,6 +88,12 @@ export class SharedInfrastructureStack extends Stack {
 				apiKey: SecretValue.unsafePlainText(ulid()),
 			},
 		});
+
+		new ssm.StringParameter(this, 'stacApiSecretNameParameter', {
+			parameterName: stacApiSecretNameParameter(props.environment),
+			stringValue: secret.secretName,
+		});
+
 		this.apiKeySecretName = secret.secretName;
 		this.apiKeySecretArn = secret.secretArn;
 

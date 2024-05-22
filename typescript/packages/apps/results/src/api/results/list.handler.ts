@@ -64,11 +64,11 @@ Permissions:
 			// parse request
 			const { count, paginationToken } = request.query;
 			const { regionId } = request.params;
-			const [results, nextToken] = await svc.list(request.authz, regionId, { lastEvaluatedToken: paginationToken, count });
+			const [results, nextToken] = await svc.list(request.authz, regionId, { token: paginationToken, count });
 			const response: ResultList = { results };
 			if (count || nextToken) {
 				response.pagination = {
-					lastEvaluatedToken: nextToken,
+					token: nextToken,
 					count,
 				};
 			}
