@@ -1,0 +1,4 @@
+cogeo-mosaic==7.1.0
+fastapi==0.111.0
+titiler.core==0.18.1
+mangum==0.17.0

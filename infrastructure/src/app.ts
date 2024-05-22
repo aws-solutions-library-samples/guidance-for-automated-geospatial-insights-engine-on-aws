@@ -7,15 +7,15 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EngineStack } from './engine/engine.stack.js';
+import { NotificationsStack } from './notifications/notifications.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
+import { RegionsExtensionStack } from './regionsExtension/regionsExtension.stack.js';
 import { ResultsStack } from './results/results.stack.js';
 import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
-import { NotificationsStack } from './notifications/notifications.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 import { StacServerStack } from './stacServer/stacServer.stack.js';
 import { UIApiStack } from './ui/ui.stack.js';
-import { RegionsExtensionStack } from "./regionsExtension/regionsExtension.stack.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,10 +49,7 @@ cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 const stackName = (suffix: string) => `arcade-${environment}-${suffix}`;
 const stackDescription = (moduleName: string) => `Infrastructure for ARCADE ${moduleName} module`;
 
-const deployPlatform = (callerEnvironment?: {
-	accountId?: string;
-	region?: string
-}): void => {
+const deployPlatform = (callerEnvironment?: { accountId?: string; region?: string }): void => {
 	const sharedStack = new SharedInfrastructureStack(app, 'SharedStack', {
 		stackName: stackName('shared'),
 		description: stackDescription('Shared'),
@@ -63,11 +60,11 @@ const deployPlatform = (callerEnvironment?: {
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-					fromEmail: cognitoFromEmail,
-					fromName: cognitoFromName,
-					replyTo: cognitoReplyToEmail,
-					sesVerifiedDomain: cognitoVerifiedDomain,
-				}
+						fromEmail: cognitoFromEmail,
+						fromName: cognitoFromName,
+						replyTo: cognitoReplyToEmail,
+						sesVerifiedDomain: cognitoVerifiedDomain,
+				  }
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -88,7 +85,7 @@ const deployPlatform = (callerEnvironment?: {
 		stackName: stackName('regionsExtension'),
 		description: stackDescription('RegionsExtension'),
 		environment,
-	})
+	});
 
 	regionsExtensionStack.addDependency(regionsStack);
 
@@ -164,20 +161,23 @@ const deployPlatform = (callerEnvironment?: {
 		stackName: stackName('ui'),
 		description: stackDescription('UI'),
 		environment,
+		stacServerUrl,
 	});
 	uiStack.addDependency(sharedStack);
 };
 
-const getCallerEnvironment = (): {
-	accountId?: string;
-	region?: string
-} | undefined => {
+const getCallerEnvironment = ():
+	| {
+			accountId?: string;
+			region?: string;
+	  }
+	| undefined => {
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-			'EXAMPLE\n' +
-			'$ npm run cdk deploy -- -e sampleEnvironment'
+				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+				'EXAMPLE\n' +
+				'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));

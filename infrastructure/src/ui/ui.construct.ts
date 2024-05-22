@@ -24,6 +24,8 @@ const __dirname = path.dirname(__filename);
 export interface UIConstructProperties {
 	environment: string;
 	cognitoUserPoolId: string;
+	bucketName: string;
+	stacServerUrl: string;
 }
 
 export const uiApiUrlParameter = (environment: string) => `/arcade/${environment}/ui/apiUrl`;
@@ -50,7 +52,7 @@ export class UIModule extends Construct {
 			description: `ARCADE: UI Tiler: ${props.environment}`,
 			runtime: Runtime.PYTHON_3_11,
 			tracing: Tracing.ACTIVE,
-			code: Code.fromDockerBuild(path.join(__dirname, '../../../python/apps/titiler/lambda'), {
+			code: Code.fromDockerBuild(path.join(__dirname, '../../../python/apps/tiler/lambda'), {
 				file: 'Dockerfile',
 				buildArgs: {
 					ENVIRONMENT: props.environment,
@@ -62,10 +64,8 @@ export class UIModule extends Construct {
 			logRetention: RetentionDays.ONE_WEEK,
 			environment: {
 				ENVIRONMENT: props.environment,
-				TITILER_STACK_NAME: 'my-tiler',
-				TITILER_STACK_STAGE: 'dev',
-				TITILER_STACK_MEMORY: '1500',
-				TITILER_API_ROOT_PATH: '/prod',
+				STAC_URL: props.stacServerUrl,
+				ROOT_PATH: '/prod',
 				GDAL_CACHEMAX: '200', // 200 mb
 				GDAL_DISABLE_READDIR_ON_OPEN: 'EMPTY_DIR',
 				GDAL_INGESTED_BYTES_AT_OPEN: '32768', // get more bytes when opening the files.
@@ -84,7 +84,7 @@ export class UIModule extends Construct {
 		 */
 
 		// For now reads from the shared account bucket and a trust to this role is manually added to the bucket policy
-		const dataBucket = Bucket.fromBucketArn(this, 'DataBucket', 'arn:aws:s3:::arcade-354851405923-us-west-2-shared');
+		const dataBucket = Bucket.fromBucketName(this, 'DataBucket', props.bucketName);
 		dataBucket.grantRead(apiLambda);
 
 		const userPool = UserPool.fromUserPoolId(this, 'UserPool', props.cognitoUserPoolId);
@@ -208,7 +208,7 @@ export class UIModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::arn:aws:s3:::arcade-354851405923-us-west-2-shared/*', 'Action::s3:List*', 'Action::s3:GetObject*', 'Action::s3:GetBucket*'],
+					appliesTo: ['Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*', 'Action::s3:List*', 'Action::s3:GetObject*', 'Action::s3:GetBucket*'],
 					reason: 'Must read from entire bucket.',
 				},
 			],

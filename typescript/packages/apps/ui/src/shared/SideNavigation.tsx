@@ -5,9 +5,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 export default () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const activeHref = location.pathname.match(/^\/(\w+)/)?.[1] || '';
+
 	return (
 		<SideNavigation
-			activeHref={location.pathname}
+			activeHref={`/${activeHref}`}
 			header={{ href: '/', text: 'ARCADE' }}
 			onFollow={(event) => {
 				if (!event.detail.external) {

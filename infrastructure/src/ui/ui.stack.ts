@@ -1,3 +1,4 @@
+import { bucketNameParameter } from '@arcade/cdk-common';
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
@@ -7,6 +8,7 @@ import { UIModule } from './ui.construct.js';
 
 export type UIStackProperties = StackProps & {
 	environment: string;
+	stacServerUrl: string;
 };
 
 export class UIApiStack extends Stack {
@@ -21,9 +23,16 @@ export class UIApiStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
+		const bucketName = StringParameter.fromStringParameterAttributes(this, 'bucketName', {
+			parameterName: bucketNameParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
 		const uiModule = new UIModule(this, 'UIModule', {
 			environment: props.environment,
 			cognitoUserPoolId,
+			bucketName,
+			stacServerUrl: props.stacServerUrl,
 		});
 
 		NagSuppressions.addResourceSuppressionsByPath(

@@ -4,34 +4,29 @@ import { useNavigate, useParams } from 'react-router-dom';
 import usePagination from '../../hooks/usePagination';
 import Breadcrumbs from '../../shared/Breadcrumbs';
 import Shell from '../../shared/Shell';
-import { useGetGroupQuery, useListRegionsQuery } from '../../slices/regionsApiSlice';
-import ProcessingStatus from '../Farms/ProcessingStatus';
+import { useGetRegionQuery, useListPolygonsQuery } from '../../slices/regionsApiSlice';
 
-export default function ViewGrower() {
+export default function ViewFarm() {
 	const navigate = useNavigate();
-	const { id: growerId } = useParams();
-	const { data: grower } = useGetGroupQuery(growerId!);
-	// const [searchParams, setSearchParams] = useSearchParams();
-
-	// List farms for grower
+	const { id } = useParams();
+	const { data: farm } = useGetRegionQuery(id!);
 	const apiPageSize = 20;
 	const [apiPaginationToken, setApiPaginationToken] = useState<string>();
-	const { data = { regions: [] }, isFetching } = useListRegionsQuery({ groupId: growerId, count: apiPageSize, paginationToken: apiPaginationToken });
+	const { data = { polygons: [] }, isFetching } = useListPolygonsQuery({ regionId: id, count: apiPageSize, paginationToken: apiPaginationToken, includeLatestState: true });
 	const { currentPage, maxKnownPage, handlePageChange, openEnd, items } = usePagination({
 		apiPageSize,
 		responsePageSize: 10,
-		data: data.regions,
+		data: data.polygons,
 		setApiPaginationToken,
 		apiPaginationResponse: data.pagination,
 	});
-	// const [selectedItems, setSelectedItems] = useState<Region[]>([]);
 	return (
 		<Shell
 			breadcrumbs={
 				<Breadcrumbs
 					items={[
-						{ text: 'Growers', href: '/growers' },
-						{ text: growerId!, href: `/growers/${growerId}` },
+						{ text: 'Farms', href: '/farms' },
+						{ text: id!, href: `/farms/${id}` },
 					]}
 				/>
 			}
@@ -39,7 +34,7 @@ export default function ViewGrower() {
 			content={
 				<ContentLayout
 					header={
-						grower && (
+						farm && (
 							<Header
 								variant="h1"
 								actions={
@@ -49,25 +44,25 @@ export default function ViewGrower() {
 									</SpaceBetween>
 								}
 							>
-								{grower.name}
+								{farm.name}
 							</Header>
 						)
 					}
 				>
 					<SpaceBetween direction="vertical" size="l">
 						<Container header={<Header variant="h2">Details</Header>}>
-							{grower && (
+							{farm && (
 								<ColumnLayout columns={2} variant="text-grid">
 									<SpaceBetween direction="vertical" size="l">
 										<div>
 											<Box variant="awsui-key-label">Name</Box>
-											<div>{grower!.name}</div>
+											<div>{farm!.name}</div>
 										</div>
 										<div>
 											<Box variant="awsui-key-label">ID</Box>
 											<CopyToClipboard
 												variant="inline"
-												textToCopy={grower!.id}
+												textToCopy={farm!.id}
 												copyButtonAriaLabel="Copy ID"
 												copySuccessText="ID copied"
 												copyErrorText="ID failed to copy"
@@ -78,9 +73,9 @@ export default function ViewGrower() {
 										<div>
 											<Box variant="awsui-key-label">No. Farms</Box>
 											<div>
-												{grower.totalRegions ? (
-													<Link variant="primary" onFollow={() => navigate(`/farms?growerId=${grower!.id}`)}>
-														{grower.totalRegions}
+												{farm.totalPolygons ? (
+													<Link variant="primary" onFollow={() => navigate(`/fields?farmId=${farm!.id}`)}>
+														{farm.totalPolygons}
 													</Link>
 												) : (
 													'-'
@@ -92,7 +87,7 @@ export default function ViewGrower() {
 							)}
 						</Container>
 						<Table
-							header={<Header variant="h2">Farms</Header>}
+							header={<Header variant="h2">Fields</Header>}
 							variant="container"
 							pagination={
 								<Pagination
@@ -104,30 +99,35 @@ export default function ViewGrower() {
 									}}
 								/>
 							}
-							items={items}
-							// selectedItems={selectedItems}
-							selectionType="single"
 							loading={isFetching}
-							loadingText="Loading farms for this grower"
-							empty={
-								<Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
-									<SpaceBetween size="m">
-										<b>No farms for this grower</b>
-										<Button>Create farm</Button>
-									</SpaceBetween>
-								</Box>
-							}
+							loadingText="Loading fields for this farm"
+							items={items}
 							columnDefinitions={[
-								{ header: 'Name', cell: (item) => <Link onFollow={() => navigate(`/farms/${item.id}`)}>{item.name}</Link> },
-								{ header: 'Acres', cell: (item) => (item.totalArea ? item.totalArea.toFixed(2) : '-') },
-								{ header: 'No. Fields', cell: (item) => item.totalPolygons ?? '-' },
 								{
-									header: 'Analysis',
-									cell: (item) => <ProcessingStatus status={item.tags && item.tags['arcade:results:status'] ? item.tags['arcade:results:status'] : undefined} />,
+									id: 'name',
+									header: 'Name',
+									cell: (item) => <Link onFollow={() => navigate(`/fields/${item.id}`)}>{item.name}</Link>,
+									isRowHeader: true,
 								},
 								{
-									header: 'Last analysis',
-									cell: (item) => (item.tags && item.tags['arcade:results:updatedAt'] ? new Date(item.tags['arcade:results:updatedAt']).toDateString() : '-'),
+									id: 'acres',
+									header: 'Acres',
+									cell: (item) => (item.area ? item.area.toFixed(2) : '-'),
+								},
+								{
+									id: 'crop',
+									header: 'Crop',
+									cell: (item) => (item.state?.tags?.crop ? item.state?.tags?.crop : '-'),
+								},
+								{
+									id: 'plantedAt',
+									header: 'Planted At',
+									cell: (item) => (item.state?.tags?.plantedAt ? new Date(item.state?.tags?.plantedAt).toDateString() : '-'),
+								},
+								{
+									id: 'harvestedAt',
+									header: 'Harvested At',
+									cell: (item) => (item.state?.tags?.harvestedAt ? new Date(item.state?.tags?.harvestedAt).toDateString() : '-'),
 								},
 							]}
 						/>
