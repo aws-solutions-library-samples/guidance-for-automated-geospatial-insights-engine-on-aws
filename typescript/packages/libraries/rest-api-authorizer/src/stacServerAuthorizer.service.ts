@@ -27,16 +27,15 @@ export class StacServerAuthorizer {
 		ow(event.requestContext?.httpMethod, 'request httpMethod', ow.string.nonEmpty);
 
 		let authType: AuthType = 'cognito';
-		let token;
-		if (!Object.keys(event.headers).includes('X-API-KEY')) {
+		let token: string;
+		if (!Object.keys(event.headers).includes('X-API-KEY') && !Object.keys(event.headers).includes('x-api-key')) {
 			// Depending on http1.1 or http2, API Gateway provides different case on the authorization header.
 			const authorizationHeader = event.headers?.Authorization ?? event.headers?.authorization;
 			ow(authorizationHeader, 'authorization header', ow.string.nonEmpty);
 			token = authorizationHeader.replace('Bearer ', '');
 		} else {
-			ow(event.headers['X-API-KEY'], 'X-API-KEY', ow.string.nonEmpty);
-			token = event.headers['X-API-KEY'];
-
+			token = event.headers['X-API-KEY'] ?? event.headers['x-api-key'];
+			ow(token, ow.string.nonEmpty);
 			authType = 'secret';
 		}
 		// Verifier that expects valid access tokens:

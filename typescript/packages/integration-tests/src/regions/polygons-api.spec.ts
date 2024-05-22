@@ -444,7 +444,8 @@ describe(TEST_PREFIX + 'listing polygons', () => {
 			withIdToken: userToken,
 			expectJsonLike: {
 				totalArea: 304660968.06245893,
-				totalPolygons: 1
+				totalPolygons: 1,
+				boundingBox: [0, 0, 10, 10]
 			}
 		})
 	});

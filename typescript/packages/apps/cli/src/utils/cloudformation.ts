@@ -6,6 +6,7 @@ export interface StacServerMetadata {
 	ingestionLambdaFunctionName: string;
 	ingestionTopicArn: string;
 	openSearchEndPoint: string;
+	stacServerUrl: string;
 }
 
 export interface StackMetadata {
@@ -32,6 +33,10 @@ const getDeployedStacServerMetaData = async (environment: string, roleArn?: stri
 			if (output.OutputKey == 'IngestLambdaFunctionQualifiedArn') return output;
 		}).OutputValue.split(':')[6];
 
+		const stacServerUrl = result.Stacks[0].Outputs.find((output) => {
+			if (output.OutputKey == 'ServiceEndpoint') return output;
+		}).OutputValue;
+
 		const ingestionTopicArn = `arn:aws:sns:${region}:${accountId}:stac-server-${environment}-ingest`;
 
 		const openSearchEndPoint = result.Stacks[0].Outputs.find((output) => {
@@ -43,6 +48,7 @@ const getDeployedStacServerMetaData = async (environment: string, roleArn?: stri
 			ingestionLambdaFunctionName,
 			ingestionTopicArn,
 			openSearchEndPoint,
+			stacServerUrl
 		};
 	}
 	return response;

@@ -28,7 +28,14 @@ export type Role = 'thumbnail' | 'overview' | 'data' | 'metadata';
  * LineString: "coordinates": [[102.0, 0.0],[103.0, 1.0],[104.0, 0.0],[105.0, 1.0]]
  * Polygon: "coordinates": [[[100.0, 0.0],[101.0, 0.0],[101.0, 1.0],[100.0, 1.0],[100.0, 0.0]]]
  */
-export type GeometryType = 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon' | 'GeometryCollection';
+export type GeometryType =
+	'Point'
+	| 'MultiPoint'
+	| 'LineString'
+	| 'MultiLineString'
+	| 'Polygon'
+	| 'MultiPolygon'
+	| 'GeometryCollection';
 
 export interface Geometry {
 	type: GeometryType;
@@ -290,7 +297,9 @@ export interface Collection {
 	/**
 	 * A map of property summaries, either a set of values, a range of values or a JSON Schema.
 	 */
-	summaries?: { [k: string]: unknown };
+	summaries?: {
+		[k: string]: unknown
+	};
 	/**
 	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
 	 */
@@ -384,8 +393,9 @@ export interface regionDetails {
 	attributes?: Record<string, any>;
 	createdAt: string;
 	createdBy: string;
-	updatedBy: string;
+	updatedBy?: string;
 	updatedAt?: string;
+	boundingBox?: number[];
 }
 
 export type {

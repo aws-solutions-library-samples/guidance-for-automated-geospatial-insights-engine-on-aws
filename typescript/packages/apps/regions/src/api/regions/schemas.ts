@@ -75,6 +75,9 @@ const processingConfig = Type.Object({
 
 }, { description: 'The processing configuration for the region.' })
 
+
+const boundingBox = Type.Array(Type.Number(), { description: 'The bounding box of the region.' });
+
 const totalArea = Type.Number({ description: 'The total area covered by all polygons under this region.' });
 
 const totalPolygons = Type.Number({ description: 'The total number of polygons under this region.' });
@@ -104,7 +107,10 @@ export const editRegionRequestBody = Type.Object(
 );
 export type EditRegion = Static<typeof editRegionRequestBody>;
 
+export type BoundingBox = Static<typeof boundingBox>;
+
 export type UpdateAggregatedPolygonsParameter = {
+	boundingBox: BoundingBox,
 	totalAreaDelta: number
 	totalPolygonsDelta: number;
 }
@@ -117,6 +123,7 @@ export const regionResource = Type.Object(
 		totalArea,
 		totalPolygons,
 		processingConfig,
+		boundingBox: Type.Optional(boundingBox),
 		attributes: Type.Optional(Type.Ref(attributes)),
 		tags: Type.Optional(Type.Ref(tags)),
 		createdBy: createdBy,

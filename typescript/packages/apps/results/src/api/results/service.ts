@@ -17,6 +17,9 @@ export class ResultsService {
 
 	public async list(securityContext: SecurityContext, regionId: string, options: ResultListOptions): Promise<[Result[], ResultId]> {
 		this.log.debug(`ResultsService> list> regionId:${regionId}, options: ${options}`);
+		if (options.token) {
+			options.token = decodeURIComponent(options.token);
+		}
 		const [results, resultId] = await this.resultsRepository.list(regionId, options);
 		this.log.debug(`ResultsService> list> regionId:${regionId}`);
 		return [results, resultId]

@@ -1,6 +1,12 @@
 import type { StacServerClient } from '@arcade/clients';
 import type { CatalogCreateEvent, RegionChangeEvent } from '@arcade/events';
-import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
+import {
+	EngineJobCreatedDetails,
+	EngineJobUpdatedDetails,
+	GroupChangeEvent,
+	PolygonsProcessingEvent,
+	ResultsChangeEvent
+} from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import { ResultsService } from '../api/results/service.js';
 import { StacUtil } from '../utils/stacUtil.js';
@@ -39,8 +45,13 @@ export class EventProcessor {
 		this.log.info(`EventProcessor > processRegionChangeEvent >in  event: ${JSON.stringify(event)}`);
 		// Construct stac items
 		if (event.detail?.new) {
-			const groupCollection = await this.stacUtil.constructRegionCollection(event.detail.new);
-			await this.stacServerClient.publishCollection(groupCollection);
+			const regionCollection = await this.stacUtil.constructRegionCollection(event.detail.new);
+			await this.stacServerClient.publishCollection(regionCollection);
+			// when a region is created initially and no polygon associated with it, then bounding box will be undefined
+			if (event.detail.new.boundingBox) {
+				const regionStacItem = await this.stacUtil.constructRegionStacItem(event.detail.new)
+				await this.stacServerClient.publishStacItem(regionStacItem);
+			}
 		} else {
 			// Delete event is to be implemented
 		}

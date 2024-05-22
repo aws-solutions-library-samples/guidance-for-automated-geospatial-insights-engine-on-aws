@@ -1,9 +1,8 @@
-import { Flags, Command } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import { switchToArcadeLocation } from '../../utils/shell.js';
-import { getDeployedStacServerMetaData, getDeployedStackByName } from '../../utils/cloudformation.js';
+import { getDeployedStackByName, getDeployedStacServerMetaData } from '../../utils/cloudformation.js';
 import { StacCommand } from '../../types/stacCommand.js';
 import shell from 'shelljs';
-import { validateMasterPassword } from '../../utils/validator.js';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : false;
@@ -45,7 +44,7 @@ export class ArcadeInstall extends StacCommand<typeof ArcadeInstall> {
 		const folder = await switchToArcadeLocation();
 
 		const stacServerMetadata = await getDeployedStacServerMetaData(flags.environment);
-		const params = `-c environment=${flags.environment} -c administratorEmail=${flags.administratorEmail} -c administratorPhoneNumber=${flags.administratorPhoneNumber} -c stacServerTopicArn=${stacServerMetadata.ingestionTopicArn} -c stacServerFunctionName=${stacServerMetadata.apiLambdaFunctionName} -c stacServerOpenSearchEndpoint=${stacServerMetadata.openSearchEndPoint} -c stacServerOpenSearchSecret=arcade/stacServer/${flags.environment}/credentials`;
+		const params = `-c environment=${flags.environment} -c stacServerUrl=${stacServerMetadata.stacServerUrl} -c administratorEmail=${flags.administratorEmail} -c administratorPhoneNumber=${flags.administratorPhoneNumber} -c stacServerTopicArn=${stacServerMetadata.ingestionTopicArn} -c stacServerFunctionName=${stacServerMetadata.apiLambdaFunctionName} -c stacServerOpenSearchEndpoint=${stacServerMetadata.openSearchEndPoint} -c stacServerOpenSearchSecret=arcade/stacServer/${flags.environment}/credentials`;
 
 		try {
 			await getDeployedStackByName('CDKToolkit', flags?.role);

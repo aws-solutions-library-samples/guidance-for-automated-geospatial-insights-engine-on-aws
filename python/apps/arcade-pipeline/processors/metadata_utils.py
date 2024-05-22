@@ -12,7 +12,7 @@ from xarray import DataArray, Dataset
 # This import is required to extend DataArray functionality with rioxarray
 import rioxarray
 
-from stac_catalog_processor import EngineProcessRequest
+from stac_catalog_processor import EngineRequest
 
 
 class MetadataUtils:
@@ -44,7 +44,7 @@ class MetadataUtils:
 
 	@staticmethod
 	def generate_metadata(sentinel_link: Dict[str, Any], bounding_box: List[tuple[float, float]], stac_assets: Dataset, temp_dir: str, bucket_name: str,
-						  request: EngineProcessRequest):
+						  request: EngineRequest):
 
 		coordinates = request.coordinates
 

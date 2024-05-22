@@ -14,7 +14,7 @@ from processors.nitrogen_processor import NitrogenProcessor
 from processors.tif_image_processor import TifImageProcessor
 from processors.ndvi_change_processor import NdviChangeProcessor
 from processors.ndvi_raw_processor import NdviRawProcessor
-from stac_catalog_processor import STACCatalogProcessor, EngineProcessRequest
+from stac_catalog_processor import STACCatalogProcessor, EngineRequest
 
 logger = get_logger(__name__)
 
@@ -53,7 +53,7 @@ def start_task(
 	logger.info(f"Starting Stac Catalog Processor Job")
 	try:
 		data = get_input_json(output_bucket, "{}/{}/{}".format(input_prefix, job_array_index, input_filename))
-		request = EngineProcessRequest.from_dict(data)
+		request = EngineRequest.from_dict(data)
 		processor = STACCatalogProcessor(request)
 		# Load the bands from the satellite images
 		stac_assets, previous_ndvi_raster = processor.load_stac_datasets()

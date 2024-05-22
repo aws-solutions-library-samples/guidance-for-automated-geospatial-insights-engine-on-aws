@@ -32,7 +32,7 @@ export const paginationToken = Type.String({
 
 export const resultListOptions = Type.Object({
 	count: Type.Optional(count),
-	lastEvaluatedToken: Type.Optional(paginationToken),
+	token: Type.Optional(paginationToken),
 });
 
 export const resultList = Type.Object(

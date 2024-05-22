@@ -40,10 +40,11 @@ export class RegionRepository {
 		this.log.debug(`RegionRepository> updateAggregatedAttribute> id: ${id}, aggregatedAttribute: ${JSON.stringify(aggregatedAttribute)}`);
 		const regionDbId = createDelimitedAttribute(PkType.Region, id);
 		const params: UpdateCommandInput = {
-			UpdateExpression: "SET totalArea = totalArea + :totalAreaDelta, totalPolygons = totalPolygons + :totalPolygonsDelta",
+			UpdateExpression: "SET totalArea = totalArea + :totalAreaDelta, totalPolygons = totalPolygons + :totalPolygonsDelta, boundingBox = :boundingBox",
 			ExpressionAttributeValues: {
 				':totalAreaDelta': aggregatedAttribute.totalAreaDelta,
-				':totalPolygonsDelta': aggregatedAttribute.totalPolygonsDelta
+				':totalPolygonsDelta': aggregatedAttribute.totalPolygonsDelta,
+				':boundingBox': aggregatedAttribute.boundingBox
 			},
 			Key: {
 				pk: regionDbId,
@@ -93,7 +94,8 @@ export class RegionRepository {
 							updatedAt: r.updatedAt,
 							updatedBy: r.updatedBy,
 							totalArea: r.totalArea,
-							totalPolygons: r.totalPolygons
+							totalPolygons: r.totalPolygons,
+							boundingBox: r.boundingBox
 						},
 					},
 				},
@@ -164,6 +166,7 @@ export class RegionRepository {
 				createdAt: regionItem.createdAt,
 				updatedBy: regionItem.updatedBy,
 				updatedAt: regionItem.updatedAt,
+				boundingBox: regionItem.boundingBox
 			};
 			this.commonRepository.assembleTags(items, region.tags);
 		}

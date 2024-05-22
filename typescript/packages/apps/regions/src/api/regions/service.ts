@@ -80,7 +80,8 @@ export class RegionService {
 			updateParameter,
 			ow.object.exactShape({
 				totalAreaDelta: ow.number.not.infinite,
-				totalPolygonsDelta: ow.number.not.infinite
+				totalPolygonsDelta: ow.number.not.infinite,
+				boundingBox: ow.object.nonEmpty
 			})
 		);
 		// retrieve existing

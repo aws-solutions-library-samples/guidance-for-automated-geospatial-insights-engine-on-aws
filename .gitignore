@@ -186,3 +186,6 @@ __pycache__
 /python/apps/arcade-pipeline/output/
 /python/notebook/output/
 local.env
+
+**/stac-server-repo
+/typescript/packages/apps/cli/stac-server-repo/

@@ -17,6 +17,7 @@ import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,7 @@ export interface EngineConstructProperties {
 	bucketName: string;
 	eventBusName: string;
 	stacServerUrl: string;
+	stacApiSecretName: string;
 }
 
 export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
@@ -39,6 +41,8 @@ export class EngineConstruct extends Construct {
 		super(scope, id);
 
 		const namePrefix = `arcade-${props.environment}`;
+
+		const stacApiSecret = Secret.fromSecretNameV2(this, 'stacApiSecret', props.stacApiSecretName);
 
 		const accessLogBucket = new Bucket(this, 's3AccessLog', {
 			bucketName: `${namePrefix}-${Stack.of(this).account}-${Stack.of(this).region}-access-log`,
@@ -78,6 +82,7 @@ export class EngineConstruct extends Construct {
 		// The job role is assumed by the code running inside the container
 		bucket.grantReadWrite(jobRole);
 		eventBus.grantPutEventsTo(jobRole);
+		stacApiSecret.grantRead(jobRole);
 
 		// Create an AWS Batch Job Definition
 		const engineProcessorJobDefinition = new EcsJobDefinition(this, 'EngineProcessorJobDefinition', {
@@ -94,6 +99,7 @@ export class EngineConstruct extends Construct {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
 					ARCADE_STAC_SERVER_URL: props.stacServerUrl,
+					ARCADE_STAC_API_SECRET_NAME: props.stacApiSecretName
 				},
 			}),
 		});

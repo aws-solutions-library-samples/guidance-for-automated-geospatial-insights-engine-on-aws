@@ -44,6 +44,8 @@ export class ResultsRepository {
 		// list all items directly relating to the execution
 		const queryCommandParams: QueryCommandInput = {
 			TableName: this.tableName,
+			// ensure that we return the latest result first
+			ScanIndexForward: false,
 			KeyConditionExpression: `#hash=:hash`,
 			ExpressionAttributeNames: {
 				'#hash': 'pk',
@@ -52,10 +54,10 @@ export class ResultsRepository {
 				':hash': executionIdKey,
 			},
 			Limit: options?.count,
-			ExclusiveStartKey: options?.lastEvaluatedToken
+			ExclusiveStartKey: options?.token
 				? {
 					pk: executionIdKey,
-					sk: options.lastEvaluatedToken,
+					sk: createDelimitedAttribute(PkType.ResultId, options.token),
 				}
 				: undefined,
 		};
@@ -63,7 +65,7 @@ export class ResultsRepository {
 		try {
 			const response = await this.dynamoDBClient.send(new QueryCommand(queryCommandParams));
 			this.log.debug(`ResultsRepository> list> response:${JSON.stringify(response)}`);
-			return [this.assembleResultList(response.Items), response?.LastEvaluatedKey?.['sk']];
+			return [this.assembleResultList(response.Items), response?.LastEvaluatedKey ? encodeURIComponent(expandDelimitedAttribute(response.LastEvaluatedKey['sk'])[1]) : undefined];
 		} catch (err) {
 			if (err instanceof Error) {
 				this.log.error(err);

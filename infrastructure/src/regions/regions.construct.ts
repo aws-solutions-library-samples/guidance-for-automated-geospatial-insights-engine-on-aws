@@ -357,7 +357,7 @@ export class RegionsModule extends Construct {
 				maxReceiveCount: 10,
 				queue: resourcesModifiedDlq,
 			},
-			visibilityTimeout: Duration.minutes(15),
+			visibilityTimeout: Duration.minutes(2),
 		});
 
 		resourcesModifiedFifoQueue.addToResourcePolicy(
