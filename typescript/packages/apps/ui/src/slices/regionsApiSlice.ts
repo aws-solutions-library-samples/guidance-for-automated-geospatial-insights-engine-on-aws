@@ -1,12 +1,68 @@
-import { Group, GroupList } from '@arcade/regions';
+import {
+	CreateGroup,
+	CreatePolygon,
+	CreateRegion,
+	CreateState,
+	EditGroup,
+	EditPolygon,
+	EditRegion,
+	EditState,
+	Group,
+	GroupList,
+	Polygon,
+	PolygonList,
+	Region,
+	RegionList,
+	State,
+	StateList,
+} from '@arcade/regions';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
+interface ListPaginationOptions {
+	count?: number;
+	paginationToken?: string;
+}
+
+interface TagFilterOptions {
+	tags?: string[];
+}
+interface GroupListFilterOptions {
+	name?: string;
+}
+interface RegionListFilterOptions {
+	name?: string;
+	groupId?: string;
+}
+interface PolygonListFilterOptions {
+	name?: string;
+	groupId?: string;
+	regionId?: string;
+	includeLatestState?: boolean;
+}
+interface StateListFilterOptions {
+	name?: string;
+	groupId?: string;
+	regionId?: string;
+	polygonId?: string;
+	latestOnly?: boolean;
+}
+
+function providesList<R extends { id: string }[], T extends string>(resultsWithIds: R | undefined, tagType: T) {
+	return resultsWithIds ? [{ type: tagType, id: 'LIST' }, ...resultsWithIds.map(({ id }) => ({ type: tagType, id }))] : [{ type: tagType, id: 'LIST' }];
+}
+
+function invalidatesList<R extends string, T extends string>(id: R, tagType: T) {
+	return [
+		{ type: tagType, id: 'LIST' },
+		{ type: tagType, id },
+	];
+}
+
+const regionsApiUrl = import.meta.env.VITE_REGIONS_API_URL;
 export const getToken: () => Promise<string> = async () => {
 	return (await fetchAuthSession()).tokens?.idToken?.toString() ?? '';
 };
-
-const regionsApiUrl = import.meta.env.VITE_REGIONS_API_URL;
 export const regionsApiSlice = createApi({
 	reducerPath: 'demoApi',
 	baseQuery: fetchBaseQuery({
@@ -19,17 +75,21 @@ export const regionsApiSlice = createApi({
 			return headers;
 		},
 	}),
+	tagTypes: ['Group', 'Region', 'Polygon', 'State'],
 	endpoints: (builder) => ({
-		listGroups: builder.query<GroupList, { count?: number; paginationToken?: string }>({
-			query: ({ count, paginationToken }) => ({
+		// Groups
+		listGroups: builder.query<GroupList, ListPaginationOptions & TagFilterOptions & GroupListFilterOptions>({
+			query: ({ count, paginationToken, name }) => ({
 				url: `/groups`,
 				mode: 'cors',
 				method: 'GET',
 				params: {
 					count,
 					paginationToken,
+					name,
 				},
 			}),
+			providesTags: (result) => providesList(result?.groups, 'Group'),
 		}),
 		getGroup: builder.query<Group, string>({
 			query: (id) => ({
@@ -37,7 +97,207 @@ export const regionsApiSlice = createApi({
 				mode: 'cors',
 				method: 'GET',
 			}),
+			providesTags: (_result, _error, id) => [{ type: 'Group', id }],
+		}),
+		createGroup: builder.mutation<Group, CreateGroup>({
+			query: (body) => ({
+				url: `/groups`,
+				mode: 'cors',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: [{ type: 'Group', id: 'LIST' }],
+		}),
+		updateGroup: builder.mutation<Group, { id: string; body: EditGroup }>({
+			query: ({ id, body }) => ({
+				url: `/groups/${id}`,
+				mode: 'cors',
+				method: 'PATCH',
+				body,
+			}),
+			invalidatesTags: (_result, _error, { id }) => invalidatesList(id, 'Group'),
+		}),
+		deleteGroup: builder.mutation<void, string>({
+			query: (id) => ({
+				url: `/groups/${id}`,
+				mode: 'cors',
+				method: 'DELETE',
+			}),
+			invalidatesTags: (_result, _error, id) => invalidatesList(id, 'Group'),
+		}),
+
+		// Regions
+		listRegions: builder.query<RegionList, ListPaginationOptions & TagFilterOptions & RegionListFilterOptions>({
+			query: ({ groupId, count, paginationToken }) => ({
+				url: `/regions`,
+				mode: 'cors',
+				method: 'GET',
+				params: {
+					groupId,
+					count,
+					paginationToken,
+				},
+			}),
+			providesTags: (result) => providesList(result?.regions, 'Region'),
+		}),
+		getRegion: builder.query<Region, string>({
+			query: (id) => ({
+				url: `/regions/${id}`,
+				mode: 'cors',
+				method: 'GET',
+			}),
+			providesTags: (_result, _error, id) => [{ type: 'Region', id }],
+		}),
+		createRegion: builder.mutation<Region, CreateRegion>({
+			query: (body) => ({
+				url: `/regions`,
+				mode: 'cors',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: [{ type: 'Region', id: 'LIST' }],
+		}),
+		updateRegion: builder.mutation<Region, { id: string; body: EditRegion }>({
+			query: ({ id, body }) => ({
+				url: `/regions/${id}`,
+				mode: 'cors',
+				method: 'PATCH',
+				body,
+			}),
+			invalidatesTags: (_result, _error, { id }) => invalidatesList(id, 'Region'),
+		}),
+		deleteRegion: builder.mutation<void, string>({
+			query: (id) => ({
+				url: `/regions/${id}`,
+				mode: 'cors',
+				method: 'DELETE',
+			}),
+			invalidatesTags: (_result, _error, id) => invalidatesList(id, 'Region'),
+		}),
+
+		// Polygons
+		listPolygons: builder.query<PolygonList, ListPaginationOptions & TagFilterOptions & PolygonListFilterOptions>({
+			query: ({ groupId, regionId, includeLatestState, count, paginationToken }) => ({
+				url: `/polygons`,
+				mode: 'cors',
+				method: 'GET',
+				params: {
+					groupId,
+					regionId,
+					includeLatestState,
+					count,
+					paginationToken,
+				},
+			}),
+			providesTags: (result) => providesList(result?.polygons, 'Polygon'),
+		}),
+		getPolygon: builder.query<Polygon, string>({
+			query: (id) => ({
+				url: `/polygons/${id}`,
+				mode: 'cors',
+				method: 'GET',
+			}),
+			providesTags: (_result, _error, id) => [{ type: 'Polygon', id }],
+		}),
+		createPolygon: builder.mutation<Polygon, CreatePolygon>({
+			query: (body) => ({
+				url: `/polygons`,
+				mode: 'cors',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: [{ type: 'Polygon', id: 'LIST' }],
+		}),
+		updatePolygon: builder.mutation<Polygon, { id: string; body: EditPolygon }>({
+			query: ({ id, body }) => ({
+				url: `/polygons/${id}`,
+				mode: 'cors',
+				method: 'PATCH',
+				body,
+			}),
+			invalidatesTags: (_result, _error, { id }) => invalidatesList(id, 'Polygon'),
+		}),
+		deletePolygon: builder.mutation<void, string>({
+			query: (id) => ({
+				url: `/polygons/${id}`,
+				mode: 'cors',
+				method: 'DELETE',
+			}),
+			invalidatesTags: (_result, _error, id) => invalidatesList(id, 'Polygon'),
+		}),
+
+		// States
+		listStates: builder.query<StateList, ListPaginationOptions & TagFilterOptions & StateListFilterOptions>({
+			query: ({ groupId, regionId, polygonId, latestOnly, count, paginationToken }) => ({
+				url: `/states`,
+				mode: 'cors',
+				method: 'GET',
+				params: {
+					groupId,
+					regionId,
+					polygonId,
+					latestOnly,
+					count,
+					paginationToken,
+				},
+			}),
+			providesTags: (result) => providesList(result?.states, 'State'),
+		}),
+		getState: builder.query<State, string>({
+			query: (id) => ({
+				url: `/states/${id}`,
+				mode: 'cors',
+				method: 'GET',
+			}),
+			providesTags: (_result, _error, id) => [{ type: 'State', id }],
+		}),
+		createState: builder.mutation<State, CreateState>({
+			query: (body) => ({
+				url: `/states`,
+				mode: 'cors',
+				method: 'POST',
+				body,
+			}),
+			invalidatesTags: [{ type: 'State', id: 'LIST' }],
+		}),
+		updateState: builder.mutation<State, { id: string; body: EditState }>({
+			query: ({ id, body }) => ({
+				url: `/states/${id}`,
+				mode: 'cors',
+				method: 'PATCH',
+				body,
+			}),
+			invalidatesTags: (_result, _error, { id }) => invalidatesList(id, 'State'),
+		}),
+		deleteState: builder.mutation<void, string>({
+			query: (id) => ({
+				url: `/states/${id}`,
+				mode: 'cors',
+				method: 'DELETE',
+			}),
+			invalidatesTags: (_result, _error, id) => invalidatesList(id, 'State'),
 		}),
 	}),
 });
-export const { useListGroupsQuery, useGetGroupQuery } = regionsApiSlice;
+export const {
+	useListGroupsQuery,
+	useGetGroupQuery,
+	useCreateGroupMutation,
+	useUpdateGroupMutation,
+	useDeleteGroupMutation,
+	useListRegionsQuery,
+	useGetRegionQuery,
+	useCreateRegionMutation,
+	useUpdateRegionMutation,
+	useDeleteRegionMutation,
+	useListPolygonsQuery,
+	useGetPolygonQuery,
+	useCreatePolygonMutation,
+	useUpdatePolygonMutation,
+	useDeletePolygonMutation,
+	useListStatesQuery,
+	useGetStateQuery,
+	useCreateStateMutation,
+	useUpdateStateMutation,
+	useDeleteStateMutation,
+} = regionsApiSlice;

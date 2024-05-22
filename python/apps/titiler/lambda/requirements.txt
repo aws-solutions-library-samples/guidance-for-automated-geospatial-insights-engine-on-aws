@@ -1,2 +1,0 @@
-titiler.application==0.18.1
-mangum>=0.10.0

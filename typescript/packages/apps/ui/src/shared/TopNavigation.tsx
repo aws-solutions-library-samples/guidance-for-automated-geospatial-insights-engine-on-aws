@@ -47,7 +47,6 @@ export default () => {
 				{
 					type: 'menu-dropdown',
 					text: user?.signInDetails?.loginId ?? 'User Details',
-					description: user?.signInDetails?.loginId ?? 'email',
 					iconName: 'user-profile',
 					onItemClick: async (event) => {
 						if (event.detail.id === 'signout') {

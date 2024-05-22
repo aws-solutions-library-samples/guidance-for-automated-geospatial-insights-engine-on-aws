@@ -1,19 +1,26 @@
+import { CreateRegion } from '@arcade/regions';
 import { Button, Container, ContentLayout, Form, FormField, Header, Input, SpaceBetween } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../../shared/Breadcrumbs';
 import Shell from '../../shared/Shell';
-import { useCreateGroupMutation } from '../../slices/regionsApiSlice';
+import { useCreateRegionMutation } from '../../slices/regionsApiSlice';
 
-const defaultGrower = {
+const defaultFarm: CreateRegion = {
 	name: '',
+	processingConfig: {
+		mode: 'scheduled',
+		// scheduleExpression,
+		// scheduleExpressionTimezone
+		priority: 'standard',
+	},
 };
-export default function CreateGrower() {
+export default function CreateFarm() {
 	const navigate = useNavigate();
-	const [createGroup, result] = useCreateGroupMutation();
-	const [grower, setGrower] = useState(defaultGrower);
-	const onChange = (attribute: string, value: string) => {
-		setGrower((prevState) => {
+	const [createRegion, result] = useCreateRegionMutation();
+	const [farm, setFarm] = useState(defaultFarm);
+	const onChange = (attribute: string, value: any) => {
+		setFarm((prevState) => {
 			return {
 				...prevState,
 				[attribute]: value,
@@ -21,10 +28,10 @@ export default function CreateGrower() {
 		});
 	};
 	const handleSubmit = () => {
-		createGroup(grower)
+		createRegion(farm)
 			.unwrap()
 			.then((result) => {
-				navigate(`/growers/${result.id}`);
+				navigate(`/farms/${result.id}`);
 			})
 			.catch((reason) => {
 				console.error(reason);
@@ -35,14 +42,14 @@ export default function CreateGrower() {
 			breadcrumbs={
 				<Breadcrumbs
 					items={[
-						{ text: 'Growers', href: '/growers' },
-						{ text: 'Create grower', href: `/growers/create` },
+						{ text: 'Farms', href: '/farms' },
+						{ text: 'Create farm', href: `/farms/create` },
 					]}
 				/>
 			}
 			contentType="form"
 			content={
-				<ContentLayout header={<Header variant="h1">Create grower</Header>}>
+				<ContentLayout header={<Header variant="h1">Create farm</Header>}>
 					<form onSubmit={(event) => event.preventDefault()}>
 						<Form
 							actions={
@@ -51,11 +58,11 @@ export default function CreateGrower() {
 										Cancel
 									</Button>
 									<Button data-testid="create" variant="primary" loading={result.isLoading} onClick={handleSubmit}>
-										Create grower
+										Create farm
 									</Button>
 								</SpaceBetween>
 							}
-							// errorText={'Error creating the grower'}
+							// errorText={'Error creating the farm'}
 							errorIconAriaLabel="Error"
 						>
 							{
@@ -64,12 +71,29 @@ export default function CreateGrower() {
 										<SpaceBetween size="l">
 											<FormField
 												label="Name"
-												description="Enter the name of the grower."
+												description="Enter the name of the farm."
 												//   errorText={getErrorText('You must specify a root object.')}
 												//   i18nStrings={{ errorIconAriaLabel: 'Error' }}
 											>
 												<Input
-													value={grower.name}
+													value={farm.name}
+													ariaRequired={true}
+													// placeholder="G"
+													onChange={({ detail: { value } }) => onChange('name', value)}
+												/>
+											</FormField>
+										</SpaceBetween>
+									</Container>
+									<Container header={<Header variant="h2">Field Analysis</Header>}>
+										<SpaceBetween size="l">
+											<FormField
+												label="Name"
+												description="Enter the name of the farm."
+												//   errorText={getErrorText('You must specify a root object.')}
+												//   i18nStrings={{ errorIconAriaLabel: 'Error' }}
+											>
+												<Input
+													value={farm.name}
 													ariaRequired={true}
 													// placeholder="G"
 													onChange={({ detail: { value } }) => onChange('name', value)}
