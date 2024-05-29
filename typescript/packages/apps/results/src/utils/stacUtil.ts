@@ -1,13 +1,5 @@
 import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import {
-	Catalog,
-	CatalogDetails,
-	Collection,
-	GroupDetails,
-	polygonProcessingDetails,
-	RegionDetails,
-	StacItem
-} from '@arcade/events';
+import { Catalog, CatalogDetails, Collection, GroupDetails, polygonProcessingDetails, RegionResource, StacItem } from '@arcade/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
@@ -231,54 +223,55 @@ export class StacUtil {
 		return collection;
 	}
 
-	public async constructRegionStacItem(regionDetail: RegionDetails): Promise<StacItem> {
-		this.log.debug(`StacUtil > constructRegionStacItem > in ${JSON.stringify(regionDetail)}`);
+	public async constructRegionStacItem(regionResource: RegionResource & { isActive: boolean }): Promise<StacItem> {
+		this.log.debug(`StacUtil > constructRegionStacItem > in regionResource: ${JSON.stringify(regionResource)}`);
 		// validation
-		ow(regionDetail, ow.object.nonEmpty);
-		ow(regionDetail.id, ow.string.nonEmpty);
-		ow(regionDetail.groupId, ow.string.nonEmpty);
-		ow(regionDetail.boundingBox, ow.array.nonEmpty);
+		ow(regionResource, ow.object.nonEmpty);
+		ow(regionResource.id, ow.string.nonEmpty);
+		ow(regionResource.groupId, ow.string.nonEmpty);
+		ow(regionResource.boundingBox, ow.array.nonEmpty);
 
 		const stacItem = new DefaultStacRecords().defaultStacItem;
-		const { id, groupId } = regionDetail;
+		const { id, groupId } = regionResource;
 		stacItem.id = id;
 		stacItem.collection = `group_${groupId}`;
-		stacItem.bbox = regionDetail.boundingBox;
+		stacItem.bbox = regionResource.boundingBox;
 		// for region stac item the bbox and the polygon covers the same area
-		stacItem.geometry = bboxPolygon(regionDetail.boundingBox).geometry
+		stacItem.geometry = bboxPolygon(regionResource.boundingBox).geometry
 		stacItem.properties = {
-			datetime: regionDetail.createdAt,
-			createdAt: regionDetail.createdAt,
-			updatedAt: regionDetail.updatedAt
-
+			datetime: regionResource.createdAt,
+			createdAt: regionResource.createdAt,
+			updatedAt: regionResource.updatedAt,
+			"arcade:isActive": regionResource.isActive,
+			"arcade:processedOnNewScene": regionResource.processingConfig.mode === 'onNewScene',
 		}
 		return stacItem;
 	}
 
-	public async constructRegionCollection(regionDetail: RegionDetails): Promise<Collection> {
-		this.log.debug(`StacUtil > constructRegionCollection > in ${JSON.stringify(regionDetail)}`);
+	public async constructRegionCollection(regionResource: RegionResource): Promise<Collection> {
+		this.log.debug(`StacUtil > constructRegionCollection > in> regionResource: ${JSON.stringify(regionResource)}`);
 		// validation
-		ow(regionDetail, ow.object.nonEmpty);
-		ow(regionDetail.id, ow.string.nonEmpty);
-		ow(regionDetail.groupId, ow.string.nonEmpty);
+		ow(regionResource, ow.object.nonEmpty);
+		ow(regionResource.id, ow.string.nonEmpty);
+		ow(regionResource.groupId, ow.string.nonEmpty);
 
 		const collection = new DefaultStacRecords().defaultCollection;
 		const [group, region] = await Promise.all([
 			// get Group Collection
-			this.regionsClient.getGroupById(regionDetail.groupId, this.context),
+			this.regionsClient.getGroupById(regionResource.groupId, this.context),
 			// get Region Collection
-			this.regionsClient.getRegionById(regionDetail.id, this.context),
+			this.regionsClient.getRegionById(regionResource.id, this.context),
 		]);
 
 		collection.id = `region_${region.id}`;
 		collection.title = region.name;
 		collection.description = region.name;
 
-		if (regionDetail.boundingBox) {
-			collection.extent.spatial.bbox = [regionDetail.boundingBox]
+		if (regionResource.boundingBox) {
+			collection.extent.spatial.bbox = [regionResource.boundingBox]
 		}
 
-		collection.extent.temporal.interval = [[regionDetail.createdAt, null]]
+		collection.extent.temporal.interval = [[regionResource.createdAt, null]]
 		// Update links
 		collection.links = [
 			{

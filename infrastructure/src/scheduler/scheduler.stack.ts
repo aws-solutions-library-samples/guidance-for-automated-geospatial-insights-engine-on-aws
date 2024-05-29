@@ -13,10 +13,14 @@ import {
 import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
 import { ExecutorModule } from "./executor.construct.js";
 import { resultsApiFunctionArnParameter } from "../results/results.construct.js";
+import { stacApiSecretNameParameter } from "../shared/shared.stack.js";
+import { Function } from "aws-cdk-lib/aws-lambda";
 
 export type SchedulerStackProperties = StackProps & {
 	environment: string;
 	concurrencyLimit: number;
+	sentinelTopicArn: string;
+	stacServerUrl: string;
 }
 
 export class SchedulerStack extends Stack {
@@ -64,10 +68,23 @@ export class SchedulerStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
+
+		const stacApiSecretName = StringParameter.fromStringParameterAttributes(this, 'stacApiSecretName', {
+			parameterName: stacApiSecretNameParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const regionsApiLambda = Function.fromFunctionArn(this, 'RegionsApiFunction', regionsApiFunctionArn);
+		const resultsApiLambda = Function.fromFunctionArn(this, 'ResultsApiFunction', resultsApiFunctionArn);
+
 		const schedulerModule = new SchedulerModule(this, 'SchedulerModule', {
 			environment: props.environment,
+			sentinelTopicArn: props.sentinelTopicArn,
 			eventBusName,
-			bucketName
+			bucketName,
+			regionsApiLambda,
+			stacApiSecretName,
+			stacServerUrl: props.stacServerUrl
 		})
 
 		const executorModule = new ExecutorModule(this, 'ExecutorModule', {
@@ -78,8 +95,8 @@ export class SchedulerStack extends Stack {
 			lowPriorityQueueArn,
 			highPriorityQueueArn,
 			standardPriorityQueueArn,
-			regionsApiFunctionArn,
-			resultsApiFunctionArn,
+			regionsApiLambda,
+			resultsApiLambda,
 			bucketName,
 			engineQueue: schedulerModule.engineQueue
 		})

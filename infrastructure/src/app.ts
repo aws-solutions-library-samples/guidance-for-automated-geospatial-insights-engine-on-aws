@@ -44,12 +44,18 @@ const stacServerOpenSearchEndpoint = app.node.tryGetContext('stacServerOpenSearc
 const stacServerOpenSearchSecret = app.node.tryGetContext('stacServerOpenSearchSecret') as string;
 const stacServerUrl = app.node.tryGetContext('stacServerUrl') as string;
 
+// Sentinel-2 Open Data on AWS parameters
+const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string;
+
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 
 const stackName = (suffix: string) => `arcade-${environment}-${suffix}`;
 const stackDescription = (moduleName: string) => `Infrastructure for ARCADE ${moduleName} module`;
 
-const deployPlatform = (callerEnvironment?: { accountId?: string; region?: string }): void => {
+const deployPlatform = (callerEnvironment?: {
+	accountId?: string;
+	region?: string
+}): void => {
 	const sharedStack = new SharedInfrastructureStack(app, 'SharedStack', {
 		stackName: stackName('shared'),
 		description: stackDescription('Shared'),
@@ -60,11 +66,11 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-						fromEmail: cognitoFromEmail,
-						fromName: cognitoFromName,
-						replyTo: cognitoReplyToEmail,
-						sesVerifiedDomain: cognitoVerifiedDomain,
-				  }
+					fromEmail: cognitoFromEmail,
+					fromName: cognitoFromName,
+					replyTo: cognitoReplyToEmail,
+					sesVerifiedDomain: cognitoVerifiedDomain,
+				}
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
@@ -123,6 +129,8 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		description: stackDescription('Scheduler'),
 		environment,
 		concurrencyLimit,
+		sentinelTopicArn,
+		stacServerUrl
 	});
 
 	schedulerStack.addDependency(sharedStack);
@@ -169,16 +177,16 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 
 const getCallerEnvironment = ():
 	| {
-			accountId?: string;
-			region?: string;
-	  }
+	accountId?: string;
+	region?: string;
+}
 	| undefined => {
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-				'EXAMPLE\n' +
-				'$ npm run cdk deploy -- -e sampleEnvironment'
+			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+			'EXAMPLE\n' +
+			'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));

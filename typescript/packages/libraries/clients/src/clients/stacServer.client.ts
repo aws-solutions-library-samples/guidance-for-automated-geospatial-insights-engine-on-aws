@@ -1,4 +1,5 @@
 import type { Catalog, Collection, ResourceType, StacItem } from '@arcade/events';
+import { SearchResult } from "@arcade/events";
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
@@ -6,8 +7,13 @@ import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import axios from 'axios';
 import ow from 'ow';
+import { SearchRequest } from "./stacServer.model.js";
 
 export class StacServerClient extends ClientServiceBase {
+
+	private stacApiKey: string;
+	private credentials: { username: string, password: string }
+
 	constructor(
 		readonly log: BaseLogger,
 		readonly snsClient: SNSClient,
@@ -16,9 +22,25 @@ export class StacServerClient extends ClientServiceBase {
 		readonly stacServerUrl: string,
 		readonly secretsManagerClient: SecretsManagerClient,
 		readonly stacServerOpenSearchEndpoint: string,
-		readonly openSearchMasterCredentials: string
+		readonly stacOpenSearchSecretName: string,
+		readonly stacApiKeySecretName: string
 	) {
 		super();
+	}
+
+	private async getApiKey(): Promise<string> {
+		if (this.stacApiKey !== undefined) return this.stacApiKey;
+		const secretResponse = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.stacApiKeySecretName }))
+		const { apiKey } = JSON.parse(secretResponse.SecretString);
+		this.stacApiKey = Buffer.from(apiKey, 'utf-8').toString('base64');
+		return this.stacApiKey;
+	}
+
+	private async getOpenSearchCredentials(): Promise<{ username: string, password: string }> {
+		if (this.credentials !== undefined) return this.credentials
+		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.stacOpenSearchSecretName }));
+		this.credentials = JSON.parse(masterCredentials.SecretString);
+		return this.credentials;
 	}
 
 	public async publishCatalog(req: Catalog): Promise<void> {
@@ -56,18 +78,40 @@ export class StacServerClient extends ClientServiceBase {
 		this.log.trace(`StacServerClient > publishStacItem > exit`);
 	}
 
-	public async getCollection(token: string, request: {
+	public async search(request: SearchRequest): Promise<SearchResult> {
+		this.log.trace(`StacServerClient > getCollection > in > request: ${JSON.stringify(JSON.stringify(request))} `);
+		let result: SearchResult;
+		ow(request, ow.object.nonEmpty);
+		ow(request.bbox, ow.array.nonEmpty);
+		try {
+			const token = await this.getApiKey();
+			const response = await axios.post<SearchResult>(`${this.stacServerUrl}/search`,
+				request,
+				{
+					headers: {
+						'X-API-KEY': `${token}`,
+					}
+				});
+			result = response.data;
+		} catch (err) {
+			this.log.error(`StacServerClient> getCollection> error: ${JSON.stringify(err)}`);
+		}
+
+		this.log.trace(`StacServerClient > getCollection > exit payload:${JSON.stringify(result)}`);
+		return result;
+	}
+
+	public async getCollection(request: {
 		id: string;
 		type: ResourceType
 	}): Promise<Collection> {
 		this.log.trace(`StacServerClient > getCollection > in > request: ${JSON.stringify(JSON.stringify(request))} `);
 		let result: Collection;
-
 		ow(request, ow.object.nonEmpty);
 		ow(request.type, ow.string.oneOf(['Group', 'Region']));
 		ow(request.id, ow.string.nonEmpty);
-
 		try {
+			const token = await this.getApiKey();
 			const collectionId = `${request.type.toLowerCase()}_${request.id}`;
 			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${collectionId}`, {
 				headers: {
@@ -83,7 +127,7 @@ export class StacServerClient extends ClientServiceBase {
 		return result;
 	}
 
-	public async getCollectionItem(token: string, request: {
+	public async getCollectionItem(request: {
 		id: string;
 		collectionId: string;
 		collectionType: ResourceType
@@ -97,6 +141,7 @@ export class StacServerClient extends ClientServiceBase {
 
 		let result: StacItem;
 		try {
+			const token = await this.getApiKey();
 			const collectionId = `${request.collectionType.toLowerCase()}_${request.id}`;
 			const itemId = `${request.collectionId}_${request.id}`;
 			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${itemId}`, {
@@ -115,9 +160,7 @@ export class StacServerClient extends ClientServiceBase {
 	public async createOpenSearchRole(): Promise<void> {
 		this.log.trace(`StacServerClient >createOpenSearchRole > in`);
 		//get the master credentials from secretsManager
-		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
-		const credentials = JSON.parse(masterCredentials.SecretString);
-
+		const credentials = await this.getOpenSearchCredentials();
 		const payload = {
 			cluster_permissions: ['cluster_composite_ops', 'cluster:monitor/health'],
 			index_permissions: [
@@ -147,11 +190,8 @@ export class StacServerClient extends ClientServiceBase {
 
 	public async createOpenSearchUser(password: string): Promise<void> {
 		this.log.trace(`StacServerClient > createOpenSearchUser > in`);
-
-		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
-		const credentials = JSON.parse(masterCredentials.SecretString);
-		const payload = { password };
-		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/internalusers/stac_server` as string, payload, {
+		const credentials = await this.getOpenSearchCredentials();
+		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/internalusers/stac_server` as string, { password: credentials.password }, {
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -165,10 +205,7 @@ export class StacServerClient extends ClientServiceBase {
 
 	public async LinkRoleToUser(): Promise<void> {
 		this.log.trace(`StacServerClient > LinkRoleToUser> in`);
-
-		const masterCredentials = await this.secretsManagerClient.send(new GetSecretValueCommand({ SecretId: this.openSearchMasterCredentials }));
-		const credentials = JSON.parse(masterCredentials.SecretString);
-
+		const credentials = await this.getOpenSearchCredentials();
 		const payload = { users: ['stac_server'] };
 		await axios.put(`https://${this.stacServerOpenSearchEndpoint}/_plugins/_security/api/rolesmapping/stac_server_role` as string, payload, {
 			headers: {

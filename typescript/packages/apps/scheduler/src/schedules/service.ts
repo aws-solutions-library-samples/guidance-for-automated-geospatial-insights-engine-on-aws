@@ -1,22 +1,22 @@
 import { FastifyBaseLogger } from "fastify";
-import {
-	CreateScheduleCommand,
-	CreateScheduleCommandInput,
-	DeleteScheduleCommand,
-	GetScheduleCommand,
-	SchedulerClient,
-	UpdateScheduleCommand
-} from "@aws-sdk/client-scheduler";
+import { CreateScheduleCommand, CreateScheduleCommandInput, DeleteScheduleCommand, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
 import ow from 'ow';
 import { DomainEvent, ProcessingConfig, RegionResource } from "@arcade/events";
 
 export class SchedulesService {
-	constructor(readonly log: FastifyBaseLogger, private readonly schedulerClient: SchedulerClient, private readonly schedulerGroup: string, private readonly sqsArn: string, private readonly roleArn: string) {
+	constructor(readonly log: FastifyBaseLogger,
+				readonly schedulerClient: SchedulerClient,
+				readonly schedulerGroup: string,
+				readonly sqsArn: string,
+				readonly roleArn: string,
+				readonly environment: string,
+	) {
 	}
 
 	private scheduleName(id: string): string {
-		return `${id}-schedule`;
+		return `arcade-${this.environment}-${id}-schedule`;
 	}
+
 
 	public async process(event: DomainEvent<RegionResource>): Promise<void> {
 		this.log.debug(`SchedulesService> process> event:${JSON.stringify(event)}`);

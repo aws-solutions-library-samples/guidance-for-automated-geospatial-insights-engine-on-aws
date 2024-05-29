@@ -4,7 +4,7 @@ import { Duration } from 'aws-cdk-lib';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { AnyPrincipal, Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { CfnScheduleGroup } from 'aws-cdk-lib/aws-scheduler';
@@ -14,6 +14,10 @@ import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { FilterOrPolicy, SubscriptionFilter, Topic } from "aws-cdk-lib/aws-sns";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +26,10 @@ export interface ScheduledConstructProperties {
 	environment: string;
 	eventBusName: string;
 	bucketName: string;
+	sentinelTopicArn: string;
+	stacServerUrl: string;
+	stacApiSecretName: string;
+	regionsApiLambda: IFunction;
 }
 
 const schedulerGroupNameParameter = (environment: string) => `/arcade/${environment}/scheduler/groupName`;
@@ -37,7 +45,18 @@ export class SchedulerModule extends Construct {
 
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName);
 
-		const engineDlq = new Queue(this, `taskDlq`, { queueName: `${namePrefix}-engine-dlq` });
+		const topic = Topic.fromTopicArn(this, 'Sentinel2Topic', props.sentinelTopicArn)
+
+		const stacApiSecret = Secret.fromSecretNameV2(this, 'stacApiSecret', props.stacApiSecretName);
+		/**
+		 * This is the queue that the scheduler will publish to when a new processing task available for a region
+		 */
+		const engineDlq = new Queue(this, `taskDlq`,
+			{
+				queueName: `${namePrefix}-engine-dlq.fifo`,
+				fifo: true
+			});
+
 		engineDlq.addToResourcePolicy(
 			new PolicyStatement({
 				sid: 'enforce-ssl',
@@ -54,7 +73,8 @@ export class SchedulerModule extends Construct {
 		);
 
 		this.engineQueue = new Queue(this, `taskQueue`, {
-			queueName: `${namePrefix}-engine-queue`,
+			queueName: `${namePrefix}-engine-queue.fifo`,
+			fifo: true,
 			deadLetterQueue: {
 				maxReceiveCount: 10,
 				queue: engineDlq,
@@ -77,6 +97,109 @@ export class SchedulerModule extends Construct {
 			})
 		);
 
+		/**
+		 * This is the queue that subscribes to the SNS topic hosted by element84
+		 * https://registry.opendata.aws/sentinel-2-l2a-cogs/
+		 */
+		const sentinelDlq = new Queue(this, `SentinelDLQ`, { queueName: `${namePrefix}-sentinel-dlq` });
+		sentinelDlq.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [sentinelDlq.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
+
+		const sentinelQueue = new Queue(this, `SentinelQueue`, {
+			queueName: `${namePrefix}-sentinel-queue`,
+			deadLetterQueue: {
+				maxReceiveCount: 10,
+				queue: sentinelDlq,
+			},
+			visibilityTimeout: Duration.minutes(2),
+		});
+
+		sentinelQueue.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [sentinelQueue.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
+
+		// create subscription to the Sentinel topics
+		topic.addSubscription(new SqsSubscription(sentinelQueue,
+			{
+				rawMessageDelivery: true,
+				filterPolicyWithMessageBody: {
+					collection: FilterOrPolicy.filter(SubscriptionFilter.stringFilter({
+						// only subscribed to cloud optimized sentinel images update
+						allowlist: ['sentinel-2-c1-l2a'],
+					}))
+				}
+			}));
+
+		// Lambda function that processor schedule queued in SQS
+		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
+			description: 'Scheduler module sentinel sqs processor',
+			entry: path.join(__dirname, '../../../typescript/packages/apps/scheduler/src/lambda_sqs.ts'),
+			functionName: `${namePrefix}-scheduler-sqs-processor`,
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 512,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.minutes(2),
+			environment: {
+				EVENT_BUS_NAME: props.eventBusName,
+				BUCKET_NAME: props.bucketName,
+				STAC_SERVER_URL: props.stacServerUrl,
+				STAC_API_SECRET_NAME: props.stacApiSecretName,
+				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
+				QUEUE_URL: this.engineQueue.queueUrl
+			},
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20.1',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk', 'pg-native'],
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
+		});
+
+		stacApiSecret.grantRead(sqsProcessorLambda);
+		this.engineQueue.grantSendMessages(sqsProcessorLambda);
+		props.regionsApiLambda.grantInvoke(sqsProcessorLambda)
+
+		sqsProcessorLambda.addEventSource(
+			new SqsEventSource(sentinelQueue, {
+				maxBatchingWindow: Duration.minutes(1),
+				batchSize: 50,
+				reportBatchItemFailures: true,
+			})
+		);
+
+		/**
+		 * This is the eventbridge scheduler configured for a region (in a scheduled processing mode).
+		 * It will publish the scheduled event to the engine queue explained above.
+		 */
 		const cfnScheduleGroup = new CfnScheduleGroup(this, 'ArcadeScheduleGroup', {
 			name: `${namePrefix}-scheduler`,
 		});
@@ -106,7 +229,7 @@ export class SchedulerModule extends Construct {
 			functionName: `${namePrefix}-scheduler-eventbridge-processor`,
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
-			memorySize: 512,
+			memorySize: 256,
 			logRetention: RetentionDays.ONE_WEEK,
 			timeout: Duration.minutes(1),
 			environment: {
@@ -188,7 +311,7 @@ export class SchedulerModule extends Construct {
 
 
 		NagSuppressions.addResourceSuppressions(
-			[eventbridgeLambda],
+			[eventbridgeLambda, sqsProcessorLambda],
 			[
 				{
 					id: 'AwsSolutions-IAM4',
@@ -197,7 +320,7 @@ export class SchedulerModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::*'],
+					appliesTo: ['Resource::*', 'Resource::<regionsApiFunctionArnParameter>:*'],
 					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
 				},
 			],
@@ -205,7 +328,7 @@ export class SchedulerModule extends Construct {
 		);
 
 		NagSuppressions.addResourceSuppressions(
-			[engineDlq, schedulerEventBridgeHandlerDLQ],
+			[engineDlq, schedulerEventBridgeHandlerDLQ, sentinelDlq],
 			[
 				{
 					id: 'AwsSolutions-SQS3',

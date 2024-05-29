@@ -9,6 +9,10 @@ export interface Group {
 	updatedAt?: string;
 }
 
+export interface GroupListResources {
+	groups: Group[]
+}
+
 export type Priority = 'low' | 'standard' | 'high';
 
 export type Mode = 'scheduled' | 'disabled' | 'onNewScene';
@@ -30,7 +34,8 @@ export interface Region {
 	createdAt: string;
 	updatedBy?: string;
 	updatedAt?: string;
-	processingConfig: ProcessingConfig
+	processingConfig: ProcessingConfig;
+	boundingBox: number[];
 }
 
 export interface UpdateRegionParams {

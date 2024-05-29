@@ -25,6 +25,9 @@
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-sns": "~3",
+		"@aws-sdk/client-sqs": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
 		"@aws-sdk/client-scheduler": "~3",
@@ -47,18 +50,20 @@
 		"pino-pretty": "~11",
 		"pino": "~8",
 		"p-limit": "~5",
+		"@turf/turf": "~6",
 		"ulid": "~2"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
 		"@types/node": "~20",
+		"aws-sdk-client-mock": "~4",
 		"@aws-sdk/client-ssm": "~3",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",
 		"typescript": "~5",
-		"vitest": "~1",
+		"vitest": "~0",
 		"vitest-mock-extended": "~1"
 	},
 	"private": false
