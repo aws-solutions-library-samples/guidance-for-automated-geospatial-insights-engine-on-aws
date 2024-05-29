@@ -3,14 +3,7 @@ import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import { LambdaRequestContext } from '../common/models.js';
-import {
-	Group,
-	ListPolygonsOptions,
-	Polygon,
-	PolygonListResource,
-	Region,
-	UpdateRegionParams
-} from './regions.models.js';
+import { Group, GroupListResources, ListPolygonsOptions, Polygon, PolygonListResource, Region, UpdateRegionParams } from './regions.models.js';
 
 export class RegionsClient extends ClientServiceBase {
 	private readonly log: BaseLogger;
@@ -22,6 +15,21 @@ export class RegionsClient extends ClientServiceBase {
 		this.log = log;
 		this.lambdaInvoker = lambdaInvoker;
 		this.regionsApiFunctionName = regionsApiFunctionName;
+	}
+
+	public async listGroups(requestContext: LambdaRequestContext): Promise<GroupListResources | undefined> {
+		this.log.trace(`RegionsClient> listGroups> in:`);
+		const additionalHeaders = {};
+
+		const event: LambdaApiGatewayEventBuilder = new LambdaApiGatewayEventBuilder()
+			.setMethod('GET')
+			.setHeaders(super.buildHeaders(additionalHeaders))
+			.setRequestContext(requestContext)
+			.setPath(`/groups`);
+
+		const result = (await this.lambdaInvoker.invoke(this.regionsApiFunctionName, event))?.body as GroupListResources;
+		this.log.trace(`RegionsClient> getGroupById> exit> result: ${JSON.stringify(result)}`);
+		return result;
 	}
 
 	public async getGroupById(id: string, requestContext: LambdaRequestContext): Promise<Group | undefined> {

@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import path from "path";
-import { Function, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
+import { IFunction, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Duration } from "aws-cdk-lib";
 import { getLambdaArchitecture } from "@arcade/cdk-common";
@@ -20,8 +20,8 @@ export interface ExecutorConstructProperties {
 	eventBusName: string;
 	bucketName: string;
 	jobDefinitionArn: string;
-	regionsApiFunctionArn: string;
-	resultsApiFunctionArn: string;
+	regionsApiLambda: IFunction;
+	resultsApiLambda: IFunction;
 	highPriorityQueueArn: string;
 	standardPriorityQueueArn: string;
 	lowPriorityQueueArn: string;
@@ -49,14 +49,12 @@ export class ExecutorModule extends Construct {
 
 		const eventBus = EventBus.fromEventBusName(scope, 'Bus', props.eventBusName)
 
-		const regionsApiLambda = Function.fromFunctionArn(scope, 'RegionsApiFunction', props.regionsApiFunctionArn);
-		const resultsApiLambda = Function.fromFunctionArn(scope, 'ResultsApiFunction', props.resultsApiFunctionArn);
 
 		// Lambda function that processor schedule queued in SQS
 		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
-			description: 'Scheduler module sqs processor',
+			description: 'Executor module sqs processor',
 			entry: path.join(__dirname, '../../../typescript/packages/apps/executor/src/lambda_sqs.ts'),
-			functionName: `${namePrefix}-scheduler-sqs-processor`,
+			functionName: `${namePrefix}-executor-sqs-processor`,
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
 			memorySize: 512,
@@ -69,8 +67,8 @@ export class ExecutorModule extends Construct {
 				LOW_PRIORITY_QUEUE_ARN: lowPriorityQueue.jobQueueArn,
 				STANDARD_PRIORITY_QUEUE_ARN: standardPriorityQueue.jobQueueArn,
 				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
-				REGIONS_API_FUNCTION_NAME: regionsApiLambda.functionName,
-				RESULTS_API_FUNCTION_NAME: resultsApiLambda.functionName,
+				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
+				RESULTS_API_FUNCTION_NAME: props.resultsApiLambda.functionName,
 				BUCKET_NAME: props.bucketName
 			},
 			bundling: {
@@ -86,8 +84,8 @@ export class ExecutorModule extends Construct {
 			architecture: getLambdaArchitecture(scope),
 		});
 
-		regionsApiLambda.grantInvoke(sqsProcessorLambda);
-		resultsApiLambda.grantInvoke(sqsProcessorLambda);
+		props.regionsApiLambda.grantInvoke(sqsProcessorLambda);
+		props.resultsApiLambda.grantInvoke(sqsProcessorLambda);
 		bucket.grantReadWrite(sqsProcessorLambda);
 		eventBus.grantPutEventsTo(sqsProcessorLambda);
 

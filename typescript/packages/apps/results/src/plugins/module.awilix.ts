@@ -134,7 +134,7 @@ const registerContainer = (app?: FastifyInstance) => {
 	const userPoolId = process.env['USER_POOL_ID'];
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
-	const backEndAuthorizerSecret = process.env['BACKEND_AUTHORIZER_SECRET_ID'];
+	const stacApiSecretName = process.env['STAC_API_SECRET_NAME'];
 
 	diContainer.register({
 		// Clients
@@ -184,7 +184,8 @@ const registerContainer = (app?: FastifyInstance) => {
 					stacServerUrl,
 					container.secretsManagerClient,
 					openSearchEndPoint,
-					openSearchSecret
+					openSearchSecret,
+					stacApiSecretName
 				),
 			{
 				...commonInjectionOptions,
@@ -229,7 +230,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 		stacServerAuthorizer: asFunction(
-			(container) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId, backEndAuthorizerSecret, container.secretsManagerClient),
+			(container) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId, stacApiSecretName, container.secretsManagerClient),
 			{
 				...commonInjectionOptions,
 			}

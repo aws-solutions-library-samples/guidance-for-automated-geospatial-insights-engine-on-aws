@@ -315,6 +315,20 @@ export interface Collection {
 	[k: string]: unknown;
 }
 
+export interface SearchResult {
+	"type": string,
+	"stac_version": string,
+	"stac_extensions": string[],
+	"context": {
+		"limit": number,
+		"matched": number,
+		"returned": number
+	},
+	"numberMatched": number,
+	"numberReturned": number,
+	"features": StacItem[]
+}
+
 export type Status = 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeeded';
 
 export type EngineType = 'aws-batch';
@@ -383,26 +397,10 @@ export interface groupDetails {
 	updatedAt?: string;
 }
 
-export interface regionDetails {
-	/**
-	 * The id of the group the collection belongs to
-	 */
-	id: string;
-	groupId: string;
-	name: string;
-	attributes?: Record<string, any>;
-	createdAt: string;
-	createdBy: string;
-	updatedBy?: string;
-	updatedAt?: string;
-	boundingBox?: number[];
-}
-
 export type {
 	catalogDetails as CatalogDetails,
 	groupDetails as GroupDetails,
 	polygonProcessingDetails as PipelineMetadataDetails,
-	regionDetails as RegionDetails,
 	engineJobDetails as EngineJobDetails,
 	engineJobCreatedDetails as EngineJobCreatedDetails,
 	engineJobUpdatedDetails as EngineJobUpdatedDetails,

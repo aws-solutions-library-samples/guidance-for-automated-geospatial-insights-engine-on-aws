@@ -1,5 +1,6 @@
-import type { CatalogDetails, GroupDetails, RegionDetails } from '../results/models.js';
+import type { CatalogDetails, GroupDetails } from '../results/models.js';
 import { EngineJobDetails, polygonProcessingDetails } from '../results/models.js';
+import { RegionResource } from "../regions/models.js";
 
 export type EventType = 'created' | 'updated' | 'deleted';
 
@@ -88,7 +89,7 @@ export interface regionChangeEvent {
 	region: string;
 	source: string;
 	'detail-type': string;
-	detail: DomainEvent<RegionDetails>;
+	detail: DomainEvent<RegionResource>;
 }
 
 export interface resultsChangeEvent {

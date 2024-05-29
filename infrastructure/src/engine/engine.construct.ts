@@ -1,11 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Duration, RemovalPolicy, Size, Stack } from 'aws-cdk-lib';
-import {
-	EcsFargateContainerDefinition,
-	EcsJobDefinition,
-	FargateComputeEnvironment,
-	JobQueue
-} from 'aws-cdk-lib/aws-batch';
+import { EcsFargateContainerDefinition, EcsJobDefinition, FargateComputeEnvironment, JobQueue } from 'aws-cdk-lib/aws-batch';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import { ContainerImage, CpuArchitecture, OperatingSystemFamily } from 'aws-cdk-lib/aws-ecs';
@@ -98,8 +93,8 @@ export class EngineConstruct extends Construct {
 				environment: {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
-					ARCADE_STAC_SERVER_URL: props.stacServerUrl,
-					ARCADE_STAC_API_SECRET_NAME: props.stacApiSecretName
+					STAC_SERVER_URL: props.stacServerUrl,
+					STAC_API_SECRET_NAME: props.stacApiSecretName
 				},
 			}),
 		});

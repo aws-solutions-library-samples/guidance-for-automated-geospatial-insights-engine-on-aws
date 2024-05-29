@@ -96,7 +96,7 @@ export class StacServerConstruct extends Construct {
 				POLICY_STORE_ID: props.policyStoreId,
 				USER_POOL_ID: props.cognitoUserPoolId,
 				CLIENT_ID: props.cognitoClientId,
-				BACKEND_AUTHORIZER_SECRET_ID: props.authorizerSecretId,
+				STAC_API_SECRET_NAME: props.authorizerSecretId,
 			},
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
 			architecture: getLambdaArchitecture(scope),

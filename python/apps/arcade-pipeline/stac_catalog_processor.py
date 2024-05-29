@@ -116,7 +116,7 @@ class STACCatalogProcessor:
 
 	@staticmethod
 	def get_previous_tif(region_id: str, result_id: str, polygon_id: str) -> Optional[Item]:
-		arcade_stac_url = os.getenv("ARCADE_STAC_SERVER_URL")
+		arcade_stac_url = os.getenv("STAC_SERVER_URL")
 
 		api_key = STACCatalogProcessor.get_api_key()
 
@@ -150,7 +150,7 @@ class STACCatalogProcessor:
 
 	@staticmethod
 	def get_api_key():
-		arcade_stac_api_secret_name = os.getenv("ARCADE_STAC_API_SECRET_NAME")
+		arcade_stac_api_secret_name = os.getenv("STAC_API_SECRET_NAME")
 		secret_manager = boto3.client('secretsmanager')
 		secret_value_response = secret_manager.get_secret_value(SecretId=arcade_stac_api_secret_name)
 		secret = json.loads(secret_value_response['SecretString'])
