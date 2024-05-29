@@ -1,0 +1,375 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ARCADE Results",
+    "description": "Manages ARCADE engine execution results.",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "def-0": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-1"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "description": "No. of results returned when pagination requested.",
+                "type": "integer"
+              },
+              "token": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "title": "resultListResource"
+      },
+      "def-1": {
+        "type": "object",
+        "properties": {
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique Result ID.",
+            "type": "string"
+          },
+          "scheduleDateTime": {
+            "description": "The failure reason.",
+            "type": "string"
+          },
+          "executionId": {
+            "description": "The id of the execution.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "The creation time of the result",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "The update time of the result.",
+            "type": "string"
+          },
+          "message": {
+            "description": "The failure reason.",
+            "type": "string"
+          },
+          "engineType": {
+            "type": "string",
+            "enum": [
+              "aws-batch"
+            ],
+            "description": "The type of compute used to process the satellite images."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "starting",
+              "inProgress",
+              "failed",
+              "succeeded"
+            ],
+            "description": "The status of the pipeline"
+          }
+        },
+        "required": [
+          "regionId",
+          "id",
+          "createdAt",
+          "engineType",
+          "status"
+        ],
+        "title": "resultResource"
+      }
+    }
+  },
+  "paths": {
+    "/regions/{regionId}/results": {
+      "get": {
+        "operationId": "listResults",
+        "summary": "List all results when processing a region.",
+        "tags": [
+          "Results"
+        ],
+        "description": "List all results when processing a region.\n\nPermissions:\n- `readers` may list results.\n",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "paginationToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-1"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "description": "No. of results returned when pagination requested.",
+                          "type": "integer"
+                        },
+                        "token": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "results"
+                  ]
+                },
+                "examples": {
+                  "List of results": {
+                    "summary": "Paginated list of results.",
+                    "value": {
+                      "results": [
+                        {
+                          "regionId": "01hwvwmm5d2crn4xx8k0s0a61z",
+                          "id": "01hwy44p6yjpvkdx4c9g675h55",
+                          "createdAt": "2024-05-03T02:22:16.932Z",
+                          "engineType": "aws-batch",
+                          "status": "succeeded",
+                          "executionId": "56e998fb-8437-4bdb-b378-703481fdee6c",
+                          "updatedAt": "2024-05-03T02:23:31.334Z",
+                          "message": "Essential container in task exited"
+                        }
+                      ],
+                      "pagination": {
+                        "count": 20
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{regionId}/results/{resultId}": {
+      "get": {
+        "operationId": "listResults",
+        "summary": "Get pipeline result by id.",
+        "tags": [
+          "Results"
+        ],
+        "description": "Get pipeline result by id.\n\nPermissions:\n- `readers` may list results.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "regionId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "resultId",
+            "required": true,
+            "description": "Unique Region ID."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "regionId": {
+                      "description": "Unique Region ID.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "Unique Result ID.",
+                      "type": "string"
+                    },
+                    "scheduleDateTime": {
+                      "description": "The failure reason.",
+                      "type": "string"
+                    },
+                    "executionId": {
+                      "description": "The id of the execution.",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "description": "The creation time of the result",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "The update time of the result.",
+                      "type": "string"
+                    },
+                    "message": {
+                      "description": "The failure reason.",
+                      "type": "string"
+                    },
+                    "engineType": {
+                      "type": "string",
+                      "enum": [
+                        "aws-batch"
+                      ],
+                      "description": "The type of compute used to process the satellite images."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "queued",
+                        "starting",
+                        "inProgress",
+                        "failed",
+                        "succeeded"
+                      ],
+                      "description": "The status of the pipeline"
+                    }
+                  },
+                  "required": [
+                    "regionId",
+                    "id",
+                    "createdAt",
+                    "engineType",
+                    "status"
+                  ]
+                },
+                "examples": {
+                  "Sample result": {
+                    "summary": "Sample result of successful pipeline execution.",
+                    "value": {
+                      "regionId": "01hwvwmm5d2crn4xx8k0s0a61z",
+                      "id": "01hwy44p6yjpvkdx4c9g675h55",
+                      "createdAt": "2024-05-03T02:22:16.932Z",
+                      "engineType": "aws-batch",
+                      "status": "succeeded",
+                      "executionId": "56e998fb-8437-4bdb-b378-703481fdee6c",
+                      "updatedAt": "2024-05-03T02:23:31.334Z",
+                      "message": "Essential container in task exited"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:30001"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Results",
+      "description": "Results represents collection of engine execution results."
+    }
+  ]
+}

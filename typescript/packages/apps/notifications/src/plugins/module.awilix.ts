@@ -10,7 +10,6 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { SNSClient } from '@aws-sdk/client-sns';
 import { SnsUtil } from "../common/snsUtil.js";
 import { NotificationsService } from "../api/notifications/service.js";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
@@ -29,7 +28,6 @@ declare module '@fastify/awilix' {
 		snsClient: SNSClient;
 		snsUtil: SnsUtil;
 		notificationsService: NotificationsService;
-		schedulerClient: SchedulerClient;
 		apiAuthorizer: ApiAuthorizer;
 		avpClient: VerifiedPermissionsClient;
 		eventBridgeClient: EventBridgeClient;
@@ -37,12 +35,6 @@ declare module '@fastify/awilix' {
 		lambdaInvoker: Invoker;
 		lambdaClient: LambdaClient;
 		regionsClient: RegionsClient;
-	}
-}
-
-class SchedulerClientFactory {
-	public static create(region: string | undefined): SchedulerClient {
-		return captureAWSv3Client(new SchedulerClient({ region }));
 	}
 }
 
@@ -118,10 +110,6 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		schedulerClient: asFunction(() => SchedulerClientFactory.create(awsRegion), {
-			...commonInjectionOptions
-		}),
-
 		snsClient: asFunction(() => SNSClientFactory.create(awsRegion), {
 			...commonInjectionOptions
 		}),
@@ -130,7 +118,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		notificationsService: asFunction((container) => new NotificationsService(app.log, container.schedulerClient, roleArn, container.snsClient, container.snsUtil), {
+		notificationsService: asFunction((container) => new NotificationsService(app.log, roleArn, container.snsClient, container.snsUtil), {
 			...commonInjectionOptions,
 		}),
 
