@@ -1,5 +1,4 @@
 import { FastifyBaseLogger } from "fastify";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { EngineJobDetails, EngineJobUpdatedDetails } from "@arcade/events";
 import ow from 'ow';
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
@@ -11,7 +10,6 @@ dayjs.extend(isBetween)
 
 export class NotificationsService {
 	constructor(readonly log: FastifyBaseLogger,
-				readonly schedulerClient: SchedulerClient,
 				readonly roleArn: string,
 				readonly snsClient: SNSClient,
 				readonly snsUtil: SnsUtil) {
