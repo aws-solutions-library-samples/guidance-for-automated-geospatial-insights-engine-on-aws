@@ -164,13 +164,70 @@
             "description": "The name of the Region.",
             "type": "string"
           },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
-          },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
+          "processingConfig": {
+            "description": "The processing configuration for the region.",
+            "type": "object",
+            "properties": {
+              "mode": {
+                "description": "The region processing mode.",
+                "default": "disabled",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "scheduled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "disabled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "onNewScene"
+                    ]
+                  }
+                ]
+              },
+              "scheduleExpression": {
+                "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                "type": "string"
+              },
+              "scheduleExpressionTimezone": {
+                "description": "The timezone in which the scheduling expression is evaluated.",
+                "type": "string"
+              },
+              "priority": {
+                "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                "default": "standard",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "low"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "high"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ]
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -180,7 +237,8 @@
           }
         },
         "required": [
-          "name"
+          "name",
+          "processingConfig"
         ],
         "title": "createRegionRequestBody"
       },
@@ -191,13 +249,70 @@
             "description": "The name of the Region.",
             "type": "string"
           },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
-          },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
+          "processingConfig": {
+            "description": "The processing configuration for the region.",
+            "type": "object",
+            "properties": {
+              "mode": {
+                "description": "The region processing mode.",
+                "default": "disabled",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "scheduled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "disabled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "onNewScene"
+                    ]
+                  }
+                ]
+              },
+              "scheduleExpression": {
+                "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                "type": "string"
+              },
+              "scheduleExpressionTimezone": {
+                "description": "The timezone in which the scheduling expression is evaluated.",
+                "type": "string"
+              },
+              "priority": {
+                "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                "default": "standard",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "low"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "high"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ]
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -231,13 +346,77 @@
             "description": "The total number of polygons under this region.",
             "type": "number"
           },
-          "scheduleExpression": {
-            "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-            "type": "string"
+          "processingConfig": {
+            "description": "The processing configuration for the region.",
+            "type": "object",
+            "properties": {
+              "mode": {
+                "description": "The region processing mode.",
+                "default": "disabled",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "scheduled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "disabled"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "onNewScene"
+                    ]
+                  }
+                ]
+              },
+              "scheduleExpression": {
+                "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                "type": "string"
+              },
+              "scheduleExpressionTimezone": {
+                "description": "The timezone in which the scheduling expression is evaluated.",
+                "type": "string"
+              },
+              "priority": {
+                "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                "default": "standard",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "low"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "standard"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "high"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ]
           },
-          "scheduleExpressionTimezone": {
-            "description": "The timezone in which the scheduling expression is evaluated.",
-            "type": "string"
+          "boundingBox": {
+            "description": "The bounding box of the region.",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           },
           "attributes": {
             "$ref": "#/components/schemas/def-0"
@@ -270,6 +449,7 @@
           "name",
           "totalArea",
           "totalPolygons",
+          "processingConfig",
           "createdBy",
           "createdAt"
         ],
@@ -588,6 +768,205 @@
           "states"
         ],
         "title": "stateList"
+      },
+      "def-19": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {}
+          },
+          "taskType": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update"
+            ],
+            "description": "Task type"
+          }
+        },
+        "required": [
+          "items",
+          "taskType"
+        ],
+        "title": "createTaskRequestBody"
+      },
+      "def-20": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique Polygon Task ID.",
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update"
+            ],
+            "description": "Task type"
+          },
+          "taskStatus": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "inProgress",
+              "success",
+              "failure"
+            ],
+            "description": "Task execution status"
+          },
+          "statusMessage": {
+            "description": "message for the status",
+            "type": "string"
+          },
+          "progress": {
+            "description": "total progress of the task",
+            "type": "number"
+          },
+          "batchesTotal": {
+            "description": "no. of batches the task has been split into",
+            "type": "number"
+          },
+          "batchesCompleted": {
+            "description": "no. of batches the task which have been completed",
+            "type": "number"
+          },
+          "itemsTotal": {
+            "description": "total number of items in the task",
+            "type": "number"
+          },
+          "itemsSucceeded": {
+            "description": "total number of items succeeded",
+            "type": "number"
+          },
+          "itemsFailed": {
+            "description": "no. of items failed",
+            "type": "number"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "taskType",
+          "taskStatus",
+          "itemsTotal",
+          "itemsSucceeded",
+          "itemsFailed",
+          "createdAt",
+          "createdBy"
+        ],
+        "title": "taskResource"
+      },
+      "def-21": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-20"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              },
+              "count": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "count"
+            ]
+          }
+        },
+        "required": [
+          "tasks"
+        ],
+        "title": "taskList"
+      },
+      "def-22": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the resource.",
+            "type": "string"
+          },
+          "taskId": {
+            "description": "Task id.",
+            "type": "string"
+          },
+          "resourceId": {
+            "description": "Unique Resource ID.",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "failure"
+            ],
+            "description": "Task item state"
+          },
+          "statusMessage": {
+            "description": "failure message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "taskItemResource"
+      },
+      "def-23": {
+        "type": "object",
+        "properties": {
+          "taskItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-22"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "description": "Token used to paginate to the next page of search result.",
+                "type": "string"
+              },
+              "count": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "count"
+            ]
+          }
+        },
+        "required": [
+          "taskItems"
+        ],
+        "title": "taskItemList"
       }
     }
   },
@@ -1456,8 +1835,11 @@
                   "summary": "Create a new region.",
                   "value": {
                     "name": "Abshire Harvest",
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth"
+                    "processingConfig": {
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
+                      "mode": "scheduled"
+                    }
                   }
                 }
               }
@@ -1528,13 +1910,77 @@
                       "description": "The total number of polygons under this region.",
                       "type": "number"
                     },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
+                    "processingConfig": {
+                      "description": "The processing configuration for the region.",
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "description": "The region processing mode.",
+                          "default": "disabled",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "scheduled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "disabled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "onNewScene"
+                              ]
+                            }
+                          ]
+                        },
+                        "scheduleExpression": {
+                          "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                          "type": "string"
+                        },
+                        "scheduleExpressionTimezone": {
+                          "description": "The timezone in which the scheduling expression is evaluated.",
+                          "type": "string"
+                        },
+                        "priority": {
+                          "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                          "default": "standard",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "low"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "standard"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "high"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "mode"
+                      ]
                     },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
+                    "boundingBox": {
+                      "description": "The bounding box of the region.",
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -1567,6 +2013,7 @@
                     "name",
                     "totalArea",
                     "totalPolygons",
+                    "processingConfig",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1578,8 +2025,11 @@
                       "id": "76ghytgt5",
                       "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
-                      "scheduleExpression": "rate(5 days)",
-                      "scheduleExpressionTimezone": "Australia/Perth",
+                      "processingConfig": {
+                        "scheduleExpression": "rate(5 days)",
+                        "scheduleExpressionTimezone": "Australia/Perth",
+                        "mode": "scheduled"
+                      },
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
                       "totalArea": 100,
@@ -1795,8 +2245,11 @@
                           "id": "76ghytgt5",
                           "groupId": "sjduwydjd",
                           "name": "Abshire Harvest",
-                          "scheduleExpression": "rate(5 days)",
-                          "scheduleExpressionTimezone": "Australia/Perth",
+                          "processingConfig": {
+                            "scheduleExpression": "rate(5 days)",
+                            "scheduleExpressionTimezone": "Australia/Perth",
+                            "mode": "scheduled"
+                          },
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
                           "totalArea": 100,
@@ -1811,7 +2264,12 @@
                           "updatedAt": "2022-08-12T07:34:23.132Z",
                           "updatedBy": "someoneelse@somewhere.com",
                           "totalArea": 100,
-                          "totalPolygons": 2
+                          "totalPolygons": 2,
+                          "processingConfig": {
+                            "scheduleExpression": "rate(5 days)",
+                            "scheduleExpressionTimezone": "Australia/Perth",
+                            "mode": "scheduled"
+                          }
                         },
                         {
                           "id": "rrwth876d",
@@ -1820,7 +2278,10 @@
                           "createdAt": "2022-08-10T23:55:20.322Z",
                           "createdBy": "someone@somewhere.com",
                           "totalArea": 100,
-                          "totalPolygons": 2
+                          "totalPolygons": 2,
+                          "processingConfig": {
+                            "mode": "disabled"
+                          }
                         }
                       ],
                       "pagination": {
@@ -1909,13 +2370,77 @@
                       "description": "The total number of polygons under this region.",
                       "type": "number"
                     },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
+                    "processingConfig": {
+                      "description": "The processing configuration for the region.",
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "description": "The region processing mode.",
+                          "default": "disabled",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "scheduled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "disabled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "onNewScene"
+                              ]
+                            }
+                          ]
+                        },
+                        "scheduleExpression": {
+                          "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                          "type": "string"
+                        },
+                        "scheduleExpressionTimezone": {
+                          "description": "The timezone in which the scheduling expression is evaluated.",
+                          "type": "string"
+                        },
+                        "priority": {
+                          "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                          "default": "standard",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "low"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "standard"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "high"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "mode"
+                      ]
                     },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
+                    "boundingBox": {
+                      "description": "The bounding box of the region.",
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -1948,6 +2473,7 @@
                     "name",
                     "totalArea",
                     "totalPolygons",
+                    "processingConfig",
                     "createdBy",
                     "createdAt"
                   ]
@@ -1959,8 +2485,11 @@
                       "id": "76ghytgt5",
                       "groupId": "sjduwydjd",
                       "name": "Abshire Harvest",
-                      "scheduleExpression": "rate(5 days)",
-                      "scheduleExpressionTimezone": "Australia/Perth",
+                      "processingConfig": {
+                        "scheduleExpression": "rate(5 days)",
+                        "scheduleExpressionTimezone": "Australia/Perth",
+                        "mode": "scheduled"
+                      },
                       "createdAt": "2022-08-10T23:55:20.322Z",
                       "createdBy": "someone@somewhere.com",
                       "totalArea": 100,
@@ -2104,15 +2633,22 @@
                   "summary": "Update an existing region.",
                   "value": {
                     "name": "Abshire Harvest",
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth"
+                    "processingConfig": {
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
+                      "mode": "scheduled"
+                    }
                   }
                 },
                 "Changing tags": {
                   "summary": "Changing the tags of a region.",
                   "value": {
-                    "scheduleExpression": "rate(5 days)",
-                    "scheduleExpressionTimezone": "Australia/Perth",
+                    "processingConfig": {
+                      "mode": "scheduled",
+                      "scheduleExpression": "rate(5 days)",
+                      "scheduleExpressionTimezone": "Australia/Perth",
+                      "priority": "high"
+                    },
                     "tags": {
                       "tier": "GOLD"
                     }
@@ -2186,13 +2722,77 @@
                       "description": "The total number of polygons under this region.",
                       "type": "number"
                     },
-                    "scheduleExpression": {
-                      "description": "The expression that defines when the schedule runs. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
-                      "type": "string"
+                    "processingConfig": {
+                      "description": "The processing configuration for the region.",
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "description": "The region processing mode.",
+                          "default": "disabled",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "scheduled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "disabled"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "onNewScene"
+                              ]
+                            }
+                          ]
+                        },
+                        "scheduleExpression": {
+                          "description": "The expression that defines when the schedule runs, required when mode is set to scheduled. The following formats are supported.\n\n    at expression - at(yyyy-mm-ddThh:mm:ss)\n\n    rate expression - rate(value unit)\n\n    cron expression - cron(fields)\n\nYou can use at expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use rate and cron expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.\n\nA cron expression consists of six fields separated by white spaces: (minutes hours day_of_month month day_of_week year).\n\nA rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ",
+                          "type": "string"
+                        },
+                        "scheduleExpressionTimezone": {
+                          "description": "The timezone in which the scheduling expression is evaluated.",
+                          "type": "string"
+                        },
+                        "priority": {
+                          "description": "The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'",
+                          "default": "standard",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "low"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "standard"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "high"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "mode"
+                      ]
                     },
-                    "scheduleExpressionTimezone": {
-                      "description": "The timezone in which the scheduling expression is evaluated.",
-                      "type": "string"
+                    "boundingBox": {
+                      "description": "The bounding box of the region.",
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
                     },
                     "attributes": {
                       "$ref": "#/components/schemas/def-0"
@@ -2225,6 +2825,7 @@
                     "name",
                     "totalArea",
                     "totalPolygons",
+                    "processingConfig",
                     "createdBy",
                     "createdAt"
                   ]
@@ -2241,7 +2842,12 @@
                       "updatedAt": "2022-08-12T07:34:23.132Z",
                       "updatedBy": "someoneelse@somewhere.com",
                       "totalArea": 100,
-                      "totalPolygons": 2
+                      "totalPolygons": 2,
+                      "processingConfig": {
+                        "scheduleExpression": "rate(5 days)",
+                        "scheduleExpressionTimezone": "Australia/Perth",
+                        "mode": "scheduled"
+                      }
                     }
                   }
                 }
@@ -4471,6 +5077,1440 @@
                       "description": "Name `xyz` already exists."
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/polygonTasks": {
+      "post": {
+        "operationId": "createPolygonTask",
+        "summary": "Start a task to create polygon in bulk.",
+        "tags": [
+          "PolygonTasks"
+        ],
+        "description": "The endpoint allows user to create polygon resource in bulk. Typically used when performing bulk import of resources from external sources such as file.\n\nPermissions:\n- Only `contributor` and above may create new polygon tasks.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-19"
+              },
+              "examples": {
+                "New polygon task": {
+                  "summary": "Create a new polygon task.",
+                  "value": {
+                    "items": [
+                      {
+                        "name": "Field 1",
+                        "regionId": "Region 1",
+                        "boundary": [
+                          [
+                            -104.5079674,
+                            39.9194752
+                          ],
+                          [
+                            -104.4894065,
+                            39.9193435
+                          ],
+                          [
+                            -104.4893912,
+                            39.9122295
+                          ],
+                          [
+                            -104.5078877,
+                            39.9123941
+                          ],
+                          [
+                            -104.5079674,
+                            39.9194752
+                          ]
+                        ]
+                      },
+                      {
+                        "name": "Field 2",
+                        "regionId": "Region 2",
+                        "boundary": [
+                          [
+                            -104.5079674,
+                            39.9194752
+                          ],
+                          [
+                            -104.4894065,
+                            39.9193435
+                          ],
+                          [
+                            -104.4893912,
+                            39.9122295
+                          ],
+                          [
+                            -104.5078877,
+                            39.9123941
+                          ],
+                          [
+                            -104.5079674,
+                            39.9194752
+                          ]
+                        ]
+                      }
+                    ],
+                    "taskType": "create"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Polygon Task ID.",
+                      "type": "string"
+                    },
+                    "taskType": {
+                      "type": "string",
+                      "enum": [
+                        "create",
+                        "update"
+                      ],
+                      "description": "Task type"
+                    },
+                    "taskStatus": {
+                      "type": "string",
+                      "enum": [
+                        "waiting",
+                        "inProgress",
+                        "success",
+                        "failure"
+                      ],
+                      "description": "Task execution status"
+                    },
+                    "statusMessage": {
+                      "description": "message for the status",
+                      "type": "string"
+                    },
+                    "progress": {
+                      "description": "total progress of the task",
+                      "type": "number"
+                    },
+                    "batchesTotal": {
+                      "description": "no. of batches the task has been split into",
+                      "type": "number"
+                    },
+                    "batchesCompleted": {
+                      "description": "no. of batches the task which have been completed",
+                      "type": "number"
+                    },
+                    "itemsTotal": {
+                      "description": "total number of items in the task",
+                      "type": "number"
+                    },
+                    "itemsSucceeded": {
+                      "description": "total number of items succeeded",
+                      "type": "number"
+                    },
+                    "itemsFailed": {
+                      "description": "no. of items failed",
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "taskType",
+                    "taskStatus",
+                    "itemsTotal",
+                    "itemsSucceeded",
+                    "itemsFailed",
+                    "createdAt",
+                    "createdBy"
+                  ]
+                },
+                "examples": {
+                  "New polygon task": {
+                    "summary": "New polygon task created successfully.",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "taskType": "create",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected array to not be empty."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listPolygonTasks",
+        "summary": "List all polygon tasks.",
+        "tags": [
+          "PolygonTasks"
+        ],
+        "description": "List all polygon tasks.\n\nPermissions:\n- `readers` may list polygon tasks.\n",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "paginationToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-20"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "count"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "tasks"
+                  ]
+                },
+                "examples": {
+                  "List of polygons": {
+                    "summary": "Paginated list of polygons.",
+                    "value": {
+                      "tasks": [
+                        {
+                          "id": "string",
+                          "taskStatus": "waiting",
+                          "taskType": "create",
+                          "statusMessage": "string",
+                          "progress": 50,
+                          "itemsTotal": 100,
+                          "itemsSucceeded": 99,
+                          "itemsFailed": 1,
+                          "createdAt": "2022-08-30T03:18:26.809Z",
+                          "createdBy": "someone@somewhere"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/polygonTasks/{taskId}": {
+      "get": {
+        "tags": [
+          "Polygon Task"
+        ],
+        "description": "Retrieve details of an polygon task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Unique Polygon Task ID."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-20"
+                },
+                "examples": {
+                  "Existing Polygon Task": {
+                    "summary": "Polygon Task Details",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "taskType": "create",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/polygonTasks/{taskId}/taskItems": {
+      "get": {
+        "operationId": "listPolygonTaskItems",
+        "tags": [
+          "Polygon Task Items"
+        ],
+        "description": "Lists polygons task items",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromName",
+            "required": false,
+            "description": "Id to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "description": "filter by status of the tasks, i.e. success, failure"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Task id."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-23"
+                },
+                "examples": {
+                  "List of task items": {
+                    "summary": "Paginated list of polygon task items",
+                    "value": {
+                      "taskItems": [
+                        {
+                          "name": "testPolygon"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/polygonTasks/{taskId}/taskItems/{name}": {
+      "get": {
+        "tags": [
+          "Task Item"
+        ],
+        "description": "Retrieve details of an polygon task item in an activity task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Task id."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": "Name of the resource."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-22"
+                },
+                "examples": {
+                  "Existing Polygon Task Item": {
+                    "summary": "Polygon Task Item Details",
+                    "value": {
+                      "name": "testPolygon"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/polygonTasks/{id}": {
+      "delete": {
+        "operationId": "deletePolygonTask",
+        "summary": "Deletes an polygon task",
+        "tags": [
+          "Polygon Tasks"
+        ],
+        "description": "Deletes an polygon task.\n\nPermissions:\n- Only `admin` and above may delete polygon tasks.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Unique Polygon Task ID."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regionTasks": {
+      "post": {
+        "operationId": "createRegionTask",
+        "summary": "Start a task to create region in bulk.",
+        "tags": [
+          "RegionTasks"
+        ],
+        "description": "The endpoint allows user to create region resource in bulk. Typically used when performing bulk import of resources from external sources such as file.\n\nPermissions:\n- Only `admin` and above may create new region tasks.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-19"
+              },
+              "examples": {
+                "New region task": {
+                  "summary": "Create a new region task.",
+                  "value": {
+                    "items": [
+                      {
+                        "groupId": "groupId1",
+                        "name": "region1",
+                        "processingConfig": {
+                          "mode": "onNewScene"
+                        }
+                      },
+                      {
+                        "groupId": "groupId2",
+                        "name": "region2",
+                        "processingConfig": {
+                          "mode": "disabled"
+                        }
+                      }
+                    ],
+                    "taskType": "create"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Unique Polygon Task ID.",
+                      "type": "string"
+                    },
+                    "taskType": {
+                      "type": "string",
+                      "enum": [
+                        "create",
+                        "update"
+                      ],
+                      "description": "Task type"
+                    },
+                    "taskStatus": {
+                      "type": "string",
+                      "enum": [
+                        "waiting",
+                        "inProgress",
+                        "success",
+                        "failure"
+                      ],
+                      "description": "Task execution status"
+                    },
+                    "statusMessage": {
+                      "description": "message for the status",
+                      "type": "string"
+                    },
+                    "progress": {
+                      "description": "total progress of the task",
+                      "type": "number"
+                    },
+                    "batchesTotal": {
+                      "description": "no. of batches the task has been split into",
+                      "type": "number"
+                    },
+                    "batchesCompleted": {
+                      "description": "no. of batches the task which have been completed",
+                      "type": "number"
+                    },
+                    "itemsTotal": {
+                      "description": "total number of items in the task",
+                      "type": "number"
+                    },
+                    "itemsSucceeded": {
+                      "description": "total number of items succeeded",
+                      "type": "number"
+                    },
+                    "itemsFailed": {
+                      "description": "no. of items failed",
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "description": "Date/time created",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "createdBy": {
+                      "description": "ID of owner.",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "Date/time updated",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updatedBy": {
+                      "description": "Last ID of user who made a change.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "taskType",
+                    "taskStatus",
+                    "itemsTotal",
+                    "itemsSucceeded",
+                    "itemsFailed",
+                    "createdAt",
+                    "createdBy"
+                  ]
+                },
+                "examples": {
+                  "New region task": {
+                    "summary": "New region task created successfully.",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "taskType": "create",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request.",
+                    "value": {
+                      "description": "Expected array to not be empty."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listRegionTasks",
+        "summary": "List all region tasks.",
+        "tags": [
+          "Region Tasks"
+        ],
+        "description": "List all region tasks.\n\nPermissions:\n- `readers` may list region tasks.\n",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "paginationToken",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/def-20"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "description": "Token used to paginate to the next page of search result.",
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "count"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "tasks"
+                  ]
+                },
+                "examples": {
+                  "List of regions": {
+                    "summary": "Paginated list of regions.",
+                    "value": {
+                      "tasks": [
+                        {
+                          "id": "string",
+                          "taskStatus": "waiting",
+                          "taskType": "create",
+                          "statusMessage": "string",
+                          "progress": 50,
+                          "itemsTotal": 100,
+                          "itemsSucceeded": 99,
+                          "itemsFailed": 1,
+                          "createdAt": "2022-08-30T03:18:26.809Z",
+                          "createdBy": "someone@somewhere"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regionTasks/{taskId}": {
+      "get": {
+        "tags": [
+          "Region Task"
+        ],
+        "description": "Retrieve details of an region task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Unique Region Task ID."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-20"
+                },
+                "examples": {
+                  "Existing Region Task": {
+                    "summary": "Region Task Details",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "taskType": "create",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regionTasks/{taskId}/taskItems": {
+      "get": {
+        "operationId": "listRegionTaskItems",
+        "tags": [
+          "Region Task Items"
+        ],
+        "description": "Lists polygons task items",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromName",
+            "required": false,
+            "description": "Id to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "description": "filter by status of the tasks, i.e. success, failure"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Task id."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-23"
+                },
+                "examples": {
+                  "List of task items": {
+                    "summary": "Paginated list of polygon task items",
+                    "value": {
+                      "taskItems": [
+                        {
+                          "name": "testPolygon"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regionTasks/{taskId}/taskItems/{name}": {
+      "get": {
+        "tags": [
+          "Task Item"
+        ],
+        "description": "Retrieve details of an polygon task item in an activity task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Task id."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": "Name of the resource."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-22"
+                },
+                "examples": {
+                  "Existing Region Task Item": {
+                    "summary": "Region Task Item Details",
+                    "value": {
+                      "name": "testPolygon"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regionTasks/{id}": {
+      "delete": {
+        "operationId": "deleteRegionTask",
+        "summary": "Deletes an region task",
+        "tags": [
+          "Region Tasks"
+        ],
+        "description": "Deletes an region task.\n\nPermissions:\n- Only `admin` and above may delete region tasks.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Unique Region Task ID."
+          },
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }

@@ -60,4 +60,8 @@ await getValues('regions', {
 	TABLE_NAME: 'tableName',
 });
 
+await getValues('regions', {
+	TASK_QUEUE_URL: 'taskQueueUrl',
+});
+
 fs.writeFileSync('.env', outputFile);

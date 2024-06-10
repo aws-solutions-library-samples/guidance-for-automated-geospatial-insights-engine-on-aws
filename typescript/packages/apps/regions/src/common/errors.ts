@@ -11,6 +11,15 @@
  *  and limitations under the License.
  */
 
+
+export class PolygonTaskDefinitionError extends Error {
+	public constructor(message: string) {
+		super(message);
+		this.name = 'PolygonTaskDefinitionError';
+	}
+}
+
+
 export class NotFoundError extends Error {
 	public constructor(message: string) {
 		super(message);

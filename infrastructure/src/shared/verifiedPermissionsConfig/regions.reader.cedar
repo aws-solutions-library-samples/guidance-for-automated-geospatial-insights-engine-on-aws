@@ -11,7 +11,17 @@ permit (
         Arcade::Action::"DescribePolygon",
 
         Arcade::Action::"ListStates",
-        Arcade::Action::"DescribeState"
+        Arcade::Action::"DescribeState",
+
+        Arcade::Action::"ListRegionTasks",
+        Arcade::Action::"DescribeRegionTask",
+        Arcade::Action::"ListRegionTaskItems",
+        Arcade::Action::"DescribeRegionTaskItem",
+
+        Arcade::Action::"ListPolygonTasks",
+        Arcade::Action::"DescribePolygonTask",
+        Arcade::Action::"ListPolygonTaskItems",
+        Arcade::Action::"DescribePolygonTaskItem"
     ],
     resource
 )

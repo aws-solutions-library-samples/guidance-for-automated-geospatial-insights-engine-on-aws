@@ -36,6 +36,14 @@ import { TagUtils } from '../tags/tags.util.js';
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { AggregatorService } from "../aggregator/service.js";
+import { PolygonTaskService } from "../api/polygonTasks/service.js";
+import { PolygonTaskWorkflowProcessor } from "../api/polygonTasks/workflows/processor.js";
+import { TaskRepository } from '../common/tasks/repository.js';
+import { TaskItemRepository } from '../common/taskItems/repository.js';
+import { TaskItemService } from "../common/taskItems/service.js";
+import { PkType } from "../common/pkTypes.js";
+import { RegionTaskService } from "../api/regionTasks/service.js";
+import { RegionTaskWorkflowProcessor } from "../api/regionTasks/workflows/processor.js";
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -59,6 +67,16 @@ declare module '@fastify/awilix' {
 		apiAuthorizer: ApiAuthorizer;
 		avpClient: VerifiedPermissionsClient;
 		aggregatorService: AggregatorService;
+		regionTaskRepository: TaskRepository;
+		regionTaskService: RegionTaskService;
+		regionTaskItemRepository: TaskItemRepository;
+		regionTaskItemService: TaskItemService;
+		regionTaskWorkflowProcessor: RegionTaskWorkflowProcessor;
+		polygonTaskRepository: TaskRepository;
+		polygonTaskService: PolygonTaskService;
+		polygonTaskItemRepository: TaskItemRepository;
+		polygonTaskItemService: TaskItemService;
+		polygonTaskWorkflowProcessor: PolygonTaskWorkflowProcessor;
 	}
 }
 
@@ -198,5 +216,47 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
+
+		polygonTaskService: asFunction((c: Cradle) => new PolygonTaskService(app.log, c.polygonTaskRepository, c.commonRepository, app.config.TASK_BATCH_SIZE, c.sqsClient, app.config.TASK_QUEUE_URL, app.config.TASK_PARALLEL_LIMIT), {
+			...commonInjectionOptions,
+		}),
+
+		polygonTaskRepository: asFunction((c: Cradle) => new TaskRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, PkType.PolygonTask), {
+			...commonInjectionOptions,
+		}),
+
+		polygonTaskWorkflowProcessor: asFunction((c: Cradle) => new PolygonTaskWorkflowProcessor(app.log, c.polygonService, c.polygonTaskService, c.polygonTaskItemService, app.config.TASK_PARALLEL_LIMIT), {
+			...commonInjectionOptions,
+		}),
+
+		polygonTaskItemRepository: asFunction((c: Cradle) => new TaskItemRepository(app.log, c.dynamoDBDocumentClient, tableName, PkType.PolygonTask, PkType.PolygonTaskItem), {
+			...commonInjectionOptions,
+		}),
+
+		polygonTaskItemService: asFunction((c: Cradle) => new TaskItemService(app.log, c.polygonTaskItemRepository), {
+			...commonInjectionOptions,
+		}),
+
+		regionTaskRepository: asFunction((c: Cradle) => new TaskRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, PkType.RegionTask), {
+			...commonInjectionOptions,
+		}),
+
+		regionTaskService: asFunction((c: Cradle) => new RegionTaskService(app.log, c.regionTaskRepository, c.commonRepository, app.config.TASK_BATCH_SIZE, c.sqsClient, app.config.TASK_QUEUE_URL, app.config.TASK_PARALLEL_LIMIT), {
+			...commonInjectionOptions,
+		}),
+
+		regionTaskItemRepository: asFunction((c: Cradle) => new TaskItemRepository(app.log, c.dynamoDBDocumentClient, tableName, PkType.RegionTask, PkType.RegionTaskItem), {
+			...commonInjectionOptions,
+		}),
+
+		regionTaskItemService: asFunction((c: Cradle) => new TaskItemService(app.log, c.regionTaskItemRepository), {
+			...commonInjectionOptions,
+		}),
+
+		regionTaskWorkflowProcessor: asFunction((c: Cradle) => new RegionTaskWorkflowProcessor(app.log, c.regionService, c.regionTaskService, c.regionTaskItemService, app.config.TASK_PARALLEL_LIMIT), {
+			...commonInjectionOptions,
+		}),
+
+
 	});
 });

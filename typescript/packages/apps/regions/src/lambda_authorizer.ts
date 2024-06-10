@@ -22,6 +22,34 @@ const app: FastifyInstance = await buildLightApp();
 const di: AwilixContainer = app.diContainer;
 
 const ACTION_MAP = {
+	regionTasks: {
+		GET: 'ListRegionTasks',
+		POST: 'CreateRegionTask',
+		'*': {
+			GET: 'DescribeRegionTask',
+			DELETE: 'DeleteRegionTask',
+			taskItems: {
+				GET: 'ListRegionTaskItems',
+				'*': {
+					GET: 'GetRegionTaskItem',
+				}
+			},
+		},
+	},
+	polygonTasks: {
+		GET: 'ListPolygonTasks',
+		POST: 'CreatePolygonTask',
+		'*': {
+			GET: 'DescribePolygonTask',
+			DELETE: 'DeletePolygonTask',
+			taskItems: {
+				GET: 'ListPolygonTaskItems',
+				'*': {
+					GET: 'GetPolygonTaskItem',
+				}
+			},
+		},
+	},
 	groups: {
 		GET: 'ListGroups',
 		POST: 'CreateGroup',
