@@ -43,6 +43,8 @@ export const groupId = Type.String({ description: 'Unique Group ID.' });
 export const regionId = Type.String({ description: 'Unique Region ID.' });
 export const polygonId = Type.String({ description: 'Unique Polygon ID.' });
 export const stateId = Type.String({ description: 'Unique State ID.' });
+export const polygonTaskId = Type.String({ description: 'Unique Polygon Task ID.' });
+export const regionTaskId = Type.String({ description: 'Unique Region Task ID.' });
 
 export const createdBy = Type.String({ description: 'ID of owner.' });
 export const createdAt = Type.String({

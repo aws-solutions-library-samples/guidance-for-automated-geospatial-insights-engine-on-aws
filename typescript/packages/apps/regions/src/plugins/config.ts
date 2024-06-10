@@ -24,6 +24,9 @@ export const configSchema = Type.Object({
 	NODE_ENV: Type.String({ default: 'local' }),
 	PORT: Type.Number({ default: 30001 }),
 	TABLE_NAME: Type.String(),
+	TASK_QUEUE_URL: Type.String(),
+	TASK_BATCH_SIZE: Type.Number({ default: 100 }),
+	TASK_PARALLEL_LIMIT: Type.Number({ default: 20 }),
 });
 
 export type ConfigSchemaType = Static<typeof configSchema>;

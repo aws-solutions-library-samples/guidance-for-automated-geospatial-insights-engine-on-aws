@@ -218,7 +218,92 @@
 					"resourceTypes": ["Resource"],
 					"principalTypes": ["User"]
 				}
-			}
+			},
+			"CreateRegionTask": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListRegionTasks": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribeRegionTask": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeleteRegionTask": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+            "ListRegionTaskItems": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+            "DescribeRegionTaskItem": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+
+            "CreatePolygonTask": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+            "ListPolygonTasks": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+            "DescribePolygonTask": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+			"DeletePolygonTask": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+            "ListPolygonTaskItems": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            },
+            "DescribePolygonTaskItem": {
+              "appliesTo": {
+                "context": { "type": "Record", "attributes": {} },
+                "resourceTypes": ["Resource"],
+                "principalTypes": ["User"]
+              }
+            }
 		}
 	}
 }

@@ -23,7 +23,21 @@ permit (
         Arcade::Action::"ListStates",
         Arcade::Action::"DescribeState",
         Arcade::Action::"UpdateState",
-        Arcade::Action::"DeleteState"
+        Arcade::Action::"DeleteState",
+
+        Arcade::Action::"ListRegionTasks",
+        Arcade::Action::"DescribeRegionTask",
+        Arcade::Action::"CreateRegionTask",
+        Arcade::Action::"DeleteRegionTask",
+        Arcade::Action::"ListRegionTaskItems",
+        Arcade::Action::"DescribeRegionTaskItem",
+
+        Arcade::Action::"ListPolygonTasks",
+        Arcade::Action::"DescribePolygonTask",
+        Arcade::Action::"CreatePolygonTask",
+        Arcade::Action::"DeletePolygonTask",
+        Arcade::Action::"ListPolygonTaskItems",
+        Arcade::Action::"DescribePolygonTaskItem"
     ],
     resource
 )

@@ -11,17 +11,9 @@
  *  and limitations under the License.
  */
 
-export enum PkType {
-	Group = 'g',
-	Region = 'r',
-	Polygon = 'p',
-	State = 's',
-	LatestState = 'ps',
-	TagKey = 'tk',
-	TagValue = 'tv',
-	Timestamp = 'ts',
-	PolygonTask = 'pt',
-	PolygonTaskItem = 'pi',
-	RegionTask = 'rt',
-	RegionTaskItem = 'ri'
+
+import { TaskBatch } from "./schemas.js";
+
+export interface WorkflowAction {
+	process(task: TaskBatch): Promise<void>;
 }

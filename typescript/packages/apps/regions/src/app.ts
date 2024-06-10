@@ -26,7 +26,13 @@ import createPolygonRoute from './api/polygons/create.handler.js';
 import deletePolygonRoute from './api/polygons/delete.handler.js';
 import getPolygonRoute from './api/polygons/get.handler.js';
 import listPolygonsRoute from './api/polygons/list.handler.js';
-import { createPolygonRequestBody, editPolygonRequestBody, polygonCoordinates, polygonList, polygonResource } from './api/polygons/schemas.js';
+import {
+	createPolygonRequestBody,
+	editPolygonRequestBody,
+	polygonCoordinates,
+	polygonList,
+	polygonResource
+} from './api/polygons/schemas.js';
 import updatePolygonRoute from './api/polygons/update.handler.js';
 import createRegionRoute from './api/regions/create.handler.js';
 import deleteRegionRoute from './api/regions/delete.handler.js';
@@ -46,6 +52,23 @@ import { authzPlugin } from './plugins/authz.js';
 import config from './plugins/config.js';
 import moduleAwilix from './plugins/module.awilix.js';
 import swagger from './plugins/swagger.js';
+
+import createPolygonTaskRoute from './api/polygonTasks/create.handler.js'
+import listPolygonTasksRoute from './api/polygonTasks/list.handler.js'
+import getPolygonTaskRoute from './api/polygonTasks/get.handler.js'
+import listPolygonTaskItemsRoute from './api/polygonTaskItems/list.handler.js'
+import getPolygonTaskItemRoute from './api/polygonTaskItems/get.handler.js'
+import deletePolygonTaskRoute from './api/polygonTasks/delete.handler.js'
+
+import createRegionTaskRoute from './api/regionTasks/create.handler.js'
+import listRegionTasksRoute from './api/regionTasks/list.handler.js'
+import getRegionTaskRoute from './api/regionTasks/get.handler.js'
+import listRegionTaskItemsRoute from './api/regionTaskItems/list.handler.js'
+import getRegionTaskItemRoute from './api/regionTaskItems/get.handler.js'
+import deleteRegionTaskRoute from './api/regionTasks/delete.handler.js'
+
+import { createTaskRequestBody, taskList, taskResource } from "./common/tasks/schemas.js";
+import { taskItemList, taskItemResource } from "./common/taskItems/schemas.js";
 
 export const buildApp = async (): Promise<FastifyInstance> => {
 	const node_env = process.env['NODE_ENV'] as string;
@@ -119,6 +142,12 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 	app.addSchema(stateResource);
 	app.addSchema(stateList);
 
+	app.addSchema(createTaskRequestBody);
+	app.addSchema(taskResource);
+	app.addSchema(taskList);
+	app.addSchema(taskItemResource);
+	app.addSchema(taskItemList);
+
 	await app.register(createGroupRoute);
 	await app.register(listGroupsRoute);
 	await app.register(getGroupRoute);
@@ -142,6 +171,20 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 	await app.register(getStateRoute);
 	await app.register(deleteStateRoute);
 	await app.register(updateStateRoute);
+
+	await app.register(createPolygonTaskRoute);
+	await app.register(listPolygonTasksRoute);
+	await app.register(getPolygonTaskRoute);
+	await app.register(listPolygonTaskItemsRoute);
+	await app.register(getPolygonTaskItemRoute);
+	await app.register(deletePolygonTaskRoute);
+
+	await app.register(createRegionTaskRoute);
+	await app.register(listRegionTasksRoute);
+	await app.register(getRegionTaskRoute);
+	await app.register(listRegionTaskItemsRoute);
+	await app.register(getRegionTaskItemRoute);
+	await app.register(deleteRegionTaskRoute);
 
 	return app as unknown as FastifyInstance;
 };

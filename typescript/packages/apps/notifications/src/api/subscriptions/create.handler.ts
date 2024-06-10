@@ -28,7 +28,7 @@ export default function createSubscriptionRoute(fastify: FastifyTypebox, _option
 			description: `Create a new subscription.
 
 Permissions:
-- Only \`admin\` and above may create new subscriptions.
+- Only \`contributor\` and above may create new subscriptions.
 `,
 			tags: ['Subscriptions'],
 			headers: commonHeaders,
