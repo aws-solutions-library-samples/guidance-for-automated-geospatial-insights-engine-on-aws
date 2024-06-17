@@ -148,14 +148,14 @@ export const regionsApiSlice = createApi({
 			}),
 			providesTags: (_result, _error, id) => [{ type: 'Region', id }],
 		}),
-		createRegion: builder.mutation<Region, CreateRegion>({
-			query: (body) => ({
-				url: `/regions`,
+		createRegion: builder.mutation<Region, { groupId: string; body: CreateRegion }>({
+			query: ({ groupId, body }) => ({
+				url: `/groups/${groupId}/regions`,
 				mode: 'cors',
 				method: 'POST',
 				body,
 			}),
-			invalidatesTags: [{ type: 'Region', id: 'LIST' }],
+			invalidatesTags: (_result, _error, { groupId }) => [{ type: 'Region', id: 'LIST' }, ...invalidatesList(groupId, 'Group')],
 		}),
 		updateRegion: builder.mutation<Region, { id: string; body: EditRegion }>({
 			query: ({ id, body }) => ({
@@ -172,7 +172,8 @@ export const regionsApiSlice = createApi({
 				mode: 'cors',
 				method: 'DELETE',
 			}),
-			invalidatesTags: (_result, _error, id) => invalidatesList(id, 'Region'),
+			// Should invalidate parent group
+			invalidatesTags: (_result, _error, id) => [...invalidatesList(id, 'Region')],
 		}),
 
 		// Polygons
@@ -228,13 +229,11 @@ export const regionsApiSlice = createApi({
 
 		// States
 		listStates: builder.query<StateList, ListPaginationOptions & TagFilterOptions & StateListFilterOptions>({
-			query: ({ groupId, regionId, polygonId, latestOnly, count, paginationToken }) => ({
+			query: ({ polygonId, latestOnly, count, paginationToken }) => ({
 				url: `/states`,
 				mode: 'cors',
 				method: 'GET',
 				params: {
-					groupId,
-					regionId,
 					polygonId,
 					latestOnly,
 					count,

@@ -123,18 +123,9 @@ class ArcadeSTACBackend(BaseBackend):
         query["intersects"] = geom
         query["fields"] = {
             "exclude": [
-                "assets.blue",
-                "assets.green",
-                "assets.ndvi_change",
-                "assets.nir08",
-                "assets.red",
-                "assets.scl_surface",
-                "assets.nitrogen_metadata",
-                "assets.ndvi_raw",
-                "assets.scl",
+                "assets",
                 "stac_version",
             ],
-            "include": ["assets.ndvi"],
         }
         query["sortBy"] = [{"field": "properties.datetime", "direction": "desc"}]
         if self.arcade_filters.timestamp is not None:
@@ -152,6 +143,8 @@ class ArcadeSTACBackend(BaseBackend):
 
         for feature in features:
             id_parts = feature["id"].split("_")
+            if len(id_parts) != 2:
+                continue
             polygon_id = id_parts[1]
             collection = feature["collection"]
             datetime_obj = datetime.fromisoformat(feature["properties"]["datetime"])
@@ -301,3 +294,29 @@ def get_query() -> Dict:
     """Get the query from the user."""
     query = {}
     return query
+
+def fetch_feature(stac_url: str,
+    auth_token: Optional[str] = None,
+    collection_id: str = None,
+    item_id: str = None):
+    headers = {
+        "Content-Type": "application/json",
+        "Accept-Encoding": "gzip",
+        "Accept": "application/geo+json",
+        "Authorization": auth_token,
+    }
+    url = f"{stac_url}/collections/{collection_id}/items/{item_id}"
+    if collection_id is None or item_id is None:
+        raise ValueError("Both collection_id and item_id must be provided.")
+    try:
+        r = httpx.get(url, headers=headers)
+        r.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        # post-flight errors
+        status_code = e.response.status_code
+        exc = _HTTP_EXCEPTIONS.get(status_code, MosaicError)
+        raise exc(e.response.content) from e
+    except httpx.RequestError as e:
+        # pre-flight errors
+        raise MosaicError(e.args[0].reason) from e
+    return r.json()

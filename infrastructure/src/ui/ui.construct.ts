@@ -2,9 +2,9 @@ import { getLambdaArchitecture } from '@arcade/cdk-common';
 import { IdentityPool, UserPoolAuthenticationProvider } from '@aws-cdk/aws-cognito-identitypool-alpha';
 import { Duration } from 'aws-cdk-lib';
 import { Cors } from 'aws-cdk-lib/aws-apigateway';
-import { CorsHttpMethod, HttpApi, HttpMethod, HttpNoneAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2';
+import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpUserPoolAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
-import { HttpLambdaIntegration, HttpUrlIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { IUserPoolClient, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Code, Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
@@ -17,6 +17,7 @@ import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { userPoolClientIdParameter } from '../shared/cognito.construct.js';
+import { StaticSite } from './ui.staticSite.construct.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,22 +84,14 @@ export class UIModule extends Construct {
 		 * Define the API Gateway
 		 */
 
-		// For now reads from the shared account bucket and a trust to this role is manually added to the bucket policy
 		const dataBucket = Bucket.fromBucketName(this, 'DataBucket', props.bucketName);
 		dataBucket.grantRead(apiLambda);
 
 		const userPool = UserPool.fromUserPoolId(this, 'UserPool', props.cognitoUserPoolId);
 
-		// const client = userPool.addClient('UIClient', {
-		// 	authFlows: {
-		// 		userPassword: true,
-		// 		userSrp: true,
-		// 	},
-		// });
 		const client = UserPoolClient.fromUserPoolClientId(this, 'UIClient', StringParameter.valueForStringParameter(this, userPoolClientIdParameter(props.environment)));
 
 		const lambdaIntegration = new HttpLambdaIntegration('HttpLambdaIntegration', apiLambda);
-		const proxyIntegration = new HttpUrlIntegration('HttpUrlIntegration', 'https://earth-search.aws.element84.com/v0/search', {});
 		const userPoolAuthorizer = new HttpUserPoolAuthorizer('Authorizer', userPool, {
 			userPoolClients: [client],
 		});
@@ -117,16 +110,6 @@ export class UIModule extends Construct {
 			methods: [HttpMethod.DELETE, HttpMethod.GET, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT],
 			integration: lambdaIntegration,
 			authorizer: userPoolAuthorizer,
-		});
-
-		/**
-		 * A proxy route for searching the STAC server
-		 */
-		httpApi.addRoutes({
-			path: '/search',
-			methods: [HttpMethod.DELETE, HttpMethod.GET, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT],
-			integration: proxyIntegration,
-			authorizer: new HttpNoneAuthorizer(),
 		});
 
 		const prodStage = httpApi.addStage('ProdStage', {
@@ -169,8 +152,7 @@ export class UIModule extends Construct {
 			})
 		);
 
-		// Temporarily disabled while figuring out deployment environments
-		// new StaticSite(this, 'Deployment');
+		new StaticSite(this, 'Deployment');
 
 		new StringParameter(this, 'UIApiIdParameter', {
 			parameterName: uiApiIdParameter(props.environment),

@@ -1,24 +1,28 @@
 import { CreateRegion } from '@arcade/regions';
-import { Button, Container, ContentLayout, Form, FormField, Header, Input, SpaceBetween } from '@cloudscape-design/components';
+import { Button, Container, ContentLayout, Form, FormField, Header, Input, Select, SpaceBetween } from '@cloudscape-design/components';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from '../../shared/Breadcrumbs';
 import Shell from '../../shared/Shell';
 import { useCreateRegionMutation } from '../../slices/regionsApiSlice';
+interface ChangeSelectEventDetail {
+	selectedOption: any;
+}
 
-const defaultFarm: CreateRegion = {
-	name: '',
-	processingConfig: {
-		mode: 'scheduled',
-		// scheduleExpression,
-		// scheduleExpressionTimezone
-		priority: 'standard',
-	},
-};
 export default function CreateFarm() {
+	const { growerId } = useParams();
+	const defaultFarm: CreateRegion = {
+		name: '',
+		processingConfig: {
+			mode: 'scheduled',
+			scheduleExpression: 'rate(5 days)',
+			priority: 'standard',
+		},
+	};
 	const navigate = useNavigate();
 	const [createRegion, result] = useCreateRegionMutation();
 	const [farm, setFarm] = useState(defaultFarm);
+	const [selectedOption, setSelectedOption] = useState({ label: 'Standard', value: 'standard' });
 	const onChange = (attribute: string, value: any) => {
 		setFarm((prevState) => {
 			return {
@@ -27,8 +31,19 @@ export default function CreateFarm() {
 			};
 		});
 	};
+	const onChangeProcessingConfig = (attribute: string, value: any) => {
+		setFarm((prevState) => {
+			return {
+				...prevState,
+				processingConfig: {
+					...prevState.processingConfig,
+					[attribute]: value,
+				},
+			};
+		});
+	};
 	const handleSubmit = () => {
-		createRegion(farm)
+		createRegion({ groupId: growerId!, body: farm })
 			.unwrap()
 			.then((result) => {
 				navigate(`/farms/${result.id}`);
@@ -42,7 +57,9 @@ export default function CreateFarm() {
 			breadcrumbs={
 				<Breadcrumbs
 					items={[
-						{ text: 'Farms', href: '/farms' },
+						{ text: 'Growers', href: '/growers' },
+						{ text: growerId!, href: `/growers/${growerId}` },
+						{ text: 'Farms', href: `/growers/${growerId}/farms` },
 						{ text: 'Create farm', href: `/farms/create` },
 					]}
 				/>
@@ -62,41 +79,38 @@ export default function CreateFarm() {
 									</Button>
 								</SpaceBetween>
 							}
-							// errorText={'Error creating the farm'}
 							errorIconAriaLabel="Error"
 						>
 							{
 								<SpaceBetween size="l">
 									<Container header={<Header variant="h2">Details</Header>}>
 										<SpaceBetween size="l">
-											<FormField
-												label="Name"
-												description="Enter the name of the farm."
-												//   errorText={getErrorText('You must specify a root object.')}
-												//   i18nStrings={{ errorIconAriaLabel: 'Error' }}
-											>
-												<Input
-													value={farm.name}
-													ariaRequired={true}
-													// placeholder="G"
-													onChange={({ detail: { value } }) => onChange('name', value)}
-												/>
+											<FormField label="Grower ID" description="Enter the id of the grower.">
+												<Input disabled value={growerId!} ariaRequired={true} />
+											</FormField>
+											<FormField label="Name" description="Enter the name of the farm.">
+												<Input value={farm.name} ariaRequired={true} onChange={({ detail: { value } }) => onChange('name', value)} />
 											</FormField>
 										</SpaceBetween>
 									</Container>
 									<Container header={<Header variant="h2">Field Analysis</Header>}>
-										<SpaceBetween size="l">
-											<FormField
-												label="Name"
-												description="Enter the name of the farm."
-												//   errorText={getErrorText('You must specify a root object.')}
-												//   i18nStrings={{ errorIconAriaLabel: 'Error' }}
-											>
+										<SpaceBetween size="l" direction="horizontal">
+											<FormField label="Priority" description="Priority for performing the field analysis.">
+												<Select
+													selectedOption={selectedOption}
+													onChange={({ detail }: { detail: ChangeSelectEventDetail }) => setSelectedOption(detail.selectedOption)}
+													options={[
+														{ label: 'Low', value: 'low' },
+														{ label: 'Standard', value: 'standard' },
+														{ label: 'High', value: 'high' },
+													]}
+												/>
+											</FormField>
+											<FormField label="Schedule expression" description="Enter the schedule expression for processing.">
 												<Input
-													value={farm.name}
+													value={farm.processingConfig.scheduleExpression ?? ''}
 													ariaRequired={true}
-													// placeholder="G"
-													onChange={({ detail: { value } }) => onChange('name', value)}
+													onChange={({ detail: { value } }) => onChangeProcessingConfig('scheduleExpression', value)}
 												/>
 											</FormField>
 										</SpaceBetween>

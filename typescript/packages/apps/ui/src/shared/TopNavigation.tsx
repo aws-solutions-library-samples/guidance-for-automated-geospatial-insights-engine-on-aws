@@ -32,19 +32,6 @@ export default () => {
 			}}
 			utilities={[
 				{
-					type: 'button',
-					iconName: 'notification',
-					title: 'Notifications',
-					href: '/notifications',
-					onFollow: (event) => {
-						event.preventDefault();
-						navigate('/notifications');
-					},
-					ariaLabel: 'Notifications (unread)',
-					badge: true,
-					disableUtilityCollapse: false,
-				},
-				{
 					type: 'menu-dropdown',
 					text: user?.signInDetails?.loginId ?? 'User Details',
 					iconName: 'user-profile',

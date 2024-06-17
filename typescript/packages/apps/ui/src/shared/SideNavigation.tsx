@@ -1,4 +1,3 @@
-import { Badge } from '@cloudscape-design/components';
 import SideNavigation from '@cloudscape-design/components/side-navigation';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -25,9 +24,8 @@ export default () => {
 				{ type: 'divider' },
 				{
 					type: 'link',
-					text: 'Notifications',
-					href: '/notifications',
-					info: <Badge color="red">2</Badge>,
+					text: 'Subscriptions',
+					href: '/subscriptions',
 				},
 				{
 					type: 'link',

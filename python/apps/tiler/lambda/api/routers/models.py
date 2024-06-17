@@ -1,7 +1,8 @@
-from typing import Optional
-from enum import Enum
-from pydantic import BaseModel
 from datetime import datetime, timezone
+from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel
 
 
 class CommonFilterQueryParams(BaseModel):
@@ -30,3 +31,10 @@ class CommonFilterQueryParams(BaseModel):
 class ImageType(str, Enum):
     rgb = "rgb"
     ndvi = "ndvi"
+    ndvi_raw = "ndvi_raw"
+    ndvi_change = "ndvi_change"
+    scl = "scl"
+    
+    # scl_surface = "scl_surface"
+    # nitrogen_metadata = "nitrogen_metadata"
+    # nir08 = "nir08"

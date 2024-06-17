@@ -13,6 +13,11 @@ interface ListFeaturesOptions extends FeatureFilterOptions {
 	bbox: number[];
 }
 
+interface GetFeatureOptions {
+	collection_id: string;
+	item_id: string;
+}
+
 const tilerApiUrl = import.meta.env.VITE_UI_REST_API_URL;
 export const getToken: () => Promise<string> = async () => {
 	return (await fetchAuthSession()).tokens?.idToken?.toString() ?? '';
@@ -43,6 +48,17 @@ export const tilerApiSlice = createApi({
 				},
 			}),
 		}),
+		getFeature: builder.query<ArcadeFeature, GetFeatureOptions>({
+			query: ({ collection_id, item_id }) => ({
+				url: `/feature`,
+				mode: 'cors',
+				method: 'GET',
+				params: {
+					collection_id,
+					item_id,
+				},
+			}),
+		}),
 	}),
 });
-export const { useGetFeaturesQuery } = tilerApiSlice;
+export const { useGetFeaturesQuery, useGetFeatureQuery } = tilerApiSlice;
