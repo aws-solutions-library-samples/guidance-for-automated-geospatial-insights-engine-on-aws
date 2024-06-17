@@ -19,10 +19,12 @@ import type { Construct } from 'constructs';
 import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPermissions.construct.js';
 import { RegionsModule } from './regions.construct.js';
+import { IVpc } from "aws-cdk-lib/aws-ec2";
 
 export type RegionsStackProperties = StackProps & {
 	environment: string;
 	policyStoreIdParameter: string;
+	vpc: IVpc;
 };
 
 export class RegionsApiStack extends Stack {
@@ -61,6 +63,7 @@ export class RegionsApiStack extends Stack {
 			cognitoClientId,
 			eventBusName,
 			policyStoreId,
+			vpc: props.vpc
 		});
 
 		this.regionsFunctionName = regionsModule.regionsFunctionName;

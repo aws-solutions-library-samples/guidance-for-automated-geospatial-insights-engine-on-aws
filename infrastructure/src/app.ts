@@ -83,6 +83,11 @@ const deployPlatform = (callerEnvironment?: {
 		description: stackDescription('Regions'),
 		environment,
 		policyStoreIdParameter: verifiedPermissionsPolicyStoreIdParameter(environment),
+		vpc: sharedStack.vpc,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	regionsStack.addDependency(sharedStack);

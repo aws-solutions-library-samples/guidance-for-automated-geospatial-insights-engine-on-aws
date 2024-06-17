@@ -50,7 +50,8 @@
 		"pino": "~8",
 		"p-limit": "~4",
 		"sleep-promise": "~9",
-		"ulid": "~2"
+		"ulid": "~2",
+		"redis": "~4"
 	},
 	"devDependencies": {
 		"@aws-sdk/client-ssm": "~3",

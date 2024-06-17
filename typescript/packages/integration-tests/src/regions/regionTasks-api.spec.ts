@@ -99,19 +99,6 @@ describe(TEST_PREFIX + 'creating bulk tasks regions', () => {
 			}
 		).returns('id');
 
-		// unlikes the previous example, in this case the request has passed schema validation, it will create the tasks
-		await listResources(`regionTasks`, {
-			withIdToken: userToken,
-			expectStatus: 200,
-			expectJsonLike: {
-				tasks: [{
-					"taskStatus": "inProgress",
-					"id": taskId,
-					"taskType": "create",
-				}]
-			}
-		}).toss()
-
 		await waitForGetResource('regionTasks', {
 			expectStatus: 200,
 			id: taskId,
@@ -120,6 +107,20 @@ describe(TEST_PREFIX + 'creating bulk tasks regions', () => {
 				taskStatus: 'success'
 			}
 		})
+
+
+		// unlikes the previous example, in this case the request has passed schema validation, it will create the tasks
+		await listResources(`regionTasks`, {
+			withIdToken: userToken,
+			expectStatus: 200,
+			expectJsonLike: {
+				tasks: [{
+					"taskStatus": "success",
+					"id": taskId,
+					"taskType": "create",
+				}]
+			}
+		}).toss()
 
 		const expectedTaskItems = createRegionTasksRequest['items'].map(o => ({
 			"name": o.name,
@@ -150,18 +151,6 @@ describe(TEST_PREFIX + 'creating bulk tasks regions', () => {
 			}
 		).returns('id');
 
-		await listResources(`regionTasks`, {
-			withIdToken: userToken,
-			expectStatus: 200,
-			expectJsonLike: {
-				tasks: [{
-					"taskStatus": "inProgress",
-					"id": taskId,
-					"taskType": "create",
-				}]
-			}
-		}).toss()
-
 		await waitForGetResource('regionTasks', {
 			expectStatus: 200,
 			id: taskId,
@@ -171,6 +160,18 @@ describe(TEST_PREFIX + 'creating bulk tasks regions', () => {
 				taskStatus: 'success'
 			}
 		})
+
+		await listResources(`regionTasks`, {
+			withIdToken: userToken,
+			expectStatus: 200,
+			expectJsonLike: {
+				tasks: [{
+					"taskStatus": "success",
+					"id": taskId,
+					"taskType": "create",
+				}]
+			}
+		}).toss()
 
 		const expectedTaskItems = createRegionTasksRequest['items'].map(o => ({
 			"name": o.name,

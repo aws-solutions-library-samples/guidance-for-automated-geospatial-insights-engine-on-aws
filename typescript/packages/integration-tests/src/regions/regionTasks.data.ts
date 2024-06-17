@@ -9,9 +9,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-1',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}
@@ -19,9 +17,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-2',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}
@@ -29,9 +25,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-3',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}
@@ -39,9 +33,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-4',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}
@@ -49,9 +41,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-5',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}
@@ -59,9 +49,7 @@ export const create_region_task_body_with_group_id = (groupId: string, tags: Rec
 			{
 				groupId,
 				name: 'test-region-6',
-				tags: {
-					...tags,
-				},
+				tags,
 				processingConfig: {
 					mode: 'disabled'
 				}

@@ -49,6 +49,7 @@ const getValues = async (module: string, mapping: Record<string, string>) => {
 
 let outputFile = `
 NODE_ENV=local
+REDIS_ENDPOINT=127.0.0.1
 AWS_XRAY_CONTEXT_MISSING=IGNORE_ERROR
 `;
 
