@@ -101,19 +101,6 @@ describe(TEST_PREFIX + 'creating bulk tasks polygons', () => {
 			}
 		).returns('id');
 
-		// unlikes the previous example, in this case the request has passed schema validation, it will create the tasks
-		await listResources(`polygonTasks`, {
-			withIdToken: userToken,
-			expectStatus: 200,
-			expectJsonLike: {
-				tasks: [{
-					"taskStatus": "inProgress",
-					"id": ID_PATTERN,
-					"taskType": "create",
-				}]
-			}
-		}).toss()
-
 		await waitForGetResource('polygonTasks', {
 			expectStatus: 200,
 			id: taskId,
@@ -123,6 +110,19 @@ describe(TEST_PREFIX + 'creating bulk tasks polygons', () => {
 				taskStatus: 'success'
 			}
 		})
+
+		// unlikes the previous example, in this case the request has passed schema validation, it will create the tasks
+		await listResources(`polygonTasks`, {
+			withIdToken: userToken,
+			expectStatus: 200,
+			expectJsonLike: {
+				tasks: [{
+					"taskStatus": "success",
+					"id": taskId,
+					"taskType": "create",
+				}]
+			}
+		}).toss()
 
 		const expectedTaskItems = createPolygonTaskRequest['items'].map(o => ({
 			"name": o.name,
@@ -153,18 +153,6 @@ describe(TEST_PREFIX + 'creating bulk tasks polygons', () => {
 			}
 		).returns('id');
 
-		await listResources(`polygonTasks`, {
-			withIdToken: userToken,
-			expectStatus: 200,
-			expectJsonLike: {
-				tasks: [{
-					"taskStatus": "inProgress",
-					"id": taskId,
-					"taskType": "create",
-				}]
-			}
-		}).toss()
-
 		await waitForGetResource('polygonTasks', {
 			expectStatus: 200,
 			id: taskId,
@@ -174,6 +162,18 @@ describe(TEST_PREFIX + 'creating bulk tasks polygons', () => {
 				taskStatus: 'success'
 			}
 		})
+
+		await listResources(`polygonTasks`, {
+			withIdToken: userToken,
+			expectStatus: 200,
+			expectJsonLike: {
+				tasks: [{
+					"taskStatus": "success",
+					"id": taskId,
+					"taskType": "create",
+				}]
+			}
+		}).toss()
 
 		const expectedTaskItems = createPolygonTaskRequest['items'].map(o => ({
 			"name": o.name,

@@ -10,6 +10,7 @@ import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { RegionRepository } from './repository.js';
 import { CreateRegion, EditRegion, ProcessingConfig, Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
+import { CommonCache } from "../../common/cache.js";
 
 export type RegionListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -24,7 +25,8 @@ export class RegionService {
 		readonly groupService: GroupService,
 		readonly commonService: CommonService,
 		readonly commonRepository: CommonRepository,
-		readonly eventPublisher: EventPublisher
+		readonly eventPublisher: EventPublisher,
+		readonly regionCache: CommonCache<Region>
 	) {}
 
 	public async create(securityContext: SecurityContext, groupId: string, region: CreateRegion): Promise<Region> {
@@ -88,6 +90,7 @@ export class RegionService {
 		const existing = await this.regionRepository.get(id);
 		if (existing) {
 			const updated = await this.regionRepository.updateAggregatedAttribute(id, updateParameter)
+			await this.regionCache.set(id, updated)
 			// publish the event
 			await this.eventPublisher.publishEvent({
 				eventType: 'updated',
@@ -130,7 +133,9 @@ export class RegionService {
 
 		// save
 		await this.regionRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
-		const saved = await this.get(securityContext, merged.id);
+
+		const saved = await this.get(securityContext, merged.id, false);
+		await this.regionCache.set(saved.id, saved)
 
 		// publish the event
 		await this.eventPublisher.publishEvent({
@@ -145,16 +150,25 @@ export class RegionService {
 		return saved;
 	}
 
-	public async get(securityContext: SecurityContext, id: string): Promise<Region> {
+	public async get(securityContext: SecurityContext, id: string, useCache = true): Promise<Region> {
 		this.log.debug(`RegionService> get> in: id:${id}`);
 
 		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
-		// retrieve
-		const region = await this.regionRepository.get(id);
+		let region: Region;
+		if (useCache) {
+			region = await this.regionCache.get(id);
+			// if region exists in cache return the cached version
+			if (region) return region;
+		}
+
+		// else retrieve from DynamoDB
+		region = await this.regionRepository.get(id);
 		if (region === undefined) {
 			throw new NotFoundError(`Region '${id}' not found.`);
 		}
+		// insert the DynamoDB resource to cache
+		await this.regionCache.set(id, region)
 
 		this.log.debug(`RegionService> get> exit:${JSON.stringify(region)}`);
 		return region;
@@ -199,7 +213,7 @@ export class RegionService {
 		}
 
 		// delete
-		await this.regionRepository.delete(id);
+		await Promise.all([this.regionRepository.delete(id), this.regionCache.delete(id)])
 
 		// publish event
 		await this.eventPublisher.publishEvent({

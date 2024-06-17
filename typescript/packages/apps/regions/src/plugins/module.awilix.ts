@@ -13,7 +13,6 @@
 
 import { asFunction, Lifetime } from 'awilix';
 import fp from 'fastify-plugin';
-
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
 import { EventPublisher, REGIONS_EVENT_SOURCE } from '@arcade/events';
 import { ApiAuthorizer, registerAuthAwilix } from '@arcade/rest-api-authorizer';
@@ -44,6 +43,8 @@ import { TaskItemService } from "../common/taskItems/service.js";
 import { PkType } from "../common/pkTypes.js";
 import { RegionTaskService } from "../api/regionTasks/service.js";
 import { RegionTaskWorkflowProcessor } from "../api/regionTasks/workflows/processor.js";
+import { CommonCache } from "../common/cache.js";
+import { Region } from "../api/regions/schemas.js";
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -77,6 +78,7 @@ declare module '@fastify/awilix' {
 		polygonTaskItemRepository: TaskItemRepository;
 		polygonTaskItemService: TaskItemService;
 		polygonTaskWorkflowProcessor: PolygonTaskWorkflowProcessor;
+		regionCache: CommonCache<Region>;
 	}
 }
 
@@ -149,6 +151,8 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
 
+	const redisEndpoint = process.env['REDIS_ENDPOINT'];
+
 	// then we can register our classes with the DI container
 	diContainer.register({
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
@@ -181,7 +185,7 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		regionRepository: asFunction((c: Cradle) => new RegionRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
 			...commonInjectionOptions,
 		}),
-		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository, c.eventPublisher), {
+		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository, c.eventPublisher, c.regionCache), {
 			...commonInjectionOptions,
 		}),
 		polygonRepository: asFunction((c: Cradle) => new PolygonRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
@@ -214,6 +218,10 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 		}),
 
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
+			...commonInjectionOptions,
+		}),
+
+		regionCache: asFunction((c: Cradle) => new CommonCache(app.log, 'Region', redisEndpoint), {
 			...commonInjectionOptions,
 		}),
 

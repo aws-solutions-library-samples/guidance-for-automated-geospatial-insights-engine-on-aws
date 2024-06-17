@@ -3,14 +3,14 @@ import { CreateTaskRequestBody, TaskList, TaskResource } from "../../common/task
 export const regionTaskPostRequestExample: CreateTaskRequestBody = {
 	items: [
 		{
-			"groupId": "groupId1",
+			"groupId": "01j035rmw8817a11j5vy6wgbsb",
 			"name": "region1",
 			"processingConfig": {
 				"mode": "onNewScene"
 			}
 		},
 		{
-			"groupId": "groupId2",
+			"groupId": "01j035rmw8817a11j5vy6wgbsb",
 			"name": "region2",
 			"processingConfig": {
 				"mode": "disabled"
@@ -22,7 +22,7 @@ export const regionTaskPostRequestExample: CreateTaskRequestBody = {
 
 
 export const regionTaskResourceExample: TaskResource = {
-	id: 'string',
+	id: '01j035rmw8817a11j5vy6wgbsb',
 	taskStatus: 'waiting',
 	taskType: 'create',
 	statusMessage: 'string',

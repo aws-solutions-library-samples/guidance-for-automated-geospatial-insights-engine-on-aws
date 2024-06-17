@@ -5,7 +5,7 @@ export const polygonTaskPostRequestExample: CreateTaskRequestBody = {
 	items: [
 		{
 			name: 'Field 1',
-			regionId: 'Region 1',
+			regionId: '01j035rmw8817a11j5vy6wgbsb',
 			boundary: [
 				[-104.5079674, 39.9194752],
 				[-104.4894065, 39.9193435],
@@ -16,7 +16,7 @@ export const polygonTaskPostRequestExample: CreateTaskRequestBody = {
 		},
 		{
 			name: 'Field 2',
-			regionId: 'Region 2',
+			regionId: '01j035rmw8817a11j5vy6wgbsb',
 			boundary: [
 				[-104.5079674, 39.9194752],
 				[-104.4894065, 39.9193435],
@@ -31,7 +31,7 @@ export const polygonTaskPostRequestExample: CreateTaskRequestBody = {
 
 export const polygonTaskListResourceExample: TaskList = {
 	tasks: [{
-		id: 'string',
+		id: '01j035rmw8817a11j5vy6wgbsb',
 		taskStatus: 'waiting',
 		taskType: 'create',
 		statusMessage: 'string',
@@ -45,7 +45,7 @@ export const polygonTaskListResourceExample: TaskList = {
 }
 
 export const polygonTaskResourceExample: TaskResource = {
-	id: 'string',
+	id: '01j035rmw8817a11j5vy6wgbsb',
 	taskStatus: 'waiting',
 	taskType: 'create',
 	statusMessage: 'string',
