@@ -9,7 +9,9 @@ import CreateFarm from './pages/Farms/CreateFarm';
 import ListFarms from './pages/Farms/ListFarms';
 import ViewFarm from './pages/Farms/ViewFarm';
 import ListFields from './pages/Fields/ListFields';
+import ViewField from './pages/Fields/ViewField';
 import CreateGrower from './pages/Growers/CreateGrower';
+import EditGrower from './pages/Growers/EditGrower';
 import ListGrowers from './pages/Growers/ListGrowers';
 import ViewGrower from './pages/Growers/ViewGrower';
 
@@ -36,12 +38,16 @@ export default function App() {
 							<Route path="/growers" element={<ListGrowers />} />
 							<Route path="/growers/create" element={<CreateGrower />} />
 							<Route path="/growers/:id" element={<ViewGrower />} />
-							<Route path="/growers/:id/edit" element={<ViewGrower />} />
+							<Route path="/growers/:id/edit" element={<EditGrower />} />
+							<Route path="/growers/:growerId/farms" element={<ListFarms />} />
 							<Route path="/farms" element={<ListFarms />} />
-							<Route path="/farms/create" element={<CreateFarm />} />
+							<Route path="/growers/:growerId/farms/create" element={<CreateFarm />} />
 							<Route path="/farms/:id" element={<ViewFarm />} />
 							<Route path="/farms/:id/edit" element={<ViewFarm />} />
 							<Route path="/fields" element={<ListFields />} />
+							<Route path="/growers/:growerId/farms/:farmId/fields" element={<ListFields />} />
+							<Route path="/fields/:id" element={<ViewField />} />
+							{/* <Route path="/growers/:growerId/farms/:farmId/fields/create" element={<CreateField />} /> */}
 						</Routes>
 					</BrowserRouter>
 				</Authenticator>

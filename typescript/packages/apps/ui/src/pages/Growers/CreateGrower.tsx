@@ -47,7 +47,12 @@ export default function CreateGrower() {
 						<Form
 							actions={
 								<SpaceBetween direction="horizontal" size="xs">
-									<Button variant="link" onClick={() => {}}>
+									<Button
+										variant="link"
+										onClick={() => {
+											navigate(-1);
+										}}
+									>
 										Cancel
 									</Button>
 									<Button data-testid="create" variant="primary" loading={result.isLoading} onClick={handleSubmit}>
@@ -68,12 +73,7 @@ export default function CreateGrower() {
 												//   errorText={getErrorText('You must specify a root object.')}
 												//   i18nStrings={{ errorIconAriaLabel: 'Error' }}
 											>
-												<Input
-													value={grower.name}
-													ariaRequired={true}
-													// placeholder="G"
-													onChange={({ detail: { value } }) => onChange('name', value)}
-												/>
+												<Input value={grower.name} ariaRequired={true} onChange={({ detail: { value } }) => onChange('name', value)} />
 											</FormField>
 										</SpaceBetween>
 									</Container>

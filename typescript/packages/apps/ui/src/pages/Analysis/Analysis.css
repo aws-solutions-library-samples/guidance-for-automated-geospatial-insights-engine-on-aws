@@ -1,10 +1,10 @@
 .maplibregl-popup-content {
-	background-color: green;
 	border-radius: 30px;
 	padding: 0;
 }
 .maplibregl-popup-tip {
 	border-top-color: var(--color-border-divider-default-j74lyz, #b6bec9) !important;
+	border-bottom-color: var(--color-border-divider-default-j74lyz, #b6bec9) !important;
 }
 .close-button-container {
 	position: absolute;
@@ -14,7 +14,7 @@
 
 .control-panel-container {
 	position: absolute;
-	bottom: 1rem;
+	bottom: 3rem;
 	left: 50%;
 	transform: translateX(-50%);
 	background-color: white;
@@ -23,6 +23,14 @@
 	border-color: var(--color-border-divider-default-j74lyz, #b6bec9);
 	border-width: 2px;
 	border-style: solid;
+}
+
+.feature-popup {
+	z-index: 2;
+}
+
+.slider-container {
+	padding: 0px 15px;
 }
 
 .awsui_title_k5dlb_d6w6r_228:not(#\9) {
