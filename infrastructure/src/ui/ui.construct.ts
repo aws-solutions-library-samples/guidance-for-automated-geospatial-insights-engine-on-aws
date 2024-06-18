@@ -1,13 +1,14 @@
 import { getLambdaArchitecture } from '@arcade/cdk-common';
 import { IdentityPool, UserPoolAuthenticationProvider } from '@aws-cdk/aws-cognito-identitypool-alpha';
-import { Duration } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Duration, Stack } from 'aws-cdk-lib';
 import { Cors } from 'aws-cdk-lib/aws-apigateway';
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpUserPoolAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { IUserPoolClient, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Code, Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { Code, Function, Handler, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { CfnMap } from 'aws-cdk-lib/aws-location';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -26,7 +27,8 @@ export interface UIConstructProperties {
 	environment: string;
 	cognitoUserPoolId: string;
 	bucketName: string;
-	stacServerUrl: string;
+	stacApiEndpoint: string;
+	stacApiResourceArn: string;
 }
 
 export const uiApiUrlParameter = (environment: string) => `/arcade/${environment}/ui/apiUrl`;
@@ -44,28 +46,29 @@ export class UIModule extends Construct {
 		super(scope, id);
 
 		const namePrefix = `arcade-${props.environment}`;
-
+		const account = Stack.of(this).account;
+		const region = cdk.Stack.of(this).region;
 		/**
 		 * API Lambda for the tiler
 		 */
-		const apiLambda = new Function(this, 'TilerLambda', {
-			functionName: `${namePrefix}-uiApi`,
+		const apiLambda = new Function(this, 'TilerApiLambda', {
+			functionName: `${namePrefix}-tiler-api`,
 			description: `ARCADE: UI Tiler: ${props.environment}`,
-			runtime: Runtime.PYTHON_3_11,
+			runtime: Runtime.FROM_IMAGE,
 			tracing: Tracing.ACTIVE,
-			code: Code.fromDockerBuild(path.join(__dirname, '../../../python/apps/tiler/lambda'), {
+			code: Code.fromAssetImage(path.join(__dirname, '../../../python/apps/tiler/lambda'), {
 				file: 'Dockerfile',
 				buildArgs: {
 					ENVIRONMENT: props.environment,
 				},
 			}),
-			handler: 'handler.handler',
+			handler: Handler.FROM_IMAGE,
 			memorySize: 1769,
 			timeout: Duration.seconds(29),
 			logRetention: RetentionDays.ONE_WEEK,
 			environment: {
 				ENVIRONMENT: props.environment,
-				STAC_URL: props.stacServerUrl,
+				STAC_URL: props.stacApiEndpoint,
 				ROOT_PATH: '/prod',
 				GDAL_CACHEMAX: '200', // 200 mb
 				GDAL_DISABLE_READDIR_ON_OPEN: 'EMPTY_DIR',
@@ -79,6 +82,14 @@ export class UIModule extends Construct {
 			},
 			architecture: getLambdaArchitecture(scope),
 		});
+
+		apiLambda.addToRolePolicy(
+			new PolicyStatement({
+				actions: ['execute-api:Invoke'],
+				effect: Effect.ALLOW,
+				resources: [props.stacApiResourceArn],
+			})
+		);
 
 		/**
 		 * Define the API Gateway
@@ -152,7 +163,7 @@ export class UIModule extends Construct {
 			})
 		);
 
-		new StaticSite(this, 'Deployment');
+		new StaticSite(this, 'Deployment', { environment: props.environment });
 
 		new StringParameter(this, 'UIApiIdParameter', {
 			parameterName: uiApiIdParameter(props.environment),
@@ -190,7 +201,7 @@ export class UIModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*', 'Action::s3:List*', 'Action::s3:GetObject*', 'Action::s3:GetBucket*'],
+					appliesTo: ['Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*', 'Action::s3:List*', 'Action::s3:GetObject*', 'Action::s3:GetBucket*', `Resource::arn:<AWS::Partition>:execute-api:${region}:${account}:<StacServerModuleStacApiGateway48C0D803>/*/*/*`],
 					reason: 'Must read from entire bucket.',
 				},
 			],

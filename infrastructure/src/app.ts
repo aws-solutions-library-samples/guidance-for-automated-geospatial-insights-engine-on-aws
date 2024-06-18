@@ -7,15 +7,15 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EngineStack } from './engine/engine.stack.js';
-import { NotificationsStack } from './notifications/notifications.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
 import { RegionsExtensionStack } from './regionsExtension/regionsExtension.stack.js';
-import { ResultsStack } from './results/results.stack.js';
-import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 import { StacServerStack } from './stacServer/stacServer.stack.js';
-import { UIApiStack } from './ui/ui.stack.js';
+import { ResultsStack } from "./results/results.stack.js";
+import { SchedulerStack } from "./scheduler/scheduler.stack.js";
+import { NotificationsStack } from "./notifications/notifications.stack.js";
+import { UIApiStack } from "./ui/ui.stack.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,16 +33,15 @@ const cognitoVerifiedDomain = app.node.tryGetContext('cognitoVerifiedDomain') as
 const cognitoFromName = app.node.tryGetContext('cognitoFromName') as string;
 const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as string;
 
+// optional concurrency limit used by the executor module when uploading polygon input files for region processing
 const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10);
+
+// optional configuration for STAC OpenSearch servers
+const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'm5.large.search';
+const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerInstanceType') ?? 50);
 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
-
-// Stac server parameters
-const stacServerTopicArn = getOrThrow(app, 'stacServerTopicArn') as string;
-const stacServerOpenSearchEndpoint = app.node.tryGetContext('stacServerOpenSearchEndpoint') as string;
-const stacServerOpenSearchSecret = app.node.tryGetContext('stacServerOpenSearchSecret') as string;
-const stacServerUrl = app.node.tryGetContext('stacServerUrl') as string;
 
 // Sentinel-2 Open Data on AWS parameters
 const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string;
@@ -96,16 +95,34 @@ const deployPlatform = (callerEnvironment?: {
 		stackName: stackName('regionsExtension'),
 		description: stackDescription('RegionsExtension'),
 		environment,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	regionsExtensionStack.addDependency(regionsStack);
+
+	const stacServerStack = new StacServerStack(app, 'StacServerModule', {
+		stackName: stackName('stacServer'),
+		description: stackDescription('StacServer initializer'),
+		environment,
+		volumeSize: stacServerVolumeSize,
+		instanceType: stacServerInstanceType,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
+	});
+	stacServerStack.addDependency(sharedStack);
 
 	const engineStack = new EngineStack(app, 'EngineModule', {
 		stackName: stackName('engine'),
 		description: stackDescription('Engine'),
 		environment,
 		vpc: sharedStack.vpc,
-		stacServerUrl,
+		stacApiEndpoint: stacServerStack.stacApiEndpoint,
+		stacApiResourceArn: stacServerStack.stacApiResourceArn,
 		env: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId,
@@ -122,8 +139,9 @@ const deployPlatform = (callerEnvironment?: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId,
 		},
-		stacServerTopicArn,
-		stacServerUrl,
+		stacServerTopicArn: stacServerStack.stacIngestTopicArn,
+		stacApiEndpoint: stacServerStack.stacApiEndpoint,
+		stacApiResourceArn: stacServerStack.stacApiResourceArn,
 	});
 
 	resultStack.addDependency(sharedStack);
@@ -135,32 +153,18 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		concurrencyLimit,
 		sentinelTopicArn,
-		stacServerUrl
+		stacApiEndpoint: stacServerStack.stacApiEndpoint,
+		stacApiResourceArn: stacServerStack.stacApiResourceArn,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	schedulerStack.addDependency(sharedStack);
 	schedulerStack.addDependency(engineStack);
 	schedulerStack.addDependency(regionsStack);
 	schedulerStack.addDependency(resultStack);
-
-	// Only deploy when openSearch endpoint has been supplied
-	if (stacServerOpenSearchEndpoint) {
-		const stacServerStack = new StacServerStack(app, 'StacServerStack', {
-			stackName: stackName('stac-server-init'),
-			description: stackDescription('StacServer initializer'),
-			environment,
-			openSearchEndpoint: stacServerOpenSearchEndpoint,
-			openSearchSecret: stacServerOpenSearchSecret,
-			authorizerSecretId: sharedStack.apiKeySecretName,
-			env: {
-				// The ARCADE_REGION domain variable
-				region: process.env?.['ARCADE_REGION'] || callerEnvironment?.region,
-				account: callerEnvironment?.accountId,
-			},
-		});
-		stacServerStack.addDependency(sharedStack);
-		stacServerStack.addDependency(resultStack);
-	}
 
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),
@@ -175,7 +179,12 @@ const deployPlatform = (callerEnvironment?: {
 		stackName: stackName('ui'),
 		description: stackDescription('UI'),
 		environment,
-		stacServerUrl,
+		stacApiEndpoint: stacServerStack.stacApiEndpoint,
+		stacApiResourceArn: stacServerStack.stacApiResourceArn,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
 	});
 	uiStack.addDependency(sharedStack);
 };

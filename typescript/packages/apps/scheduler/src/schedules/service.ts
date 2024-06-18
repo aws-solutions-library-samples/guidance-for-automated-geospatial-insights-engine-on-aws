@@ -124,7 +124,10 @@ export class SchedulesService {
 			Target: {
 				Arn: this.sqsArn,
 				Input: JSON.stringify(request),
-				RoleArn: this.roleArn
+				RoleArn: this.roleArn,
+				SqsParameters: {
+					MessageGroupId: request.id,
+				}
 			}
 		}
 

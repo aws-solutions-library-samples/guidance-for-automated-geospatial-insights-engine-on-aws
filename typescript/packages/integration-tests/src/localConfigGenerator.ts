@@ -12,8 +12,6 @@
  */
 
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
-import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
-import { CloudFormationClient, ListExportsCommand } from '@aws-sdk/client-cloudformation';
 import * as fs from 'fs';
 
 const { ENVIRONMENT, AWS_REGION } = process.env;
@@ -23,8 +21,6 @@ if (!ENVIRONMENT || !AWS_REGION) {
 }
 
 const ssm = new SSMClient({ region: process.env['AWS_REGION'] });
-const cloudformation = new CloudFormationClient({ region: process.env['AWS_REGION'] });
-const secretsManager = new SecretsManagerClient({ region: process.env['AWS_REGION'] })
 
 const getValues = async (module: string, mapping: Record<string, string>) => {
 	for (const key in mapping) {
@@ -54,31 +50,13 @@ const getValues = async (module: string, mapping: Record<string, string>) => {
 let outputFile = `
 NODE_ENV=local
 AWS_XRAY_CONTEXT_MISSING=IGNORE_ERROR
-STAC_OS_SECRET_NAME=stac-server-${ENVIRONMENT}-opensearch-user-creds
 `;
 
-// Get the API URL for the elasticsearch
-let keepGoing = true, nextToken: string;
-while (keepGoing) {
-	const result = await cloudformation.send(new ListExportsCommand({ NextToken: nextToken }))
-	result.Exports.forEach(e => {
-		if (e.Name === `sls-stac-server-${ENVIRONMENT}-ServiceEndpoint`) {
-			outputFile += `STAC_API_URL=${e.Value}/\r\n`;
-		} else if (e.Name === `stac-server-${ENVIRONMENT}-os-endpoint`) {
-			outputFile += `STAC_OS_SERVER_URL=${e.Value}\r\n`;
-		}
-	});
-
-	nextToken = result.NextToken
-	keepGoing = nextToken !== undefined;
-}
-
-
-const secretResponse = await secretsManager.send(new GetSecretValueCommand({ SecretId: `arcade/${ENVIRONMENT}/shared/apiKey` }))
-
-const { apiKey } = JSON.parse(secretResponse.SecretString);
-
-outputFile += `STAC_API_KEY=${apiKey}\r\n`;
+await getValues('stacServer', {
+	STAC_API_URL: 'apiUrl',
+	STAC_OS_SERVER_URL: 'openSearchUrl',
+	STAC_OS_SECRET_NAME: 'administratorSecretName'
+});
 
 await getValues('shared', {
 	EVENT_BUS_NAME: 'eventBusName',

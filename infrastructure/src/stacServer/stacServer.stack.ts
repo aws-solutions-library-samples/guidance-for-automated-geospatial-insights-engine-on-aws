@@ -1,76 +1,37 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
-import { StacServerConstruct } from './stacServer.construct.js';
 import { NagSuppressions } from 'cdk-nag';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import { verifiedPermissionsPolicyStoreIdParameter } from '../shared/verifiedPermissions.construct.js';
-import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
+import { StacServerModule } from "./stacServer.construct.js";
 
 export type StacServerProperties = StackProps & {
-	environment: string;
-	openSearchEndpoint: string;
-	openSearchSecret: string;
-	authorizerSecretId: string;
+	readonly environment: string;
+	readonly instanceType: string;
+	readonly volumeSize: number;
 };
 
-export const initializerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/initializerFunctionName`;
-export const authorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionArn`;
-export const authorizerFunctionNameParameter = (environment: string) => `/arcade/${environment}/stacServer/authorizerFunctionName`;
-const namePrefix = (environment: string) => `arcade-${environment}-stac-server`;
-export const authorizerFunctionName = (environment: string) => `${namePrefix(environment)}-prehook-authorizer`;
-
 export class StacServerStack extends Stack {
+	public stacServerEndpoint: string;
+	public stacIngestTopicArn: string;
+	public stacApiResourceArn: string;
+	public stacApiEndpoint: string;
+
 	constructor(scope: Construct, id: string, props: StacServerProperties) {
 		super(scope, id, props);
 
-		const cognitoUserPoolId = StringParameter.fromStringParameterAttributes(this, 'userPoolId', {
-			parameterName: userPoolIdParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const policyStoreId = StringParameter.fromStringParameterAttributes(this, 'policyStoreId', {
-			parameterName: verifiedPermissionsPolicyStoreIdParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const cognitoClientId = StringParameter.fromStringParameterAttributes(this, 'clientId', {
-			parameterName: userPoolClientIdParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const init = new StacServerConstruct(this, 'StacServerInitializer', {
+		const stacServerModule = new StacServerModule(this, 'StacServerModule', {
 			environment: props.environment,
-			openSearchEndpoint: props.openSearchEndpoint,
-			openSearchSecret: props.openSearchSecret,
-			namePrefix: namePrefix(props.environment),
-			authorizerFunctionName: authorizerFunctionName(props.environment),
-			cognitoUserPoolId,
-			policyStoreId,
-			cognitoClientId,
-			authorizerSecretId: props.authorizerSecretId,
+			volumeSize: props.volumeSize,
+			instanceType: props.instanceType
 		});
 
-		new StringParameter(this, 'functionNameParameter', {
-			parameterName: initializerFunctionNameParameter(props.environment),
-			description: 'function Name of ARCADE Stac server initializer',
-			stringValue: init.functionName,
-		});
-
-		new StringParameter(this, 'authorizerFunctionArnParameter', {
-			parameterName: authorizerFunctionArnParameter(props.environment),
-			description: 'function Arn of ARCADE Stac server authorizer',
-			stringValue: init.authorizerFunctionArn,
-		});
-
-		new StringParameter(this, 'authorizerFunctionNameParameter', {
-			parameterName: authorizerFunctionNameParameter(props.environment),
-			description: 'function Name of ARCADE Stac server authorizer',
-			stringValue: init.authorizerFunctionName,
-		});
+		this.stacServerEndpoint = stacServerModule.stacServerEndpoint;
+		this.stacIngestTopicArn = stacServerModule.stacIngestTopicArn;
+		this.stacApiResourceArn = stacServerModule.stacApiResourceArn;
+		this.stacApiEndpoint = stacServerModule.stacApiEndpoint;
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,
-			'/StacServerStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource',
+			'/StacServerModule/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource',
 			[
 				{
 					id: 'AwsSolutions-IAM4',

@@ -1,18 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as s3Deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const websiteBucketParameter = (environment: string) => `/arcade/${environment}/ui/websiteBucket`;
+
+export interface StaticSiteConstructProperties {
+	environment: string;
+}
 
 export class StaticSite extends Construct {
 	readonly distribution: cloudfront.CloudFrontWebDistribution;
-	constructor(scope: Construct, id: string) {
+
+	constructor(scope: Construct, id: string, props: StaticSiteConstructProperties) {
 		super(scope, id);
 
 		const hostingBucket = new s3.Bucket(this, 'StaticSiteBucket', {
@@ -57,9 +59,9 @@ export class StaticSite extends Construct {
 			],
 		});
 
-		const bucketDeployment = new s3Deploy.BucketDeployment(this, 'BucketDeployment', {
-			sources: [s3Deploy.Source.asset(path.join(__dirname, '../../../typescript/packages/apps/ui/dist'), {})],
-			destinationBucket: hostingBucket,
+		new StringParameter(this, 'WebsiteBucketParameter', {
+			parameterName: websiteBucketParameter(props.environment),
+			stringValue: hostingBucket.bucketName,
 		});
 
 		this.distribution = distribution;

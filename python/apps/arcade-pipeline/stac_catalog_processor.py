@@ -1,26 +1,27 @@
-import base64
-import json
 import os
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from io import BytesIO
 from logging import Logger
 from typing import List, Optional, Dict
-from datetime import datetime, timedelta
+from urllib.parse import urlparse
+
 import boto3
+import geopandas as gpd
 import rasterio
 import requests
+import shapely.geometry as geom
+from aws_requests_auth.aws_auth import AWSRequestsAuth
 from dataclasses_json import DataClassJsonMixin, config
 from numpy import ndarray
 from odc.stac import stac_load
+from pyproj import CRS
 from pystac import Item
+from pystac.extensions.projection import ProjectionExtension
 from pystac_client import Client
 from xarray import Dataset
 
 from logger_utils import get_logger
-from pystac.extensions.projection import ProjectionExtension
-from pyproj import CRS
-import shapely.geometry as geom
-import geopandas as gpd
 
 STAC_URL = 'https://earth-search.aws.element84.com/v1'
 STAC_COLLECTION = 'sentinel-2-c1-l2a'
@@ -116,19 +117,19 @@ class STACCatalogProcessor:
 
 	@staticmethod
 	def get_previous_tif(region_id: str, result_id: str, polygon_id: str) -> Optional[Item]:
-		arcade_stac_url = os.getenv("STAC_SERVER_URL")
+		arcade_stac_endpoint = os.getenv("STAC_API_ENDPOINT")
+		aws_region = os.getenv("AWS_REGION")
 
-		api_key = STACCatalogProcessor.get_api_key()
+		aws_auth = STACCatalogProcessor.get_api_auth(arcade_stac_endpoint, aws_region)
 
 		# Retrieve the previous result stac item
-		url = "{}/collections/region_{}/items/{}_{}".format(arcade_stac_url, region_id, result_id, polygon_id)
+		url = "{}/collections/region_{}/items/{}_{}".format(arcade_stac_endpoint, region_id, result_id, polygon_id)
 
 		# Set any required headers
 		headers = {
 			"Content-Type": "application/json",
-			"X-API-KEY": api_key
 		}
-		stac_api_response = requests.get(url, headers=headers)
+		stac_api_response = requests.get(url, headers=headers, auth=aws_auth)
 
 		if stac_api_response.status_code != 200:
 			return None
@@ -149,14 +150,19 @@ class STACCatalogProcessor:
 			print(f"Error: {e}")
 
 	@staticmethod
-	def get_api_key():
-		arcade_stac_api_secret_name = os.getenv("STAC_API_SECRET_NAME")
-		secret_manager = boto3.client('secretsmanager')
-		secret_value_response = secret_manager.get_secret_value(SecretId=arcade_stac_api_secret_name)
-		secret = json.loads(secret_value_response['SecretString'])
-		base64_bytes = base64.b64encode(secret['apiKey'].encode("utf-8"))
-		api_key = base64_bytes.decode("utf-8")
-		return api_key
+	def get_api_auth(endpoint: str, region: str) -> AWSRequestsAuth:
+		credentials = boto3.Session().get_credentials()
+		parsed_url = urlparse(endpoint)
+		host = parsed_url.hostname
+		auth = AWSRequestsAuth(
+			aws_access_key=credentials.access_key,
+			aws_secret_access_key=credentials.secret_key,
+			aws_token=credentials.token,
+			aws_host=host,
+			aws_region=region,
+			aws_service="execute-api",
+		)
+		return auth
 
 	def load_stac_datasets(self) -> [Dataset, Dataset]:
 		self._load_stac_item()

@@ -31,7 +31,7 @@
 		"@typescript-eslint/eslint-plugin": "~7",
 		"@typescript-eslint/parser": "~7",
 		"aws-sdk-client-mock": "~4",
-		"eslint": "~8",
+		"eslint": "~9",
 		"pino-pretty": "~11",
 		"pino": "~8",
 		"shx": "~0",
@@ -39,7 +39,8 @@
 		"typescript": "~5",
 		"vitest-mock-extended": "~1",
 		"vitest": "~1",
-		"axios": "~1"
+		"axios": "~1",
+		"aws4-axios": "~3"
 	},
 	"private": false
 }

@@ -5,12 +5,12 @@ import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from 'constructs';
 import { EngineConstruct } from "./engine.construct.js";
-import { stacApiSecretNameParameter } from "../shared/shared.stack.js";
 
 export type EngineStackProperties = StackProps & {
 	environment: string;
 	vpc: IVpc;
-	stacServerUrl: string;
+	stacApiEndpoint: string;
+	stacApiResourceArn: string;
 }
 
 export class EngineStack extends cdk.Stack {
@@ -19,12 +19,6 @@ export class EngineStack extends cdk.Stack {
 
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
 			parameterName: eventBusNameParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-
-		const stacApiSecretName = StringParameter.fromStringParameterAttributes(this, 'stacApiSecretName', {
-			parameterName: stacApiSecretNameParameter(props.environment),
 			simpleName: false,
 		}).stringValue;
 
@@ -39,8 +33,8 @@ export class EngineStack extends cdk.Stack {
 				environment: props.environment,
 				eventBusName,
 				bucketName,
-				stacApiSecretName,
-				stacServerUrl: props.stacServerUrl
+				stacApiEndpoint: props.stacApiEndpoint,
+				stacApiResourceArn: props.stacApiResourceArn
 			})
 	}
 }

@@ -39,7 +39,7 @@ const ACTION_MAP = {
 };
 
 export async function handler(event: APIGatewayRequestAuthorizerEvent): Promise<APIGatewayAuthorizerResult> {
-	console.log(JSON.stringify(event))
+	app.log.debug(`lambda> handler> in: ${JSON.stringify(event)}`);
 
 	const apiAuthorizer: ApiAuthorizer = di.resolve('apiAuthorizer');
 

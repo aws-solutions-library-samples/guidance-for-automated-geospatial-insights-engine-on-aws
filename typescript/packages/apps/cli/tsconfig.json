@@ -12,10 +12,12 @@
 		"esModuleInterop": true,
 		"ignoreDeprecations": "5.0",
 		"noPropertyAccessFromIndexSignature": false,
-
 		// overrides of extends
 		"strict": false,
 		"exactOptionalPropertyTypes": false
+	},
+	"ts-node": {
+		"esm": true
 	},
 	"include": [
 		"src/**/*.ts"
