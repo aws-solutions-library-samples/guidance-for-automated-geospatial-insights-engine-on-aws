@@ -60,8 +60,6 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 				throw new UnauthorizedError('Missing or malformed authorization token.');
 			}
 
-			console.log(JSON.stringify(lambdaEvent))
-
 			// extract the users claims from the ID token (provided by the COGNITO_USER_POOLS integration)
 			email = lambdaEvent?.requestContext?.authorizer?.['email'] as string;
 			sub = lambdaEvent?.requestContext?.authorizer?.['sub'] as string;

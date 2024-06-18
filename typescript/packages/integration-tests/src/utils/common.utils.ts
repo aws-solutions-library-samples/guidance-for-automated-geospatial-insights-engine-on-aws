@@ -3,12 +3,12 @@ import { request, spec, stash } from 'pactum';
 import Spec from 'pactum/src/models/Spec.js';
 import path from 'path';
 import { initializeConfig } from '../utils/config.js';
-import { AuthenticationType, COMMON_HEADERS } from '../utils/headers.js';
+import { COMMON_HEADERS } from '../utils/headers.js';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { Client } from "@opensearch-project/opensearch";
 import pWaitFor from "p-wait-for";
-
+import { Credentials, Request as AWS4Request, sign } from "aws4";
 
 request.setDefaultTimeout(5000)
 
@@ -38,7 +38,7 @@ type ParentIdExpectArgs = {
 };
 type AuthExpectArgs = {
 	withIdToken?: string;
-	withApiKey?: string;
+	withIAMCredentials?: Credentials;
 };
 
 export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & AuthExpectArgs;
@@ -87,6 +87,22 @@ export const initializeCommonDataStash = () => {
 	});
 };
 
+export const signResourceUrl = (baseUrl: string, resourcePlural: string, args: ListExpectArgs | GetArgs): string => {
+	const [host, stage] = baseUrl.replace('https://', '').split('/');
+	const signingOptions: AWS4Request = {
+		method: 'GET',
+		host,
+		path: `/${stage}/${resourcePlural}`,
+		region: process.env['AWS_REGION'],
+		service: 'execute-api',
+		headers: COMMON_HEADERS(args.withIdToken),
+		signQuery: true
+	};
+	sign(signingOptions, args.withIAMCredentials);
+	resourcePlural = `${signingOptions.path.replace(`/${stage}/`, '')}`
+	return resourcePlural;
+}
+
 export const createResourcesMethodForModules = (module: 'results' | 'regions' | 'notifications' | 'stac') => {
 
 	let baseUrl: string;
@@ -105,21 +121,9 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			break;
 	}
 
-	const constructAuth = (args: AuthExpectArgs): {
-		type: AuthenticationType,
-		secret: string
-	} => {
-		if (args.withIdToken) {
-			return { type: 'token', secret: args.withIdToken }
-		}
-		if (args.withApiKey) {
-			return { type: 'apiKey', secret: args.withApiKey }
-		}
-	}
-
 	const createResource = (resourcePlural: string, args: CreateArgs, parentResourcePlural?: string, parentId?: string): Spec => {
 		const url = parentId ? `${baseUrl}${parentResourcePlural}/${parentId}/${resourcePlural}` : `${BASE_URL}${resourcePlural}`;
-		let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
+		let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 
 		let requestBody = args.withJson;
 		if (args.withTags) {
@@ -141,7 +145,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			.patch(`${baseUrl}${resourcePlural}/{id}`)
 			.withPathParams('id', args.id)
 			.withJson(args.withJson)
-			.withHeaders(COMMON_HEADERS(constructAuth(args)))
+			.withHeaders(COMMON_HEADERS(args.withIdToken))
 			.expectStatus(args.expectStatus);
 		if (args.expectJsonLike) {
 			s = s.expectJsonLike(args.expectJsonLike);
@@ -171,7 +175,11 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	}
 
 	const getResource = (resourcePlural: string, args: GetArgs): Spec => {
-		let s = spec().get(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
+		if (args.withIAMCredentials) {
+			resourcePlural = signResourceUrl(baseUrl, resourcePlural, args);
+		}
+
+		let s = spec().get(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 		if (args.expectJsonLike) {
 			s = s.expectJsonLike(args.expectJsonLike);
 		}
@@ -182,13 +190,16 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	const listResources = (resourcePlural: string, args: ListExpectArgs): Spec => {
-		let s = spec().get(`${baseUrl}${resourcePlural}`).withHeaders(COMMON_HEADERS(constructAuth(args))).expectStatus(args.expectStatus);
+		if (args.withIAMCredentials) {
+			resourcePlural = signResourceUrl(baseUrl, resourcePlural, args);
+		}
+
+		let s = spec().get(`${baseUrl}${resourcePlural}`).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 
 		if (args.withCount) {
 			s = s.withQueryParams('count', args.withCount);
 		}
 		if (args.withToken) {
-			// s = s.withQueryParams('paginationToken', encodeURIComponent(args.withToken));
 			s = s.withQueryParams('paginationToken', args.withToken);
 		}
 		if (args.withPolygonId) {
@@ -218,7 +229,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	const deleteResource = (resourcePlural: string, args: DeleteArgs): Spec => {
-		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(constructAuth(args)));
+		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken));
 		if (args.expectStatus) {
 			s = s.expectStatus(args.expectStatus);
 		}
@@ -228,7 +239,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	const teardownResources = async <T>(resourcePlural: string, tagKey: string, tagValue: string, idToken: string, queryString?: Record<string, unknown>) => {
 		let token: string;
 		do {
-			let s = spec().get(`${baseUrl}${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS(constructAuth({ withIdToken: idToken })));
+			let s = spec().get(`${baseUrl}${resourcePlural}`).withQueryParams('tags', `${tagKey}:${tagValue}`).withQueryParams('count', '100').withHeaders(COMMON_HEADERS(idToken));
 
 			if (queryString) {
 				s = s.withQueryParams(queryString);

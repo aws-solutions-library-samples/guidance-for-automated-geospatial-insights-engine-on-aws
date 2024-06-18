@@ -12,8 +12,20 @@
  */
 
 import { Flags } from '@oclif/core';
-import { generateAuthToken } from '@arcade/helpers';
 import { DeploymentCommand } from '../types/deploymentCommand.js';
+import { Amplify } from 'aws-amplify';
+import { confirmSignIn, fetchAuthSession, getCurrentUser, signIn } from 'aws-amplify/auth';
+import { getParameterValue } from "../utils/ssm.js";
+
+export interface AuthorizerUserProps {
+	environment: string;
+	username: string;
+	password: string;
+	newPassword?: string;
+}
+
+export const userPoolIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolId`;
+export const userPoolClientIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolClientId`;
 
 export class Auth extends DeploymentCommand<typeof Auth> {
 	public static description = 'Walks the user through the authentication process to generate a JWT token for making API calls.';
@@ -45,10 +57,56 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 		'<%= config.bin %> <%= command.id %> -e prod -r us-west-2 -u username -p password -n newPassword',
 	];
 
+	private async generateAuthToken(props: AuthorizerUserProps): Promise<string> {
+		const userPoolClientId = await getParameterValue(userPoolClientIdParameter(props.environment));
+		const userPoolId = await getParameterValue(userPoolIdParameter(props.environment));
+
+		Amplify.configure({
+			Auth: {
+				Cognito: {
+					userPoolId,
+					userPoolClientId,
+				},
+			},
+		});
+
+		try {
+			let loginFlowFinished = false;
+			while (!loginFlowFinished) {
+				const user = await signIn({
+					username: props.username,
+					password: props.password,
+					options: {
+						authFlowType: 'USER_SRP_AUTH',
+					},
+				});
+				if (user.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+					if (props.newPassword) {
+						await confirmSignIn({ challengeResponse: props.newPassword });
+					} else {
+						await confirmSignIn({ challengeResponse: props.password });
+					}
+				}
+
+				const { signInDetails } = await getCurrentUser();
+				if (signInDetails?.authFlowType === 'USER_SRP_AUTH') {
+					const { idToken } = (await fetchAuthSession()).tokens ?? {};
+					loginFlowFinished = true;
+					return idToken.toString();
+				}
+			}
+		} catch (err: any) {
+			// swallow errors but log incase of false positive
+			console.log(`authorizeUser: err: ${err}`);
+			throw err;
+		}
+		return '';
+	}
+
 	public async runChild(): Promise<void> {
 		const { flags } = await this.parse(Auth);
 		try {
-			const token = await generateAuthToken({
+			const token = await this.generateAuthToken({
 				environment: flags.environment,
 				username: flags.username,
 				password: flags.password,
@@ -58,7 +116,6 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 		} catch (error) {
 			console.log(JSON.stringify(error));
 		}
-
 		// TODO: add error handling
 	}
 }

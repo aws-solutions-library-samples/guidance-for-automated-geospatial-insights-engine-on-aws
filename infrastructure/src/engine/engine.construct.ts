@@ -5,14 +5,13 @@ import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import { ContainerImage, CpuArchitecture, OperatingSystemFamily } from 'aws-cdk-lib/aws-ecs';
 import { EventBus } from 'aws-cdk-lib/aws-events';
-import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Effect, ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,8 +21,8 @@ export interface EngineConstructProperties {
 	environment: string;
 	bucketName: string;
 	eventBusName: string;
-	stacServerUrl: string;
-	stacApiSecretName: string;
+	stacApiEndpoint: string;
+	stacApiResourceArn: string;
 }
 
 export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
@@ -36,8 +35,6 @@ export class EngineConstruct extends Construct {
 		super(scope, id);
 
 		const namePrefix = `arcade-${props.environment}`;
-
-		const stacApiSecret = Secret.fromSecretNameV2(this, 'stacApiSecret', props.stacApiSecretName);
 
 		const accessLogBucket = new Bucket(this, 's3AccessLog', {
 			bucketName: `${namePrefix}-${Stack.of(this).account}-${Stack.of(this).region}-access-log`,
@@ -77,7 +74,13 @@ export class EngineConstruct extends Construct {
 		// The job role is assumed by the code running inside the container
 		bucket.grantReadWrite(jobRole);
 		eventBus.grantPutEventsTo(jobRole);
-		stacApiSecret.grantRead(jobRole);
+		jobRole.addToPolicy(
+			new PolicyStatement({
+				actions: ['execute-api:Invoke'],
+				effect: Effect.ALLOW,
+				resources: [props.stacApiResourceArn],
+			})
+		);
 
 		// Create an AWS Batch Job Definition
 		const engineProcessorJobDefinition = new EcsJobDefinition(this, 'EngineProcessorJobDefinition', {
@@ -93,8 +96,7 @@ export class EngineConstruct extends Construct {
 				environment: {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
-					STAC_SERVER_URL: props.stacServerUrl,
-					STAC_API_SECRET_NAME: props.stacApiSecretName
+					STAC_API_ENDPOINT: props.stacApiEndpoint,
 				},
 			}),
 		});
@@ -205,6 +207,7 @@ export class EngineConstruct extends Construct {
 						'Action::s3:List*',
 						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
 						'Resource::arn:<AWS::Partition>:logs:<AWS::Region>:<AWS::AccountId>:log-group:/aws/batch/job:*',
+						`Resource::arn:<AWS::Partition>:execute-api:${region}:${account}:<StacServerModuleStacApiGateway48C0D803>/*/*/*`
 					],
 					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
 				},

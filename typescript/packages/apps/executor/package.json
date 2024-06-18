@@ -46,7 +46,7 @@
     "ow": "~1",
     "pino-pretty": "~11",
     "pino": "~8",
-    "p-limit": "~4",
+    "p-limit": "~5",
     "ulid": "~2"
   },
   "devDependencies": {

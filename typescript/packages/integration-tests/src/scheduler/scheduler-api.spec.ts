@@ -14,6 +14,8 @@ import pWaitFor from 'p-wait-for';
 import { ResultResource } from "@arcade/clients";
 import { ID_PATTERN, ISO8601_DATE_TIME_MS_PATTERN, UUID_PATTERN } from "../utils/regex.js";
 import { createResourcesMethodForModules } from "../utils/common.utils.js";
+import { fromProcess } from "@aws-sdk/credential-providers";
+import { Credentials } from "aws4";
 
 dayjs.extend(utc)
 
@@ -41,15 +43,18 @@ const teardown = async () => {
 
 describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 	let regionId: string, groupId: string, polygonId: string, stateId: string, userToken: string;
+	let credentials: Credentials;
 
 	beforeEach(async () => {
 		userToken = await getAuthToken(ADMIN_USERNAME, ADMIN_PASSWORD);
+		const { accessKeyId, secretAccessKey, sessionToken } = await (fromProcess())();
+		credentials = { accessKeyId, secretAccessKey, sessionToken }
 		groupId = await createGroup(userToken);
 		// verify that the groups collection is created
-		await waitForStacCollection(`group_${groupId}`, create_group_body['name'])
+		await waitForStacCollection(credentials, `group_${groupId}`, create_group_body['name'])
 		regionId = await createRegionWithoutSchedule(groupId, userToken);
 		// verify that region stac collection is created
-		await waitForStacCollection(`region_${regionId}`, create_region_body_without_schedule['name'])
+		await waitForStacCollection(credentials, `region_${regionId}`, create_region_body_without_schedule['name'])
 		polygonId = await createPolygon(regionId, userToken);
 		stateId = await createState(polygonId, userToken);
 	});
@@ -59,8 +64,10 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		await updateRegionWithSchedule(regionId, userToken);
 		// wait for successful engine execution
 		const resultListResource = await waitForSuccessfulEngineExecution(regionId, userToken);
+
 		// verify that the polygon stac item is published
-		await listStacItems(regionId, resultListResource[0].id, polygonId, create_state_body['tags']['crop'], create_state_body['tags']['plantedAt'])
+		await listStacItems(credentials, regionId, resultListResource[0].id, polygonId, create_state_body['tags']['crop'], create_state_body['tags']['plantedAt'])
+
 		// ensure that results status is propagated to the region resource
 		await regions.waitForGetResource('regions', {
 			withIdToken: userToken,
@@ -82,10 +89,10 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 	})
 });
 
-const waitForStacCollection = async (id: string, title: string): Promise<void> => {
+const waitForStacCollection = async (credentials: Credentials, id: string, title: string): Promise<void> => {
 	await pWaitFor(async (): Promise<any> => {
 		try {
-			await getStacItem(id, title);
+			await getStacItem(credentials, id, title);
 			return true;
 		} catch (e) {
 			if (e.message === 'HTTP status 404 !== 200') {
@@ -128,9 +135,9 @@ const waitForSuccessfulEngineExecution = async (regionId: string, userToken: str
 	return resultListResource;
 }
 
-const getStacItem = async (id: string, title: string): Promise<any> => {
+const getStacItem = async (credentials: Credentials, id: string, title: string): Promise<any> => {
 	await stacs.listResources(`collections/${id}`, {
-		withApiKey: process.env['STAC_API_KEY'],
+		withIAMCredentials: credentials,
 		withContentHeader: 'application/json; charset=utf-8',
 		expectJsonLike: {
 			title,
@@ -140,9 +147,9 @@ const getStacItem = async (id: string, title: string): Promise<any> => {
 	}).toss();
 }
 
-const listStacItems = async (regionId: string, resultId: string, polygonId: string, crop: string, plantedAt: string): Promise<any> => {
+const listStacItems = async (credentials: Credentials, regionId: string, resultId: string, polygonId: string, crop: string, plantedAt: string): Promise<any> => {
 	await stacs.listResources(`collections/region_${regionId}/items`, {
-		withApiKey: process.env['STAC_API_KEY'],
+		withIAMCredentials: credentials,
 		withContentHeader: 'application/geo+json; charset=utf-8',
 		expectJsonLike: {
 			features: [{

@@ -30,7 +30,7 @@ export class RegionsExtensionModule extends Construct {
 
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName)
 
-		const regionsApiLambda = Function.fromFunctionArn(scope, 'RegionsApiFunction', props.regionsApiFunctionArn);
+		const regionsApiLambda = Function.fromFunctionAttributes(scope, 'RegionsApiFunction', { functionArn: props.regionsApiFunctionArn, sameEnvironment: true });
 
 		// Lambda function that processor schedule queued in SQS
 		const eventbridgeLambda = new NodejsFunction(this, 'EventBridgeProcessorLambda', {

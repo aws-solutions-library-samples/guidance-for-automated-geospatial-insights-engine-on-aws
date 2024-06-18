@@ -73,12 +73,8 @@ const registerContainer = (app?: FastifyInstance) => {
 	const roleArn: string = process.env['ROLE_ARN'];
 	const queueUrl = process.env['QUEUE_URL'];
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
-	const stacServerUrl = process.env['STAC_SERVER_URL'];
-	const openSearchEndPoint = process.env['OPEN_SEARCH_ENDPOINT'];
-	const openSearchSecret = process.env['OPEN_SEARCH_SECRET'];
-	const stacApiSecret = process.env['STAC_API_SECRET_NAME']
+	const stacApiEndpoint = process.env['STAC_API_ENDPOINT'];
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
-
 
 	diContainer.register({
 		// Clients
@@ -128,7 +124,7 @@ const registerContainer = (app?: FastifyInstance) => {
 		),
 
 		stacServerClient: asFunction(
-			(c: Cradle) => new StacServerClient(app.log, c.snsClient, c.lambdaClient, stacServerTopicArn, stacServerUrl, c.secretsManagerClient, openSearchEndPoint, openSearchSecret, stacApiSecret),
+			(c: Cradle) => new StacServerClient(app.log, c.snsClient, stacServerTopicArn, stacApiEndpoint, awsRegion),
 			{
 				...commonInjectionOptions,
 			}

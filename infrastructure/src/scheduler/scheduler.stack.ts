@@ -13,14 +13,14 @@ import {
 import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
 import { ExecutorModule } from "./executor.construct.js";
 import { resultsApiFunctionArnParameter } from "../results/results.construct.js";
-import { stacApiSecretNameParameter } from "../shared/shared.stack.js";
 import { Function } from "aws-cdk-lib/aws-lambda";
 
 export type SchedulerStackProperties = StackProps & {
 	environment: string;
 	concurrencyLimit: number;
 	sentinelTopicArn: string;
-	stacServerUrl: string;
+	stacApiEndpoint: string;
+	stacApiResourceArn: string;
 }
 
 export class SchedulerStack extends Stack {
@@ -69,13 +69,11 @@ export class SchedulerStack extends Stack {
 		}).stringValue;
 
 
-		const stacApiSecretName = StringParameter.fromStringParameterAttributes(this, 'stacApiSecretName', {
-			parameterName: stacApiSecretNameParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
+		const regionsApiLambda = Function.fromFunctionAttributes(this, 'RegionsApiFunction', { functionArn: regionsApiFunctionArn, sameEnvironment: true });
 
-		const regionsApiLambda = Function.fromFunctionArn(this, 'RegionsApiFunction', regionsApiFunctionArn);
-		const resultsApiLambda = Function.fromFunctionArn(this, 'ResultsApiFunction', resultsApiFunctionArn);
+		const resultsApiLambda = Function.fromFunctionAttributes(this, 'ResultsApiFunction', {
+			functionArn: resultsApiFunctionArn, sameEnvironment: true
+		});
 
 		const schedulerModule = new SchedulerModule(this, 'SchedulerModule', {
 			environment: props.environment,
@@ -83,8 +81,8 @@ export class SchedulerStack extends Stack {
 			eventBusName,
 			bucketName,
 			regionsApiLambda,
-			stacApiSecretName,
-			stacServerUrl: props.stacServerUrl
+			stacApiEndpoint: props.stacApiEndpoint,
+			stacApiResourceArn: props.stacApiResourceArn
 		})
 
 		const executorModule = new ExecutorModule(this, 'ExecutorModule', {

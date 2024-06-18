@@ -16,11 +16,10 @@ import { SSMClient } from '@aws-sdk/client-ssm';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { EventProcessor } from '../events/eventProcessor.js';
 import { StacUtil } from '../utils/stacUtil.js';
-import { StacServerInitializer } from '../events/stacServerInitializer.js';
 import { ResultsService } from '../api/results/service.js';
 import { ResultsRepository } from '../api/results/repository.js';
 import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { ApiAuthorizer, StacServerAuthorizer } from '@arcade/rest-api-authorizer';
+import { ApiAuthorizer } from '@arcade/rest-api-authorizer';
 import { VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
 
 const { captureAWSv3Client } = pkg;
@@ -28,7 +27,6 @@ const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
 	interface Cradle {
 		eventProcessor: EventProcessor;
-		stacServerInitializer: StacServerInitializer;
 		eventBridgeClient: EventBridgeClient;
 		dynamoDbUtils: DynamoDbUtils;
 		dynamoDBDocumentClient: DynamoDBDocumentClient;
@@ -45,7 +43,6 @@ declare module '@fastify/awilix' {
 		lambdaInvoker: Invoker;
 		resultsService: ResultsService;
 		apiAuthorizer: ApiAuthorizer;
-		stacServerAuthorizer: StacServerAuthorizer;
 		avpClient: VerifiedPermissionsClient;
 	}
 }
@@ -127,14 +124,11 @@ const registerContainer = (app?: FastifyInstance) => {
 	const bucketName = process.env['BUCKET_NAME'];
 	const tableName = process.env['TABLE_NAME'];
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
-	const stacServerUrl = process.env['STAC_SERVER_URL'];
+	const stacApiEndpoint = process.env['STAC_API_ENDPOINT'];
 	const regionsFunctionName = process.env['REGIONS_FUNCTION_NAME'];
-	const openSearchEndPoint = process.env['OPEN_SEARCH_ENDPOINT'];
-	const openSearchSecret = process.env['OPEN_SEARCH_SECRET'];
 	const userPoolId = process.env['USER_POOL_ID'];
 	const policyStoreId = process.env['POLICY_STORE_ID'];
 	const clientId = process.env['CLIENT_ID'];
-	const stacApiSecretName = process.env['STAC_API_SECRET_NAME'];
 
 	diContainer.register({
 		// Clients
@@ -179,13 +173,9 @@ const registerContainer = (app?: FastifyInstance) => {
 				new StacServerClient(
 					app.log,
 					container.snsClient,
-					container.lambdaClient,
 					stacServerTopicArn,
-					stacServerUrl,
-					container.secretsManagerClient,
-					openSearchEndPoint,
-					openSearchSecret,
-					stacApiSecretName
+					stacApiEndpoint,
+					awsRegion
 				),
 			{
 				...commonInjectionOptions,
@@ -213,10 +203,6 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		stacServerInitializer: asFunction((container) => new StacServerInitializer(app.log, container.stacServerClient), {
-			...commonInjectionOptions,
-		}),
-
 		// Repositories
 		resultsRepository: asFunction((container) => new ResultsRepository(app.log, container.dynamoDBDocumentClient, tableName), {
 			...commonInjectionOptions,
@@ -229,12 +215,6 @@ const registerContainer = (app?: FastifyInstance) => {
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
 			...commonInjectionOptions,
 		}),
-		stacServerAuthorizer: asFunction(
-			(container) => new StacServerAuthorizer(app.log, policyStoreId, userPoolId, clientId, stacApiSecretName, container.secretsManagerClient),
-			{
-				...commonInjectionOptions,
-			}
-		),
 	});
 };
 

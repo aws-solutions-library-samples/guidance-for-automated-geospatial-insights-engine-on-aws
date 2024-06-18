@@ -10,12 +10,15 @@
 		"pretest": "npx tsx src/localConfigGenerator.ts"
 	},
 	"devDependencies": {
+		"@types/aws4": "~1",
 		"@arcade/regions": "workspace:*",
 		"@arcade/clients": "workspace:*",
-		"@aws-amplify/core": "6.1.0",
-		"@aws-amplify/auth": "6.2.2",
-		"aws-amplify": "6.2.0",
+		"@aws-amplify/core": "~6",
+		"@aws-amplify/auth": "~6",
+		"aws-amplify": "~6",
 		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-sts": "~3",
+		"@aws-sdk/credential-providers": "~3",
 		"@aws-sdk/client-cloudformation": "~3",
 		"@aws-sdk/client-secrets-manager": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
@@ -35,10 +38,11 @@
 		"typescript": "~5",
 		"vitest-mock-extended": "~1",
 		"vitest": "~0",
-		"ulid": "~2"
+		"ulid": "~2",
+		"aws4": "~1"
 	},
 	"private": false,
 	"dependencies": {
-		"p-wait-for": "~5.0.2"
+		"p-wait-for": "~5"
 	}
 }
