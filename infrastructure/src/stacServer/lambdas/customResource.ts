@@ -16,6 +16,338 @@ export interface Credentials {
 	password: string;
 }
 
+const polygonIndexMapping: Record<string, any> = {
+	"dynamic_templates": [
+		{
+			"descriptions": {
+				"match": "description",
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "text"
+				}
+			}
+		},
+		{
+			"titles": {
+				"match": "title",
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "text"
+				}
+			}
+		},
+		{
+			"proj_epsg": {
+				"match": "proj:epsg",
+				"mapping": {
+					"type": "integer"
+				}
+			}
+		},
+		{
+			"proj_projjson": {
+				"match": "proj:projjson",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"proj_centroid": {
+				"match": "proj:centroid",
+				"mapping": {
+					"type": "geo_point"
+				}
+			}
+		},
+		{
+			"proj_geometry": {
+				"match": "proj:geometry",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"proj_transform": {
+				"match": "proj:transform",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"no_index_href": {
+				"match": "href",
+				"mapping": {
+					"index": false,
+					"type": "text"
+				}
+			}
+		},
+		{
+			"strings": {
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "keyword"
+				}
+			}
+		},
+		{
+			"numerics": {
+				"match_mapping_type": "long",
+				"mapping": {
+					"type": "float"
+				}
+			}
+		}
+	],
+	"numeric_detection": false,
+	"properties": {
+		"assets": {
+			"enabled": false,
+			"type": "object"
+		},
+		"bbox": {
+			"type": "float"
+		},
+		"collection": {
+			"type": "keyword"
+		},
+		"geometry": {
+			"type": "geo_shape"
+		},
+		"id": {
+			"type": "keyword"
+		},
+		"links": {
+			"enabled": false,
+			"type": "object"
+		},
+		"properties": {
+			"type": "object",
+			"properties": {
+				"area_size": {
+					"type": "float"
+				},
+				"area_unit_of_measure": {
+					"type": "keyword"
+				},
+				"created": {
+					"type": "date"
+				},
+				"crop_type": {
+					"type": "keyword"
+				},
+				"datetime": {
+					"type": "date"
+				},
+				"end_datetime": {
+					"type": "date"
+				},
+				"planted_at": {
+					"type": "date"
+				},
+				"sat:absolute_orbit": {
+					"type": "integer"
+				},
+				"sat:relative_orbit": {
+					"type": "integer"
+				},
+				"start_datetime": {
+					"type": "date"
+				},
+				"updated": {
+					"type": "date"
+				}
+			}
+		},
+		"stac_version": {
+			"type": "keyword"
+		},
+		"type": {
+			"type": "keyword"
+		}
+	}
+}
+
+const regionIndexMapping: Record<string, any> = {
+	"dynamic_templates": [
+		{
+			"descriptions": {
+				"match": "description",
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "text"
+				}
+			}
+		},
+		{
+			"titles": {
+				"match": "title",
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "text"
+				}
+			}
+		},
+		{
+			"proj_epsg": {
+				"match": "proj:epsg",
+				"mapping": {
+					"type": "integer"
+				}
+			}
+		},
+		{
+			"proj_projjson": {
+				"match": "proj:projjson",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"proj_centroid": {
+				"match": "proj:centroid",
+				"mapping": {
+					"type": "geo_point"
+				}
+			}
+		},
+		{
+			"proj_geometry": {
+				"match": "proj:geometry",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"proj_transform": {
+				"match": "proj:transform",
+				"mapping": {
+					"enabled": false,
+					"type": "object"
+				}
+			}
+		},
+		{
+			"no_index_href": {
+				"match": "href",
+				"mapping": {
+					"index": false,
+					"type": "text"
+				}
+			}
+		},
+		{
+			"strings": {
+				"match_mapping_type": "string",
+				"mapping": {
+					"type": "keyword"
+				}
+			}
+		},
+		{
+			"numerics": {
+				"match_mapping_type": "long",
+				"mapping": {
+					"type": "float"
+				}
+			}
+		}
+	],
+	"numeric_detection": false,
+	"properties": {
+		"assets": {
+			"enabled": false,
+			"type": "object"
+		},
+		"bbox": {
+			"type": "float"
+		},
+		"collection": {
+			"type": "keyword"
+		},
+		"geometry": {
+			"type": "geo_shape"
+		},
+		"id": {
+			"type": "keyword"
+		},
+		"links": {
+			"enabled": false,
+			"type": "object"
+		},
+		"properties": {
+			"type": "object",
+			"properties": {
+				"arcade:isActive": {
+					"type": "boolean"
+				},
+				"arcade:processedOnNewScene": {
+					"type": "boolean"
+				},
+				"created": {
+					"type": "date"
+				},
+				"createdAt": {
+					"type": "date"
+				},
+				"datetime": {
+					"type": "date"
+				},
+				"end_datetime": {
+					"type": "date"
+				},
+				"sat:absolute_orbit": {
+					"type": "integer"
+				},
+				"sat:relative_orbit": {
+					"type": "integer"
+				},
+				"start_datetime": {
+					"type": "date"
+				},
+				"updated": {
+					"type": "date"
+				},
+				"updatedAt": {
+					"type": "date"
+				}
+			}
+		},
+		"stac_version": {
+			"type": "keyword"
+		},
+		"type": {
+			"type": "keyword"
+		}
+	}
+}
+
+const createIndices = async (adminCredentials: Credentials, indexName: string, mappings: Record<string, any>): Promise<void> => {
+	console.log(`stacServer.customResource> createOpenSearchUser> in:`);
+	const result = await axios.put(`https://${STAC_ENDPOINT}/${indexName}` as string, {
+		"mappings": mappings
+	}, {
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		auth: {
+			username: adminCredentials.username,
+			password: adminCredentials.password,
+		},
+	});
+
+	console.log(`stacServer.customResource> createOpenSearchUser> exit> result: ${JSON.stringify(result.data)}`);
+}
 const updateStacAPIEnvironmentVariables = async (): Promise<void> => {
 	console.log(`stacServer.customResource> updateStacAPIEnvironmentVariables> in:`);
 	const updateLambdaFutures = [STAC_API_LAMBDA, STAC_INGEST_LAMBDA].map(async (l: string) => {
@@ -48,6 +380,48 @@ const createCollectionIndices = async (): Promise<void> => {
 			InvocationType: 'RequestResponse',
 			Payload: fromUtf8(JSON.stringify({ create_indices: true })),
 		}),
+	);
+
+	const createdAt = new Date(Date.now()).toISOString();
+
+
+	const constructCollection = (type: string) => {
+		return {
+			id: `arcade-${type}`,
+			type: 'Collection',
+			stac_version: '1.0.0',
+			stac_extensions: [
+				'https://stac-extensions.github.io/eo/v1.0.0/schema.json',
+				'https://stac-extensions.github.io/projection/v1.0.0/schema.json',
+				'https://stac-extensions.github.io/view/v1.0.0/schema.json',
+			],
+			description: `Collection contains all ${type}s in ARCADE framework.`,
+			license: 'proprietary',
+			extent: {
+				spatial: {
+					bbox: [],
+				},
+				temporal: {
+					interval: [[createdAt, null]],
+				},
+			},
+			links: [],
+		}
+	}
+
+
+	await snsClient.send(
+		new PublishCommand({
+			Message: JSON.stringify(constructCollection('polygon')),
+			TopicArn: INGESTION_TOPIC_ARN
+		})
+	);
+
+	await snsClient.send(
+		new PublishCommand({
+			Message: JSON.stringify(constructCollection('polygon')),
+			TopicArn: INGESTION_TOPIC_ARN
+		})
 	);
 
 	console.log(`stacServer.customResource> createCollectionIndices> exit:`);
@@ -136,44 +510,17 @@ const init = async (): Promise<void> => {
 	await createOpenSearchRole(STAC_ROLE_NAME, credentials);
 	await linkRoleToUser(STAC_ROLE_NAME, userCredentials.username, credentials);
 
-	// create index
+	// create index for collection
 	await createCollectionIndices();
 
-	// publish catalog event
-	await createCatalog();
+	// create index for polygon and region resources
+	await createIndices(credentials, 'arcade-polygon', polygonIndexMapping);
+	await createIndices(credentials, 'arcade-region', regionIndexMapping);
 
 	// update StacAPI lambda environment variables
 	await updateStacAPIEnvironmentVariables();
 
 	console.log(`stacServer.customResource> init> exit :`);
-}
-
-const createCatalog = async (): Promise<void> => {
-	console.log(`stacServer.customResource> createCatalog> in :`);
-	const catalog = {
-		id: 'catalog_arcade',
-		type: 'Catalog',
-		stac_version: '1.0.0',
-		links: [
-			{
-				rel: 'self',
-				href: '../catalog.json',
-				type: 'application/json',
-				title: 'ARCADE Catalog',
-			},
-		],
-		description: 'Default Catalog for ARCADE',
-		title: 'ARCADE Catalog',
-	};
-
-	await snsClient.send(
-		new PublishCommand({
-			Message: JSON.stringify(catalog),
-			TopicArn: INGESTION_TOPIC_ARN
-		})
-	);
-
-	console.log(`stacServer.customResource> createCatalog> exit:`);
 }
 
 export const handler = async (event: CloudFormationCustomResourceEvent): Promise<any> => {

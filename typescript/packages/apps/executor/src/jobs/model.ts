@@ -14,8 +14,11 @@ export type FinishJobRequest = {
 
 export interface BatchEngineInput {
 	polygonId: string;
+	polygonName: string;
 	groupId: string;
+	groupName: string;
 	regionId: string;
+	regionName: string;
 	resultId: string;
 	coordinates: [[number, number]],
 	exclusions?: [[[number, number]]];

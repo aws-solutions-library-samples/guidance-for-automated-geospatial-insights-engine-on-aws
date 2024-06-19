@@ -90,7 +90,7 @@ export class StacServerModule extends Construct {
 		)
 
 		const ingestTopic = new Topic(this, 'IngestTopic', {
-			topicName: `${namePrefix}-ingest`,
+			topicName: `${namePrefix}-stac-ingest`,
 			enforceSSL: true,
 		});
 
@@ -111,7 +111,7 @@ export class StacServerModule extends Construct {
 		this.stacIngestTopicArn = ingestTopic.topicArn;
 
 		const ingestDlq = new Queue(this, 'IngestDlq', {
-			queueName: `${namePrefix}-dlq`,
+			queueName: `${namePrefix}-stac-ingest-dlq`,
 			enforceSSL: true
 		});
 
@@ -131,7 +131,7 @@ export class StacServerModule extends Construct {
 		const ingestQueue = new Queue(this, 'IngestQueue', {
 			visibilityTimeout: Duration.seconds(120),
 			receiveMessageWaitTime: Duration.seconds(5),
-			queueName: `${namePrefix}-queue`,
+			queueName: `${namePrefix}-stac-queue`,
 			deadLetterQueue: {
 				maxReceiveCount: 2,
 				queue: ingestDlq,
@@ -213,13 +213,13 @@ export class StacServerModule extends Construct {
 			ebsOptions: {
 				ebsEnabled: true,
 				volumeType: 'gp3',
-				volumeSize: 35
+				volumeSize: props.volumeSize
 			},
 			clusterConfig: {
 				instanceType: props.instanceType,
-				instanceCount: 1,
-				dedicatedMasterEnabled: false,
-				zoneAwarenessEnabled: false,
+				instanceCount: 4,
+				dedicatedMasterEnabled: true,
+				zoneAwarenessEnabled: true,
 			},
 			engineVersion: 'OpenSearch_2.11',
 			logPublishingOptions: {

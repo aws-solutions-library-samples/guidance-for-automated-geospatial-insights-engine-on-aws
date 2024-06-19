@@ -190,7 +190,7 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		stacUtil: asFunction((container: Cradle) => new StacUtil(app.log, container.s3Client, bucketName, container.regionsClient), {
+		stacUtil: asFunction((container: Cradle) => new StacUtil(app.log, container.s3Client, bucketName), {
 			...commonInjectionOptions,
 		}),
 

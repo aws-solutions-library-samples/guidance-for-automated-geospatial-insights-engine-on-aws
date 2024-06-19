@@ -1,6 +1,6 @@
 import type { StacServerClient } from '@arcade/clients';
 import type { CatalogCreateEvent, RegionChangeEvent } from '@arcade/events';
-import { EngineJobCreatedDetails, EngineJobUpdatedDetails, GroupChangeEvent, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
+import { EngineJobCreatedDetails, EngineJobUpdatedDetails, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import { ResultsService } from '../api/results/service.js';
 import { StacUtil } from '../utils/stacUtil.js';
@@ -24,19 +24,6 @@ export class EventProcessor {
 		this.log.info(`EventProcessor > processCatalogCreationEvent >exit`);
 	}
 
-	public async processGroupChangeEvent(event: GroupChangeEvent): Promise<void> {
-		this.log.info(`EventProcessor > processGroupChangeEvent >in  event: ${JSON.stringify(event)}`);
-		// Construct stac items
-		if (event.detail.new) {
-			const groupCollection = await this.stacUtil.constructGroupCollection(event.detail.new);
-			await this.stacServerClient.publishCollection(groupCollection);
-		} else {
-			// Delete event is to be implemented
-		}
-
-		this.log.info(`EventProcessor > processGroupChangeEvent >exit`);
-	}
-
 	public async processRegionChangeEvent(event: RegionChangeEvent): Promise<void> {
 		this.log.info(`EventProcessor > processRegionChangeEvent >in  event: ${JSON.stringify(event)}`);
 
@@ -48,8 +35,6 @@ export class EventProcessor {
 		// Construct stac items
 		if (event.detail.eventType === 'created' || event.detail.eventType === 'updated') {
 			ow(event.detail.new, ow.object.nonEmpty);
-			const regionCollection = await this.stacUtil.constructRegionCollection(event.detail.new);
-			await this.stacServerClient.publishCollection(regionCollection);
 			// when a region is created initially and no polygon associated with it, then bounding box will be undefined
 			if (event.detail.new.boundingBox) {
 				const regionStacItem = await this.stacUtil.constructRegionStacItem({ ...event.detail.new, isActive: true })
@@ -57,8 +42,10 @@ export class EventProcessor {
 			}
 		} else {
 			ow(event.detail.old, ow.object.nonEmpty);
-			const regionStacItem = await this.stacUtil.constructRegionStacItem({ ...event.detail.old, isActive: false })
-			await this.stacServerClient.publishStacItem(regionStacItem);
+			if (event.detail.new.boundingBox) {
+				const regionStacItem = await this.stacUtil.constructRegionStacItem({ ...event.detail.old, isActive: false })
+				await this.stacServerClient.publishStacItem(regionStacItem);
+			}
 		}
 		this.log.info(`EventProcessor > processRegionChangeEvent >exit`);
 	}

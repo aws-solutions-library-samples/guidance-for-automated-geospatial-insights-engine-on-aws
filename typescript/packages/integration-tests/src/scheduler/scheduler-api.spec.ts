@@ -50,12 +50,10 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		const { accessKeyId, secretAccessKey, sessionToken } = await (fromProcess())();
 		credentials = { accessKeyId, secretAccessKey, sessionToken }
 		groupId = await createGroup(userToken);
-		// verify that the groups collection is created
-		await waitForStacCollection(credentials, `group_${groupId}`, create_group_body['name'])
 		regionId = await createRegionWithoutSchedule(groupId, userToken);
-		// verify that region stac collection is created
-		await waitForStacCollection(credentials, `region_${regionId}`, create_region_body_without_schedule['name'])
 		polygonId = await createPolygon(regionId, userToken);
+		// verify that region stac collection is created
+		await waitForStacCollection(credentials, `arcade-region`, regionId)
 		stateId = await createState(polygonId, userToken);
 	});
 
@@ -65,8 +63,8 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		// wait for successful engine execution
 		const resultListResource = await waitForSuccessfulEngineExecution(regionId, userToken);
 
-		// verify that the polygon stac item is published
-		await listStacItems(credentials, regionId, resultListResource[0].id, polygonId, create_state_body['tags']['crop'], create_state_body['tags']['plantedAt'])
+		// wait until the stac collection is published
+		await waitForStacCollection(credentials, `arcade-polygon`, `${resultListResource[0].id}_${polygonId}`)
 
 		// ensure that results status is propagated to the region resource
 		await regions.waitForGetResource('regions', {
@@ -89,10 +87,10 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 	})
 });
 
-const waitForStacCollection = async (credentials: Credentials, id: string, title: string): Promise<void> => {
+const waitForStacCollection = async (credentials: Credentials, collectionId: string, id: string): Promise<void> => {
 	await pWaitFor(async (): Promise<any> => {
 		try {
-			await getStacItem(credentials, id, title);
+			await getStacItem(credentials, collectionId, id);
 			return true;
 		} catch (e) {
 			if (e.message === 'HTTP status 404 !== 200') {
@@ -135,35 +133,17 @@ const waitForSuccessfulEngineExecution = async (regionId: string, userToken: str
 	return resultListResource;
 }
 
-const getStacItem = async (credentials: Credentials, id: string, title: string): Promise<any> => {
-	await stacs.listResources(`collections/${id}`, {
-		withIAMCredentials: credentials,
-		withContentHeader: 'application/json; charset=utf-8',
-		expectJsonLike: {
-			title,
-			type: 'Collection'
-		},
-		expectStatus: 200,
-	}).toss();
-}
-
-const listStacItems = async (credentials: Credentials, regionId: string, resultId: string, polygonId: string, crop: string, plantedAt: string): Promise<any> => {
-	await stacs.listResources(`collections/region_${regionId}/items`, {
+const getStacItem = async (credentials: Credentials, collectionId: string, itemId: string): Promise<any> => {
+	await stacs.listResources(`collections/${collectionId}/items/${itemId}`, {
 		withIAMCredentials: credentials,
 		withContentHeader: 'application/geo+json; charset=utf-8',
 		expectJsonLike: {
-			features: [{
-				id: `${resultId}_${polygonId}`,
-				properties: {
-					crop_type: crop,
-					planted_at: plantedAt
-				}
-			}]
+			id: itemId,
+			type: 'Feature'
 		},
 		expectStatus: 200,
 	}).toss();
 }
-
 
 const createGroup = async (idToken: string): Promise<string> => {
 	return await regions.createResource('groups', {

@@ -37,7 +37,7 @@ const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as str
 const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10);
 
 // optional configuration for STAC OpenSearch servers
-const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'm5.large.search';
+const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'c5.4xlarge.search';
 const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerInstanceType') ?? 50);
 
 // optional requirement to remove bucket and objects when it got deleted

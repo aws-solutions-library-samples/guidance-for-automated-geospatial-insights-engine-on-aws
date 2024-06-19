@@ -356,14 +356,17 @@ export interface polygonProcessingDetails {
 	 * Fields are represented as a polygon
 	 */
 	polygonId: string;
+	polygonName: string;
 	/**
 	 * A grower may own many farms. A grower is represented as a group.
 	 */
 	groupId: string;
+	groupName: string;
 	/**
 	 * Farms are comprised of many fields. A farm is represented as a region.
 	 */
 	regionId: string;
+	regionName: string;
 	/**
 	 * The id of the resource that this metadata belongs to.
 	 */

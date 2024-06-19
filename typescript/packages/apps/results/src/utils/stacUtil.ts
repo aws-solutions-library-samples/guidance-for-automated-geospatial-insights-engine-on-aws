@@ -1,5 +1,5 @@
-import { LambdaRequestContext, RegionsClient } from '@arcade/clients';
-import { Catalog, CatalogDetails, Collection, GroupDetails, polygonProcessingDetails, RegionResource, StacItem } from '@arcade/events';
+import { LambdaRequestContext } from '@arcade/clients';
+import { Catalog, CatalogDetails, polygonProcessingDetails, RegionResource, StacItem } from '@arcade/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
@@ -15,11 +15,13 @@ dayjs.extend(utc);
 export class StacUtil {
 	readonly context: LambdaRequestContext;
 
-	public constructor(readonly log: BaseLogger, readonly s3Client: S3Client, readonly bucketName: string, readonly regionsClient: RegionsClient) {
+	private readonly regionIndexName = 'arcade-region';
+	private readonly polygonIndexName = 'arcade-polygon';
+
+	public constructor(readonly log: BaseLogger, readonly s3Client: S3Client, readonly bucketName: string) {
 		this.log = log;
 		this.s3Client = s3Client;
 		this.bucketName = bucketName;
-		this.regionsClient = regionsClient;
 
 		// TODO must replace with valid credentials
 		// Credentials used for calling the regions API
@@ -41,8 +43,11 @@ export class StacUtil {
 			ow.object.exactShape({
 				jobId: ow.string.nonEmpty,
 				groupId: ow.string.nonEmpty,
+				groupName: ow.string.nonEmpty,
 				regionId: ow.string.nonEmpty,
+				regionName: ow.string.nonEmpty,
 				polygonId: ow.string.nonEmpty,
+				polygonName: ow.string.nonEmpty,
 				resultId: ow.string.nonEmpty,
 				createdAt: ow.string.nonEmpty,
 				scheduleDateTime: ow.string.nonEmpty,
@@ -77,20 +82,11 @@ export class StacUtil {
 		const utcDate = date.split('T')[0];
 		const utcTime = date.split('T')[1].split('+')[0];
 
-		const [group, region, polygon] = await Promise.all([
-			// get Group Collection
-			this.regionsClient.getGroupById(details.groupId, this.context),
-			// get Region Collection
-			this.regionsClient.getRegionById(details.regionId, this.context),
-			//  Get Polygon Collection
-			this.regionsClient.getPolygonById(details.polygonId, this.context),
-		]);
-
 		// Update stac item id
-		stacItem.id = `${details.resultId}_${polygon.id}`;
+		stacItem.id = `${details.resultId}_${details.polygonId}`;
 
 		// set the collection
-		stacItem.collection = `region_${region.id}`;
+		stacItem.collection = this.polygonIndexName;
 
 		// set the bbox
 		stacItem.bbox = engineMetadata.bounding_box;
@@ -106,25 +102,25 @@ export class StacUtil {
 				rel: 'self',
 				href: `./${stacItem.id}.json`,
 				type: 'application/geo+json',
-				title: polygon.name,
+				title: details.polygonName,
 			},
 			{
 				rel: 'collection',
-				href: `./region_${region.id}.json`,
+				href: `./region_${details.regionId}.json`,
 				type: 'application/json',
-				title: region.name,
+				title: details.regionName,
 			},
 			{
 				rel: 'parent',
-				href: `./region_${region.id}.json`,
+				href: `./region_${details.regionId}.json`,
 				type: 'application/json',
-				title: region.name,
+				title: details.regionName,
 			},
 			{
 				rel: 'collection',
-				href: `./group_${group.id}.json`,
+				href: `./group_${details.groupId}.json`,
 				type: 'application/json',
-				title: group.name,
+				title: details.groupName,
 			},
 			{
 				rel: 'root',
@@ -134,12 +130,14 @@ export class StacUtil {
 			},
 		];
 
-		// update extensiona
+		// update extension
 		stacItem.stac_extensions = engineMetadata.extensions;
 
 		// Update the properties
 		stacItem.properties = {
 			datetime: details.createdAt,
+			"arcade:groupId": details.groupId,
+			"arcade:regionId": details.regionId,
 			...engineMetadata.properties,
 		};
 
@@ -183,46 +181,6 @@ export class StacUtil {
 		return catalog;
 	}
 
-	public async constructGroupCollection(groupDetail: GroupDetails): Promise<Collection> {
-		this.log.debug(`StacUtil > constructGroupCollection > in ${JSON.stringify(groupDetail)}`);
-		// validation
-		ow(groupDetail, ow.object.nonEmpty);
-		ow(groupDetail.id, ow.string.nonEmpty);
-
-		const collection = new DefaultStacRecords().defaultCollection;
-		const group = await this.regionsClient.getGroupById(groupDetail.id, this.context);
-
-		collection.id = `group_${group.id}`;
-		collection.title = group.name;
-		collection.description = group.name;
-		collection.extent.temporal.interval = [[groupDetail.createdAt, null]]
-
-		// Update links
-		collection.links = [
-			{
-				rel: 'self',
-				href: `./group_${group.id}.json`,
-				type: 'application/geo+json',
-				title: group.name,
-			},
-			{
-				rel: 'parent',
-				href: '../catalog.json',
-				type: 'application/json',
-				title: 'ARCADE Catalog',
-			},
-			{
-				rel: 'root',
-				href: '../catalog.json',
-				type: 'application/json',
-				title: 'ARCADE Catalog',
-			},
-		];
-
-		this.log.debug(`StacUtil > constructGroupCollection > exit ${JSON.stringify(collection)}`);
-		return collection;
-	}
-
 	public async constructRegionStacItem(regionResource: RegionResource & { isActive: boolean }): Promise<StacItem> {
 		this.log.debug(`StacUtil > constructRegionStacItem > in regionResource: ${JSON.stringify(regionResource)}`);
 		// validation
@@ -234,7 +192,7 @@ export class StacUtil {
 		const stacItem = new DefaultStacRecords().defaultStacItem;
 		const { id, groupId } = regionResource;
 		stacItem.id = id;
-		stacItem.collection = `group_${groupId}`;
+		stacItem.collection = `arcade-region`;
 		stacItem.bbox = regionResource.boundingBox;
 		// for region stac item the bbox and the polygon covers the same area
 		stacItem.geometry = bboxPolygon(regionResource.boundingBox).geometry
@@ -244,57 +202,8 @@ export class StacUtil {
 			updatedAt: regionResource.updatedAt,
 			"arcade:isActive": regionResource.isActive,
 			"arcade:processedOnNewScene": regionResource.processingConfig.mode === 'onNewScene',
+			"arcade:groupId": groupId
 		}
 		return stacItem;
-	}
-
-	public async constructRegionCollection(regionResource: RegionResource): Promise<Collection> {
-		this.log.debug(`StacUtil > constructRegionCollection > in> regionResource: ${JSON.stringify(regionResource)}`);
-		// validation
-		ow(regionResource, ow.object.nonEmpty);
-		ow(regionResource.id, ow.string.nonEmpty);
-		ow(regionResource.groupId, ow.string.nonEmpty);
-
-		const collection = new DefaultStacRecords().defaultCollection;
-		const [group, region] = await Promise.all([
-			// get Group Collection
-			this.regionsClient.getGroupById(regionResource.groupId, this.context),
-			// get Region Collection
-			this.regionsClient.getRegionById(regionResource.id, this.context),
-		]);
-
-		collection.id = `region_${region.id}`;
-		collection.title = region.name;
-		collection.description = region.name;
-
-		if (regionResource.boundingBox) {
-			collection.extent.spatial.bbox = [regionResource.boundingBox]
-		}
-
-		collection.extent.temporal.interval = [[regionResource.createdAt, null]]
-		// Update links
-		collection.links = [
-			{
-				rel: 'self',
-				href: `./region_${region.id}.json`,
-				type: 'application/geo+json',
-				title: region.name,
-			},
-			{
-				rel: 'parent',
-				href: `./group_${group.id}.json`,
-				type: 'application/geo+json',
-				title: group.name,
-			},
-			{
-				rel: 'root',
-				href: '../catalog.json',
-				type: 'application/json',
-				title: 'ARCADE Catalog',
-			},
-		];
-
-		this.log.debug(`StacUtil > constructGroupCollection > exit ${JSON.stringify(collection)}`);
-		return collection;
 	}
 }

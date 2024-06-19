@@ -10,9 +10,6 @@ import {
 	PolygonsProcessingEvent,
 	RegionChangeEvent,
 	REGIONS_EVENT_SOURCE,
-	REGIONS_GROUP_CREATED_EVENT,
-	REGIONS_GROUP_DELETED_EVENT,
-	REGIONS_GROUP_UPDATED_EVENT,
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
@@ -43,11 +40,6 @@ export const handler: EventBridgeHandler<string, EventDetails, void> = async (ev
 	 */
 	if ((event['detail-type'] as string) === CLI_CATALOG_CREATE_EVENT && event['source'] === CLI_EVENT_SOURCE) {
 		await eventProcessor.processCatalogCreationEvent(event as unknown as CatalogCreateEvent);
-	} else if ([REGIONS_GROUP_CREATED_EVENT, REGIONS_GROUP_UPDATED_EVENT, REGIONS_GROUP_DELETED_EVENT].includes(event['detail-type']) && event['source'] === REGIONS_EVENT_SOURCE) {
-		/**
-		 * Filter the group collection change event received from the regions module
-		 */
-		await eventProcessor.processGroupChangeEvent(event as unknown as GroupChangeEvent);
 	} else if (
 		/**
 		 * Filter the region collection change event received from the regions module
