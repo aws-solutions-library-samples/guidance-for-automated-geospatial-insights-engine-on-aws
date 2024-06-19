@@ -87,8 +87,11 @@ def start_task(
 			'DetailType': 'com.aws.arcade.executor>PolygonMetadata>created',
 			'Detail': json.dumps({
 				"groupId": request.group_id,
+				"groupName": request.group_name,
 				"polygonId": request.polygon_id,
+				"polygonName": request.polygon_name,
 				"regionId": request.region_id,
+				"regionName": request.region_name,
 				"resultId": request.result_id,
 				"jobId": aws_batch_job_id,
 				"scheduleDateTime": request.schedule_date_time,

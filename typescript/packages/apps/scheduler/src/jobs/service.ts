@@ -8,7 +8,8 @@ import { ulid } from "ulid";
 
 export class JobsService {
 
-	readonly context: LambdaRequestContext;
+	private readonly context: LambdaRequestContext;
+	private readonly regionIndexName = 'arcade-region';
 
 	constructor(private readonly logger: FastifyBaseLogger, private readonly stacClient: StacServerClient, private readonly regionsClient: RegionsClient, private readonly sqsClient: SQSClient, private readonly queueUrl: string) {
 		this.context = {
@@ -31,11 +32,9 @@ export class JobsService {
 			ow(sentinelStacItem.properties?.datetime, ow.string.nonEmpty);
 			ow(sentinelStacItem.bbox, ow.array.length(4));
 
-			const groupCollections = (await this.regionsClient.listGroups(this.context)).groups.map(o => `group_${o.id}`);
-
 			// search for all regions intersects the sentinel bounding box that is currently active and processing mode set to onNewScene
 			const searchResult = await this.stacClient.search({
-				collections: groupCollections,
+				collections: [this.regionIndexName],
 				bbox: sentinelStacItem.bbox,
 				"query": {
 					"arcade:isActive": {

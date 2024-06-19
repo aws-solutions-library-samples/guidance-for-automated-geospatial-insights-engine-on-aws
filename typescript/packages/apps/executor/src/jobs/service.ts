@@ -1,24 +1,11 @@
 import { LambdaRequestContext, Polygon, RegionsClient, ResultResource, ResultsClient } from '@arcade/clients';
-import {
-	BatchClient,
-	ListTagsForResourceCommand,
-	SubmitJobCommand,
-	SubmitJobCommandInput
-} from '@aws-sdk/client-batch';
+import { BatchClient, ListTagsForResourceCommand, SubmitJobCommand, SubmitJobCommandInput } from '@aws-sdk/client-batch';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import pLimit from 'p-limit';
 import { BatchEngineInput, FinishJobRequest, JobQueueArn, StartJobRequest } from './model.js';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import {
-	ARCADE_EVENT_SOURCE,
-	DomainEvent,
-	EngineJobDetails,
-	EngineType,
-	EventPublisher,
-	Priority,
-	Status
-} from "@arcade/events";
+import { ARCADE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, Priority, Status } from "@arcade/events";
 import { ulid } from 'ulid';
 
 const filename = 'metadata.json'
@@ -60,14 +47,21 @@ export class JobsService {
 		this.log.debug(`JobsService> uploadFileForBatchJob> params: ${JSON.stringify(params)}`);
 		const { request, resultId, keyPrefix, polygons, latestSuccessfulResult } = params
 		const limit = pLimit(this.concurrencyLimit);
+
+		const group = await this.regionsClient.getGroupById(request.groupId, this.context);
+
 		// run engine processing for each polygon
 		const createInputFilesForBatchProcessorFutures = polygons.map((polygon, index) => {
 			const containerEngineInput: BatchEngineInput = {
 				...request,
 				coordinates: polygon.boundary,
 				exclusions: polygon.exclusions,
+				groupId: request.groupId,
+				groupName: group.name,
 				polygonId: polygon.id,
+				polygonName: polygon.name,
 				regionId: request.id,
+				regionName: request.name,
 				resultId: resultId,
 				state: polygon.state,
 				latestSuccessfulResult,

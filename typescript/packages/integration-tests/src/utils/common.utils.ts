@@ -251,17 +251,6 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 
 			for (const r of resources) {
 				await deleteResource(resourcePlural, { id: r['id'], withIdToken: idToken }).toss();
-				try {
-					if (resourcePlural === 'groups') {
-						await openSearchClient.indices.delete({ index: `group_${r['id']}` });
-					} else if (resourcePlural === 'regions') {
-						await openSearchClient.indices.delete({ index: `region_${r['id']}` });
-					}
-				} catch (e) {
-					if (!e.message.includes('index_not_found_exception')) {
-						throw e;
-					}
-				}
 			}
 		} while (token);
 	};

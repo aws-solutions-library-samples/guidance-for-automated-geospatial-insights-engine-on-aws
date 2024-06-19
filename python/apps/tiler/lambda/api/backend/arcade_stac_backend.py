@@ -135,7 +135,12 @@ class ArcadeSTACBackend(BaseBackend):
 		if self.arcade_filters.timestamp is not None:
 			query["datetime"] = f"/{self.arcade_filters.timestamp.isoformat()}"
 		if self.arcade_filters.region_id is not None:
-			query["collections"] = [f"region_{self.arcade_filters.region_id}"]
+			query["collections"] = ["arcade-polygon"]
+			query["query"] = {
+				"arcade:regionId": {
+					"eq": self.arcade_filters.region_id
+				}
+			}
 
 		features = _fetch(
 			self.auth,

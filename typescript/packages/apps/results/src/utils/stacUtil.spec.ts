@@ -3,15 +3,12 @@ import { StacUtil } from "./stacUtil.js";
 import pino from "pino";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Client } from "@aws-sdk/client-s3";
-import { MockProxy } from 'vitest-mock-extended';
-import { RegionsClient } from "@arcade/clients";
 import { RegionResource } from "@arcade/events";
 
 describe('StacUtil', () => {
 
 	let underTest: StacUtil;
 	let mockS3Client = mockClient(S3Client);
-	let mockRegionsClient: MockProxy<RegionsClient>;
 
 	const regionCreatedEvent: RegionResource = {
 		"id": "01hxr5q6wkt4xbhk7thrvq269d",
@@ -43,7 +40,7 @@ describe('StacUtil', () => {
 			})
 		);
 		logger.level = 'info';
-		underTest = new StacUtil(logger, mockS3Client as unknown as S3Client, 'testBucketName', mockRegionsClient)
+		underTest = new StacUtil(logger, mockS3Client as unknown as S3Client, 'testBucketName')
 	})
 
 	it('should assemble stac item for created region', async () => {
@@ -51,7 +48,7 @@ describe('StacUtil', () => {
 		expect(result).toEqual(
 			{
 				"id": "01hxr5q6wkt4xbhk7thrvq269d",
-				"collection": "group_01hxr5q5x80vvn71depzg9083k",
+				"collection": "arcade-region",
 				"type": "Feature",
 				"stac_version": "1.0.0",
 				"stac_extensions": [],
@@ -89,6 +86,7 @@ describe('StacUtil', () => {
 					42.9037868
 				],
 				"properties": {
+					"arcade:groupId": "01hxr5q5x80vvn71depzg9083k",
 					"arcade:isActive": true,
 					"arcade:processedOnNewScene": false,
 					"createdAt": "2024-05-20T06:43:27.006Z",
@@ -106,7 +104,7 @@ describe('StacUtil', () => {
 		expect(result).toEqual(
 			{
 				"id": "01hxr5q6wkt4xbhk7thrvq269d",
-				"collection": "group_01hxr5q5x80vvn71depzg9083k",
+				"collection": "arcade-region",
 				"type": "Feature",
 				"stac_version": "1.0.0",
 				"stac_extensions": [],
@@ -144,6 +142,7 @@ describe('StacUtil', () => {
 					42.9037868
 				],
 				"properties": {
+					"arcade:groupId": "01hxr5q5x80vvn71depzg9083k",
 					"arcade:isActive": false,
 					"arcade:processedOnNewScene": false,
 					"createdAt": "2024-05-20T06:43:27.006Z",

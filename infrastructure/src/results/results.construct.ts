@@ -4,9 +4,6 @@ import {
 	EXECUTOR_JOB_CREATED_EVENT,
 	EXECUTOR_JOB_UPDATED_EVENT,
 	EXECUTOR_POLYGON_METADATA_CREATED_EVENT,
-	REGIONS_GROUP_CREATED_EVENT,
-	REGIONS_GROUP_DELETED_EVENT,
-	REGIONS_GROUP_UPDATED_EVENT,
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
@@ -325,10 +322,6 @@ export class ResultsModule extends Construct {
 					EXECUTOR_JOB_CREATED_EVENT,
 					// These events will trigger the creation/deletion of feature stac item
 					EXECUTOR_POLYGON_METADATA_CREATED_EVENT,
-					// These events will trigger the creation/deletion of group stac item
-					REGIONS_GROUP_CREATED_EVENT,
-					REGIONS_GROUP_UPDATED_EVENT,
-					REGIONS_GROUP_DELETED_EVENT,
 					// These events will trigger the creation/deletion of region stac item
 					REGIONS_REGION_CREATED_EVENT,
 					REGIONS_REGION_UPDATED_EVENT,
