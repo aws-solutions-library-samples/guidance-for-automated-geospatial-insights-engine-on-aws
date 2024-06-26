@@ -44,7 +44,7 @@ export default function FarmsTable({ growerId, variant }: { growerId?: string; v
 						variant={variant === 'full-page' ? 'awsui-h1-sticky' : 'h2'}
 						actions={
 							<SpaceBetween direction="horizontal" size="xs">
-								<Button variant="icon" iconName="refresh" onClick={refetch} />
+								<Button variant="icon" iconName="refresh" onClick={refetch}/>
 
 								<Button disabled={!selectedItems.length} onClick={() => navigate(`/farms/${selectedItems[0].id}`)}>
 									View details
@@ -113,13 +113,13 @@ export default function FarmsTable({ growerId, variant }: { growerId?: string; v
 					{
 						id: 'analysisStatus',
 						header: 'Analysis',
-						cell: (item) => <ProcessingStatus status={item.tags && item.tags['arcade:results:status'] ? item.tags['arcade:results:status'] : undefined} />,
+						cell: (item) => <ProcessingStatus status={item.attributes && item.attributes['arcade:results:status'] ? item.attributes['arcade:results:status'] : undefined}/>,
 					},
 					{
 						id: 'lastAnalysis',
 						header: 'Last Analysis',
 						cell: (item) =>
-							item.tags && item.tags['arcade:results:updatedAt'] ? (
+							item.attributes && item.attributes['arcade:results:updatedAt'] ? (
 								<Link
 									onFollow={() => {
 										const searchParams = new URLSearchParams();
@@ -127,12 +127,12 @@ export default function FarmsTable({ growerId, variant }: { growerId?: string; v
 										searchParams.set('bbox', bbox);
 										const farmId = item.id;
 										searchParams.set('farmId', farmId);
-										const timestamp = new Date(item.tags!['arcade:results:updatedAt']!).toISOString();
+										const timestamp = new Date(item.attributes!['arcade:results:updatedAt']!).toISOString();
 										searchParams.set('timestamp', timestamp);
 										navigate(`/analysis?${searchParams.toString()}`);
 									}}
 								>
-									{new Date(item.tags['arcade:results:updatedAt']).toLocaleString()}
+									{new Date(item.attributes['arcade:results:updatedAt']).toLocaleString()}
 								</Link>
 							) : (
 								'-'

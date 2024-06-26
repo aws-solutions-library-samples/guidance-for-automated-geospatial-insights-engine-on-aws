@@ -979,6 +979,9 @@ importers:
       aws-xray-sdk:
         specifier: ~3
         version: 3.9.0
+      axios:
+        specifier: ~1
+        version: 1.7.2
       dayjs:
         specifier: ~1
         version: 1.11.11

@@ -1,7 +1,7 @@
 import { DomainEvent } from "@arcade/events";
 import { Polygon } from "../api/polygons/schemas.js";
 import { FastifyBaseLogger } from "fastify";
-import { BBox, bbox, bboxPolygon, polygon, union } from "@turf/turf";
+import { BBox, bbox, bboxPolygon, multiPolygon, union } from "@turf/turf";
 import { RegionService } from "../api/regions/service.js";
 import { SecurityContext, SecurityScope } from "../common/scopes.js";
 import { Region } from "../api/regions/schemas.js";
@@ -66,7 +66,10 @@ export class AggregatorService {
 		}
 
 		for (const [groupId, aggregatedGroupParameter] of Object.entries(aggregatedGroupParameterMap)) {
-			await this.groupService.updateAggregatedRegionsAttributes(groupId, { totalAreaDelta: aggregatedGroupParameter.totalAreaDelta, totalRegionsDelta: aggregatedGroupParameter.totalRegionsDelta })
+			await this.groupService.updateAggregatedRegionsAttributes(groupId, {
+				totalAreaDelta: aggregatedGroupParameter.totalAreaDelta,
+				totalRegionsDelta: aggregatedGroupParameter.totalRegionsDelta
+			})
 		}
 
 		this.log.debug(`AggregatorService> aggregateRegions> exit>`)
@@ -77,8 +80,8 @@ export class AggregatorService {
 
 		const aggregateParameterByRegion: AggregatedRegionParameterMap = {};
 
-		const calculateBbox: BBox = (newBoundary: number[][], existingBBox: BBox): BBox => {
-			let combinedPolygon = polygon([newBoundary]);
+		const calculateBbox: BBox = (newBoundary: number[][][][], existingBBox: BBox): BBox => {
+			let combinedPolygon = multiPolygon(newBoundary);
 			if (existingBBox) {
 				combinedPolygon = union(combinedPolygon, bboxPolygon(existingBBox));
 			}
@@ -110,7 +113,11 @@ export class AggregatorService {
 		}
 
 		for (const [regionId, aggregatedParameter] of Object.entries(aggregateParameterByRegion)) {
-			await this.regionService.updateAggregatedPolygonsAttributes(regionId, { totalAreaDelta: aggregatedParameter.totalAreaDelta, totalPolygonsDelta: aggregatedParameter.totalPolygonsDelta, boundingBox: aggregatedParameter.boundingBox })
+			await this.regionService.updateAggregatedPolygonsAttributes(regionId, {
+				totalAreaDelta: aggregatedParameter.totalAreaDelta,
+				totalPolygonsDelta: aggregatedParameter.totalPolygonsDelta,
+				boundingBox: aggregatedParameter.boundingBox
+			})
 		}
 
 		this.log.debug(`AggregatorService> aggregatePolygons> exit> domainEvents: ${JSON.stringify(domainEvents)}`)

@@ -138,7 +138,7 @@ const CloudscapeMap = () => {
 					<NavigationControl />
 					<Layer id={'top-layer'} type="background" layout={{ visibility: 'none' }} paint={{}} />
 					<Layer id={'bottom-layer'} type="background" layout={{ visibility: 'none' }} paint={{}} beforeId="top-layer" />
-					<Source key={`tiles-mosaic`} type="raster" tiles={[`${UI_TILER_API_ENDPOINT}/tiles/{z}/{x}/{y}?${queryString}`]} minzoom={8} maxzoom={16}>
+					<Source key={`tiles-mosaic`} type="raster" tiles={[`${UI_TILER_API_ENDPOINT}/tiles/{z}/{x}/{y}?${queryString}`]} minzoom={8} maxzoom={16} volatile={true}>
 						<Layer
 							key={`tiles-layer-mosaic`}
 							id={`tiles-layer-mosaic`}

@@ -9,7 +9,7 @@ const isSilent = isSilentStr ? isSilentStr === 'true' : false;
 
 export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 	public static description = 'Install ARCADE for the specified environment';
-	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -a dummyEmail@test.com'];
+	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -a dummyEmail@test.com -n +614xxxxxxxx'];
 	public static enableJsonFlag = true;
 
 	public static flags = {
@@ -22,12 +22,6 @@ export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 			char: 'r',
 			required: true,
 			description: 'The AWS Region arcade is deployed to',
-		}),
-		sentinelTopicArn: Flags.string({
-			char: 's',
-			required: false,
-			default: 'arn:aws:sns:eu-central-1:214830741341:SentinelS2L2A',
-			description: 'New scene notifications for L2A images (https://registry.opendata.aws/sentinel-2/)',
 		}),
 		administratorEmail: Flags.string({
 			char: 'a',
@@ -49,7 +43,7 @@ export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 		const { flags } = await this.parse(ArcadeInstall);
 		await switchToArcadeLocation();
 
-		const params = `-c sentinelTopicArn=${flags.sentinelTopicArn} -c environment=${flags.environment}  -c administratorEmail=${flags.administratorEmail} -c administratorPhoneNumber=${flags.administratorPhoneNumber} `;
+		const params = `-c environment=${flags.environment}  -c administratorEmail=${flags.administratorEmail} -c administratorPhoneNumber=${flags.administratorPhoneNumber} `;
 
 		try {
 			await getDeployedStackByName('CDKToolkit', flags?.role);

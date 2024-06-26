@@ -71,7 +71,7 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 			withIdToken: userToken,
 			id: regionId,
 			expectJsonLike: {
-				tags: {
+				attributes: {
 					'arcade:results:id': resultListResource[0].id,
 					'arcade:results:status': 'succeeded',
 					"arcade:results:message": "Essential container in task exited",

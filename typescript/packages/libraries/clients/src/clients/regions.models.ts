@@ -60,7 +60,7 @@ export interface Polygon {
 	id: string;
 	name: string;
 	regionId: string;
-	boundary: [[number, number]];
+	boundary: [[[[number, number]]]];
 	exclusions?: [[[number, number]]];
 	area: number;
 	attributes?: Record<string, string>;

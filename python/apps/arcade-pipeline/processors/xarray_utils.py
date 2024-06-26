@@ -16,7 +16,9 @@ class XarrayUtils:
 
 	@staticmethod
 	def calculate_ndvi(stac_asset: Dataset) -> DataArray:
-		return (stac_asset.nir08 - stac_asset.red) / (stac_asset.nir08 + stac_asset.red)
+		red = stac_asset["red"].astype("float")
+		nir = stac_asset["nir08"].astype("float")
+		return (nir - red) / (nir + red)
 
 	@staticmethod
 	def remove_cloud(scl_asset: Dataset) -> DataArray:

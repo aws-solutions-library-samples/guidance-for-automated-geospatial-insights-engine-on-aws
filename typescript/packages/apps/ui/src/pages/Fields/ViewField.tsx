@@ -4,15 +4,30 @@ import Breadcrumbs from '../../shared/Breadcrumbs';
 import Shell from '../../shared/Shell';
 import { useGetPolygonQuery } from '../../slices/regionsApiSlice';
 import CropsTable from '../Crops/CropsTable';
+import { useEffect, useState } from "react";
 
 export default function ViewField() {
 	// const navigate = useNavigate();
 	const { id } = useParams();
 	const { data: field, isLoading: isLoadingPolygon } = useGetPolygonQuery(id!);
-	// const [coordinates, setCoordinates] = useState([
-	// 	{ key: 'some-key-1', value: 'some-value-1' },
-	// 	{ key: 'some-key-2', value: 'some-value-2' },
-	// ]);
+
+	const [coordinates, setCoordinates] = useState<[number, number][]>([])
+
+	useEffect(() => {
+		const mergedCoordinates: [number, number][] = []
+		if (field?.boundary) {
+			field.boundary.forEach((b1) => {
+				b1.forEach((b2) => {
+					b2.forEach((coordinate) => {
+						mergedCoordinates.push(coordinate);
+					});
+				});
+			});
+			setCoordinates(mergedCoordinates)
+		}
+	}, [field]);
+
+
 	return (
 		<Shell
 			breadcrumbs={
@@ -70,7 +85,7 @@ export default function ViewField() {
 						<Table
 							header={<Header variant="h2">Coordinates</Header>}
 							loading={isLoadingPolygon}
-							items={field?.boundary ?? []}
+							items={coordinates ?? []}
 							empty={
 								<Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
 									<SpaceBetween size="m">
@@ -94,7 +109,7 @@ export default function ViewField() {
 								},
 							]}
 						/>
-						{field && <CropsTable variant="container" growerId={field.groupId} farmId={field.regionId} fieldId={field.id} />}
+						{field && <CropsTable variant="container" growerId={field.groupId} farmId={field.regionId} fieldId={field.id}/>}
 					</SpaceBetween>
 				</ContentLayout>
 			}

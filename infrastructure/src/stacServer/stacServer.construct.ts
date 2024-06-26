@@ -56,6 +56,7 @@ export class StacServerModule extends Construct {
 		const region = Stack.of(this).region;
 
 		const namePrefix = `arcade-${props.environment}`;
+		const excludeCharacters = '"#%&\'()*,-./:;<=>@[\\]_`{|}~';
 
 		// This will be used by custom resource to initialise the OpenSearch server with resources required fo STAC
 		const openSearchStacAdministrator = 'admin'
@@ -64,7 +65,7 @@ export class StacServerModule extends Construct {
 			{
 				secretName: `${namePrefix}-admin-secret`,
 				generateSecretString: {
-					excludeCharacters: `'%{}\`/@"'\\`,
+					excludeCharacters: excludeCharacters,
 					secretStringTemplate: JSON.stringify({ "username": openSearchStacAdministrator }),
 					generateStringKey: passwordField
 				},
@@ -82,7 +83,7 @@ export class StacServerModule extends Construct {
 			{
 				secretName: `${namePrefix}-user-secret`,
 				generateSecretString: {
-					excludeCharacters: `'%{}\`/@"'\\`,
+					excludeCharacters: excludeCharacters,
 					secretStringTemplate: JSON.stringify({ "username": openSearchStacUser }),
 					generateStringKey: passwordField
 				},

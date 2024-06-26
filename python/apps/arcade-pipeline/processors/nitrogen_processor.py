@@ -8,7 +8,7 @@ from processors.metadata_utils import MetadataUtils
 
 
 class NitrogenProcessor(AbstractProcessor):
-	def __init__(self, temp_dir: str, yield_target: float, coordinates: List[Tuple[float, float]], previous_tif_raster: np.ndarray):
+	def __init__(self, temp_dir: str, yield_target: float, coordinates: List[List[List[Tuple[float, float]]]], previous_tif_raster: np.ndarray):
 		self.yield_target = yield_target
 		self.coordinates = coordinates
 		self.temp_dir = temp_dir

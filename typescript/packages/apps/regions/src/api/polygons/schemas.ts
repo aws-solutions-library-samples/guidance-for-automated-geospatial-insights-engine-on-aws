@@ -16,13 +16,14 @@ export const includeLatestStateQS = Type.Optional(Type.Boolean({ description: 'I
  */
 const name = Type.String({ description: 'The name of the Polygon.' });
 const area = Type.Number({ description: 'The area of the Polygon.' });
-export const polygonCoordinates = Type.Array(Type.Array(Type.Number({ description: 'Latitude' }), Type.Number({ description: 'Longitude' })), {
+export const polygonCoordinates = Type.Array(Type.Array(Type.Array(Type.Tuple([Type.Number({ description: 'Latitude' }), Type.Number({ description: 'Longitude' })]))), {
 	$id: 'polygon',
 	description: 'Coordinates defining a polygon.',
 });
 export type PolygonCoordinates = Static<typeof polygonCoordinates>;
 
 const boundary = Type.Ref(polygonCoordinates, { description: 'The boundary of the Polygon.' });
+
 const exclusions = Type.Array(Type.Ref(polygonCoordinates), { description: 'Boundaries to be excluded from the Polygon.' });
 
 /**

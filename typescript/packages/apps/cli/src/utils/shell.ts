@@ -13,7 +13,6 @@ const execAsync = promisify<string, { silent: boolean }, string>(shell.exec);
 export type Folder = string;
 
 const switchToArcadeLocation = async (): Promise<Folder> => {
-	console.log(__dirname);
 	let arcadeLocation = config.get('arcadePath');
 	if (!arcadeLocation) {
 		arcadeLocation = path.join(__dirname, '../../../../../');
