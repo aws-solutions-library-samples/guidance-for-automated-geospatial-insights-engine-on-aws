@@ -23,13 +23,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export interface ScheduledConstructProperties {
-	environment: string;
-	eventBusName: string;
-	bucketName: string;
-	sentinelTopicArn: string;
-	stacApiEndpoint: string;
-	stacApiResourceArn: string;
-	regionsApiLambda: IFunction;
+	readonly environment: string;
+	readonly eventBusName: string;
+	readonly bucketName: string;
+	readonly sentinelTopicArn: string;
+	readonly stacApiEndpoint: string;
+	readonly stacApiResourceArn: string;
+	readonly regionsApiLambda: IFunction;
+	readonly sentinelApiUrl: string;
+	readonly sentinelCollection: string;
 }
 
 const schedulerGroupNameParameter = (environment: string) => `/arcade/${environment}/scheduler/groupName`;
@@ -171,7 +173,9 @@ export class SchedulerModule extends Construct {
 				STAC_API_ENDPOINT: props.stacApiEndpoint,
 				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
 				QUEUE_URL: this.engineQueue.queueUrl,
-				ENVIRONMENT: props.environment
+				ENVIRONMENT: props.environment,
+				SENTINEL_API_URL: props.sentinelApiUrl,
+				SENTINEL_COLLECTION: props.sentinelCollection
 			},
 			bundling: {
 				minify: true,

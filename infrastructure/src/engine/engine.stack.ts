@@ -7,10 +7,12 @@ import { Construct } from 'constructs';
 import { EngineConstruct } from "./engine.construct.js";
 
 export type EngineStackProperties = StackProps & {
-	environment: string;
-	vpc: IVpc;
-	stacApiEndpoint: string;
-	stacApiResourceArn: string;
+	readonly environment: string;
+	readonly vpc: IVpc;
+	readonly stacApiEndpoint: string;
+	readonly stacApiResourceArn: string;
+	readonly sentinelApiUrl: string;
+	readonly sentinelCollection: string;
 }
 
 export class EngineStack extends cdk.Stack {
@@ -34,7 +36,9 @@ export class EngineStack extends cdk.Stack {
 				eventBusName,
 				bucketName,
 				stacApiEndpoint: props.stacApiEndpoint,
-				stacApiResourceArn: props.stacApiResourceArn
+				stacApiResourceArn: props.stacApiResourceArn,
+				sentinelApiUrl: props.sentinelApiUrl,
+				sentinelCollection: props.sentinelCollection
 			})
 	}
 }

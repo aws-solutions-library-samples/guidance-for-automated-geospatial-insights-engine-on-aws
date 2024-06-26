@@ -5,13 +5,13 @@ export const POLYGONS_INTEGRATION_TEST_TAG_VALUE = 'regions-module-polygons';
 
 export const create_polygon_body: object = {
 	name: 'test-polygon-1',
-	boundary: [
+	boundary: [[[
 		[0, 0],
 		[0, 10],
 		[10, 10],
 		[10, 0],
 		[0, 0],
-	],
+	]]],
 	attributes: {
 		attr1: 'attr-one',
 		attr2: 'attr-two',
@@ -32,13 +32,13 @@ export const created_polygon_resource = (username: string): object => {
 
 export const update_polygon_body: object = {
 	name: 'test-polygon-1-updated',
-	boundary: [
+	boundary: [[[
 		[0, 0],
 		[0, 20],
 		[20, 20],
 		[20, 0],
 		[0, 0],
-	],
+	]]],
 	attributes: {
 		attr2: 'attr-two-updated',
 	},

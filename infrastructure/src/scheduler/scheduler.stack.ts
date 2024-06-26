@@ -16,11 +16,13 @@ import { resultsApiFunctionArnParameter } from "../results/results.construct.js"
 import { Function } from "aws-cdk-lib/aws-lambda";
 
 export type SchedulerStackProperties = StackProps & {
-	environment: string;
-	concurrencyLimit: number;
-	sentinelTopicArn: string;
-	stacApiEndpoint: string;
-	stacApiResourceArn: string;
+	readonly environment: string;
+	readonly concurrencyLimit: number;
+	readonly sentinelTopicArn: string;
+	readonly stacApiEndpoint: string;
+	readonly stacApiResourceArn: string;
+	readonly sentinelApiUrl: string;
+	readonly sentinelCollection: string;
 }
 
 export class SchedulerStack extends Stack {
@@ -82,7 +84,9 @@ export class SchedulerStack extends Stack {
 			bucketName,
 			regionsApiLambda,
 			stacApiEndpoint: props.stacApiEndpoint,
-			stacApiResourceArn: props.stacApiResourceArn
+			stacApiResourceArn: props.stacApiResourceArn,
+			sentinelCollection: props.sentinelCollection,
+			sentinelApiUrl: props.sentinelApiUrl
 		})
 
 		const executorModule = new ExecutorModule(this, 'ExecutorModule', {

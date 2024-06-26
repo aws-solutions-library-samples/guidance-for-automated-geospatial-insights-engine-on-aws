@@ -17,12 +17,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export interface EngineConstructProperties {
-	vpc: IVpc;
-	environment: string;
-	bucketName: string;
-	eventBusName: string;
-	stacApiEndpoint: string;
-	stacApiResourceArn: string;
+	readonly vpc: IVpc;
+	readonly environment: string;
+	readonly bucketName: string;
+	readonly eventBusName: string;
+	readonly stacApiEndpoint: string;
+	readonly stacApiResourceArn: string;
+	readonly sentinelApiUrl: string;
+	readonly sentinelCollection: string;
 }
 
 export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
@@ -97,6 +99,8 @@ export class EngineConstruct extends Construct {
 					EVENT_BUS_NAME: eventBus.eventBusName,
 					OUTPUT_BUCKET: bucket.bucketName,
 					STAC_API_ENDPOINT: props.stacApiEndpoint,
+					SENTINEL_API_URL: props.sentinelApiUrl,
+					SENTINEL_COLLECTION: props.sentinelCollection
 				},
 			}),
 		});

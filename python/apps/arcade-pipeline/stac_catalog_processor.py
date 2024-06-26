@@ -19,12 +19,16 @@ from pyproj import CRS
 from pystac import Item
 from pystac.extensions.projection import ProjectionExtension
 from pystac_client import Client
+from rioxarray.merge import merge_datasets
+from shapely import box, Polygon, MultiPolygon, unary_union
+from shapely.geometry import shape
 from xarray import Dataset
+import rioxarray
 
 from logger_utils import get_logger
 
-STAC_URL = 'https://earth-search.aws.element84.com/v1'
-STAC_COLLECTION = 'sentinel-2-c1-l2a'
+STAC_URL = os.getenv("SENTINEL_API_URL")
+STAC_COLLECTION = os.getenv("SENTINEL_COLLECTION")
 
 logger: Logger = get_logger()
 
@@ -53,7 +57,7 @@ class Result(DataClassJsonMixin):
 @dataclass
 class EngineRequest(DataClassJsonMixin):
 	schedule_date_time: str = field(metadata=config(field_name="scheduleDateTime"))
-	coordinates: List[tuple[float, float]] = field(metadata=config(field_name="coordinates"), default=None)
+	coordinates: List[List[List[tuple[float, float]]]] = field(metadata=config(field_name="coordinates"), default=None)
 	group_id: str = field(metadata=config(field_name="groupId"), default=None)
 	group_name: str = field(metadata=config(field_name="groupName"), default=None)
 	region_id: str = field(metadata=config(field_name="regionId"), default=None)
@@ -62,7 +66,7 @@ class EngineRequest(DataClassJsonMixin):
 	polygon_name: str = field(metadata=config(field_name="polygonName"), default=None)
 	output_prefix: str = field(metadata=config(field_name="outputPrefix"), default=None)
 	result_id: str = field(metadata=config(field_name="resultId"), default=None)
-	state: State = field(metadata=config(field_name="state"), default=None)
+	state: Optional[State] = field(metadata=config(field_name="state"), default=None)
 	latest_successful_result: Optional[Result] = field(metadata=config(field_name="latestSuccessfulResult"), default=None)
 
 
@@ -73,34 +77,30 @@ class STACCatalogProcessor:
 		request: EngineRequest,
 	):
 		self.request: EngineRequest = request
-		self.stac_item: Optional[Item] = None
+		self.polygon_list: List[Polygon] = []
+		self.stac_items: Optional[List[Item]] = None
 		self.previous_tif_raster: Optional[ndarray] = None
 		self.bounding_box: Optional[ndarray] = None
 
-	def _load_stac_item(self):
+	@staticmethod
+	def _load_stac_items(schedule_date_time: str, latest_successful_result: Result, bounding_box: list[float]) -> List[Item]:
 
 		# get the last successful run from region resource tags
-		if self.request.latest_successful_result is not None and self.request.latest_successful_result.created_at is not None:
-			last_successful_run = datetime.fromisoformat(self.request.latest_successful_result.created_at).strftime("%Y-%m-%d")
+		if latest_successful_result is not None and latest_successful_result.created_at is not None:
+			last_successful_run = datetime.fromisoformat(latest_successful_result.created_at).strftime("%Y-%m-%d")
 		else:
 			# default to 5 days ago if we don't have a previous successful run
-			last_successful_run = (datetime.strptime(self.request.schedule_date_time, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
+			last_successful_run = (datetime.strptime(schedule_date_time, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
 
-		time_filter = "{}/{}".format(last_successful_run, self.request.schedule_date_time)
-		CRS = 'epsg:4326'
-		polygon = geom.Polygon(self.request.coordinates)
-		max_cloud_cover = 10
-		polygon_array = [polygon]
-		polygon_series = gpd.GeoSeries(polygon_array, crs=CRS)
-		# Store the bounding box
-		self.bounding_box = polygon_series.total_bounds
+		time_filter = "{}/{}".format(last_successful_run, schedule_date_time)
+
 		stac_catalog = Client.open(STAC_URL)
+
 		stac_query = stac_catalog.search(
-			bbox=self.bounding_box,
+			bbox=bounding_box,
 			datetime=time_filter,
-			query=[
-				# 'eo:cloud_cover<{}'.format(max_cloud_cover)
-			],
+			query={
+			},
 			collections=[STAC_COLLECTION],
 			sortby='-properties.datetime',
 			max_items=10
@@ -112,11 +112,7 @@ class STACCatalogProcessor:
 		if len(stac_items) == 0:
 			raise Exception("No items found")
 
-		# Get the latest satellite image
-		stac_items = sorted(stac_items, key=lambda x: x.properties['datetime'])
-		latest_stac_item = stac_items.pop()
-		self.stac_item = latest_stac_item
-		return latest_stac_item
+		return stac_items
 
 	@staticmethod
 	def get_previous_tif(region_id: str, result_id: str, polygon_id: str) -> Optional[Item]:
@@ -126,7 +122,7 @@ class STACCatalogProcessor:
 		aws_auth = STACCatalogProcessor.get_api_auth(arcade_stac_endpoint, aws_region)
 
 		# Retrieve the previous result stac item
-		url = "{}/collections/region_{}/items/{}_{}".format(arcade_stac_endpoint, region_id, result_id, polygon_id)
+		url = "{}/collections/arcade-region/items/{}_{}".format(arcade_stac_endpoint, region_id, result_id, polygon_id)
 
 		# Set any required headers
 		headers = {
@@ -167,24 +163,68 @@ class STACCatalogProcessor:
 		)
 		return auth
 
-	def load_stac_datasets(self) -> [Dataset, Dataset]:
-		self._load_stac_item()
+	@staticmethod
+	def _filter_stac_assets(result_stac_items: List[Item], polygon_list: List[Polygon], bbox: ndarray) -> Optional[Dataset]:
+
+		# Stac item that we will load as Xarray Dataset
+		stac_items = []
+		stac_assets = []
+
+		result_stac_items.sort(key=lambda x: x.properties['datetime'], reverse=True)
+		combined_polygon: Optional[MultiPolygon] = None
+
 		# default to CRS and resolution from first Item
-		sentinel_epsg = ProjectionExtension.ext(self.stac_item).epsg
+		sentinel_epsg = ProjectionExtension.ext(result_stac_items[0]).epsg
 		output_crs = CRS.from_epsg(sentinel_epsg)
 
-		stac_assets = stac_load(
-			[self.stac_item],
-			bands=("red", "green", "blue", "nir08", "scl"),  # <-- filter on just the bands we need
-			bbox=self.bounding_box,  # <-- filters based on overall polygon boundaries
-			output_crs=output_crs,
-			resolution=10,
-			groupby="solar_day",  # <-- merge tiles of same day
-		)
-		stac_assets = stac_assets.compute()
+		# get the bounding box of the polygon
+		aoi_bbox_polygon = box(*bbox)
+
+		# We iterate and combine all the stac item list (from the latest) to ensure it covers the input area of interest
+		for item in result_stac_items:
+			stac_items.append(item)
+			stac_asset = stac_load(
+				items=[item],
+				bands=("red", "green", "blue", "nir08", "scl"),  # <-- filter on just the bands we need
+				bbox=bbox.tolist(),  # <-- filters based on overall polygon boundaries
+				output_crs=output_crs,
+				resolution=10,
+				groupby="solarday"
+			)
+			stac_assets.append(stac_asset)
+
+			# Combined the multiple stac_items polygon
+			item_polygon = shape(item.geometry)
+			if combined_polygon is None:
+				combined_polygon = item_polygon
+			else:
+				combined_polygon = unary_union([combined_polygon, item_polygon])
+
+			# if our aoi is inside the combined_polygon exit from the loop
+			if combined_polygon.contains(aoi_bbox_polygon):
+				break
+
+		# Merge all the loaded stac assets
+		merged_dataset = merge_datasets(stac_assets)
+
+		# clipped the stac asset to the input polygon
+		clipped_dataset = merged_dataset.rio.clip(polygon_list, crs='epsg:4326')
+		return clipped_dataset
+
+	def load_stac_datasets(self) -> [Dataset, Dataset]:
+		for coord in self.request.coordinates:
+			for test in coord:
+				self.polygon_list.append(geom.Polygon(test))
+
+		polygon_series = gpd.GeoSeries(self.polygon_list, crs='epsg:4326')
+		# Store the bounding box
+		self.bounding_box = polygon_series.total_bounds
+
+		self.stac_items = self._load_stac_items(self.request.schedule_date_time, self.request.latest_successful_result, self.bounding_box)
+
+		stac_assets = self._filter_stac_assets(self.stac_items, self.polygon_list, self.bounding_box)
 
 		previous_ndvi_raster = None
-
 		if self.request.latest_successful_result is not None and self.request.latest_successful_result.id is not None:
 			try:
 				previous_ndvi_raster = self.get_previous_tif(self.request.region_id, self.request.latest_successful_result.id, self.request.polygon_id)

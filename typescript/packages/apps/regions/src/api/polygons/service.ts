@@ -1,5 +1,5 @@
 import { EventPublisher } from '@arcade/events';
-import { area, polygon } from '@turf/turf';
+import { area, multiPolygon, polygon } from '@turf/turf';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
@@ -83,7 +83,7 @@ export class PolygonService {
 
 	private calculateArea(polygonResource: Polygon) {
 		try {
-			let areaSqMt = area(polygon([polygonResource.boundary]));
+			let areaSqMt = area(multiPolygon(polygonResource.boundary));
 			polygonResource.exclusions?.forEach((p) => {
 				// TODO This approach does not take into consideration overlapping of exclusion boundaries.
 				const exclusionArea = area([polygon(p)]);
@@ -96,9 +96,14 @@ export class PolygonService {
 	}
 
 	private validatePolygons(polygon: CreatePolygon | EditPolygon): void {
-		polygon.boundary.forEach((coordinate) => {
-			ow(coordinate, ow.array.exactShape([ow.number.inRange(-180.0, 180.0), ow.number.inRange(-90.0, 90.0)]));
+		polygon.boundary.forEach((b1) => {
+			b1.forEach((b2) => {
+				b2.forEach((coordinate) => {
+					ow(coordinate, ow.array.exactShape([ow.number.inRange(-180.0, 180.0), ow.number.inRange(-90.0, 90.0)]));
+				});
+			});
 		});
+
 		polygon.exclusions?.forEach((polygon) => {
 			polygon.forEach((coordinate) => {
 				ow(coordinate, ow.array.exactShape([ow.number.inRange(-180.0, 180.0), ow.number.inRange(-90.0, 90.0)]));

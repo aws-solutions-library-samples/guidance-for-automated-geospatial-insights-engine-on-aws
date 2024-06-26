@@ -5,14 +5,14 @@ import shutil
 from typing import List, Dict, Any, Set, Tuple, Optional
 import boto3
 import numpy as np
-import pyproj
-from shapely import Polygon
 from xarray import DataArray, Dataset
 
 # This import is required to extend DataArray functionality with rioxarray
 import rioxarray
 
 from stac_catalog_processor import EngineRequest
+import geopandas as gpd
+import shapely.geometry as geom
 
 
 class MetadataUtils:
@@ -43,23 +43,23 @@ class MetadataUtils:
 		return hash_obj.hexdigest()
 
 	@staticmethod
-	def generate_metadata(sentinel_link: Dict[str, Any], bounding_box: List[tuple[float, float]], stac_assets: Dataset, temp_dir: str, bucket_name: str,
+	def generate_metadata(sentinel_links: List[Dict[str, Any]], bounding_box: np.ndarray, stac_assets: Dataset, temp_dir: str, bucket_name: str,
 						  request: EngineRequest):
 
 		coordinates = request.coordinates
 
 		area_acres = MetadataUtils.calculate_area(coordinates)
 		metadata = {
-			"bounding_box": bounding_box,
+			"bounding_box": bounding_box.tolist(),
 			"geometry": {
-				'type': 'Polygon',
-				'coordinates': [coordinates]
+				'type': 'MultiPolygon',
+				'coordinates': coordinates
 			},
 			"properties": {
 				'area_size': area_acres,
 				'area_unit_of_measure': 'acres',
 			},
-			"links": [sentinel_link],
+			"links": sentinel_links,
 			"assets": {
 			}
 		}
@@ -89,9 +89,12 @@ class MetadataUtils:
 						]
 					}
 
-					# if the band exists, generate the histogram based on our whitelist
-					if band in ['scl', 'ndvi', 'ndvi_change', 'scl_surface'] and stac_assets.get(band) is not None:
-						metadata["assets"][band]['raster:band'] = [MetadataUtils.generate_histogram(stac_assets[band])]
+					# generate the histogram for the NDVI band
+					if band == 'ndvi' and stac_assets.get('ndvi') is not None:
+						# This is the valid range of NDVI
+						bins = [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3,
+								0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+						metadata["assets"][band]['raster:band'] = [MetadataUtils.generate_histogram(stac_assets[band], bins, (-1, 1), area_acres)]
 
 				# generate metadata for nitrogen recommendation
 				elif file == 'nitrogen.json':
@@ -126,24 +129,19 @@ class MetadataUtils:
 				print(f'Uploaded {file_path} to s3://{bucket_name}/{s3_key}')
 
 	@staticmethod
-	def calculate_area(coordinates: List[Tuple[float, float]]) -> float:
-		in_crs = pyproj.CRS('EPSG:4326')  # WGS84 (latitude/longitude)
-		out_crs = pyproj.CRS('EPSG:3857')  # Web Mercator (meters)
-		polygon = Polygon(coordinates)
-		# Create a transformer object
-		transformer = pyproj.Transformer.from_crs(in_crs, out_crs, always_xy=True)
-		# Transform the polygon coordinates to a projected CRS
-		projected_coords = [transformer.transform(*xy) for xy in list(polygon.exterior.coords)]
-		# Create a new Shapely Polygon object with the projected coordinates
-		projected_polygon = Polygon(projected_coords)
-		# Calculate the area in square meters
-		area_sq_meters = projected_polygon.area
-		# Convert square meters to acres (1 acre = 4046.856422 square meters)
-		area_acres = area_sq_meters / 4046.856422
+	def calculate_area(coordinates: List[List[List[Tuple[float, float]]]]) -> float:
+		polygon_list = []
+		for coord in coordinates:
+			for test in coord:
+				polygon_list.append(geom.Polygon(test))
+		polygon_series = gpd.GeoSeries(polygon_list, crs='epsg:4326').to_crs(3827)
+		area_sq_m = polygon_series.area.sum()
+		# Convert square meters to acres
+		area_acres = area_sq_m * 0.000247105
 		return area_acres
 
 	@staticmethod
-	def generate_nitrogen_metadata(temp_dir: str, yield_target: Optional[float], coordinates: List[Tuple[float, float]]) -> None:
+	def generate_nitrogen_metadata(temp_dir: str, yield_target: Optional[float], coordinates: List[List[List[Tuple[float, float]]]]) -> None:
 		# If there is no yield target, we cannot process nitrogen recommendation
 		if yield_target is None:
 			return
@@ -171,28 +169,28 @@ class MetadataUtils:
 			file.write(json.dumps(nitrogen_metadata))
 
 	@staticmethod
-	def generate_histogram(stac_asset_band: DataArray, bins=10) -> Dict[str, Any]:
-		band_array = stac_asset_band.data.flatten()
-		band_min = float(band_array.min())
-		band_max = float(band_array.max())
-		counts, bins = np.histogram(band_array, bins)
+	def generate_histogram(stac_asset_band: DataArray, bins: List[float], range: tuple[float, float], area_acres: float) -> Dict[str, Any]:
+		stac_band_array = stac_asset_band.data.flatten()
+		filtered_band_array = stac_band_array[~np.isnan(stac_band_array)]
+		[band_min, band_max] = range
+		counts, _ = np.histogram(filtered_band_array, bins, range)
 		statistic = {
 			"nodata": 0,
 			"data_type": "uint8",
 			"histogram": [
 				{
-					"count": len(band_array),
+					"count": len(filtered_band_array),
 					"min": band_min,
 					"max": band_max,
-					"buckets": bins.tolist(),
-					"bucket_count": counts.tolist(),
+					"buckets": bins,
+					"bucket_count": [(c / len(filtered_band_array) * area_acres) for c in counts.tolist()],
 				}
 			],
 			"statistics": {
 				"minimum": band_min,
 				"maximum": band_max,
-				"mean": band_array.mean(),
-				"stddev": band_array.std(),
+				"mean": filtered_band_array.mean(),
+				"stddev": filtered_band_array.std(),
 			}
 		}
 		return statistic

@@ -75,6 +75,8 @@ const registerContainer = (app?: FastifyInstance) => {
 	const stacServerTopicArn = process.env['STAC_SERVER_TOPIC_ARN'];
 	const stacApiEndpoint = process.env['STAC_API_ENDPOINT'];
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
+	const sentinelApiUrl = process.env['SENTINEL_API_URL']
+	const sentinelCollection = process.env['SENTINEL_COLLECTION'];
 
 	diContainer.register({
 		// Clients
@@ -117,7 +119,7 @@ const registerContainer = (app?: FastifyInstance) => {
 		),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.stacServerClient, c.regionsClient, c.sqsClient, queueUrl),
+			(c: Cradle) => new JobsService(app.log, c.stacServerClient, c.regionsClient, c.sqsClient, queueUrl, sentinelApiUrl, sentinelCollection),
 			{
 				...commonInjectionOptions,
 			}

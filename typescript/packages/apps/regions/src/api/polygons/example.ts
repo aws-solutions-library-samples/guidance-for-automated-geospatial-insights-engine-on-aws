@@ -2,13 +2,13 @@ import { CreatePolygon, EditPolygon, Polygon, PolygonList } from './schemas.js';
 
 export const polygonPostRequestExample: CreatePolygon = {
 	name: 'Field 1',
-	boundary: [
+	boundary: [[[
 		[-104.5079674, 39.9194752],
 		[-104.4894065, 39.9193435],
 		[-104.4893912, 39.9122295],
 		[-104.5078877, 39.9123941],
 		[-104.5079674, 39.9194752],
-	],
+	]]],
 };
 
 export const polygonPatchRequestExample1: EditPolygon = polygonPostRequestExample;
@@ -36,7 +36,7 @@ export const polygonResourceExample2: Polygon = {
 	name: 'Field 2',
 	regionId: 'htgdjajdhja',
 	groupId: 'jsuueyhdjs8',
-	boundary: [
+	boundary: [[[
 		[-104.4895628, 39.9390518],
 		[-104.492009, 39.938295],
 		[-104.4926527, 39.9376369],
@@ -48,7 +48,7 @@ export const polygonResourceExample2: Polygon = {
 		[-104.4996908, 39.926909],
 		[-104.4895199, 39.9268103],
 		[-104.4895628, 39.9390518],
-	],
+	]]],
 	area: 655,
 	createdAt: '2022-08-10T23:55:20.322Z',
 	createdBy: 'someone@somewhere.com',

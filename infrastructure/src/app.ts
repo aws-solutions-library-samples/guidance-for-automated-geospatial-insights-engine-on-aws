@@ -44,7 +44,9 @@ const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerInstance
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 
 // Sentinel-2 Open Data on AWS parameters
-const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string;
+const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string ?? 'arn:aws:sns:us-west-2:608149789419:cirrus-es-prod-publish';
+const sentinelApiUrl = app.node.tryGetContext('sentinelApiUrl') as string ?? 'https://earth-search.aws.element84.com/v1';
+const sentinelCollection = app.node.tryGetContext('sentinelCollection') as string ?? 'sentinel-2-c1-l2a';
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 
@@ -123,6 +125,8 @@ const deployPlatform = (callerEnvironment?: {
 		vpc: sharedStack.vpc,
 		stacApiEndpoint: stacServerStack.stacApiEndpoint,
 		stacApiResourceArn: stacServerStack.stacApiResourceArn,
+		sentinelApiUrl,
+		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId,
@@ -155,6 +159,8 @@ const deployPlatform = (callerEnvironment?: {
 		sentinelTopicArn,
 		stacApiEndpoint: stacServerStack.stacApiEndpoint,
 		stacApiResourceArn: stacServerStack.stacApiResourceArn,
+		sentinelApiUrl,
+		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId,

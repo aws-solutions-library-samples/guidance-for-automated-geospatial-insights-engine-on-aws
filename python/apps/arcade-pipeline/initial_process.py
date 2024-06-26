@@ -75,9 +75,14 @@ def start_task(
 
 		stac_assets = cloud_removal_processor.process(stac_assets)
 
-		sentinel_link = [{"rel": "derived_from", "href": link.href, "type": link.media_type} for link in processor.stac_item.links if link.rel == 'self'].pop()
+		# generate the 'derived_from' sentinel metadata
+		sentinel_link = []
+		for item in processor.stac_items:
+			for link in item.links:
+				if link.rel == 'self':
+					sentinel_link.append({"rel": "derived_from", "href": link.href, "type": link.media_type})
 
-		MetadataUtils.generate_metadata(sentinel_link, processor.bounding_box.tolist(), stac_assets, temp_dir, output_bucket, request)
+		MetadataUtils.generate_metadata(sentinel_link, processor.bounding_box, stac_assets, temp_dir, output_bucket, request)
 
 		MetadataUtils.upload_assets(output_bucket, request.output_prefix, temp_dir)
 

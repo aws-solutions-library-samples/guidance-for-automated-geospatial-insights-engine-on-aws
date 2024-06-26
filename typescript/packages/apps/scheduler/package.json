@@ -40,6 +40,7 @@
 		"@fastify/type-provider-typebox": "~4",
 		"@sinclair/typebox": "~0",
 		"awilix": "~10",
+		"axios": "~1",
 		"aws-lambda": "~1",
 		"aws-xray-sdk": "~3",
 		"dayjs": "~1",

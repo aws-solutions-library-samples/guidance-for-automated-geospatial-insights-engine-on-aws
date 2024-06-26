@@ -117,7 +117,7 @@ const polygonEvent1: DomainEvent<Polygon> =
 			id: "polygon-1",
 			name: "region-name-1",
 			regionId: "region-1",
-			boundary: [
+			boundary: [[[
 				[
 					-72.4493408,
 					42.9080108
@@ -138,7 +138,7 @@ const polygonEvent1: DomainEvent<Polygon> =
 					-72.4493408,
 					42.9080108
 				],
-			],
+			]]],
 			groupId: "group-1",
 			area: 20,
 			createdBy: "",
@@ -155,7 +155,7 @@ const polygonEvent2: DomainEvent<Polygon> =
 			id: "polygon-2",
 			name: "region-name-1",
 			regionId: "region-1",
-			boundary: [
+			boundary: [[[
 				[
 					-72.4523878,
 					42.9075393
@@ -176,7 +176,7 @@ const polygonEvent2: DomainEvent<Polygon> =
 					-72.4523878,
 					42.9075393
 				],
-			],
+			]]],
 			groupId: "group-1",
 			area: 10,
 			createdBy: "",
@@ -193,7 +193,7 @@ const polygonEvent3: DomainEvent<Polygon> =
 			id: "polygon-3",
 			name: "region-name-2",
 			regionId: "region-2",
-			boundary: [
+			boundary: [[[
 				[
 					-72.4483377,
 					42.9037868
@@ -214,7 +214,7 @@ const polygonEvent3: DomainEvent<Polygon> =
 					-72.4483377,
 					42.9037868
 				],
-			],
+			]]],
 			groupId: "group-1",
 			area: 10,
 			createdBy: "",

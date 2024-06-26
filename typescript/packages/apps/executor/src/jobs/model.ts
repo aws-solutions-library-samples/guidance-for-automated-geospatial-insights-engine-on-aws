@@ -20,7 +20,7 @@ export interface BatchEngineInput {
 	regionId: string;
 	regionName: string;
 	resultId: string;
-	coordinates: [[number, number]],
+	coordinates: [[[[number, number]]]],
 	exclusions?: [[[number, number]]];
 	scheduleDateTime: string;
 	outputPrefix: string;

@@ -38,7 +38,7 @@ export const create_state_body: object = {
 };
 export const create_polygon_body: object = {
 	name: 'test-polygon-1',
-	boundary: [
+	boundary: [[[
 		[
 			-104.4895628,
 			39.9390518
@@ -83,7 +83,7 @@ export const create_polygon_body: object = {
 			-104.4895628,
 			39.9390518
 		]
-	],
+	]]],
 	attributes: {
 		attr1: 'attr-one',
 		attr2: 'attr-two',

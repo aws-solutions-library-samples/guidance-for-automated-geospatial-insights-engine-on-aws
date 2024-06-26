@@ -1,17 +1,25 @@
 import { FastifyBaseLogger } from "fastify";
 import { LambdaRequestContext, RegionsClient, StacServerClient } from "@arcade/clients";
 import { RegionResource, StacItem } from "@arcade/events";
-import { bboxPolygon, booleanContains, polygon } from "@turf/turf";
+import { booleanContains, booleanWithin, polygon, union } from "@turf/turf";
 import { SendMessageBatchCommand, SendMessageBatchRequestEntry, SQSClient } from "@aws-sdk/client-sqs";
 import ow from 'ow';
 import { ulid } from "ulid";
+import axios from 'axios';
+import dayjs from 'dayjs';
 
 export class JobsService {
 
 	private readonly context: LambdaRequestContext;
 	private readonly regionIndexName = 'arcade-region';
 
-	constructor(private readonly logger: FastifyBaseLogger, private readonly stacClient: StacServerClient, private readonly regionsClient: RegionsClient, private readonly sqsClient: SQSClient, private readonly queueUrl: string) {
+	constructor(private readonly logger: FastifyBaseLogger,
+				private readonly stacClient: StacServerClient,
+				private readonly regionsClient: RegionsClient,
+				private readonly sqsClient: SQSClient,
+				private readonly queueUrl: string,
+				private readonly stacUrl: string,
+				private readonly sentinelCollection: string) {
 		this.context = {
 			authorizer: {
 				claims: {
@@ -21,6 +29,61 @@ export class JobsService {
 			},
 		};
 	}
+
+	private async isRegionWithinSentinelImages(sentinelItem: StacItem, regionItem: StacItem): Promise<boolean> {
+		this.logger.debug(`JobsService> shouldProcessRegion> sentinelItem: ${JSON.stringify(sentinelItem)}, regionItem: ${regionItem}`)
+
+		const regionPolygon = polygon(regionItem.geometry.coordinates);
+		const stacItemPolygon = polygon(sentinelItem.geometry.coordinates);
+
+		let matchRegion = false;
+
+		// if the region is within the sentinel image bounding box then queue the processing task
+		if (booleanContains(stacItemPolygon, regionPolygon)) {
+			matchRegion = true;
+		}
+		// if one sentinel image does not cover the whole region, check if we can combine with other images
+		else {
+			const sortByDateDesc = (a: StacItem, b: StacItem) => {
+				const dateA: any = new Date(a.properties.datetime);
+				const dateB: any = new Date(b.properties.datetime);
+				return dateB - dateA
+			};
+
+			// query the stac server with the region bounding box
+			let stacItems = [];
+			try {
+				const results = await axios.post(`${this.stacUrl}/search`, {
+					bbox: regionItem.bbox,
+					collections: [this.sentinelCollection],
+					datetime: `${dayjs().subtract(5, 'day').toISOString()}/${dayjs().endOf('day').toISOString()}`,
+					limit: 10,
+				})
+				stacItems = [...results.data.features]
+				stacItems.sort(sortByDateDesc)
+			} catch (e) {
+				this.logger.error(`JobsService> shouldProcessRegion> error: ${JSON.stringify(e)}, regionItem: ${regionItem}`)
+			}
+
+			let combinedPolygon;
+			for (const stacItem of stacItems) {
+				if (combinedPolygon) {
+					combinedPolygon = union(combinedPolygon, polygon(stacItem.geometry.coordinates));
+				} else {
+					combinedPolygon = polygon(stacItem.geometry.coordinates)
+				}
+				// if boolean is within the combined region
+				if (booleanWithin(regionPolygon, combinedPolygon)) {
+					matchRegion = true;
+					break
+				}
+			}
+		}
+
+		this.logger.debug(`JobsService> shouldProcessRegion> matchRegion: ${matchRegion}`)
+		return matchRegion;
+	}
+
 
 	public async startJobOnRegionMatch(sentinelStacItemList: StacItem[]): Promise<void> {
 		this.logger.debug(`JobsService> startJobOnRegionMatch> stacItem: ${JSON.stringify(sentinelStacItemList)} `)
@@ -45,17 +108,17 @@ export class JobsService {
 					}
 				}
 			})
-			const stacItemPolygon = bboxPolygon(sentinelStacItem.bbox);
+
 			for (const item of searchResult.features) {
-				const regionPolygon = polygon(item.geometry.coordinates);
-				// if the region is within the sentinel image bounding box then queue the processing task
-				if (booleanContains(stacItemPolygon, regionPolygon) && !regionProcessingDate[item.id]) {
-					const region = await this.regionsClient.getRegionById(item.id, this.context);
-					regionProcessingDate[item.id] = {
-						datetime: sentinelStacItem.properties.datetime,
-						region
+				if (!regionProcessingDate[item.id]) {
+					const processRegion = await this.isRegionWithinSentinelImages(sentinelStacItem, item);
+					if (processRegion) {
+						const region = await this.regionsClient.getRegionById(item.id, this.context);
+						regionProcessingDate[item.id] = {
+							datetime: sentinelStacItem.properties.datetime,
+							region
+						}
 					}
-					// TODO: this will be implemented as part of the GeoMosaic works
 				}
 			}
 		}
