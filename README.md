@@ -1,103 +1,127 @@
-# arcade
+# **ARCADE** (Agricultural Root Cause Analysis and Decision Engine )
 
-## Getting started
+## Solution Overview
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+`AWS ARCADE` removes the undifferentiated heavy lifting that customers face when designing, building, and implementing decision support technologies, and improving work-order management, supply chain, and logistics management systems in agriculture.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Prerequisites for Deployment
 
-## Add your files
+In order to deploy `ARCADE` from your local workstation, you need to install the following dependencies:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- [AWS Command Line Interface](https://aws.amazon.com/cli/)
+- [Docker](https://docs.docker.com/engine/install/)
+- [Rush.js](https://rushjs.io/)
+- Node.js 20.x
 
+## Deployment
+
+### 1. Clone the solution
+
+Run the following command to clone the solution repository into your local workstation:
+
+```shell
+$ git clone https://github.com/aws-solutions-library-samples/guidance-for-aws-arcade
+$ cd guidance-for-aws-arcade
+$ export ARCADE_FOLDER=$PWD
+$ export CLI_FOLDER="$(PWD)/typescript/packages/apps/cli"
 ```
-cd existing_repo
-git remote add origin https://gitlab.aws.dev/wwso-cross-industry-prototyping/arcade/arcade.git
-git branch -M main
-git push -uf origin main
+
+
+### 2. Build the solution
+
+Run the following command to install the solution dependencies and build it:
+
+```shell
+$ cd $ARCADE_FOLDER
+$ rush update
+$ rush build
 ```
 
-## Integrate with your tools
+### 3. Deploy the solution
 
-- [ ] [Set up project integrations](https://gitlab.aws.dev/wwso-cross-industry-prototyping/arcade/arcade/-/settings/integrations)
+Setup some environment variables which will be referenced by rest of the commands. Replace the following variables with the actual value.
 
-## Collaborate with your team
+| Name                               | Description                                                                                                           |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| ARCADE_ENVIRONMENT                 | Environment (.e.g dev, stage or prod). You can have multiple environment deployed in the same AWS account and region. |
+| ARCADE_ADMINISTRATOR_EMAIL         | Administrator's email.                                                                                                |
+| ARCADE_REGION                      | Solution's AWS Region deployment.                                                                                     |
+| ARCADE_ADMINISTRATOR_MOBILE_NUMBER | Administrator's phone number (including the area code, e.g. +61xxxxxx).                                               |
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
 
-## Test and Deploy
+```shell
+$ export ARCADE_ADMINISTRATOR_EMAIL=<ARCADE_ADMINISTRATOR_EMAIL>
+$ export ARCADE_ADMINISTRATOR_MOBILE_NUMBER=<ARCADE_ADMINISTRATOR_MOBILE_NUMBER>
+$ export ARCADE_ENVIRONMENT=<ARCADE_ENVIRONMENT>
+$ export ARCADE_REGION=<ARCADE_REGION>
+```
 
-Use the built-in continuous integration in GitLab.
+Run the following command to output the help command of the installer:
+```shell
+$ cd $CLI_FOLDER
+$ sudo bin/run.js install --help
+Install ARCADE for the specified environment
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+USAGE
+  $ arcade install -e <value> -r <value> -a <value> -n <value> [--json] [-l <value>]
 
-***
+FLAGS
+  -a, --administratorEmail=<value>        (required) The administrator Email address
+  -e, --environment=<value>               (required) The environment used to deploy the arcade project to
+  -l, --role=<value>                      The RoleArn for the CLI to assume for deployment
+  -n, --administratorPhoneNumber=<value>  (required) Enter the administrator phone number, including + and the country code, for example +12065551212.
+  -r, --region=<value>                    (required) The AWS Region arcade is deployed to
 
-# Editing this README
+GLOBAL FLAGS
+  --json  Format output as json.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+DESCRIPTION
+  Install ARCADE for the specified environment
 
-## Suggestions for a good README
+EXAMPLES
+  $ arcade install -e stage -r us-west-2 -a dummyEmail@test.com -n +614xxxxxxxx
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Run the following command to start the installation of ARCADE:
 
-## Name
+```shell
+$ bin/run install -e $ARCADE_ENVIRONMENT -r $ARCADE_REGION -n $ARCADE_ADMINISTRATOR_MOBILE_NUMBER -a $ARCADE_ADMINISTRATOR_EMAIL
+```
 
-Choose a self-explaining name for your project.
+### 4. Deploy the UI
 
-## Description
+Run the following the bundle the Web UI assets and upload it to the web artifact buckets:
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```shell
+$ cd $ARCADE_FOLDER/typescript/packages/apps/ui
+$ npm run deploy
+```
 
-## Badges
+### 5. Set your initial password
 
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Run the following command to set the password for the administrator user (replace the `<PASSWORD>` with your own) :
 
-## Visuals
+```shell
+export USER_POOL_ID=$(aws ssm get-parameter --name "/arcade/$ARCADE_ENVIRONMENT/shared/cognitoUserPoolId" --query "Parameter.Value" --output text)
 
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID  --username $ARCADE_ADMINISTRATOR_EMAIL --password <PASSWORD> --permanent
+```
 
-## Installation
 
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Next Steps
 
-## Usage
+- [Walkthrough](docs/walkthrough.md)
+- [Regions Module](typescript/packages/apps/regions)
+- [Executor Module](typescript/packages/apps/executor)
+- [Notifications Module](typescript/packages/apps/notifications)
+- [Results Module](typescript/packages/apps/results)
+- [Scheduler Module](typescript/packages/apps/scheduler)
+- [Regions Extension Module](typescript/packages/apps/regions-extension)
+- [UI Module](typescript/packages/apps/ui)
+- [Integration Tests](typescript/packages/integration-tests)
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
 
-## Roadmap
 
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-
-Show your appreciation to those who have contributed to the project.
-
-## License
-
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.

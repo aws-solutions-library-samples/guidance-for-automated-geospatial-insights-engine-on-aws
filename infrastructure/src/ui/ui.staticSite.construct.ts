@@ -3,9 +3,10 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 
 export const websiteBucketParameter = (environment: string) => `/arcade/${environment}/ui/websiteBucket`;
+export const websiteUrlParameter = (environment: string) => `/arcade/${environment}/ui/websiteUrl`;
 
 export interface StaticSiteConstructProperties {
 	environment: string;
@@ -21,7 +22,7 @@ export class StaticSite extends Construct {
 			versioned: true,
 			blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
 			encryption: s3.BucketEncryption.S3_MANAGED,
-			enforceSSL: true,
+			enforceSSL: true
 		});
 
 		const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'OriginAccessIdentity');
@@ -32,15 +33,15 @@ export class StaticSite extends Construct {
 				{
 					s3OriginSource: {
 						s3BucketSource: hostingBucket,
-						originAccessIdentity: originAccessIdentity,
+						originAccessIdentity: originAccessIdentity
 					},
 					behaviors: [
 						{
 							isDefaultBehavior: true,
-							viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-						},
-					],
-				},
+							viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+						}
+					]
+				}
 			],
 			viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
 			errorConfigurations: [
@@ -48,35 +49,42 @@ export class StaticSite extends Construct {
 					errorCode: 404,
 					errorCachingMinTtl: 0,
 					responseCode: 200,
-					responsePagePath: '/index.html',
+					responsePagePath: '/index.html'
 				},
 				{
 					errorCode: 403,
 					errorCachingMinTtl: 0,
 					responseCode: 200,
-					responsePagePath: '/index.html',
-				},
-			],
+					responsePagePath: '/index.html'
+				}
+			]
 		});
+
+
+		new StringParameter(this, 'WebsiteUrlParameter', {
+			parameterName: websiteUrlParameter(props.environment),
+			stringValue: distribution.distributionDomainName
+		});
+
 
 		new StringParameter(this, 'WebsiteBucketParameter', {
 			parameterName: websiteBucketParameter(props.environment),
-			stringValue: hostingBucket.bucketName,
+			stringValue: hostingBucket.bucketName
 		});
 
 		this.distribution = distribution;
 
 		new cdk.CfnOutput(this, 'WebsiteDomain', {
 			value: distribution.distributionDomainName,
-			description: 'Domain for the CloudFront distribution',
+			description: 'Domain for the CloudFront distribution'
 		});
 		NagSuppressions.addResourceSuppressions(
 			[hostingBucket],
 			[
 				{
 					id: 'AwsSolutions-S1',
-					reason: 'No access logs for hosting bucket.',
-				},
+					reason: 'No access logs for hosting bucket.'
+				}
 			],
 			true
 		);
@@ -86,12 +94,12 @@ export class StaticSite extends Construct {
 			[
 				{
 					id: 'AwsSolutions-CFR3',
-					reason: 'No access logs on distribution for now.',
+					reason: 'No access logs on distribution for now.'
 				},
 				{
 					id: 'AwsSolutions-CFR4',
-					reason: 'No TLSV1.1 or 1.2 on distribution for now.',
-				},
+					reason: 'No TLSV1.1 or 1.2 on distribution for now.'
+				}
 			],
 			true
 		);

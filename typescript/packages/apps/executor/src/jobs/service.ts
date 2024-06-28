@@ -7,6 +7,7 @@ import { BatchEngineInput, FinishJobRequest, JobQueueArn, StartJobRequest } from
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ARCADE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, Priority, Status } from "@arcade/events";
 import { ulid } from 'ulid';
+import dayjs from 'dayjs';
 
 const filename = 'metadata.json'
 
@@ -211,24 +212,45 @@ export class JobsService {
 		ow(request.processingConfig, ow.object.nonEmpty);
 		ow(request.processingConfig.priority, ow.string.nonEmpty);
 
-		// get list of polygons for this particular region
-		const polygonListResource = await this.regionsClient.listPolygons({ regionId: request.id, includeLatestState: true }, this.context);
-		if (polygonListResource.polygons.length === 0) {
+		// Retrieve all polygons belonging to the region
+		let listPolygonsKeepGoing = true, listPolygonsToken: string;
+		const polygons: Polygon[] = [];
+		while (listPolygonsKeepGoing) {
+			let options = { regionId: request.id, includeLatestState: true };
+			if (listPolygonsToken) {
+				options['paginationToken'] = listPolygonsToken;
+			}
+			const polygonListResource = await this.regionsClient.listPolygons(options, this.context);
+			polygons.push(...polygonListResource.polygons);
+			listPolygonsToken = polygonListResource.pagination?.token;
+			listPolygonsKeepGoing = listPolygonsToken !== undefined;
+		}
+
+		if (polygons.length === 0) {
 			this.log.warn(`JobsService> start> no polygon associated with the region ${request.name}}`);
 			return;
 		}
 
+		// Retrieve latest result
 		let keepGoing = true, token: string, latestSuccessfulResult: ResultResource;
 		while (keepGoing) {
-			const response = await this.resultsClient.listResults(request.id, { paginationToken: token }, this.context)
+			let options = {};
+			if (token) {
+				options['paginationToken'] = token;
+			}
+			const response = await this.resultsClient.listResults(request.id, options, this.context);
 			for (const result of response.results) {
 				if (result.status === 'succeeded') {
 					latestSuccessfulResult = result;
+					// only include the result if region has not been updated since last successful run
+					if (request.updatedAt && dayjs(request.updatedAt).isBefore(dayjs(result.createdAt))) {
+						latestSuccessfulResult = result;
+					}
 					keepGoing = false;
 					break;
 				}
 			}
-			token = response.pagination?.lastEvaluatedToken
+			token = response.pagination?.lastEvaluatedToken;
 			keepGoing = token !== undefined;
 		}
 
@@ -238,7 +260,7 @@ export class JobsService {
 				resultId,
 				request,
 				latestSuccessfulResult,
-				polygons: polygonListResource.polygons
+				polygons
 			});
 		} catch (exception) {
 			await this.eventPublisher.publishEvent<EngineJobDetails>({
