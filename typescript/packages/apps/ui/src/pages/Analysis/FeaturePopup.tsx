@@ -80,13 +80,13 @@ const FeaturePopup = ({ popupInfo, onClose, boundingBox }: FeaturePopupProps) =>
 									<h3>Acres</h3>
 									<p>{isLoading ? <Spinner /> : polygon?.area ? polygon?.area.toFixed(2) : '-'}</p>
 									<h3>Planted At</h3>
-									<p>{isLoading ? <Spinner /> : polygon?.state?.tags?.plantedAt ? new Date(polygon?.state?.tags?.plantedAt).toDateString() : '-'}</p>
+									<p>{isLoading ? <Spinner /> : polygon?.state?.tags?.plantDate ? new Date(polygon?.state?.tags?.plantDate).toDateString() : '-'}</p>
 								</div>
 								<div>
 									<h3>Crop</h3>
 									<p>{isLoading ? <Spinner /> : polygon?.state?.tags?.crop ? polygon?.state?.tags?.crop : '-'}</p>
 									<h3>Harvested At</h3>
-									<p>{isLoading ? <Spinner /> : polygon?.state?.tags?.harvestedAt ? new Date(polygon?.state?.tags?.harvestedAt).toDateString() : '-'}</p>
+									<p>{isLoading ? <Spinner /> : polygon?.state?.tags?.harvestDate ? new Date(polygon?.state?.tags?.harvestDate).toDateString() : '-'}</p>
 								</div>
 							</ColumnLayout>
 						</TextContent>

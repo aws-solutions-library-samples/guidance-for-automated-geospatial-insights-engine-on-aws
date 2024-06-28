@@ -1,12 +1,12 @@
-import type { Catalog, Collection, ResourceType, StacItem } from '@arcade/events';
-import { SearchResult } from "@arcade/events";
+import type { Catalog, Collection, StacItem } from '@arcade/events';
+import { SearchResult } from '@arcade/events';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';
 import axios from 'axios';
 import ow from 'ow';
-import { SearchRequest } from "./stacServer.model.js";
-import { aws4Interceptor } from "aws4-axios";
+import { SearchRequest } from './stacServer.model.js';
+import { aws4Interceptor } from 'aws4-axios';
 
 
 export class StacServerClient extends ClientServiceBase {
@@ -20,8 +20,8 @@ export class StacServerClient extends ClientServiceBase {
 		const interceptor = aws4Interceptor({
 			options: {
 				region,
-				service: "execute-api",
-			},
+				service: 'execute-api'
+			}
 		});
 		axios.interceptors.request.use(interceptor as any);
 		super();
@@ -32,7 +32,7 @@ export class StacServerClient extends ClientServiceBase {
 		await this.snsClient.send(
 			new PublishCommand({
 				Message: JSON.stringify(req),
-				TopicArn: this.stacServerIngestSnsTopicArn,
+				TopicArn: this.stacServerIngestSnsTopicArn
 			})
 		);
 		this.log.trace(`StacServerClient > publishCatalog > exit`);
@@ -43,7 +43,7 @@ export class StacServerClient extends ClientServiceBase {
 		await this.snsClient.send(
 			new PublishCommand({
 				Message: JSON.stringify(req),
-				TopicArn: this.stacServerIngestSnsTopicArn,
+				TopicArn: this.stacServerIngestSnsTopicArn
 			})
 		);
 		this.log.trace(`StacServerClient > publishCollection > exit`);
@@ -55,7 +55,7 @@ export class StacServerClient extends ClientServiceBase {
 		await this.snsClient.send(
 			new PublishCommand({
 				Message: JSON.stringify(req),
-				TopicArn: this.stacServerIngestSnsTopicArn,
+				TopicArn: this.stacServerIngestSnsTopicArn
 			})
 		);
 
@@ -81,16 +81,13 @@ export class StacServerClient extends ClientServiceBase {
 
 	public async getCollection(request: {
 		id: string;
-		type: ResourceType
 	}): Promise<Collection> {
 		this.log.trace(`StacServerClient > getCollection > in > request: ${JSON.stringify(JSON.stringify(request))} `);
 		let result: Collection;
 		ow(request, ow.object.nonEmpty);
-		ow(request.type, ow.string.oneOf(['Group', 'Region']));
 		ow(request.id, ow.string.nonEmpty);
 		try {
-			const collectionId = `${request.type.toLowerCase()}_${request.id}`;
-			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${collectionId}`);
+			const response = await axios.get<Collection>(`${this.stacServerUrl}/collections/${request.id}`);
 			result = response.data;
 		} catch (err) {
 			this.log.error(`StacServerClient> getCollection> error: ${JSON.stringify(err)}`);
@@ -103,20 +100,18 @@ export class StacServerClient extends ClientServiceBase {
 	public async getCollectionItem(request: {
 		id: string;
 		collectionId: string;
-		collectionType: ResourceType
 	}): Promise<StacItem> {
 		this.log.trace(`StacServerClient > getCollectionItem > in > request: ${JSON.stringify(request)} `);
 
 		ow(request, ow.object.nonEmpty);
-		ow(request.collectionType, ow.string.oneOf(['Group', 'Region']));
-		ow(request.id, ow.string.nonEmpty);
 		ow(request.collectionId, ow.string.nonEmpty);
+		ow(request.id, ow.string.nonEmpty);
+
+		const { collectionId, id } = request;
 
 		let result: StacItem;
 		try {
-			const collectionId = `${request.collectionType.toLowerCase()}_${request.id}`;
-			const itemId = `${request.collectionId}_${request.id}`;
-			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${itemId}`);
+			const response = await axios.get<StacItem>(`${this.stacServerUrl}/collections/${collectionId}/items/${id}`);
 			result = response.data;
 		} catch (err) {
 			this.log.error(`StacServerClient> getCollectionItem> error: ${JSON.stringify(err)}`);

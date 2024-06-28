@@ -110,12 +110,12 @@ export default function FieldsTable({ growerId, farmId, variant }: { growerId?: 
 				{
 					id: 'plantedAt',
 					header: 'Planted At',
-					cell: (item) => (item.state?.tags?.plantedAt ? new Date(item.state?.tags?.plantedAt).toDateString() : '-'),
+					cell: (item) => (item.state?.tags?.plantDate ? new Date(item.state?.tags?.plantDate).toDateString() : '-'),
 				},
 				{
 					id: 'harvestedAt',
 					header: 'Harvested At',
-					cell: (item) => (item.state?.tags?.harvestedAt ? new Date(item.state?.tags?.harvestedAt).toDateString() : '-'),
+					cell: (item) => (item.state?.tags?.harvestDate ? new Date(item.state?.tags?.harvestDate).toDateString() : '-'),
 				},
 			]}
 		/>
