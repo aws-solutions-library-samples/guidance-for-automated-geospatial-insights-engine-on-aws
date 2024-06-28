@@ -59,7 +59,7 @@ export class ExecutorModule extends Construct {
 			tracing: Tracing.ACTIVE,
 			memorySize: 512,
 			logRetention: RetentionDays.ONE_WEEK,
-			timeout: Duration.minutes(5),
+			timeout: Duration.minutes(2),
 			environment: {
 				EVENT_BUS_NAME: props.eventBusName,
 				JOB_DEFINITION_ARN: engineProcessorJobDefinition.jobDefinitionArn,
