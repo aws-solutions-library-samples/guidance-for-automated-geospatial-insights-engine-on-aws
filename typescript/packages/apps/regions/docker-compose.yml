@@ -1,5 +1,8 @@
 version: '3.8'
 services:
+  # Semgrep issue https://sg.run/e4JE
+  # Ignore reason: The docker compose is not being used to deploy, it's mainly for local testing
+  # nosemgrep
   cache:
     image: redis:7.0.15-alpine
     restart: always

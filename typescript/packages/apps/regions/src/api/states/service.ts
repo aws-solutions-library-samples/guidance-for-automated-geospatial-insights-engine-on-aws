@@ -1,3 +1,16 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
@@ -35,8 +48,6 @@ export class StateService {
 	public async create(securityContext: SecurityContext, polygonId: string, state: CreateState): Promise<State> {
 		this.log.debug(`StateService> create> in> polygonId:${polygonId}, state:${JSON.stringify(state)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(polygonId, ow.string.nonEmpty);
 		ow(
@@ -47,8 +58,6 @@ export class StateService {
 				tags: ow.optional.object,
 			})
 		);
-
-		// TODO: perform more detailed validation on attributes and tags
 
 		// ensure parent polygon exists (will throw error if not exist or insufficient privileges).
 		const polygonFuture = this.polygonService.get(securityContext, polygonId);
@@ -102,8 +111,6 @@ export class StateService {
 	public async update(securityContext: SecurityContext, id: string, state: EditState): Promise<State> {
 		this.log.debug(`StateService> update> id:${id}, state:${JSON.stringify(state)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(
 			state,
@@ -112,8 +119,6 @@ export class StateService {
 				tags: ow.optional.object,
 			})
 		);
-
-		// TODO: perform more detailed validation on attributes and tags
 
 		// retrieve existing
 		const existing = await this.get(securityContext, id);
@@ -140,8 +145,6 @@ export class StateService {
 	public async get(securityContext: SecurityContext, id: string): Promise<State> {
 		this.log.debug(`StateService> get> in: id:${id}}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// retrieve
 		const state = await this.stateRepository.get(id);
 		if (state === undefined) {
@@ -154,8 +157,6 @@ export class StateService {
 
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {
 		this.log.debug(`StateService> delete> id:${id}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
 		const state = await this.get(securityContext, id);
@@ -180,8 +181,6 @@ export class StateService {
 	public async list(securityContext: SecurityContext, options: StateListFilterOptions): Promise<[State[], ResourceId]> {
 		this.log.debug(`StateService> list> in> options:${JSON.stringify(options)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// if supported fields are being filtered, add as reserved tag searches
 		for (const tag of RESERVED_FIELDS_AS_TAGS) {
 			if (options[tag]) {
@@ -194,11 +193,6 @@ export class StateService {
 		if (options.latestOnly === true) {
 			options.tags = { ...options.tags, [`${RESERVED_PREFIX}isLatest`]: 'true' };
 		}
-
-		// // decode the token if provided
-		// if (options.token) {
-		// 	options.token = decodeURIComponent(options.token);
-		// }
 
 		let states: State[] = [];
 		let stateIds: string[];

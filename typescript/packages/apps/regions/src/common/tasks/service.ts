@@ -1,27 +1,41 @@
-import { FastifyBaseLogger } from "fastify";
-import { SecurityContext } from "../../common/scopes.js";
-import { CreateTaskRequestBody, ResourceType, TaskBatch, TaskBatchProgress, TaskResource } from "./schemas.js";
-import { ulid } from "ulid";
-import { SendMessageCommand, SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
-import pLimit from 'p-limit';
-import { NotFoundError } from "../../common/errors.js";
-import { TaskRepository } from "./repository.js";
-import { CommonRepository, ResourceId } from "../../api/repository.common.js";
-import { ListPaginationOptions } from "../../api/service.common.js";
-import { PkType } from "../pkTypes.js";
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
+import { SQSClient, SendMessageCommand, SendMessageCommandOutput } from '@aws-sdk/client-sqs';
+import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
+import pLimit from 'p-limit';
+import { ulid } from 'ulid';
+import { CommonRepository, ResourceId } from '../../api/repository.common.js';
+import { ListPaginationOptions } from '../../api/service.common.js';
+import { NotFoundError } from '../../common/errors.js';
+import { SecurityContext } from '../../common/scopes.js';
+import { PkType } from '../pkTypes.js';
+import { TaskRepository } from './repository.js';
+import { CreateTaskRequestBody, ResourceType, TaskBatch, TaskBatchProgress, TaskResource } from './schemas.js';
 
 export abstract class TaskService {
-	public constructor(protected readonly log: FastifyBaseLogger,
-					   private readonly repository: TaskRepository,
-					   private readonly commonRepository: CommonRepository,
-					   private readonly batchSize: number,
-					   private readonly sqsClient: SQSClient,
-					   private readonly sqsQueueUrl: string,
-					   private readonly concurrencyLimit: number,
-					   private readonly taskPrefix: string,
-					   private readonly resourceType: ResourceType) {
-	}
+	public constructor(
+		protected readonly log: FastifyBaseLogger,
+		private readonly repository: TaskRepository,
+		private readonly commonRepository: CommonRepository,
+		private readonly batchSize: number,
+		private readonly sqsClient: SQSClient,
+		private readonly sqsQueueUrl: string,
+		private readonly concurrencyLimit: number,
+		private readonly taskPrefix: string,
+		private readonly resourceType: ResourceType
+	) {}
 
 	// Different resource task will need to implement its own validation
 	abstract validate(request: CreateTaskRequestBody): void;
@@ -29,12 +43,15 @@ export abstract class TaskService {
 	public async updateTaskProgress(taskBatchProgress: TaskBatchProgress): Promise<void> {
 		this.log.debug(`TaskService> updateTaskProgress> in: taskUpdate:${JSON.stringify(taskBatchProgress)}`);
 		ow(taskBatchProgress, ow.object.nonEmpty);
-		ow(taskBatchProgress, ow.object.exactShape({
-			taskId: ow.string.nonEmpty,
-			totalItems: ow.number.greaterThanOrEqual(0),
-			itemsFailed: ow.number.greaterThanOrEqual(0),
-			itemsSucceeded: ow.number.greaterThanOrEqual(0)
-		}));
+		ow(
+			taskBatchProgress,
+			ow.object.exactShape({
+				taskId: ow.string.nonEmpty,
+				totalItems: ow.number.greaterThanOrEqual(0),
+				itemsFailed: ow.number.greaterThanOrEqual(0),
+				itemsSucceeded: ow.number.greaterThanOrEqual(0),
+			})
+		);
 		await this.repository.updateProgress(taskBatchProgress);
 		this.log.debug(`TaskService> update> exit`);
 	}
@@ -49,7 +66,6 @@ export abstract class TaskService {
 
 	public async list(securityContext: SecurityContext, options: ListPaginationOptions): Promise<[TaskResource[], ResourceId]> {
 		this.log.debug(`TaskService> list> in> options:${JSON.stringify(options)}`);
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 		const [polygonTaskIds, paginationKey] = await this.commonRepository.listResourceIds(this.taskPrefix as PkType, options);
 		const polygonTasks = await this.repository.listByIds(polygonTaskIds);
 
@@ -59,7 +75,6 @@ export abstract class TaskService {
 
 	public async get(securityContext: SecurityContext, taskId: string): Promise<TaskResource> {
 		this.log.debug(`TaskService> get> taskId Id: ${taskId}`);
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 		// retrieve task
 		const task = await this.repository.get(taskId);
 		if (task === undefined) {
@@ -82,7 +97,6 @@ export abstract class TaskService {
 
 	public async create(securityContext: SecurityContext, createRequest: CreateTaskRequestBody): Promise<TaskResource> {
 		this.log.debug(`TaskService> create> createRequest:${createRequest}`);
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 		// validation
 		this.validate(createRequest);
 		const batcher = <T>(items: T[]) =>

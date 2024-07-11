@@ -1,5 +1,6 @@
 ARG PYTHON_VERSION=3.11
-
+#checkov:skip=CKV_DOCKER_2:This is a backend application
+#checkov:skip=CKV_DOCKER_3:This is not required
 FROM --platform=linux/amd64 public.ecr.aws/lambda/python:${PYTHON_VERSION}
 
 # Copy dependencies

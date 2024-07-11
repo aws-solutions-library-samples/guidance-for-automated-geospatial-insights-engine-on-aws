@@ -11,14 +11,11 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
  *  and limitations under the License.
  */
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// main
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import * as fg from 'fast-glob';
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
-import fs from "fs";
+import fs from 'fs';
 import axios from 'axios';
-import { authorizeUser } from "./auth.js";
+import { authorizeUser } from './auth.js';
 
 
 enum ResourceType {
@@ -55,7 +52,7 @@ async function apiGet(url: string, path: string, authToken: string): Promise<Api
 				'Accept-Version': '1.0.0',
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${authToken}`
-			},
+			}
 		});
 
 		return {
@@ -82,8 +79,8 @@ async function apiPost(url: string, path: string, authToken: string, data: strin
 			headers: {
 				'Accept-Version': '1.0.0',
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${authToken}`,
-			},
+				Authorization: `Bearer ${authToken}`
+			}
 		});
 
 		return {
@@ -108,8 +105,8 @@ async function apiPatch(url: string, path: string, authToken: string, data: stri
 			headers: {
 				'Accept-Version': '1.0.0',
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${authToken}`,
-			},
+				Authorization: `Bearer ${authToken}`
+			}
 		});
 
 		return {
@@ -134,8 +131,8 @@ async function apiDelete(url: string, path: string, groupContext: string, authTo
 			headers: {
 				'Accept-Version': '1.0.0',
 				Authorization: `Bearer ${authToken}`,
-				'x-groupcontextid': groupContext,
-			},
+				'x-groupcontextid': groupContext
+			}
 		});
 
 		return {
@@ -163,10 +160,10 @@ async function seedGroups(entries: SeedEntry[], endpoint: string, token: string)
 		const getGroupByNameResponse = await apiGet(endpoint, `/groups?name=${groupName}`, token);
 		if (getGroupByNameResponse.response.groups.length > 0) {
 			const currentGroup = getGroupByNameResponse.response.groups[0];
-			console.log(`Updating group ${groupName} with id ${currentGroup.id}`)
+			console.log(`Updating group ${groupName} with id ${currentGroup.id}`);
 			await apiPatch(endpoint, `/groups/${currentGroup.id}`, token, groupDefinitionJson);
 		} else {
-			console.log(`Creating new group with name ${groupName}`)
+			console.log(`Creating new group with name ${groupName}`);
 			await apiPost(endpoint, `/groups`, token, groupDefinitionJson);
 		}
 	}
@@ -181,7 +178,7 @@ async function seedStates(entries: SeedEntry[], endpoint: string, token: string)
 		stateDefinitionJson.tags.plantedAt = new Date().toISOString();
 		const getPolygonByName = await apiGet(endpoint, `/polygons?name=${se.resourceName}`, token);
 		const currentPolygon = getPolygonByName.response.polygons[0];
-		console.log(`Creating state for polygon ${currentPolygon.name} with id ${currentPolygon.id}`)
+		console.log(`Creating state for polygon ${currentPolygon.name} with id ${currentPolygon.id}`);
 		await apiPost(endpoint, `/polygons/${currentPolygon.id}/states`, token, stateDefinitionJson);
 	}
 }
@@ -197,10 +194,10 @@ async function seedRegions(entries: SeedEntry[], endpoint: string, token: string
 		const getRegionByNameResponse = await apiGet(endpoint, `/regions?name=${regionName}`, token);
 		if (getRegionByNameResponse.response.regions.length > 0) {
 			const currentRegion = getRegionByNameResponse.response.regions[0];
-			console.log(`Updating region ${regionName} with id ${currentRegion.id}`)
+			console.log(`Updating region ${regionName} with id ${currentRegion.id}`);
 			await apiPatch(endpoint, `/regions/${currentRegion.id}`, token, regionDefinitionJson);
 		} else {
-			console.log(`Creating new region with name ${regionName}`)
+			console.log(`Creating new region with name ${regionName}`);
 			await apiPost(endpoint, `/groups/${groupId}/regions`, token, regionDefinitionJson);
 		}
 	}
@@ -217,10 +214,10 @@ async function seedPolygons(entries: SeedEntry[], endpoint: string, token: strin
 		const getPolygonByName = await apiGet(endpoint, `/polygons?name=${polygonName}`, token);
 		if (getPolygonByName.response.polygons.length > 0) {
 			const currentPolygon = getPolygonByName.response.polygons[0];
-			console.log(`Updating polygon ${polygonName} with id ${currentPolygon.id}`)
+			console.log(`Updating polygon ${polygonName} with id ${currentPolygon.id}`);
 			await apiPatch(endpoint, `/polygons/${currentPolygon.id}`, token, polygonDefinitionJson);
 		} else {
-			console.log(`Creating new region with name ${polygonName}`)
+			console.log(`Creating new region with name ${polygonName}`);
 			await apiPost(endpoint, `/regions/${regionId}/polygons`, token, polygonDefinitionJson);
 		}
 	}
@@ -233,7 +230,7 @@ async function getSSMParameter(path: string, context: string): Promise<{
 	const ssm = new SSMClient({});
 	const response = await ssm.send(
 		new GetParameterCommand({
-			Name: path,
+			Name: path
 		})
 	);
 	return {
@@ -248,7 +245,7 @@ async function getApiEndpoints(environment: string): Promise<{
 	// Get the url for the api endpoints
 	const regionsUrlPath = `/arcade/${environment}/regions/apiUrl`;
 	const apiEndpointsPromises = await Promise.all([
-		getSSMParameter(regionsUrlPath, 'regions'),
+		getSSMParameter(regionsUrlPath, 'regions')
 	]);
 
 	const apiEndpoints: {
@@ -286,7 +283,7 @@ if (operation === 'seed') {
 		const endPoints = await getApiEndpoints(environment);
 		const [userPool, userClient] = await Promise.all([
 			getSSMParameter(`/arcade/${environment}/shared/cognitoUserPoolId`, 'cognitoUserPoolId'),
-			getSSMParameter(`/arcade/${environment}/shared/cognitoUserPoolClientId`, 'cognitoUserClientId'),
+			getSSMParameter(`/arcade/${environment}/shared/cognitoUserPoolClientId`, 'cognitoUserClientId')
 		]);
 		process.env.COGNITO_USER_POOL_ID = userPool.value;
 		process.env.COGNITO_CLIENT_ID = userClient.value;

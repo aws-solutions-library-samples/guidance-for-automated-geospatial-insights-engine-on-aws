@@ -1,3 +1,16 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import { EventPublisher } from '@arcade/events';
 import { area, multiPolygon, polygon } from '@turf/turf';
 import { FastifyBaseLogger } from 'fastify';
@@ -34,8 +47,6 @@ export class PolygonService {
 	public async create(securityContext: SecurityContext, regionId: string, polygon: CreatePolygon): Promise<Polygon> {
 		this.log.debug(`PolygonService> create> regionId:${regionId}, polygon:${JSON.stringify(polygon)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(regionId, ow.string.nonEmpty);
 		ow(
@@ -49,8 +60,6 @@ export class PolygonService {
 			})
 		);
 		this.validatePolygons(polygon);
-
-		// TODO: perform more detailed validation on attributes and tags
 
 		// ensure parent region exists (will throw error if not exist or insufficient privileges)
 		const region = await this.regionService.get(securityContext, regionId);
@@ -114,8 +123,6 @@ export class PolygonService {
 	public async update(securityContext: SecurityContext, id: string, polygon: EditPolygon): Promise<Polygon> {
 		this.log.debug(`PolygonService> update> id:${id}, polygon:${JSON.stringify(polygon)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(
 			polygon,
@@ -128,8 +135,6 @@ export class PolygonService {
 			})
 		);
 		this.validatePolygons(polygon);
-
-		// TODO: perform more detailed validation on attributes and tags
 
 		// retrieve existing
 		const existing = await this.get(securityContext, id);
@@ -160,8 +165,6 @@ export class PolygonService {
 	public async get(securityContext: SecurityContext, id: string): Promise<Polygon> {
 		this.log.debug(`PolygonService> get> in: id:${id}}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// retrieve
 		const polygon = await this.polygonRepository.get(id);
 		if (polygon === undefined) {
@@ -174,8 +177,6 @@ export class PolygonService {
 
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {
 		this.log.debug(`PolygonService> delete> id:${id}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
 		const existing = await this.get(securityContext, id);
@@ -202,8 +203,6 @@ export class PolygonService {
 
 	public async list(securityContext: SecurityContext, options: PolygonListFilterOptions): Promise<[Polygon[], ResourceId]> {
 		this.log.debug(`PolygonService> list> in> options:${JSON.stringify(options)}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// if name, groupId, or regionId are being filtered, add as reserved tag searches
 		for (const tag of RESERVED_FIELDS_AS_TAGS) {

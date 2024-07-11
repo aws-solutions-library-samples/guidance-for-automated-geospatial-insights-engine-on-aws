@@ -1,3 +1,14 @@
+#   Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+#   with the License. A copy of the License is located at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+#   OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+#   and limitations under the License.
+
 import hashlib
 import json
 import os
@@ -78,6 +89,9 @@ class MetadataUtils:
 				if file.endswith('.tif'):
 					band = file.replace('.tif', "")
 					metadata["assets"][band] = {
+						# Semgrep issue https://sg.run/oYz6
+						# Ignore reason: The bucket name and s3 key are not being specified by user
+						# nosemgrep
 						"href": "s3://{}/{}".format(bucket_name, s3_key),
 						"type": "image/tiff; application=geotiff; profile=cloud-optimized",
 						"title": band,
@@ -99,6 +113,9 @@ class MetadataUtils:
 				# generate metadata for nitrogen recommendation
 				elif file == 'nitrogen.json':
 					metadata["assets"]['nitrogen_metadata'] = {
+						# Semgrep issue https://sg.run/oYz6
+						# Ignore reason: The bucket name and s3 key are not being specified by user
+						# nosemgrep
 						"href": "s3://{}/{}".format(bucket_name, s3_key),
 						"type": "application/json",
 						"file:checksum": MetadataUtils.calculate_checksum(file_path),

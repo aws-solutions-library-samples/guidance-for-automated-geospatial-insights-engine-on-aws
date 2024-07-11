@@ -1,4 +1,6 @@
 # Use the official Python 3.11 image as the base image
+#checkov:skip=CKV_DOCKER_2:This is a backend application
+#checkov:skip=CKV_DOCKER_3:This is not required
 FROM --platform=linux/amd64 python:3.11.9-alpine
 
 # Set the working directory

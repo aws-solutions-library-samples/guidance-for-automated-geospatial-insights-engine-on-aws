@@ -1,5 +1,16 @@
 """rio_tiler.io.stac: STAC reader."""
 
+#   Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+#   with the License. A copy of the License is located at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+#   OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+#   and limitations under the License.
+
 import json
 import os
 import warnings
@@ -46,8 +57,8 @@ def aws_get_object(
 	request_pays: bool = False,
 	client: "boto3_session.client" = None,
 ) -> bytes:
-	"""AWS s3 get object content."""
-	assert boto3_session is not None, "'boto3' must be installed to use s3:// urls"
+	if boto3_session is None:
+		raise AssertionError("'boto3' must be installed to use s3:// urls")
 
 	if not client:
 		if profile_name := os.environ.get("AWS_PROFILE", None):

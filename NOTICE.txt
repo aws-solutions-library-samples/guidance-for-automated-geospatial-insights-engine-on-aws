@@ -1,0 +1,514 @@
+
+
+Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+Licensed under the Apache License Version 2.0 (the "License"). You may not use this file except
+in compliance with the License. A copy of the License is located at http://www.apache.org/licenses/
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+
+**********************
+TYPESCRIPT
+**********************
+
+AWS SDK under the Apache License Version 2.0
+
+"@aws-amplify/auth@6.3.8","Apache-2.0","https://github.com/aws-amplify/amplify-js"
+"@aws-amplify/core@6.3.4","Apache-2.0","https://github.com/aws-amplify/amplify-js"
+"@aws-cdk/aws-cognito-identitypool-alpha@2.140.0-alpha.0","Apache-2.0","https://github.com/aws/aws-cdk"
+"@aws-sdk/client-batch@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-cloudformation@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-cognito-identity-provider@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-dynamodb@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-eventbridge@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-lambda@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-s3@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-scheduler@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-secrets-manager@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-sns@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-sqs@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-ssm@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-sso-admin@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-sso-oidc@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-sts@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/client-verifiedpermissions@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/lib-dynamodb@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/smithy-client@3.374.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/types@3.609.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/util-dynamodb@3.613.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@aws-sdk/util-utf8-node@3.259.0","Apache-2.0","https://github.com/aws/aws-sdk-js-v3"
+"@balena/dockerignore@1.0.2","Apache-2.0","https://github.com/balena-io-modules/dockerignore"
+"@fastify/awilix@5.1.0","MIT","https://github.com/fastify/fastify-awilix"
+"@fastify/aws-lambda@4.1.0","MIT","https://github.com/fastify/aws-lambda-fastify"
+"@fastify/cors@9.0.1","MIT","https://github.com/fastify/fastify-cors"
+"@fastify/env@4.4.0","MIT","https://github.com/fastify/fastify-env"
+"@fastify/sensible@5.6.0","MIT","https://github.com/fastify/fastify-sensible"
+"@fastify/swagger@8.14.0","MIT","https://github.com/fastify/fastify-swagger"
+"@fastify/type-provider-typebox@4.0.0","MIT","https://github.com/fastify/fastify-type-provider-typebox"
+"@rushstack/eslint-config@3.7.0","MIT","https://github.com/microsoft/rushstack"
+"@sinclair/typebox@0.32.34","MIT","https://github.com/sinclairzx81/typebox"
+"@tsconfig/node20@20.1.4","MIT","https://github.com/tsconfig/bases"
+"@turf/turf@6.5.0","MIT","https://github.com/Turfjs/turf"
+"@types/aws-lambda@8.10.141","MIT","https://github.com/DefinitelyTyped/DefinitelyTyped"
+"@types/http-errors@2.0.1","MIT","https://github.com/DefinitelyTyped/DefinitelyTyped"
+"@types/lodash.chunk@4.2.9","MIT","https://github.com/DefinitelyTyped/DefinitelyTyped"
+"@types/node@20.14.10","MIT","https://github.com/DefinitelyTyped/DefinitelyTyped"
+"@types/prettier@3.0.0","MIT",""
+"@typescript-eslint/eslint-plugin@7.16.0","MIT","https://github.com/typescript-eslint/typescript-eslint"
+"@typescript-eslint/parser@7.16.0","BSD-2-Clause","https://github.com/typescript-eslint/typescript-eslint"
+"@vitest/ui@1.6.0","MIT","https://github.com/vitest-dev/vitest"
+"ajv@8.16.0","MIT","https://github.com/ajv-validator/ajv"
+"ansi-regex@5.0.1","MIT","https://github.com/chalk/ansi-regex"
+"ansi-styles@4.3.0","MIT","https://github.com/chalk/ansi-styles"
+"astral-regex@2.0.0","MIT","https://github.com/kevva/astral-regex"
+"awilix@10.0.2","MIT","https://github.com/jeffijoe/awilix"
+"aws-amplify@6.4.0","Apache-2.0","https://github.com/aws-amplify/amplify-js"
+"aws-cdk-lib@2.148.0","Apache-2.0","https://github.com/aws/aws-cdk"
+"aws-cdk@2.148.0","Apache-2.0","https://github.com/aws/aws-cdk"
+"aws-jwt-verify@4.0.1","Apache-2.0","https://github.com/awslabs/aws-jwt-verify"
+"aws-lambda@1.0.7","MIT","https://github.com/awspilot/cli-lambda-deploy"
+"aws-sdk-client-mock@4.0.1","MIT","https://github.com/m-radzikowski/aws-sdk-client-mock"
+"aws-xray-sdk@3.9.0","Apache-2.0","https://github.com/aws/aws-xray-sdk-node/tree/master/packages/full_sdk"
+"aws4-axios@3.3.6","MIT","https://github.com/jamesmbourne/aws4-axios"
+"axios@1.7.2","MIT","https://github.com/axios/axios"
+"balanced-match@1.0.2","MIT","https://github.com/juliangruber/balanced-match"
+"brace-expansion@1.1.11","MIT","https://github.com/juliangruber/brace-expansion"
+"case@1.6.3","(MIT OR GPL-3.0-or-later)","https://github.com/nbubna/Case"
+"cdk-nag@2.28.158","Apache-2.0","https://github.com/cdklabs/cdk-nag"
+"color-convert@2.0.1","MIT","https://github.com/Qix-/color-convert"
+"color-name@1.1.4","MIT","https://github.com/colorjs/color-name"
+"concat-map@0.0.1","MIT","https://github.com/substack/node-concat-map"
+"constructs@10.3.0","Apache-2.0","https://github.com/aws/constructs"
+"custom-resource-helper@1.0.15","MIT","https://github.com/hupe1980/custom-resource-helper"
+"dayjs@1.11.11","MIT","https://github.com/iamkun/dayjs"
+"dotenv@16.4.5","BSD-2-Clause","https://github.com/motdotla/dotenv"
+"emoji-regex@8.0.0","MIT","https://github.com/mathiasbynens/emoji-regex"
+"esbuild@0.23.0","MIT","https://github.com/evanw/esbuild"
+"eslint-config-oclif-typescript@3.1.8","MIT","https://github.com/oclif/eslint-config-oclif-typescript"
+"eslint-config-oclif@5.2.0","MIT","https://github.com/oclif/eslint-config-oclif"
+"eslint-plugin-prettier@5.1.3","MIT","https://github.com/prettier/eslint-plugin-prettier"
+"eslint-plugin-react-hooks@4.6.2","MIT","https://github.com/facebook/react"
+"eslint-plugin-react-refresh@0.4.8","MIT","https://github.com/ArnaudBarre/eslint-plugin-react-refresh"
+"eslint-plugin-unicorn@52.0.0","MIT","https://github.com/sindresorhus/eslint-plugin-unicorn"
+"eslint@9.6.0","MIT","https://github.com/eslint/eslint"
+"fast-deep-equal@3.1.3","MIT","https://github.com/epoberezkin/fast-deep-equal"
+"fastify-plugin@4.5.1","MIT","https://github.com/fastify/fastify-plugin"
+"fastify@4.28.1","MIT","https://github.com/fastify/fastify"
+"fs-extra@11.2.0","MIT","https://github.com/jprichardson/node-fs-extra"
+"graceful-fs@4.2.11","ISC","https://github.com/isaacs/node-graceful-fs"
+"http-errors@2.0.0","MIT","https://github.com/jshttp/http-errors"
+"ignore@5.3.1","MIT","https://github.com/kaelzhang/node-ignore"
+"is-fullwidth-code-point@3.0.0","MIT","https://github.com/sindresorhus/is-fullwidth-code-point"
+"js-yaml@4.1.0","MIT","https://github.com/nodeca/js-yaml"
+"json-schema-traverse@1.0.0","MIT","https://github.com/epoberezkin/json-schema-traverse"
+"jsonfile@6.1.0","MIT","https://github.com/jprichardson/node-jsonfile"
+"jsonschema@1.4.1","MIT","https://github.com/tdegrunt/jsonschema"
+"just-clone@6.2.0","MIT","https://github.com/angus-c/just"
+"jwt-decode@4.0.0","MIT","https://github.com/auth0/jwt-decode"
+"lodash.chunk@4.2.0","MIT","https://github.com/lodash/lodash"
+"lodash.truncate@4.4.2","MIT","https://github.com/lodash/lodash"
+"merge-anything@5.1.7","MIT","https://github.com/mesqueeb/merge-anything"
+"mime-db@1.52.0","MIT","https://github.com/jshttp/mime-db"
+"mime-types@2.1.35","MIT","https://github.com/jshttp/mime-types"
+"minimatch@3.1.2","ISC","https://github.com/isaacs/minimatch"
+"node-cache@5.1.2","MIT","https://github.com/node-cache/node-cache"
+"octokit@3.2.1","MIT","https://github.com/octokit/octokit.js"
+"ow@1.1.1","MIT","https://github.com/sindresorhus/ow"
+"p-limit@5.0.0","MIT","https://github.com/sindresorhus/p-limit"
+"pino-pretty@11.2.1","MIT","https://github.com/pinojs/pino-pretty"
+"pino@8.21.0","MIT","https://github.com/pinojs/pino"
+"prettier@3.3.2","MIT","https://github.com/prettier/prettier"
+"punycode@2.3.1","MIT","https://github.com/mathiasbynens/punycode.js"
+"readable-stream@4.5.2","MIT","https://github.com/nodejs/readable-stream"
+"redis@4.6.15","MIT","https://github.com/redis/node-redis"
+"require-from-string@2.0.2","MIT","https://github.com/floatdrop/require-from-string"
+"semver@7.6.2","ISC","https://github.com/npm/node-semver"
+"shelljs@0.8.5","BSD-3-Clause","https://github.com/shelljs/shelljs"
+"shx@0.3.4","MIT","https://github.com/shelljs/shx"
+"sleep-promise@9.1.0","MIT","https://github.com/brummelte/sleep-promise"
+"slice-ansi@4.0.0","MIT","https://github.com/chalk/slice-ansi"
+"source-map-support@0.5.21","MIT","https://github.com/evanw/node-source-map-support"
+"string-width@4.2.3","MIT","https://github.com/sindresorhus/string-width"
+"strip-ansi@6.0.1","MIT","https://github.com/chalk/strip-ansi"
+"table@6.8.2","BSD-3-Clause","https://github.com/gajus/table"
+"tsx@4.16.2","MIT","https://github.com/privatenumber/tsx"
+"typescript@5.5.3","Apache-2.0","https://github.com/Microsoft/TypeScript"
+"ulid@2.3.0","MIT","https://github.com/ulid/javascript"
+"universalify@2.0.1","MIT","https://github.com/RyanZim/universalify"
+"uri-js@4.4.1","BSD-2-Clause","https://github.com/garycourt/uri-js"
+"vite@5.3.3","MIT","https://github.com/vitejs/vite"
+"vitest-mock-extended@1.3.1","MIT","https://github.com/eratio08/vitest-mock-extended"
+"vitest@0.34.6","MIT","https://github.com/vitest-dev/vitest"
+"vitest@1.5.3","MIT","https://github.com/vitest-dev/vitest"
+"vitest@1.5.3","MIT","https://github.com/vitest-dev/vitest""module name","license","repository"
+"yaml@1.10.2","ISC","https://github.com/eemeli/yaml""module name","license","repository"
+
+
+**********************
+PYTHON - ARCADE PIPELINE
+**********************
+
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Compatible ┃ Package                   ┃ License(s)                                         ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ ✔          │ GDAL                      │ MIT LICENSE                                        │
+│ ✔          │ Jinja2                    │ BSD LICENSE                                        │
+│ ✔          │ MarkupSafe                │ BSD LICENSE                                        │
+│ ✔          │ Pillow                    │ HISTORICAL PERMISSION NOTICE AND DISCLAIMER (HPND) │
+│ ✔          │ PyYAML                    │ MIT LICENSE                                        │
+│ ✔          │ affine                    │ BSD LICENSE                                        │
+│ ✔          │ attrs                     │ MIT LICENSE                                        │
+│ ✔          │ aws-requests-auth         │ BSD LICENSE                                        │
+│ ✔          │ boto3                     │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ botocore                  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ cachetools                │ MIT LICENSE                                        │
+│ ✔          │ charset-normalizer        │ MIT LICENSE                                        │
+│ ✔          │ click                     │ BSD LICENSE                                        │
+│ ✔          │ click-plugins             │ BSD LICENSE                                        │
+│ ✔          │ cligj                     │ BSD                                                │
+│ ✔          │ cloudpickle               │ BSD LICENSE                                        │
+│ ✔          │ colorama                  │ BSD LICENSE                                        │
+│ ✔          │ contourpy                 │ BSD LICENSE                                        │
+│ ✔          │ cycler                    │ BSD LICENSE                                        │
+│ ✔          │ dask                      │ BSD LICENSE                                        │
+│ ✔          │ dataclasses-json          │ MIT LICENSE                                        │
+│ ✔          │ distributed               │ BSD LICENSE                                        │
+│ ✔          │ fiona                     │ BSD LICENSE                                        │
+│ ✔          │ fonttools                 │ MIT LICENSE                                        │
+│ ✔          │ fsspec                    │ BSD LICENSE                                        │
+│ ✔          │ geopandas                 │ BSD LICENSE                                        │
+│ ✔          │ idna                      │ BSD LICENSE                                        │
+│ ✔          │ importlib-metadata        │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ importlib-resources       │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ jmespath                  │ MIT LICENSE                                        │
+│ ✔          │ jsonlines                 │ BSD LICENSE                                        │
+│ ✔          │ jsonschema                │ MIT LICENSE                                        │
+│ ✔          │ jsonschema-specifications │ MIT LICENSE                                        │
+│ ✔          │ kiwisolver                │ BSD LICENSE                                        │
+│ ✔          │ locket                    │ BSD LICENSE                                        │
+│ ✔          │ marshmallow               │ MIT LICENSE                                        │
+│ ✔          │ matplotlib                │ PYTHON SOFTWARE FOUNDATION LICENSE                 │
+│ ✔          │ msgpack                   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ mypy-extensions           │ MIT LICENSE                                        │
+│ ✔          │ numpy                     │ BSD LICENSE                                        │
+│ ✔          │ odc-geo                   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ odc-stac                  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ packaging                 │ APACHE SOFTWARE LICENSE;; BSD LICENSE              │
+│ ✔          │ pandas                    │ BSD LICENSE                                        │
+│ ✔          │ partd                     │ BSD                                                │
+│ ✔          │ pkgutil_resolve_name      │ MIT LICENSE                                        │
+│ ✔          │ psutil                    │ BSD LICENSE                                        │
+│ ✔          │ pyogrio                   │ MIT                                                │
+│ ✔          │ pyparsing                 │ MIT LICENSE                                        │
+│ ✔          │ pyproj                    │ MIT LICENSE                                        │
+│ ✔          │ pyrsistent                │ MIT LICENSE                                        │
+│ ✔          │ pystac                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ pystac-client             │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ python-dateutil           │ BSD LICENSE;; APACHE SOFTWARE LICENSE              │
+│ ✔          │ pytz                      │ MIT LICENSE                                        │
+│ ✔          │ rasterio                  │ BSD LICENSE                                        │
+│ ✔          │ referencing               │ MIT LICENSE                                        │
+│ ✔          │ requests                  │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ rioxarray                 │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ rpds-py                   │ MIT LICENSE                                        │
+│ ✔          │ s3transfer                │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ setuptools                │ MIT LICENSE                                        │
+│ ✔          │ shapely                   │ BSD LICENSE                                        │
+│ ✔          │ six                       │ MIT LICENSE                                        │
+│ ✔          │ snuggs                    │ MIT                                                │
+│ ✔          │ sortedcontainers          │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ tblib                     │ BSD LICENSE                                        │
+│ ✔          │ toolz                     │ BSD LICENSE                                        │
+│ ✔          │ tornado                   │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ typing                    │ PYTHON SOFTWARE FOUNDATION LICENSE                 │
+│ ✔          │ typing-inspect            │ MIT LICENSE                                        │
+│ ✔          │ typing_extensions         │ PYTHON SOFTWARE FOUNDATION LICENSE                 │
+│ ✔          │ tzdata                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ urllib3                   │ MIT LICENSE                                        │
+│ ✔          │ xarray                    │ APACHE SOFTWARE LICENSE                            │
+│ ✔          │ zict                      │ BSD LICENSE                                        │
+│ ✔          │ zipp                      │ MIT LICENSE                                        │
+└────────────┴───────────────────────────┴────────────────────────────────────────────────────┘
+
+**********************
+PYTHON - TILER
+**********************
+
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Compatible ┃ Package             ┃ License(s)                                ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ ✔          │ Jinja2              │ BSD LICENSE                               │
+│ ✔          │ MarkupSafe          │ BSD LICENSE                               │
+│ ✔          │ PyYAML              │ MIT LICENSE                               │
+│ ✔          │ Pygments            │ BSD LICENSE                               │
+│ ✔          │ affine              │ BSD LICENSE                               │
+│ ✔          │ annotated-types     │ MIT LICENSE                               │
+│ ✔          │ anyio               │ MIT LICENSE                               │
+│ ✔          │ attrs               │ MIT LICENSE                               │
+│ ✔          │ boto3               │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ botocore            │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ cachetools          │ MIT LICENSE                               │
+│ ✔          │ click               │ BSD LICENSE                               │
+│ ✔          │ click-plugins       │ BSD LICENSE                               │
+│ ✔          │ cligj               │ BSD                                       │
+│ ✔          │ cogeo-mosaic        │ MIT LICENSE                               │
+│ ✔          │ color-operations    │ MIT LICENSE                               │
+│ ✔          │ colorama            │ BSD LICENSE                               │
+│ ✔          │ dnspython           │ ISC LICENSE (ISCL)                        │
+│ ✔          │ email-validator     │ THE UNLICENSE (UNLICENSE)                 │
+│ ✔          │ exceptiongroup      │ MIT LICENSE                               │
+│ ✔          │ fastapi             │ MIT LICENSE                               │
+│ ✔          │ fastapi-cli         │ MIT LICENSE                               │
+│ ✔          │ fastapi-slim        │ MIT LICENSE                               │
+│ ✔          │ geojson-pydantic    │ MIT LICENSE                               │
+│ ✔          │ h11                 │ MIT LICENSE                               │
+│ ✔          │ httpcore            │ BSD LICENSE                               │
+│ ✔          │ httptools           │ MIT LICENSE                               │
+│ ✔          │ httpx               │ BSD LICENSE                               │
+│ ✔          │ httpx-auth-awssigv4 │ BSD LICENSE;; MIT LICENSE                 │
+│ ✔          │ idna                │ BSD LICENSE                               │
+│ ✔          │ importlib-metadata  │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ importlib-resources │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ jmespath            │ MIT LICENSE                               │
+│ ✔          │ mangum              │ MIT LICENSE                               │
+│ ✔          │ markdown-it-py      │ MIT LICENSE                               │
+│ ✔          │ mdurl               │ MIT LICENSE                               │
+│ ✔          │ morecantile         │ BSD LICENSE                               │
+│ ✔          │ numexpr             │ MIT LICENSE                               │
+│ ✔          │ numpy               │ BSD LICENSE                               │
+│ ✔          │ orjson              │ APACHE SOFTWARE LICENSE;; MIT LICENSE     │
+│ ✔          │ pydantic            │ MIT LICENSE                               │
+│ ✔          │ pydantic-core       │ MIT LICENSE                               │
+│ ✔          │ pydantic-settings   │ MIT LICENSE                               │
+│ ✔          │ pyparsing           │ MIT LICENSE                               │
+│ ✔          │ pyproj              │ MIT LICENSE                               │
+│ ✔          │ pystac              │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ python-dateutil     │ BSD LICENSE;; APACHE SOFTWARE LICENSE     │
+│ ✔          │ python-dotenv       │ BSD LICENSE                               │
+│ ✔          │ python-multipart    │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ rasterio            │ BSD LICENSE                               │
+│ ✔          │ rich                │ MIT LICENSE                               │
+│ ✔          │ rio-tiler           │ BSD LICENSE                               │
+│ ✔          │ s3transfer          │ APACHE SOFTWARE LICENSE                   │
+│ ✔          │ setuptools          │ MIT LICENSE                               │
+│ ✔          │ shapely             │ BSD LICENSE                               │
+│ ✔          │ shellingham         │ ISC LICENSE (ISCL)                        │
+│ ✔          │ simplejson          │ ACADEMIC FREE LICENSE (AFL);; MIT LICENSE │
+│ ✔          │ six                 │ MIT LICENSE                               │
+│ ✔          │ sniffio             │ MIT LICENSE;; APACHE SOFTWARE LICENSE     │
+│ ✔          │ snuggs              │ MIT                                       │
+│ ✔          │ starlette           │ BSD LICENSE                               │
+│ ✔          │ supermorecado       │ BSD LICENSE                               │
+│ ✔          │ titiler.core        │ MIT LICENSE                               │
+│ ✔          │ typer               │ MIT LICENSE                               │
+│ ✔          │ typing_extensions   │ PYTHON SOFTWARE FOUNDATION LICENSE        │
+│ ✔          │ ujson               │ BSD LICENSE                               │
+│ ✔          │ urllib3             │ MIT LICENSE                               │
+│ ✔          │ uvicorn             │ BSD LICENSE                               │
+│ ✔          │ uvloop              │ APACHE SOFTWARE LICENSE;; MIT LICENSE     │
+│ ✔          │ watchfiles          │ MIT LICENSE                               │
+│ ✔          │ websockets          │ BSD LICENSE                               │
+└────────────┴─────────────────────┴───────────────────────────────────────────┘
+
+**********************
+PYTHON - NOTEBOOK
+**********************
+
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Compatible ┃ Package                       ┃ License(s)                                                        ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ ✔          │ Babel                         │ BSD LICENSE                                                       │
+│ ✔          │ Cartopy                       │ BSD LICENSE                                                       │
+│ ✔          │ Jinja2                        │ BSD LICENSE                                                       │
+│ ✔          │ Markdown                      │ BSD LICENSE                                                       │
+│ ✔          │ MarkupSafe                    │ BSD LICENSE                                                       │
+│ ✔          │ Pillow                        │ HISTORICAL PERMISSION NOTICE AND DISCLAIMER (HPND)                │
+│ ✔          │ PyYAML                        │ MIT LICENSE                                                       │
+│ ✔          │ Pygments                      │ BSD LICENSE                                                       │
+│ ✔          │ QtPy                          │ MIT LICENSE                                                       │
+│ ✔          │ Send2Trash                    │ BSD LICENSE                                                       │
+│ ✔          │ affine                        │ BSD LICENSE                                                       │
+│ ✔          │ anyio                         │ MIT LICENSE                                                       │
+│ ✔          │ appnope                       │ BSD LICENSE                                                       │
+│ ✔          │ argon2-cffi                   │ MIT LICENSE                                                       │
+│ ✔          │ argon2-cffi-bindings          │ MIT LICENSE                                                       │
+│ ✔          │ arrow                         │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ asttokens                     │ APACHE 2.0                                                        │
+│ ✔          │ async-lru                     │ MIT LICENSE                                                       │
+│ ✔          │ attrs                         │ MIT LICENSE                                                       │
+│ ✔          │ backcall                      │ BSD LICENSE                                                       │
+│ ✔          │ backports.functools-lru-cache │ MIT LICENSE                                                       │
+│ ✔          │ beautifulsoup4                │ MIT LICENSE                                                       │
+│ ✔          │ bleach                        │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ bokeh                         │ BSD LICENSE                                                       │
+│ ✔          │ boto3                         │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ botocore                      │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ branca                        │ MIT LICENSE                                                       │
+│ ✔          │ cached-property               │ BSD LICENSE                                                       │
+│ ✔          │ cachetools                    │ MIT LICENSE                                                       │
+│ ✔          │ cffi                          │ MIT LICENSE                                                       │
+│ ✔          │ charset-normalizer            │ MIT LICENSE                                                       │
+│ ✔          │ click                         │ BSD LICENSE                                                       │
+│ ✔          │ click-plugins                 │ BSD LICENSE                                                       │
+│ ✔          │ cligj                         │ BSD                                                               │
+│ ✔          │ cloudpickle                   │ BSD LICENSE                                                       │
+│ ✔          │ colorama                      │ BSD LICENSE                                                       │
+│ ✔          │ comm                          │ BSD LICENSE                                                       │
+│ ✔          │ contourpy                     │ BSD LICENSE                                                       │
+│ ✔          │ cycler                        │ BSD LICENSE                                                       │
+│ ✔          │ dask                          │ BSD LICENSE                                                       │
+│ ✔          │ dask-expr                     │ BSD LICENSE                                                       │
+│ ✔          │ dataclasses                   │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ dataclasses-json              │ MIT LICENSE                                                       │
+│ ✔          │ debugpy                       │ ECLIPSE PUBLIC LICENSE 2.0 (EPL-2.0);; MIT LICENSE                │
+│ ✔          │ decorator                     │ BSD LICENSE                                                       │
+│ ✔          │ defusedxml                    │ PYTHON SOFTWARE FOUNDATION LICENSE                                │
+│ ✔          │ distributed                   │ BSD LICENSE                                                       │
+│ ✔          │ exceptiongroup                │ MIT LICENSE                                                       │
+│ ✔          │ executing                     │ MIT LICENSE                                                       │
+│ ✔          │ fastjsonschema                │ BSD LICENSE                                                       │
+│ ✔          │ fiona                         │ BSD LICENSE                                                       │
+│ ✔          │ folium                        │ MIT LICENSE                                                       │
+│ ✔          │ fonttools                     │ MIT LICENSE                                                       │
+│ ✔          │ fsspec                        │ BSD LICENSE                                                       │
+│ ✔          │ geopandas                     │ BSD LICENSE                                                       │
+│ ✔          │ geoviews                      │ BSD LICENSE                                                       │
+│ ✔          │ h11                           │ MIT LICENSE                                                       │
+│ ✔          │ holoviews                     │ BSD LICENSE                                                       │
+│ ✔          │ httpcore                      │ BSD LICENSE                                                       │
+│ ✔          │ httpx                         │ BSD LICENSE                                                       │
+│ ✔          │ hvplot                        │ BSD LICENSE                                                       │
+│ ✔          │ idna                          │ BSD LICENSE                                                       │
+│ ✔          │ importlib-metadata            │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ importlib-resources           │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ ipykernel                     │ BSD LICENSE                                                       │
+│ ✔          │ ipython                       │ BSD LICENSE                                                       │
+│ ✔          │ ipython-genutils              │ BSD LICENSE                                                       │
+│ ✔          │ ipywidgets                    │ BSD LICENSE                                                       │
+│ ✔          │ isoduration                   │ ISC LICENSE (ISCL)                                                │
+│ ✔          │ jedi                          │ MIT LICENSE                                                       │
+│ ✔          │ jmespath                      │ MIT LICENSE                                                       │
+│ ✔          │ joblib                        │ BSD LICENSE                                                       │
+│ ✔          │ json5                         │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ jsonpointer                   │ BSD LICENSE                                                       │
+│ ✔          │ jsonschema                    │ MIT LICENSE                                                       │
+│ ✔          │ jsonschema-specifications     │ MIT LICENSE                                                       │
+│ ✔          │ jupyter                       │ BSD LICENSE                                                       │
+│ ✔          │ jupyter-console               │ BSD LICENSE                                                       │
+│ ✔          │ jupyter-events                │ BSD LICENSE                                                       │
+│ ✔          │ jupyter-lsp                   │ BSD LICENSE                                                       │
+│ ✔          │ jupyter_client                │ BSD LICENSE                                                       │
+│ ✔          │ jupyter_core                  │ BSD LICENSE                                                       │
+│ ✔          │ jupyter_server                │ BSD LICENSE                                                       │
+│ ✔          │ jupyter_server_terminals      │ BSD LICENSE                                                       │
+│ ✔          │ jupyterlab                    │ BSD LICENSE                                                       │
+│ ✔          │ jupyterlab-pygments           │ BSD                                                               │
+│ ✔          │ jupyterlab-server             │ BSD LICENSE                                                       │
+│ ✔          │ jupyterlab-widgets            │ BSD LICENSE                                                       │
+│ ✔          │ kiwisolver                    │ BSD LICENSE                                                       │
+│ ✔          │ linkify-it-py                 │ MIT LICENSE                                                       │
+│ ✔          │ locket                        │ BSD LICENSE                                                       │
+│ ✔          │ mapclassify                   │ BSD LICENSE                                                       │
+│ ✔          │ markdown-it-py                │ MIT LICENSE                                                       │
+│ ✔          │ marshmallow                   │ MIT LICENSE                                                       │
+│ ✔          │ matplotlib                    │ PYTHON SOFTWARE FOUNDATION LICENSE                                │
+│ ✔          │ matplotlib-inline             │ BSD 3-CLAUSE                                                      │
+│ ✔          │ mdit-py-plugins               │ MIT LICENSE                                                       │
+│ ✔          │ mdurl                         │ MIT LICENSE                                                       │
+│ ✔          │ mistune                       │ BSD LICENSE                                                       │
+│ ✔          │ morecantile                   │ BSD LICENSE                                                       │
+│ ✔          │ nbclassic                     │ BSD LICENSE                                                       │
+│ ✔          │ nbclient                      │ BSD LICENSE                                                       │
+│ ✔          │ nbconvert                     │ BSD LICENSE                                                       │
+│ ✔          │ nbformat                      │ BSD LICENSE                                                       │
+│ ✔          │ nest-asyncio                  │ BSD LICENSE                                                       │
+│ ✔          │ networkx                      │ BSD LICENSE                                                       │
+│ ✔          │ notebook                      │ BSD LICENSE                                                       │
+│ ✔          │ notebook_shim                 │ BSD LICENSE                                                       │
+│ ✔          │ numpy                         │ BSD LICENSE                                                       │
+│ ✔          │ odc-geo                       │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ odc-stac                      │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ overrides                     │ APACHE LICENSE, VERSION 2.0                                       │
+│ ✔          │ packaging                     │ APACHE SOFTWARE LICENSE;; BSD LICENSE                             │
+│ ✔          │ pandas                        │ BSD LICENSE                                                       │
+│ ✔          │ pandocfilters                 │ BSD LICENSE                                                       │
+│ ✔          │ panel                         │ BSD LICENSE                                                       │
+│ ✔          │ param                         │ BSD LICENSE                                                       │
+│ ✔          │ parso                         │ MIT LICENSE                                                       │
+│ ✔          │ partd                         │ BSD                                                               │
+│ ✔          │ pexpect                       │ ISC LICENSE (ISCL)                                                │
+│ ✔          │ pickleshare                   │ MIT LICENSE                                                       │
+│ ✔          │ pkgutil_resolve_name          │ MIT LICENSE                                                       │
+│ ✔          │ platformdirs                  │ MIT LICENSE                                                       │
+│ ✔          │ prometheus-client             │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ prompt-toolkit                │ BSD LICENSE                                                       │
+│ ✔          │ psutil                        │ BSD LICENSE                                                       │
+│ ✔          │ ptyprocess                    │ ISC LICENSE (ISCL)                                                │
+│ ✔          │ pure-eval                     │ MIT LICENSE                                                       │
+│ ✔          │ pyarrow                       │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ pycparser                     │ BSD LICENSE                                                       │
+│ ✔          │ pydantic                      │ MIT LICENSE                                                       │
+│ ✔          │ pyogrio                       │ MIT                                                               │
+│ ✔          │ pyparsing                     │ MIT LICENSE                                                       │
+│ ✔          │ pyproj                        │ MIT LICENSE                                                       │
+│ ✔          │ pyrsistent                    │ MIT LICENSE                                                       │
+│ ✔          │ pyshp                         │ MIT                                                               │
+│ ✔          │ pystac                        │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ pystac-client                 │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ python-dateutil               │ BSD LICENSE;; APACHE SOFTWARE LICENSE                             │
+│ ✔          │ python-json-logger            │ BSD LICENSE                                                       │
+│ ✔          │ pytz                          │ MIT LICENSE                                                       │
+│ ✔          │ pyviz-comms                   │ BSD LICENSE                                                       │
+│ ✔          │ pywin32                       │ PYTHON SOFTWARE FOUNDATION LICENSE                                │
+│ ✔          │ pywinpty                      │ MIT                                                               │
+│ ✔          │ pyzmq                         │ GNU LIBRARY OR LESSER GENERAL PUBLIC LICENSE (LGPL);; BSD LICENSE │
+│ ✔          │ qtconsole                     │ BSD LICENSE                                                       │
+│ ✔          │ rasterio                      │ BSD LICENSE                                                       │
+│ ✔          │ referencing                   │ MIT LICENSE                                                       │
+│ ✔          │ requests                      │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ rfc3339-validator             │ MIT LICENSE                                                       │
+│ ✔          │ rfc3986-validator             │ MIT LICENSE                                                       │
+│ ✔          │ rio-cogeo                     │ BSD LICENSE                                                       │
+│ ✔          │ rioxarray                     │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ rpds-py                       │ MIT LICENSE                                                       │
+│ ✔          │ s3transfer                    │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ scikit-learn                  │ BSD LICENSE                                                       │
+│ ✔          │ scipy                         │ BSD LICENSE                                                       │
+│ ✔          │ setuptools                    │ MIT LICENSE                                                       │
+│ ✔          │ shapely                       │ BSD LICENSE                                                       │
+│ ✔          │ six                           │ MIT LICENSE                                                       │
+│ ✔          │ sniffio                       │ MIT LICENSE;; APACHE SOFTWARE LICENSE                             │
+│ ✔          │ snuggs                        │ MIT                                                               │
+│ ✔          │ soupsieve                     │ MIT LICENSE                                                       │
+│ ✔          │ stack-data                    │ MIT LICENSE                                                       │
+│ ✔          │ terminado                     │ BSD LICENSE                                                       │
+│ ✔          │ threadpoolctl                 │ BSD LICENSE                                                       │
+│ ✔          │ tinycss2                      │ BSD LICENSE                                                       │
+│ ✔          │ tomli                         │ MIT LICENSE                                                       │
+│ ✔          │ toolz                         │ BSD LICENSE                                                       │
+│ ✔          │ tornado                       │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ tqdm                          │ MIT LICENSE;; MOZILLA PUBLIC LICENSE 2.0 (MPL 2.0)                │
+│ ✔          │ traitlets                     │ BSD LICENSE                                                       │
+│ ✔          │ types-python-dateutil         │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ typing                        │ PYTHON SOFTWARE FOUNDATION LICENSE                                │
+│ ✔          │ typing-inspect                │ MIT LICENSE                                                       │
+│ ✔          │ typing_extensions             │ PYTHON SOFTWARE FOUNDATION LICENSE                                │
+│ ✔          │ tzdata                        │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ uc-micro-py                   │ MIT LICENSE                                                       │
+│ ✔          │ uri-template                  │ MIT LICENSE                                                       │
+│ ✔          │ urllib3                       │ MIT LICENSE                                                       │
+│ ✔          │ wcwidth                       │ MIT LICENSE                                                       │
+│ ✔          │ webcolors                     │ BSD LICENSE                                                       │
+│ ✔          │ webencodings                  │ BSD LICENSE                                                       │
+│ ✔          │ websocket-client              │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ widgetsnbextension            │ BSD LICENSE                                                       │
+│ ✔          │ xarray                        │ APACHE SOFTWARE LICENSE                                           │
+│ ✔          │ xyzservices                   │ BSD LICENSE                                                       │
+│ ✔          │ zipp                          │ MIT LICENSE                                                       │
+└────────────┴───────────────────────────────┴───────────────────────────────────────────────────────────────────┘
