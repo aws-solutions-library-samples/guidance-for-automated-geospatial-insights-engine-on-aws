@@ -1,6 +1,20 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
+import { CommonCache } from '../../common/cache.js';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { InvalidStateError, NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
@@ -10,7 +24,6 @@ import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { RegionRepository } from './repository.js';
 import { CreateRegion, EditRegion, ProcessingConfig, Region, UpdateAggregatedPolygonsParameter } from './schemas.js';
-import { CommonCache } from "../../common/cache.js";
 
 export type RegionListFilterOptions = TagFilterOptions & {
 	name?: string;
@@ -32,8 +45,6 @@ export class RegionService {
 	public async create(securityContext: SecurityContext, groupId: string, region: CreateRegion): Promise<Region> {
 		this.log.debug(`RegionService> create> groupId:${groupId}, region:${JSON.stringify(region)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(groupId, ow.string.nonEmpty);
 		ow(
@@ -46,10 +57,9 @@ export class RegionService {
 			})
 		);
 
-		// TODO: perform more detailed validation on attributes and tags
 		// validate the processing configuration
 		if (region.processingConfig) {
-			this.validateProcessingConfig(region.processingConfig)
+			this.validateProcessingConfig(region.processingConfig);
 		}
 
 		// ensure parent group exists (will throw error if not exist or insufficient privileges)
@@ -83,14 +93,14 @@ export class RegionService {
 			ow.object.exactShape({
 				totalAreaDelta: ow.number.not.infinite,
 				totalPolygonsDelta: ow.number.not.infinite,
-				boundingBox: ow.object.nonEmpty
+				boundingBox: ow.object.nonEmpty,
 			})
 		);
 		// retrieve existing
 		const existing = await this.regionRepository.get(id);
 		if (existing) {
-			const updated = await this.regionRepository.updateAggregatedAttribute(id, updateParameter)
-			await this.regionCache.set(id, updated)
+			const updated = await this.regionRepository.updateAggregatedAttribute(id, updateParameter);
+			await this.regionCache.set(id, updated);
 			// publish the event
 			await this.eventPublisher.publishEvent({
 				eventType: 'updated',
@@ -106,8 +116,6 @@ export class RegionService {
 	public async update(securityContext: SecurityContext, id: string, region: EditRegion): Promise<Region> {
 		this.log.debug(`RegionService> update> id:${id}, region:${JSON.stringify(region)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(
 			region,
@@ -119,13 +127,11 @@ export class RegionService {
 			})
 		);
 
-		// TODO: perform more detailed validation on attributes and tags
-
 		// retrieve existing
 		const existing = await this.get(securityContext, id);
 
 		if (region.processingConfig) {
-			this.validateProcessingConfig(region.processingConfig)
+			this.validateProcessingConfig(region.processingConfig);
 		}
 
 		// merge the existing and to be updated
@@ -135,7 +141,7 @@ export class RegionService {
 		await this.regionRepository.update(merged, tagDiff.toPut, tagDiff.toDelete);
 
 		const saved = await this.get(securityContext, merged.id, false);
-		await this.regionCache.set(saved.id, saved)
+		await this.regionCache.set(saved.id, saved);
 
 		// publish the event
 		await this.eventPublisher.publishEvent({
@@ -153,8 +159,6 @@ export class RegionService {
 	public async get(securityContext: SecurityContext, id: string, useCache = true): Promise<Region> {
 		this.log.debug(`RegionService> get> in: id:${id}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		let region: Region;
 		if (useCache) {
 			region = await this.regionCache.get(id);
@@ -168,7 +172,7 @@ export class RegionService {
 			throw new NotFoundError(`Region '${id}' not found.`);
 		}
 		// insert the DynamoDB resource to cache
-		await this.regionCache.set(id, region)
+		await this.regionCache.set(id, region);
 
 		this.log.debug(`RegionService> get> exit:${JSON.stringify(region)}`);
 		return region;
@@ -181,27 +185,25 @@ export class RegionService {
 					mode: ow.string.nonEmpty,
 					scheduleExpression: ow.string.nonEmpty,
 					scheduleExpressionTimezone: ow.optional.string,
-					priority: ow.string.nonEmpty
-				})
+					priority: ow.string.nonEmpty,
+				});
 				break;
 			case 'onNewScene':
 				ow.object.exactShape({
 					mode: ow.string.nonEmpty,
-					priority: ow.string.nonEmpty
-				})
+					priority: ow.string.nonEmpty,
+				});
 				break;
 			case 'disabled':
 				ow.object.exactShape({
 					mode: ow.string.nonEmpty,
-				})
+				});
 				break;
 		}
 	}
 
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {
 		this.log.debug(`RegionService> delete> id:${id}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// check exists
 		const existing = await this.get(securityContext, id);
@@ -213,7 +215,7 @@ export class RegionService {
 		}
 
 		// delete
-		await Promise.all([this.regionRepository.delete(id), this.regionCache.delete(id)])
+		await Promise.all([this.regionRepository.delete(id), this.regionCache.delete(id)]);
 
 		// publish event
 		await this.eventPublisher.publishEvent({
@@ -228,8 +230,6 @@ export class RegionService {
 
 	public async list(securityContext: SecurityContext, options: RegionListFilterOptions): Promise<[Region[], ResourceId]> {
 		this.log.debug(`RegionService> list> in> options:${JSON.stringify(options)}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// if name or groupId are being filtered, add as reserved tag searches
 		for (const tag of RESERVED_FIELDS_AS_TAGS) {

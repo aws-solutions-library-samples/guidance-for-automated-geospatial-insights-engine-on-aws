@@ -24,7 +24,7 @@ The `Executor` module runs the engine analysis task in AWS Batch which will sche
   "id": "b06dbe5c-19bc-4244-ac3d-84ced74e53e6",
   "detail-type": "com.aws.arcade.results>Result>created",
   "source": "com.aws.arcade.executor",
-  "account": "111122223333",
+  "account": "xxxxxxxxxxxx",
   "time": "2014-04-22T18:43:48Z",
   "detail": {
   "eventType": "created",

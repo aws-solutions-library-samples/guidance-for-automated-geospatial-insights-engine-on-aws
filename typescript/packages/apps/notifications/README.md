@@ -34,7 +34,7 @@ SNS is the messaging service used to broadcast notifications. A dedicated SNS to
   "id": "b06dbe5c-19bc-4244-ac3d-84ced74e53e6",
   "detail-type": "com.aws.arcade.notifications>Subscription>created",
   "source": "com.aws.arcade.notifications",
-  "account": "111122223333",
+  "account": "xxxxxxxxxxxx",
   "time": "2014-04-22T18:43:48Z",
   "detail": {
   "eventType": "created",

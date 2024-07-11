@@ -34,7 +34,7 @@ Upon any type of change event ('created', 'updated', 'deleted') of any resource 
   "id": "b06dbe5c-19bc-4244-ac3d-84ced74e53e6",
   "detail-type": "com.aws.arcade.regions>Group>updated",
   "source": "com.aws.arcade.regions",
-  "account": "111122223333",
+  "account": "xxxxxxxxxxxx",
   "time": "2014-04-22T18:43:48Z",
   "detail": {
   "eventType": "updated",

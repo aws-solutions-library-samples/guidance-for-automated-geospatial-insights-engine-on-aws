@@ -1,3 +1,16 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import { UnauthorizedError } from '@arcade/resource-api-base';
 import { Decision, IsAuthorizedWithTokenCommand, IsAuthorizedWithTokenCommandOutput, VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
@@ -115,9 +128,18 @@ export class ApiAuthorizer {
 			this.logger.trace(`ApiAuthorizer> _identifyAction>  map:${JSON.stringify(map)}`);
 			const pathPart = pathParts[i];
 			this.logger.trace(`ApiAuthorizer> _identifyAction> pathPart:${pathPart}`);
-
+			/*
+			* Semgrep issue https://sg.run/w1DB
+			* Ignore reason: The path part is being injected by API Gateway so not being specified by user
+			*/
+			// nosemgrep
 			if (map[pathPart]) {
 				// see if we have an exact match in the path
+				/*
+				* Semgrep issue https://sg.run/w1DB
+				* Ignore reason: The path part is being injected by API Gateway so not being specified by user
+				*/
+				// nosemgrep
 				map = map[pathPart];
 				this.logger.trace(`ApiAuthorizer> _identifyAction> exact match`);
 			} else if (map['*']) {

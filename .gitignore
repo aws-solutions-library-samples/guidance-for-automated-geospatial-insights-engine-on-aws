@@ -190,3 +190,7 @@ local.env
 **/stac-server-repo
 /typescript/packages/apps/cli/stac-server-repo/
 npm-shrinkwrap.json
+
+ash_cf2cdk_output
+
+ash_output

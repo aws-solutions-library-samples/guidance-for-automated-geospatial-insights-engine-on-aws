@@ -1,3 +1,16 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import { EventPublisher } from '@arcade/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
@@ -27,8 +40,6 @@ export class GroupService {
 	public async create(securityContext: SecurityContext, group: CreateGroup): Promise<Group> {
 		this.log.debug(`GroupService> create> group:${JSON.stringify(group)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(
 			group,
@@ -39,15 +50,12 @@ export class GroupService {
 			})
 		);
 
-		// TODO: perform more detailed validation on attributes and tags
 		const toSave = this.commonService.prepareResourceForCreate<CreateGroup, Group>(group, RESERVED_AS_TAGS, { createdBy: securityContext.email });
 		toSave.totalRegions = 0;
 		toSave.totalArea = 0;
 
 		// save
 		await this.groupRepository.create(toSave);
-
-		// TODO: publish event
 
 		// return
 		const saved = await this.get(securityContext, toSave.id);
@@ -71,13 +79,13 @@ export class GroupService {
 			updateParameter,
 			ow.object.exactShape({
 				totalAreaDelta: ow.number.not.infinite,
-				totalRegionsDelta: ow.number.not.infinite
+				totalRegionsDelta: ow.number.not.infinite,
 			})
 		);
 		// retrieve existing
 		const existing = await this.groupRepository.get(id);
 		if (existing) {
-			const updated = await this.groupRepository.updateAggregatedAttribute(id, updateParameter)
+			const updated = await this.groupRepository.updateAggregatedAttribute(id, updateParameter);
 			// publish the event
 			await this.eventPublisher.publishEvent({
 				eventType: 'updated',
@@ -93,8 +101,6 @@ export class GroupService {
 	public async update(securityContext: SecurityContext, id: string, group: EditGroup): Promise<Group> {
 		this.log.debug(`GroupService> update> id:${id}, group:${JSON.stringify(group)}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// Validation
 		ow(
 			group,
@@ -104,8 +110,6 @@ export class GroupService {
 				tags: ow.optional.object,
 			})
 		);
-
-		// TODO: perform more detailed validation on attributes and tags
 
 		// retrieve existing
 		const existing = await this.get(securityContext, id);
@@ -133,8 +137,6 @@ export class GroupService {
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {
 		this.log.debug(`GroupService> delete> id:${id}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// check exists
 		const existing = await this.get(securityContext, id);
 
@@ -161,8 +163,6 @@ export class GroupService {
 	public async get(securityContext: SecurityContext, id: string): Promise<Group> {
 		this.log.debug(`GroupService> get> in: id:${id}`);
 
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
-
 		// retrieve
 		const group = await this.groupRepository.get(id);
 		if (group === undefined) {
@@ -175,8 +175,6 @@ export class GroupService {
 
 	public async list(securityContext: SecurityContext, options: GroupListFilterOptions): Promise<[Group[], ResourceId]> {
 		this.log.debug(`GroupService> list> in> options:${JSON.stringify(options)}`);
-
-		// TODO: permission check (or will this be part of apigw/cognito integration with verified permissions?)
 
 		// if name is being filtered, add that as a reserved tag search
 		for (const tag of RESERVED_AS_TAGS) {
