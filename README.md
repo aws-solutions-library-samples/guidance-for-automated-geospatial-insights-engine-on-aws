@@ -26,8 +26,17 @@ $ export ARCADE_FOLDER=$PWD
 $ export CLI_FOLDER="$(PWD)/typescript/packages/apps/cli"
 ```
 
+### 2. Bundle the artifact from `Stac-server` repository
 
-### 2. Build the solution
+ARCADE conforms to the [STAC specification](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md) and generates [STAC item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md) as a result of the analysis. It stores these analysis results in [Stac-server](https://github.com/stac-utils/stac-server). To make the deployment simpler, we port the infrastructure definition from `serverless` framework to `cdk`. Run the following command to bundle `Stac-server` NodeJS application codes which are referred by the [StacServer](infrastructure/src/stacServer/stacServer.stack.ts) stack
+
+```shell
+$ git clone --depth 1 --branch  v3.8.0  https://github.com/stac-utils/stac-server.git
+$ cd stac-server && npm install && npm run build
+$ cp dist/api/api.zip $ARCADE_FOLDER/infrastructure/src/stacServer/lambdas && cp dist/ingest/ingest.zip $ARCADE_FOLDER/infrastructure/src/stacServer/lambdas
+```
+
+### 3. Build the solution
 
 Run the following command to install the solution dependencies and build it:
 
@@ -37,7 +46,7 @@ $ rush update
 $ rush build
 ```
 
-### 3. Deploy the solution
+### 4. Deploy the solution
 
 Setup some environment variables which will be referenced by rest of the commands. Replace the following variables with the actual value.
 
@@ -88,7 +97,7 @@ Run the following command to start the installation of ARCADE:
 $ bin/run install -e $ARCADE_ENVIRONMENT -r $ARCADE_REGION -n $ARCADE_ADMINISTRATOR_MOBILE_NUMBER -a $ARCADE_ADMINISTRATOR_EMAIL
 ```
 
-### 4. Deploy the UI
+### 5. Deploy the UI
 
 Run the following the bundle the Web UI assets and upload it to the web artifact buckets:
 
@@ -97,7 +106,7 @@ $ cd $ARCADE_FOLDER/typescript/packages/apps/ui
 $ npm run deploy
 ```
 
-### 5. Set your initial password
+### 6. Set your initial password
 
 Run the following command to set the password for the administrator user (replace the `<PASSWORD>` with your own) :
 
