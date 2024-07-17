@@ -194,3 +194,6 @@ npm-shrinkwrap.json
 ash_cf2cdk_output
 
 ash_output
+
+infrastructure/src/stacServer/lambdas/api.zip
+infrastructure/src/stacServer/lambdas/ingest.zip

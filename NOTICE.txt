@@ -79,7 +79,6 @@ AWS SDK under the Apache License Version 2.0
 "axios@1.7.2","MIT","https://github.com/axios/axios"
 "balanced-match@1.0.2","MIT","https://github.com/juliangruber/balanced-match"
 "brace-expansion@1.1.11","MIT","https://github.com/juliangruber/brace-expansion"
-"case@1.6.3","(MIT OR GPL-3.0-or-later)","https://github.com/nbubna/Case"
 "cdk-nag@2.28.158","Apache-2.0","https://github.com/cdklabs/cdk-nag"
 "color-convert@2.0.1","MIT","https://github.com/Qix-/color-convert"
 "color-name@1.1.4","MIT","https://github.com/colorjs/color-name"
