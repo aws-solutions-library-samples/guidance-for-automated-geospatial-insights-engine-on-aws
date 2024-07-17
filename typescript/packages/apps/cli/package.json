@@ -1,0 +1,128 @@
+{
+	"name": "@arcade/cli",
+	"version": "0.0.1",
+	"description": "ARCADE CLI helper application.",
+	"author": "Dean Hart <deanhart@amazon.com>",
+	"type": "module",
+	"bin": {
+		"arcade": "./bin/run.js"
+	},
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"/bin/run.js",
+		"/dist",
+		"/oclif.manifest.json"
+	],
+	"scripts": {
+		"lint": "npx eslint . --ext .ts",
+		"clean": "shx rm -rf dist",
+		"build": "npm run clean && tsc -b && shx cp .env dist/.env",
+		"test": "mocha --forbid-only \"test/**/*.test.ts\"",
+		"posttest": "npm run lint",
+		"prepack": "npm run build && oclif manifest && oclif readme",
+		"package:macos": "npm run build && npx oclif pack macos",
+		"package:win": "npx oclif pack win",
+		"package:debian": "npx oclif pack deb",
+		"package:tarballs": "npx oclif pack tarballs",
+		"postpack": "shx rm -f oclif.manifest.json",
+		"version": "oclif readme && git add README.md"
+	},
+	"oclif": {
+		"bin": "arcade",
+		"dirname": "arcade",
+		"helpClass": "./dist/utils/help",
+		"commands": "./dist/commands",
+		"macos": {
+			"identifier": "com.arcade.cli"
+		},
+		"plugins": [
+			"@oclif/plugin-help",
+			"@oclif/plugin-plugins"
+		],
+		"topicSeparator": " ",
+		"topics": {
+			"stacServer": {
+				"description": "Contains list of sub-commands to setup the Stac Server"
+			},
+			"arcade": {
+				"description": "Contains list of sub-commands to setup the Arcade"
+			}
+		},
+		"hooks": {
+			"init": [
+				{
+					"target": "./dist/index.js",
+					"identifier": "INIT_HOOK"
+				},
+				{
+					"target": "./dist/index.js",
+					"identifier": "ESM1_INIT_HOOK"
+				}
+			],
+			"update": {
+				"target": "./dist/index.js",
+				"identifier": "UPDATE_HOOK"
+			}
+		}
+	},
+	"dependencies": {
+		"@aws-sdk/client-cloudformation": "~3",
+		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-sts": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
+		"@aws-sdk/credential-provider-node": "~3",
+		"@aws-sdk/util-utf8-node": "~3",
+		"@aws-amplify/auth": "~6",
+		"aws-amplify": "~6",
+		"@inquirer/prompts": "~5",
+		"@inquirer/select": "~2",
+		"@microsoft/rush-lib": "~5",
+		"@microsoft/rush": "~5",
+		"@oclif/core": "~3",
+		"@oclif/plugin-help": "~6",
+		"@oclif/plugin-plugins": "~5",
+		"axios": "~1",
+		"compare-versions": "~6",
+		"conf": "~12",
+		"dayjs": "~1",
+		"dotenv": "~16",
+		"enquirer": "~2",
+		"eslint": "~9",
+		"listr2": "~8",
+		"octokit": "~3",
+		"ow": "~1",
+		"promisify": "~0",
+		"shelljs": "~0",
+		"table": "~6",
+		"ulid": "~2",
+		"simple-git": "~3",
+		"replace-in-file": "~7"
+	},
+	"devDependencies": {
+		"@oclif/test": "~3",
+		"@rushstack/eslint-config": "~3",
+		"@tsconfig/node20": "~20",
+		"@types/chai": "~4",
+		"@types/listr": "~0",
+		"@types/mocha": "~10",
+		"@types/node": "~20",
+		"@types/shelljs": "~0",
+		"chai": "~5",
+		"esbuild": "~0",
+		"eslint-config-oclif": "~5",
+		"eslint-config-oclif-typescript": "~3",
+		"eslint-plugin-prettier": "~5",
+		"eslint-plugin-unicorn": "~52",
+		"mocha": "~10",
+		"oclif": "~4",
+		"prettier": "~3",
+		"shx": "~0",
+		"tslib": "~2",
+		"typescript": "~5",
+		"ts-node": "~10"
+	},
+	"private": false
+}

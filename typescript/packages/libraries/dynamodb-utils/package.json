@@ -1,0 +1,37 @@
+{
+	"name": "@arcade/dynamodb-utils",
+	"version": "0.0.1",
+	"description": "Common DynamoDB utils.",
+	"author": "Dean Hart <deanhart@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests"
+	},
+	"dependencies": {
+		"@aws-sdk/client-dynamodb": "~3",
+		"@aws-sdk/lib-dynamodb": "~3",
+		"@aws-sdk/types": "~3",
+		"@aws-sdk/util-dynamodb": "~3",
+		"pino": "~8",
+		"pino-pretty": "~11"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/node": "~20",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest": "~1",
+		"vitest-mock-extended": "~1"
+	},
+	"private": false
+}

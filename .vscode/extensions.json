@@ -1,0 +1,28 @@
+{
+    "recommendations": [
+		"jbockle.jbockle-format-files",
+		"dbaeumer.vscode-eslint",
+		"donjayamanne.git-extension-pack",
+		"blackmist.linkcheckmd",
+		"yzhang.markdown-all-in-one",
+		"shd101wyy.markdown-preview-enhanced",
+		"darkriszty.markdown-table-prettify",
+		"davidanson.vscode-markdownlint",
+		"leizongmin.node-module-intellisense",
+		"christian-kohler.npm-intellisense",
+		"42crunch.vscode-openapi",
+		"esbenp.prettier-vscode",
+		"mohsen1.prettify-json",
+		"ms-python.vscode-pylance",
+		"ms-python.python",
+		"ms-python.debugpy",
+		"kevinrose.vsc-python-indent",
+		"wayou.vscode-todo-highlight",
+		"gruntfuggly.todo-tree",
+		"mike-co.import-sorter",
+		"pmneo.tsimporter",
+		"vitest.explorer",
+		"kingwl.vscode-vitest-runner",
+		"cedar-policy.vscode-cedar"
+    ]
+}

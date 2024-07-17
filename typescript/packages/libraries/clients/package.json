@@ -1,0 +1,46 @@
+{
+	"name": "@arcade/clients",
+	"version": "1.0.0",
+	"description": "Client library",
+	"author": "Pouya Bahavar <bahavar@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests"
+	},
+	"dependencies": {
+		"@arcade/events": "workspace:*",
+		"@arcade/lambda-invoker": "workspace:*",
+		"@aws-sdk/client-lambda": "~3",
+		"ow": "~1",
+		"@aws-sdk/client-sns": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
+		"axios": "~1"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/node": "~20",
+		"@types/prettier": "~3",
+		"@typescript-eslint/eslint-plugin": "~7",
+		"@typescript-eslint/parser": "~7",
+		"aws-sdk-client-mock": "~4",
+		"eslint": "~9",
+		"pino-pretty": "~11",
+		"pino": "~8",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1",
+		"axios": "~1",
+		"aws4-axios": "~3"
+	},
+	"private": false
+}

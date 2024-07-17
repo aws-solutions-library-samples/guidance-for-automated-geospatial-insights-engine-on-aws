@@ -1,0 +1,20 @@
+{
+	"name": "@arcade",
+	"version": "0.0.1",
+	"description": "",
+	"author": "Dean Hart <deanhart@amazon.com>",
+	"scripts": {},
+	"engines": {
+		"node": ">=20.11.1 < 21",
+		"pnpm": "=9.0.2"
+	},
+	"private": true,
+	"devDependencies": {},
+	"husky": {
+		"hooks": {
+			"pre-commit": "rush lint",
+			"prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	}
+}

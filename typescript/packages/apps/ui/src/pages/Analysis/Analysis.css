@@ -1,0 +1,51 @@
+/*
+ *  Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
+.maplibregl-popup-content {
+	border-radius: 30px;
+	padding: 0;
+}
+.maplibregl-popup-tip {
+	border-top-color: var(--color-border-divider-default-j74lyz, #b6bec9) !important;
+	border-bottom-color: var(--color-border-divider-default-j74lyz, #b6bec9) !important;
+}
+.close-button-container {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.control-panel-container {
+	position: absolute;
+	bottom: 3rem;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: white;
+	border-radius: 30px;
+	padding: 5px 9px;
+	border-color: var(--color-border-divider-default-j74lyz, #b6bec9);
+	border-width: 2px;
+	border-style: solid;
+}
+
+.feature-popup {
+	z-index: 2;
+}
+
+.slider-container {
+	padding: 0px 15px;
+}
+
+.awsui_title_k5dlb_d6w6r_228:not(#\9) {
+	overflow: visible;
+}

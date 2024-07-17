@@ -1,0 +1,51 @@
+{
+	"name": "@arcade/cdk-common",
+	"version": "0.0.1",
+	"description": "CDK constructs and shared utilities",
+	"author": "Pouya Bahavar <bahavare@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests",
+		"build:bundled": "npx tsx src/esbuild.ts"
+	},
+	"dependencies": {
+		"@aws-sdk/client-dynamodb": "~3",
+		"@aws-sdk/client-s3": "~3",
+		"@aws-sdk/client-sts": "~3",
+		"@aws-sdk/lib-dynamodb": "~3",
+		"@aws-sdk/types": "~3",
+		"aws-cdk-lib": "~2",
+		"aws-lambda": "~1",
+		"constructs": "~10",
+		"lodash.chunk": "~4",
+		"octokit": "~3",
+		"shelljs": "~0",
+		"@aws-sdk/client-verifiedpermissions": "~3"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/lodash.chunk": "~4",
+		"@types/node": "~20",
+		"aws-cdk": "~2",
+		"cdk-nag": "~2",
+		"custom-resource-helper": "~1",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"vitest-mock-extended": "~1",
+		"vitest": "~1"
+	},
+	"peerDependencies": {
+		"typescript": "~5"
+	},
+	"private": false
+}

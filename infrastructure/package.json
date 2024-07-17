@@ -1,0 +1,54 @@
+{
+	"name": "@arcade/infrastructure",
+	"version": "0.0.1",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests",
+		"predeploy": "npx tsx src/predeploy.ts",
+		"cdk": "npm run predeploy && cdk"
+	},
+	"dependencies": {
+		"@arcade/cdk-common": "workspace:*",
+		"@arcade/events": "workspace:*",
+		"@aws-sdk/client-cognito-identity-provider": "~3",
+		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/client-sns": "~3",
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/client-sso-admin": "~3",
+		"@aws-sdk/client-verifiedpermissions": "~3",
+		"@aws-sdk/client-secrets-manager": "~3",
+		"@aws-sdk/util-utf8-node": "~3",
+		"source-map-support": "~0",
+		"@aws-sdk/client-sts": "~3",
+		"aws-cdk-lib": "~2",
+		"@aws-cdk/aws-cognito-identitypool-alpha": "2.140.0-alpha.0",
+		"aws-lambda": "~1",
+		"cdk-nag": "~2",
+		"constructs": "~10",
+		"ulid": "~2",
+		"axios": "~1"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/node": "~20",
+		"aws-cdk": "~2",
+		"esbuild": "~0",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"vitest": "~1",
+		"vitest-mock-extended": "~1"
+	},
+	"peerDependencies": {
+		"typescript": "~5"
+	},
+	"private": false
+}

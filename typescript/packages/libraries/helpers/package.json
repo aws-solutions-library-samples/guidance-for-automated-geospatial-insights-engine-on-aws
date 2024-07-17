@@ -1,0 +1,44 @@
+{
+	"name": "@arcade/helpers",
+	"version": "0.0.1",
+	"description": "ARCADE helpers.",
+	"author": "Dean Hart <deanhart@amazon.com>",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.js",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests",
+		"build:bundled": "npx tsx esbuild.ts"
+	},
+	"dependencies": {
+		"@arcade/infrastructure": "workspace:*",
+		"@aws-amplify/auth": "~6",
+		"@aws-sdk/client-ssm": "~3",
+		"aws-amplify": "~6",
+		"ow": "~1"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/node": "~20",
+		"@arcade/infrastructure": "workspace:*",
+		"@typescript-eslint/eslint-plugin": "~7",
+		"@typescript-eslint/parser": "~7",
+		"aws-cdk": "~2",
+		"cdk-nag": "~2",
+		"esbuild": "~0",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5"
+	},
+	"private": false
+}

@@ -1,0 +1,39 @@
+{
+	"name": "@arcade/events",
+	"version": "0.0.1",
+	"description": "Arcade events",
+	"author": "William Sia <willsia@amazon.com>",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests"
+	},
+	"dependencies": {
+		"@aws-sdk/client-eventbridge": "~3",
+		"@sinclair/typebox": "~0"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/node": "~20",
+		"@types/prettier": "~3",
+		"@typescript-eslint/eslint-plugin": "~7",
+		"@typescript-eslint/parser": "~7",
+		"aws-sdk-client-mock": "~4",
+		"eslint": "~9",
+		"pino": "~8",
+		"shx": "~0",
+		"typescript": "~5",
+		"vitest": "~1",
+		"vitest-mock-extended": "~1"
+	},
+	"private": false
+}
