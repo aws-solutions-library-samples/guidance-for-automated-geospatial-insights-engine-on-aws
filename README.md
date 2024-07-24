@@ -1,17 +1,46 @@
-# **ARCADE** (Agricultural Root Cause Analysis and Decision Engine )
+# **ARCADE** (Automated Root Cause Analysis and Decision Engine - For Agriculture)
 
 ## Solution Overview
 
-`AWS ARCADE` removes the undifferentiated heavy lifting that customers face when designing, building, and implementing decision support technologies, and improving work-order management, supply chain, and logistics management systems in agriculture.
+Many industries depend upon intelligence and insights gained from earth observation data (satellite imagery, aerial imagery, remote sensing) and processed geospatial data, within their enterprise. Earth observation data, coupled with models (mechanistic and AI-powered), helps customers to improve demand and supply forecasting, automate risk management and mitigation workflows, improve customer outcomes, and improve their ability to meet regulatory requirements.
+
+`AWS ARCADE` removes the undifferentiated heavy lifting that customers face when designing, building, and implementing geospatial and earth observation image processing pipelines and related infrastructure. Common industries that benefit from earth observation and geospatial data processing and analytics include:
+
+- Academia
+- Agriculture
+- Consumer Packaged Goods
+- Energy, Power & Utilities
+- Financial Services, Insurance, Finance, Trading, Hedging
+- Geospatial
+- OEM (Agriculture, Construction, Mining, Off-Road, On-Road, Irrigation, Autonomy, Steering and Guidance)
+- Public Sector / Non-Governmental Organizations
+- Retail
+- Seed and Chemical Manufacturers
+- Sustainability
+
+### Success
+Upon successful deployment of this solution, you will be able to do the following:
+- Enroll polygons (areas of interest, farm fields, geographical areas of land) for processing and analysis
+- Schedule the frequency of polygon analysis, for each polygon, to support one-time and recurring automated processing
+- Automate the searching, downloading, clipping, and processing of earth observation data into NDVI maps and meta data, per polygon
+- Customize, extend, and build upon existing earth observation index calculations to meet your specific use case requirements
+- Search and access processed imagery and meta data via an API with user Authentication and Authorization
+- Directly search and query processed imagery and meta data via the integrated AWS Services
+- Establish customized alerts via Amazon SNS based upon meta data processed for each polygon
+- Visualize processed imagery and meta data via an optional but integrated UI
+- Integrate, customize, extend and augment existing workflows to achieve business goals
+
 
 ## Prerequisites for Deployment
 
 In order to deploy `ARCADE` from your local workstation, you need to install the following dependencies:
 
+- Active AWS Account
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Rush.js](https://rushjs.io/)
 - Node.js 20.x
+- NOTE: AWS ARCADE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
 
 ## Deployment
 
@@ -76,10 +105,10 @@ USAGE
 
 FLAGS
   -a, --administratorEmail=<value>        (required) The administrator Email address
-  -e, --environment=<value>               (required) The environment used to deploy the arcade project to
-  -l, --role=<value>                      The RoleArn for the CLI to assume for deployment
+  -e, --environment=<value>               (required) The environment used to deploy the arcade project into; examples could include stage, development, production
+  -l, --role=<value>                      (optional) The RoleArn for the CLI to assume for deployment
   -n, --administratorPhoneNumber=<value>  (required) Enter the administrator phone number, including + and the country code, for example +12065551212.
-  -r, --region=<value>                    (required) The AWS Region arcade is deployed to
+  -r, --region=<value>                    (required) The AWS Region arcade is deployed into; examples us-east-1, us-west-2, ca-central-1
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -94,7 +123,7 @@ EXAMPLES
 Run the following command to start the installation of ARCADE:
 
 ```shell
-$ bin/run install -e $ARCADE_ENVIRONMENT -r $ARCADE_REGION -n $ARCADE_ADMINISTRATOR_MOBILE_NUMBER -a $ARCADE_ADMINISTRATOR_EMAIL
+$ bin/run.js install -e $ARCADE_ENVIRONMENT -r $ARCADE_REGION -n $ARCADE_ADMINISTRATOR_MOBILE_NUMBER -a $ARCADE_ADMINISTRATOR_EMAIL
 ```
 
 ### 5. Deploy the UI
