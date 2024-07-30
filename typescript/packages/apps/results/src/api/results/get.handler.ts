@@ -15,8 +15,9 @@ import { Type } from '@sinclair/typebox';
 import { commonHeaders } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
+import { resultResourceExample } from './example.js';
 import { regionId, result } from './schemas.js';
-import { resultResourceExample } from "./example.js";
+import { ResultsService } from './service.js';
 
 export default function getResultRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -35,7 +36,7 @@ Permissions:
 			headers: commonHeaders,
 			params: Type.Object({
 				regionId: regionId,
-				resultId: regionId,
+				resultId: regionId
 			}),
 			response: {
 				200: {
@@ -44,25 +45,25 @@ Permissions:
 					'x-examples': {
 						'Sample result': {
 							summary: 'Sample result of successful pipeline execution.',
-							value: resultResourceExample,
-						},
-					},
-				},
+							value: resultResourceExample
+						}
+					}
+				}
 			},
-			'x-security-scopes': atLeastReader,
+			'x-security-scopes': atLeastReader
 		},
 		constraints: {
-			version: apiVersion100,
+			version: apiVersion100
 		},
 
 		handler: async (request, reply) => {
-			const svc = fastify.diContainer.resolve('resultsService');
+			const svc:ResultsService = fastify.diContainer.resolve('resultsService');
 			// parse request
 			const { regionId, resultId } = request.params;
 			const result = await svc.get(request.authz, regionId, resultId);
 			fastify.log.debug(`get.handler> exit:${JSON.stringify(result)}`);
 			await reply.status(200).send(result); // nosemgrep
-		},
+		}
 	});
 
 	done();

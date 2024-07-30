@@ -76,7 +76,7 @@
         "tags": [
           "Subscriptions"
         ],
-        "description": "Create a new subscription.\n\nPermissions:\n- Only `admin` and above may create new subscriptions.\n",
+        "description": "Create a new subscription.\n\nPermissions:\n- Only `contributor` and above may create new subscriptions.\n",
         "requestBody": {
           "content": {
             "application/json": {
