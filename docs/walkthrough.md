@@ -464,7 +464,7 @@ Authorization: Bearer <AUTH_TOKEN>
 
 > More details on the Scheduler Module can be found [here](../typescript/packages/apps/scheduler/README.md)
 
-When analyzing a specific Region, you have two options for executing the engine:
+When analyzing a specific Region, you have three options for executing the engine:
 
 1. **On-Demand Mode**: Configure the engine to run automatically whenever new satellite imagery becomes available for that Region. This mode is referred to as the onNewScene mode.
 2. **Rate Scheduled Mode**: Set up a recurring schedule to run the analysis at regular intervals, regardless of new imagery availability. This mode allows you to define a fixed rate (or one-time schedule) for executing the engine.
