@@ -40,6 +40,9 @@ In order to deploy `ARCADE` from your local workstation, you need to install the
 - [Docker](https://docs.docker.com/engine/install/)
 - [Rush.js](https://rushjs.io/)
 - Node.js 20.x
+- It may be necessary to bootstrap your AWS environment. Bootstrapping is the process of preparing your AWS environment for usage with the AWS Cloud Development Kit (AWS CDK). Before you deploy a CDK stack into an AWS environment, the environment must first be bootstrapped. For more information about bootstrapping, please review the following:
+    - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
+    - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-env.html
 - NOTE: AWS ARCADE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
 
 ## Deployment
