@@ -58,7 +58,7 @@ export default function FieldsTable({ growerId, farmId, variant }: { growerId?: 
 								Edit
 							</Button>
 							<Button disabled={!selectedItems.length}>Delete</Button>
-							{growerId && farmId && <Button>Create Field</Button>}
+							{farmId && <Button onClick={() => navigate(`/farms/${farmId}/fields/create`)}>Create Field</Button>}
 						</SpaceBetween>
 					}
 					description="A field is a physical location within a single farm to be analyzed."

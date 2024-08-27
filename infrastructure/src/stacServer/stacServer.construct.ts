@@ -11,22 +11,12 @@
  *  and limitations under the License.
  */
 
-import { Construct } from 'constructs';
 import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Code, Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Construct } from 'constructs';
 
 import { getLambdaArchitecture } from '@arcade/cdk-common';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { NagSuppressions } from 'cdk-nag';
-import { AnyPrincipal, Effect, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { CfnDomain } from 'aws-cdk-lib/aws-opensearchservice';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import { Topic } from 'aws-cdk-lib/aws-sns';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
-import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import {
 	AccessLogFormat,
 	ApiKeySourceType,
@@ -37,11 +27,21 @@ import {
 	LambdaRestApi,
 	LogGroupLogDestination,
 	MethodLoggingLevel
-} from "aws-cdk-lib/aws-apigateway";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { Provider } from "aws-cdk-lib/custom-resources";
-import { CustomResource } from "aws-cdk-lib/core";
+} from 'aws-cdk-lib/aws-apigateway';
+import { AnyPrincipal, Effect, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { CfnDomain } from 'aws-cdk-lib/aws-opensearchservice';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { CustomResource } from 'aws-cdk-lib/core';
+import { Provider } from 'aws-cdk-lib/custom-resources';
+import { NagSuppressions } from 'cdk-nag';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +50,8 @@ export interface StacServerConstructProperties {
 	readonly environment: string;
 	readonly instanceType: string;
 	readonly volumeSize: number;
+	readonly instanceCount: number;
+	readonly volumeType: string;
 }
 
 export const stacServerOpenSearchUrlParameter = (environment: string) => `/arcade/${environment}/stacServer/openSearchUrl`;
@@ -69,58 +71,55 @@ export class StacServerModule extends Construct {
 		const region = Stack.of(this).region;
 
 		const namePrefix = `arcade-${props.environment}`;
-		const excludeCharacters = '"#%&\'()*,-./:;<=>@[\\]_`{|}~';
+		const excludeCharacters = '"#%&\'()*,-./:;<=>@[\\]_`{|}~?';
 
 		// This will be used by custom resource to initialise the OpenSearch server with resources required fo STAC
-		const openSearchStacAdministrator = 'admin'
-		const passwordField = 'password'
-		const adminSecret = new Secret(this, 'OpenSearchSecret',
-			{
-				secretName: `${namePrefix}-admin-secret`,
-				generateSecretString: {
-					excludeCharacters: excludeCharacters,
-					secretStringTemplate: JSON.stringify({ "username": openSearchStacAdministrator }),
-					generateStringKey: passwordField
-				},
+		const openSearchStacAdministrator = 'admin';
+		const passwordField = 'password';
+		const adminSecret = new Secret(this, 'OpenSearchSecret', {
+			secretName: `${namePrefix}-admin-secret`,
+			generateSecretString: {
+				excludeCharacters: excludeCharacters,
+				secretStringTemplate: JSON.stringify({ username: openSearchStacAdministrator }),
+				generateStringKey: passwordField
 			}
-		)
+		});
 
 		new StringParameter(this, 'AdministratorNameParameter', {
 			parameterName: stacServerAdministratorSecretNameParameter(props.environment),
-			stringValue: adminSecret.secretName,
+			stringValue: adminSecret.secretName
 		});
 
 		// This will be used by the application to query collection and items from stac server
-		const openSearchStacUser = 'stac_server'
-		const userSecret = new Secret(this, 'OpenSearchUserSecret',
-			{
-				secretName: `${namePrefix}-user-secret`,
-				generateSecretString: {
-					excludeCharacters: excludeCharacters,
-					secretStringTemplate: JSON.stringify({ "username": openSearchStacUser }),
-					generateStringKey: passwordField
-				},
+		const openSearchStacUser = 'stac_server';
+		const userSecret = new Secret(this, 'OpenSearchUserSecret', {
+			secretName: `${namePrefix}-user-secret`,
+			generateSecretString: {
+				excludeCharacters: excludeCharacters,
+				secretStringTemplate: JSON.stringify({ username: openSearchStacUser }),
+				generateStringKey: passwordField
 			}
-		)
+		});
 
 		const ingestTopic = new Topic(this, 'IngestTopic', {
 			topicName: `${namePrefix}-stac-ingest`,
-			enforceSSL: true,
+			enforceSSL: true
 		});
 
-		ingestTopic.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sns:Publish'],
-			resources: [ingestTopic.topicArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
+		ingestTopic.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sns:Publish'],
+				resources: [ingestTopic.topicArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false'
+					}
 				}
-			}
-		}));
-
+			})
+		);
 
 		this.stacIngestTopicArn = ingestTopic.topicArn;
 
@@ -129,18 +128,20 @@ export class StacServerModule extends Construct {
 			enforceSSL: true
 		});
 
-		ingestDlq.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sqs:*'],
-			resources: [ingestDlq.queueArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
+		ingestDlq.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [ingestDlq.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false'
+					}
 				}
-			}
-		}));
+			})
+		);
 
 		const ingestQueue = new Queue(this, 'IngestQueue', {
 			visibilityTimeout: Duration.seconds(120),
@@ -148,92 +149,98 @@ export class StacServerModule extends Construct {
 			queueName: `${namePrefix}-stac-queue`,
 			deadLetterQueue: {
 				maxReceiveCount: 2,
-				queue: ingestDlq,
-			},
+				queue: ingestDlq
+			}
 		});
 
-		ingestQueue.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sqs:*'],
-			resources: [ingestQueue.queueArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
+		ingestQueue.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [ingestQueue.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false'
+					}
 				}
-			}
-		}));
+			})
+		);
 
-		ingestTopic.addSubscription(new SqsSubscription(ingestQueue,
-			{
-				rawMessageDelivery: true,
-			}));
-
+		ingestTopic.addSubscription(
+			new SqsSubscription(ingestQueue, {
+				rawMessageDelivery: true
+			})
+		);
 
 		const postIngestTopic = new Topic(this, 'PostIngestTopic', {
 			topicName: `${namePrefix}-post-ingest`,
-			enforceSSL: true,
+			enforceSSL: true
 		});
 
-		postIngestTopic.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sns:Publish'],
-			resources: [postIngestTopic.topicArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
+		postIngestTopic.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sns:Publish'],
+				resources: [postIngestTopic.topicArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false'
+					}
 				}
-			}
-		}));
+			})
+		);
 
 		/**
 		 * Set up the OpenSearch domain and its related resources
 		 */
 		const domainName = `${namePrefix}-stac`;
 
-		const searchSlowLoGroups = new LogGroup(this, 'SearchSlowLogGroups', {
-			logGroupName: `/aws/OpenSearchService/domains/${namePrefix}-stac/search-slow-logs`,
+		// add the environment postfix to ensure Log Resource Policy name is unique
+		const searchSlowLoGroups = new LogGroup(this, `SearchSlowLogGroups${props.environment}`, {
+			logGroupName: `/aws/OpenSearchService/domains/${namePrefix}-stac-server/search-slow-logs`,
 			removalPolicy: RemovalPolicy.DESTROY
-		})
+		});
 
-		const addSearchSlowLogGroupsResult = searchSlowLoGroups.addToResourcePolicy(new PolicyStatement(
-			{
+		const addSearchSlowLogGroupsResult = searchSlowLoGroups.addToResourcePolicy(
+			new PolicyStatement({
 				effect: Effect.ALLOW,
 				principals: [new ServicePrincipal('es.amazonaws.com')],
 				actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
-				resources: [`${searchSlowLoGroups.logGroupArn}:*`],
-			}
-		))
+				resources: [`${searchSlowLoGroups.logGroupArn}:*`]
+			})
+		);
 
-		const indexSlowLogsGroup = new LogGroup(this, 'IndexSlowLogsGroup', {
-			logGroupName: `/aws/OpenSearchService/domains/${namePrefix}-stac/index-slow-logs`,
+		// add the environment postfix to ensure Log Resource Policy name is unique
+		const indexSlowLogsGroup = new LogGroup(this, `IndexSlowLogsGroup${props.environment}`, {
+			logGroupName: `/aws/OpenSearchService/domains/${namePrefix}-stac-server/index-slow-logs`,
 			removalPolicy: RemovalPolicy.DESTROY
-		})
+		});
 
-		const addIndexSlowLogGroupResult = indexSlowLogsGroup.addToResourcePolicy(new PolicyStatement(
-			{
+		const addIndexSlowLogGroupResult = indexSlowLogsGroup.addToResourcePolicy(
+			new PolicyStatement({
 				effect: Effect.ALLOW,
 				principals: [new ServicePrincipal('es.amazonaws.com')],
 				actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
-				resources: [`${indexSlowLogsGroup.logGroupArn}:*`],
-			}
-		))
+				resources: [`${indexSlowLogsGroup.logGroupArn}:*`]
+			})
+		);
 
 		const stacServerDomain = new CfnDomain(this, 'StacServerDomain', {
 			domainName: domainName,
 			ebsOptions: {
 				ebsEnabled: true,
-				volumeType: 'gp3',
+				volumeType: props.volumeType,
 				volumeSize: props.volumeSize
 			},
 			clusterConfig: {
 				instanceType: props.instanceType,
-				instanceCount: 4,
+				instanceCount: props.instanceCount,
 				dedicatedMasterEnabled: true,
-				zoneAwarenessEnabled: true,
+				zoneAwarenessEnabled: true
 			},
 			engineVersion: 'OpenSearch_2.11',
 			logPublishingOptions: {
@@ -269,14 +276,14 @@ export class StacServerModule extends Construct {
 					{
 						Effect: 'Allow',
 						Principal: {
-							AWS: '*',
+							AWS: '*'
 						},
 						Action: 'es:ESHttp*',
-						Resource: `arn:aws:es:${region}:${account}:domain/${domainName}/*`,
-					},
-				],
+						Resource: `arn:aws:es:${region}:${account}:domain/${domainName}/*`
+					}
+				]
 			}
-		})
+		});
 
 		stacServerDomain.node.addDependency(addIndexSlowLogGroupResult.policyDependable);
 		stacServerDomain.node.addDependency(addSearchSlowLogGroupsResult.policyDependable);
@@ -284,54 +291,53 @@ export class StacServerModule extends Construct {
 		this.stacServerEndpoint = stacServerDomain.attrDomainEndpoint;
 		new StringParameter(this, 'stacServerOpenSearchEndpointParameter', {
 			parameterName: stacServerOpenSearchUrlParameter(props.environment),
-			stringValue: stacServerDomain.attrDomainEndpoint,
+			stringValue: stacServerDomain.attrDomainEndpoint
 		});
 
 		/**
 		 * Define the Ingestion Lambda
 		 */
 		const stacIngestLambda = new Function(this, 'StacIngestLambda', {
-			handler: "index.handler",
+			handler: 'index.handler',
 			code: Code.fromAsset(path.join(__dirname, 'lambdas/ingest.zip')),
 			functionName: `${namePrefix}-stac-ingest`,
 			runtime: Runtime.NODEJS_20_X,
 			memorySize: 512,
 			timeout: Duration.minutes(1),
 			environment: {
-				"STAC_ID": "stac-server",
-				"STAC_TITLE": "STAC API",
-				"STAC_DESCRIPTION": "A STAC API using stac-server",
-				"LOG_LEVEL": "debug",
-				"STAC_DOCS_URL": "https://stac-utils.github.io/stac-server/",
-				"OPENSEARCH_HOST": stacServerDomain.attrDomainEndpoint,
-				"ENABLE_TRANSACTIONS_EXTENSION": "false",
-				"OPENSEARCH_CREDENTIALS_SECRET_ID": adminSecret.secretName,
-				"STAC_API_ROOTPATH": "/prod",
+				STAC_ID: 'stac-server',
+				STAC_TITLE: 'STAC API',
+				STAC_DESCRIPTION: 'A STAC API using stac-server',
+				LOG_LEVEL: 'debug',
+				STAC_DOCS_URL: 'https://stac-utils.github.io/stac-server/',
+				OPENSEARCH_HOST: stacServerDomain.attrDomainEndpoint,
+				ENABLE_TRANSACTIONS_EXTENSION: 'false',
+				OPENSEARCH_CREDENTIALS_SECRET_ID: adminSecret.secretName,
+				STAC_API_ROOTPATH: '/prod',
 				// This will be modified by the custom resource using the API gateway url
-				"STAC_API_URL": "https://some-stac-server.com",
+				STAC_API_URL: 'https://some-stac-server.com',
 				POST_INGEST_TOPIC_ARN: postIngestTopic.topicArn
 			}
-		})
+		});
 
-		ingestQueue.grantSendMessages(stacIngestLambda)
-		ingestQueue.grantPurge(stacIngestLambda)
-		ingestQueue.grantConsumeMessages(stacIngestLambda)
+		ingestQueue.grantSendMessages(stacIngestLambda);
+		ingestQueue.grantPurge(stacIngestLambda);
+		ingestQueue.grantConsumeMessages(stacIngestLambda);
 		postIngestTopic.grantPublish(stacIngestLambda);
 		adminSecret.grantRead(stacIngestLambda);
-
 
 		stacIngestLambda.addToRolePolicy(
 			new PolicyStatement({
 				effect: Effect.ALLOW,
 				actions: ['es:*'],
-				resources: [`arn:aws:es:${region}:${account}:domain/${domainName}/*`],
+				resources: [`arn:aws:es:${region}:${account}:domain/${domainName}/*`]
 			})
 		);
 
 		stacIngestLambda.addEventSource(
 			new SqsEventSource(ingestQueue, {
 				batchSize: 10,
-				reportBatchItemFailures: true,
+				reportBatchItemFailures: true
 			})
 		);
 
@@ -339,40 +345,39 @@ export class StacServerModule extends Construct {
 		 * Define the Stac API lambda
 		 */
 		const stacApiLambda = new Function(this, 'StacApiLambda', {
-			handler: "index.handler",
+			handler: 'index.handler',
 			code: Code.fromAsset(path.join(__dirname, 'lambdas/api.zip')),
 			functionName: `${namePrefix}-stac-api`,
 			runtime: Runtime.NODEJS_20_X,
 			memorySize: 1024,
 			timeout: Duration.minutes(1),
 			environment: {
-				"STAC_ID": "stac-server",
-				"STAC_TITLE": "STAC API",
-				"STAC_DESCRIPTION": "A STAC API using stac-server",
-				"LOG_LEVEL": "debug",
-				"STAC_DOCS_URL": "https://stac-utils.github.io/stac-server/",
-				"ENABLE_TRANSACTIONS_EXTENSION": "false",
-				"OPENSEARCH_CREDENTIALS_SECRET_ID": adminSecret.secretName,
-				"OPENSEARCH_HOST": stacServerDomain.attrDomainEndpoint,
-				"STAC_API_ROOTPATH": "/prod",
+				STAC_ID: 'stac-server',
+				STAC_TITLE: 'STAC API',
+				STAC_DESCRIPTION: 'A STAC API using stac-server',
+				LOG_LEVEL: 'debug',
+				STAC_DOCS_URL: 'https://stac-utils.github.io/stac-server/',
+				ENABLE_TRANSACTIONS_EXTENSION: 'false',
+				OPENSEARCH_CREDENTIALS_SECRET_ID: adminSecret.secretName,
+				OPENSEARCH_HOST: stacServerDomain.attrDomainEndpoint,
+				STAC_API_ROOTPATH: '/prod',
 				// This will be modified by the custom resource using the API gateway url
-				"STAC_API_URL": "https://some-stac-server.com"
+				STAC_API_URL: 'https://some-stac-server.com'
 			}
-		})
+		});
 
-		ingestQueue.grantSendMessages(stacApiLambda)
-		ingestQueue.grantPurge(stacApiLambda)
-		ingestQueue.grantConsumeMessages(stacApiLambda)
+		ingestQueue.grantSendMessages(stacApiLambda);
+		ingestQueue.grantPurge(stacApiLambda);
+		ingestQueue.grantConsumeMessages(stacApiLambda);
 		postIngestTopic.grantPublish(stacApiLambda);
 		adminSecret.grantRead(stacApiLambda);
 		stacApiLambda.addToRolePolicy(
 			new PolicyStatement({
 				effect: Effect.ALLOW,
 				actions: ['es:*'],
-				resources: [`arn:aws:es:${region}:${account}:domain/${domainName}/*`],
+				resources: [`arn:aws:es:${region}:${account}:domain/${domainName}/*`]
 			})
 		);
-
 
 		/**
 		 * Define the API Gateway and its related resources.
@@ -387,16 +392,16 @@ export class StacServerModule extends Construct {
 				stageName: 'prod',
 				accessLogDestination: new LogGroupLogDestination(logGroup),
 				accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
-				loggingLevel: MethodLoggingLevel.INFO,
+				loggingLevel: MethodLoggingLevel.INFO
 			},
 			defaultCorsPreflightOptions: {
 				allowOrigins: Cors.ALL_ORIGINS,
-				allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent', 'Accept-Version'],
+				allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent', 'Accept-Version']
 			},
 			endpointTypes: [EndpointType.REGIONAL],
 			apiKeySourceType: ApiKeySourceType.HEADER,
 			defaultMethodOptions: {
-				authorizationType: AuthorizationType.IAM,
+				authorizationType: AuthorizationType.IAM
 			}
 		});
 
@@ -404,7 +409,7 @@ export class StacServerModule extends Construct {
 
 		new StringParameter(this, 'stacServerApiEndpointParameter', {
 			parameterName: stacServerApiUrlParameter(props.environment),
-			stringValue: apigw.url,
+			stringValue: apigw.url
 		});
 
 		this.stacApiResourceArn = apigw.arnForExecuteApi();
@@ -414,11 +419,10 @@ export class StacServerModule extends Construct {
 				if (node instanceof CfnMethod && node.httpMethod === 'OPTIONS') {
 					node.addPropertyOverride('AuthorizationType', 'NONE');
 				}
-			},
+			}
 		});
 
 		apigw.node.addDependency(stacApiLambda);
-
 
 		/**
 		 * Define the custom resource lambda containing the logic to initialize the OpenSearch server.
@@ -449,7 +453,7 @@ export class StacServerModule extends Construct {
 				INGESTION_TOPIC_ARN: ingestTopic.topicArn,
 				STAC_ROLE_NAME: 'stac_server_role',
 				STAC_API_LAMBDA: stacApiLambda.functionName,
-				STAC_API_URL: apigw.url,
+				STAC_API_URL: apigw.url
 			},
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
 			architecture: getLambdaArchitecture(scope)
@@ -458,27 +462,24 @@ export class StacServerModule extends Construct {
 		adminSecret.grantRead(customResourceLambda);
 		userSecret.grantRead(customResourceLambda);
 		ingestTopic.grantPublish(customResourceLambda);
-		stacIngestLambda.grantInvoke(customResourceLambda)
+		stacIngestLambda.grantInvoke(customResourceLambda);
 		customResourceLambda.addToRolePolicy(
 			new PolicyStatement({
 				effect: Effect.ALLOW,
-				actions: [
-					'lambda:GetFunctionConfiguration',
-					'lambda:UpdateFunctionConfiguration'
-				],
-				resources: [stacApiLambda.functionArn, stacIngestLambda.functionArn],
+				actions: ['lambda:GetFunctionConfiguration', 'lambda:UpdateFunctionConfiguration'],
+				resources: [stacApiLambda.functionArn, stacIngestLambda.functionArn]
 			})
 		);
 
 		const customResourceProvider = new Provider(this, 'CustomResourceProvider', {
-			onEventHandler: customResourceLambda,
+			onEventHandler: customResourceLambda
 		});
 
 		new CustomResource(this, 'StacServerCustomResource', {
 			serviceToken: customResourceProvider.serviceToken,
 			properties: {
-				uniqueToken: Date.now(),
-			},
+				uniqueToken: Date.now()
+			}
 		});
 
 		NagSuppressions.addResourceSuppressions(
@@ -487,17 +488,17 @@ export class StacServerModule extends Construct {
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'],
-					reason: 'This only contains the policy the create and insert log to log group.',
+					reason: 'This only contains the policy the create and insert log to log group.'
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: ['Resource::<StacServerModuleCustomResourceLambda45AAF369.Arn>:*'],
-					reason: 'This only applies to the lambda defined in this construct and its versions.',
+					reason: 'This only applies to the lambda defined in this construct and its versions.'
 				},
 				{
 					id: 'AwsSolutions-L1',
-					reason: 'The cr.Provider library is not maintained by this project.',
-				},
+					reason: 'The cr.Provider library is not maintained by this project.'
+				}
 			],
 			true
 		);
@@ -508,7 +509,7 @@ export class StacServerModule extends Construct {
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: [`Resource::<StacServerModuleStacIngestLambdaB7E642DF.Arn>:*`],
-					reason: 'This policy is the one generated by CDK.',
+					reason: 'This policy is the one generated by CDK.'
 				}
 			],
 			true
@@ -519,7 +520,7 @@ export class StacServerModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-SNS2',
-					reason: 'Not required for now as the content of the topic can only be accessed if you have account access.',
+					reason: 'Not required for now as the content of the topic can only be accessed if you have account access.'
 				}
 			],
 			true
@@ -530,18 +531,18 @@ export class StacServerModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-L1',
-					reason: 'Latest runtime not needed.',
+					reason: 'Latest runtime not needed.'
 				},
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'],
-					reason: 'This policy is the one generated by CDK.',
+					reason: 'This policy is the one generated by CDK.'
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: ['Resource::*', 'Action::es:*', `Resource::arn:aws:es:${region}:${account}:domain/${domainName}/*`],
-					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
-				},
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.'
+				}
 			],
 			true
 		);
@@ -551,33 +552,32 @@ export class StacServerModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-SMG4',
-					reason: 'Lambda from Stac Server repository cannot handle secret rotation.',
+					reason: 'Lambda from Stac Server repository cannot handle secret rotation.'
 				}
 			],
 			true
 		);
-
 
 		NagSuppressions.addResourceSuppressions(
 			[apigw],
 			[
 				{
 					id: 'AwsSolutions-APIG2',
-					reason: 'Request validation is being done by the Fastify module.',
+					reason: 'Request validation is being done by the Fastify module.'
 				},
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'],
-					reason: 'API GW needs this policy to push logs to cloudwatch.',
+					reason: 'API GW needs this policy to push logs to cloudwatch.'
 				},
 				{
 					id: 'AwsSolutions-APIG4',
-					reason: 'OPTIONS has no auth.',
+					reason: 'OPTIONS has no auth.'
 				},
 				{
 					id: 'AwsSolutions-COG4',
-					reason: 'OPTIONS does not use Cognito auth.',
-				},
+					reason: 'OPTIONS does not use Cognito auth.'
+				}
 			],
 			true
 		);
@@ -587,23 +587,23 @@ export class StacServerModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-OS1',
-					reason: 'There are external applications that resides outside the VPC.',
+					reason: 'There are external applications that resides outside the VPC.'
 				},
 				{
 					id: 'AwsSolutions-OS3',
-					reason: 'This can be configured later by users to restrict the dashboard access to allowable IP.',
+					reason: 'This can be configured later by users to restrict the dashboard access to allowable IP.'
 				},
 				{
 					id: 'AwsSolutions-OS4',
-					reason: 'This is the default configuration of OpenSearch in StacServer repository.',
+					reason: 'This is the default configuration of OpenSearch in StacServer repository.'
 				},
 				{
 					id: 'AwsSolutions-OS5',
-					reason: 'This is the default configuration of OpenSearch in StacServer repository.',
+					reason: 'This is the default configuration of OpenSearch in StacServer repository.'
 				},
 				{
 					id: 'AwsSolutions-OS7',
-					reason: 'This is the default configuration of OpenSearch in StacServer repository.',
+					reason: 'This is the default configuration of OpenSearch in StacServer repository.'
 				}
 			],
 			true

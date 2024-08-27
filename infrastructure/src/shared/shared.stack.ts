@@ -18,7 +18,7 @@ import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { Cognito } from './cognito.construct.js';
 import { identitySourceIdParameter } from './customResources/verifiedPermissions.CustomResource.js';
-import { Network } from './network.construct.js';
+import { ArcadeVpcConfig, Network } from './network.construct.js';
 import { VerifiedPermissions } from './verifiedPermissions.construct.js';
 import { VerifiedPermissionsIdentitySourceCreator } from './verifiedPermissionsIdentitySourceCreator.construct.js';
 
@@ -33,6 +33,7 @@ export type SharedStackProperties = StackProps & {
 		sesVerifiedDomain: string;
 	};
 	deleteBucket?: boolean;
+	userVpcConfig?: ArcadeVpcConfig;
 };
 
 export class SharedInfrastructureStack extends Stack {
@@ -85,7 +86,7 @@ export class SharedInfrastructureStack extends Stack {
 		this.eventBusName = eventBusName;
 		this.eventBusArn = bus.eventBusArn;
 
-		const network = new Network(this, 'Network', {});
+		const network = new Network(this, 'Network', { userVpcConfig: props.userVpcConfig });
 		this.vpc = network.vpc;
 
 		NagSuppressions.addResourceSuppressionsByPath(

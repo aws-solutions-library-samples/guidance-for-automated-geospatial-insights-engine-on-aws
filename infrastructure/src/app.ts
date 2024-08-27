@@ -25,10 +25,10 @@ import { RegionsExtensionStack } from './regionsExtension/regionsExtension.stack
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 import { StacServerStack } from './stacServer/stacServer.stack.js';
-import { ResultsStack } from "./results/results.stack.js";
-import { SchedulerStack } from "./scheduler/scheduler.stack.js";
-import { NotificationsStack } from "./notifications/notifications.stack.js";
-import { UIApiStack } from "./ui/ui.stack.js";
+import { ResultsStack } from './results/results.stack.js';
+import { SchedulerStack } from './scheduler/scheduler.stack.js';
+import { NotificationsStack } from './notifications/notifications.stack.js';
+import { UIApiStack } from './ui/ui.stack.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -51,7 +51,9 @@ const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 
 
 // optional configuration for STAC OpenSearch servers
 const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'c5.4xlarge.search';
-const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerInstanceType') ?? 50);
+const stacServerVolumeType = app.node.tryGetContext('stacServerVolumeType') as string ?? 'gp3';
+const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerVolumeSize') ?? 50);
+const stacServerInstanceCount = parseInt(app.node.tryGetContext('stacServerInstanceCount') ?? 4);
 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
@@ -60,6 +62,22 @@ const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string ?? 'arn:aws:sns:us-west-2:608149789419:cirrus-es-prod-publish';
 const sentinelApiUrl = app.node.tryGetContext('sentinelApiUrl') as string ?? 'https://earth-search.aws.element84.com/v1';
 const sentinelCollection = app.node.tryGetContext('sentinelCollection') as string ?? 'sentinel-2-c1-l2a';
+
+// user VPC config
+const useExistingVpc = tryGetBooleanContext(app, 'useExistingVpc', false);
+
+let userVpcId;
+let userIsolatedSubnetIds;
+let userPrivateSubnetIds;
+let userPublicSubnetIds;
+let userAvailabilityZones;
+if (useExistingVpc) {
+	userVpcId = getOrThrow(app, 'existingVpcId');
+	userIsolatedSubnetIds = getOrThrow(app, 'existingIsolatedSubnetIds').toString().split(',');
+	userPrivateSubnetIds = getOrThrow(app, 'existingPrivateSubnetIds').toString().split(',');
+	userPublicSubnetIds = getOrThrow(app, 'existingPublicSubnetIds').toString().split(',');
+	userAvailabilityZones = getOrThrow(app, 'userAvailabilityZones').toString().split(',');
+}
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 
@@ -77,19 +95,26 @@ const deployPlatform = (callerEnvironment?: {
 		administratorEmail,
 		administratorPhoneNumber,
 		deleteBucket,
+		userVpcConfig: useExistingVpc ? {
+			availabilityZones: userAvailabilityZones,
+			privateSubnetIds: userPrivateSubnetIds,
+			publicSubnetIds: userPublicSubnetIds,
+			isolatedSubnetIds: userIsolatedSubnetIds,
+			vpcId: userVpcId
+		} : undefined,
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
 					fromEmail: cognitoFromEmail,
 					fromName: cognitoFromName,
 					replyTo: cognitoReplyToEmail,
-					sesVerifiedDomain: cognitoVerifiedDomain,
+					sesVerifiedDomain: cognitoVerifiedDomain
 				}
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 
 	const regionsStack = new RegionsApiStack(app, 'RegionsModule', {
@@ -100,8 +125,8 @@ const deployPlatform = (callerEnvironment?: {
 		vpc: sharedStack.vpc,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 
 	regionsStack.addDependency(sharedStack);
@@ -112,8 +137,8 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 
 	regionsExtensionStack.addDependency(regionsStack);
@@ -123,11 +148,13 @@ const deployPlatform = (callerEnvironment?: {
 		description: stackDescription('StacServer initializer'),
 		environment,
 		volumeSize: stacServerVolumeSize,
+		volumeType: stacServerVolumeType,
 		instanceType: stacServerInstanceType,
+		instanceCount: stacServerInstanceCount,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 	stacServerStack.addDependency(sharedStack);
 
@@ -142,8 +169,8 @@ const deployPlatform = (callerEnvironment?: {
 		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 
 	engineStack.addDependency(sharedStack);
@@ -154,11 +181,11 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
+			account: callerEnvironment?.accountId
 		},
 		stacServerTopicArn: stacServerStack.stacIngestTopicArn,
 		stacApiEndpoint: stacServerStack.stacApiEndpoint,
-		stacApiResourceArn: stacServerStack.stacApiResourceArn,
+		stacApiResourceArn: stacServerStack.stacApiResourceArn
 	});
 
 	resultStack.addDependency(sharedStack);
@@ -176,8 +203,8 @@ const deployPlatform = (callerEnvironment?: {
 		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 
 	schedulerStack.addDependency(sharedStack);
@@ -188,7 +215,7 @@ const deployPlatform = (callerEnvironment?: {
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),
 		description: stackDescription('Notifications'),
-		environment,
+		environment
 	});
 
 	notificationsStack.addDependency(sharedStack);
@@ -202,8 +229,8 @@ const deployPlatform = (callerEnvironment?: {
 		stacApiResourceArn: stacServerStack.stacApiResourceArn,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
+			account: callerEnvironment?.accountId
+		}
 	});
 	uiStack.addDependency(sharedStack);
 };

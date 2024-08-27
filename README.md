@@ -40,6 +40,8 @@ In order to deploy `ARCADE` from your local workstation, you need to install the
 - [Docker](https://docs.docker.com/engine/install/)
 - [Rush.js](https://rushjs.io/)
 - Node.js 20.x
+- [pnpm 9.0.2](https://www.npmjs.com/package/pnpm/v/9.0.2)
+- [tsx](https://www.npmjs.com/package/tsx/v/4.18.0)
 - It may be necessary to bootstrap your AWS environment. Bootstrapping is the process of preparing your AWS environment for usage with the AWS Cloud Development Kit (AWS CDK). Before you deploy a CDK stack into an AWS environment, the environment must first be bootstrapped. For more information about bootstrapping, please review the following:
     - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
     - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-env.html
@@ -88,22 +90,22 @@ Setup some environment variables which will be referenced by rest of the command
 |------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | ARCADE_ENVIRONMENT                 | Environment (.e.g dev, stage or prod). You can have multiple environment deployed in the same AWS account and region. |
 | ARCADE_ADMINISTRATOR_EMAIL         | Administrator's email.                                                                                                |
-| ARCADE_REGION                      | Solution's AWS Region deployment.                                                                                     |
 | ARCADE_ADMINISTRATOR_MOBILE_NUMBER | Administrator's phone number (including the area code, e.g. +61xxxxxx).                                               |
+| AWS_REGION                         | ARCADE's AWS Region deployment.                                                                                       |
 
 
 ```shell
 $ export ARCADE_ADMINISTRATOR_EMAIL=<ARCADE_ADMINISTRATOR_EMAIL>
 $ export ARCADE_ADMINISTRATOR_MOBILE_NUMBER=<ARCADE_ADMINISTRATOR_MOBILE_NUMBER>
 $ export ARCADE_ENVIRONMENT=<ARCADE_ENVIRONMENT>
-$ export ARCADE_REGION=<ARCADE_REGION>
+$ export AWS_REGION=<AWS_REGION>
 ```
 
 Run the following command to start the installation of ARCADE:
 
 ```shell
-$ cd $CLI_FOLDER
-$ bin/run.js install -e $ARCADE_ENVIRONMENT -r $ARCADE_REGION -n $ARCADE_ADMINISTRATOR_MOBILE_NUMBER -a $ARCADE_ADMINISTRATOR_EMAIL
+$ cd $ARCADE_FOLDER/infrastructure
+$ npm run cdk -- deploy --concurrency=10 --require-approval never  -c environment=$ARCADE_ENVIRONMENT -c administratorEmail=$ARCADE_ADMINISTRATOR_EMAIL -c administratorPhoneNumber=$ARCADE_ADMINISTRATOR_MOBILE_NUMBER --all
 ```
 
 ### 5. Deploy the UI

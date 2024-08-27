@@ -40,19 +40,23 @@ interface ListPaginationOptions {
 interface TagFilterOptions {
 	tags?: string[];
 }
+
 interface GroupListFilterOptions {
 	name?: string;
 }
+
 interface RegionListFilterOptions {
 	name?: string;
 	groupId?: string;
 }
+
 interface PolygonListFilterOptions {
 	name?: string;
 	groupId?: string;
 	regionId?: string;
 	includeLatestState?: boolean;
 }
+
 interface StateListFilterOptions {
 	name?: string;
 	groupId?: string;
@@ -213,9 +217,9 @@ export const regionsApiSlice = createApi({
 			}),
 			providesTags: (_result, _error, id) => [{ type: 'Polygon', id }],
 		}),
-		createPolygon: builder.mutation<Polygon, CreatePolygon>({
-			query: (body) => ({
-				url: `/polygons`,
+		createPolygon: builder.mutation<Polygon, { regionId: string; body: CreatePolygon }>({
+			query: ({ regionId, body }) => ({
+				url: `/regions/${regionId}/polygons`,
 				mode: 'cors',
 				method: 'POST',
 				body,
