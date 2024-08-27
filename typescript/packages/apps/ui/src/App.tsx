@@ -27,6 +27,7 @@ import CreateGrower from './pages/Growers/CreateGrower';
 import EditGrower from './pages/Growers/EditGrower';
 import ListGrowers from './pages/Growers/ListGrowers';
 import ViewGrower from './pages/Growers/ViewGrower';
+import CreateField from './pages/Fields/CreateField';
 
 Amplify.configure({
 	Auth: {
@@ -34,32 +35,33 @@ Amplify.configure({
 			//  Amazon Cognito User Pool ID
 			userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
 			// OPTIONAL - Amazon Cognito Web Client ID (26-char alphanumeric string)
-			userPoolClientId: import.meta.env.VITE_COGNITO_USER_POOL_CLIENT_ID,
-		},
-	},
+			userPoolClientId: import.meta.env.VITE_COGNITO_USER_POOL_CLIENT_ID
+		}
+	}
 });
 
 export default function App() {
 	return (
-		<I18nProvider locale="en" messages={[enMessages]}>
+		<I18nProvider locale='en' messages={[enMessages]}>
 			<Authenticator.Provider>
 				<Authenticator>
 					<BrowserRouter>
 						<Routes>
-							<Route path="/" element={<Analysis />} />
-							<Route path="/analysis" element={<Analysis />} />
-							<Route path="/growers" element={<ListGrowers />} />
-							<Route path="/growers/create" element={<CreateGrower />} />
-							<Route path="/growers/:id" element={<ViewGrower />} />
-							<Route path="/growers/:id/edit" element={<EditGrower />} />
-							<Route path="/growers/:growerId/farms" element={<ListFarms />} />
-							<Route path="/farms" element={<ListFarms />} />
-							<Route path="/growers/:growerId/farms/create" element={<CreateFarm />} />
-							<Route path="/farms/:id" element={<ViewFarm />} />
-							<Route path="/farms/:id/edit" element={<ViewFarm />} />
-							<Route path="/fields" element={<ListFields />} />
-							<Route path="/growers/:growerId/farms/:farmId/fields" element={<ListFields />} />
-							<Route path="/fields/:id" element={<ViewField />} />
+							<Route path='/' element={<Analysis />} />
+							<Route path='/analysis' element={<Analysis />} />
+							<Route path='/growers' element={<ListGrowers />} />
+							<Route path='/growers/create' element={<CreateGrower />} />
+							<Route path='/growers/:id' element={<ViewGrower />} />
+							<Route path='/growers/:id/edit' element={<EditGrower />} />
+							<Route path='/growers/:growerId/farms' element={<ListFarms />} />
+							<Route path='/farms' element={<ListFarms />} />
+							<Route path='/growers/:growerId/farms/create' element={<CreateFarm />} />
+							<Route path='/farms/:id' element={<ViewFarm />} />
+							<Route path='/farms/:id/edit' element={<ViewFarm />} />
+							<Route path='/fields' element={<ListFields />} />
+							<Route path='/growers/:growerId/farms/:farmId/fields' element={<ListFields />} />
+							<Route path='/fields/:id' element={<ViewField />} />
+							<Route path='/farms/:farmId/fields/create' element={<CreateField />} />
 							{/* <Route path="/growers/:growerId/farms/:farmId/fields/create" element={<CreateField />} /> */}
 						</Routes>
 					</BrowserRouter>

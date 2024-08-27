@@ -11,17 +11,33 @@
  *  and limitations under the License.
  */
 
-import { Box, Button, ColumnLayout, Container, ContentLayout, CopyToClipboard, Header, Link, SpaceBetween } from '@cloudscape-design/components';
+import { Box, Button, ColumnLayout, Container, ContentLayout, CopyToClipboard, Header, Link, SpaceBetween, Spinner } from '@cloudscape-design/components';
+import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from '../../shared/Breadcrumbs';
 import Shell from '../../shared/Shell';
-import { useGetRegionQuery } from '../../slices/regionsApiSlice';
+import { useGetRegionQuery, useUpdateRegionMutation } from '../../slices/regionsApiSlice';
 import FieldsTable from '../Fields/FieldsTable';
 
 export default function ViewFarm() {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const { data: farm } = useGetRegionQuery(id!);
+
+	const [updateRegion, result] = useUpdateRegionMutation();
+
+	const analyzeRegion = async () => {
+		await updateRegion({
+			id: id!,
+			body: {
+				processingConfig: {
+					scheduleExpression: `at(${dayjs(new Date()).format('YYYY-MM-DDThh:mm:ss')})`,
+					mode: 'scheduled',
+				},
+			},
+		});
+	};
+
 	return (
 		<Shell
 			breadcrumbs={
@@ -41,6 +57,7 @@ export default function ViewFarm() {
 								variant="h1"
 								actions={
 									<SpaceBetween direction="horizontal" size="xs">
+										{result.isLoading ? <Spinner /> : <Button onClick={async () => await analyzeRegion()}>Analyze</Button>}
 										<Button>Edit</Button>
 										<Button>Delete</Button>
 									</SpaceBetween>
