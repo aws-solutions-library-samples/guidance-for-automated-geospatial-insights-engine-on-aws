@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Invoker, LambdaApiGatewayEventBuilder } from '@arcade/lambda-invoker';
+import { Invoker, LambdaApiGatewayEventBuilder } from '@agie/lambda-invoker';
 import { State } from '@aws-sdk/client-lambda';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';

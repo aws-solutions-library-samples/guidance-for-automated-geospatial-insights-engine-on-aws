@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Region } from '@arcade/regions';
+import { Region } from '@agie/regions';
 import { Box, Button, Header, Link, Pagination, SpaceBetween, Table } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -126,13 +126,13 @@ export default function FarmsTable({ growerId, variant }: { growerId?: string; v
 					{
 						id: 'analysisStatus',
 						header: 'Analysis',
-						cell: (item) => <ProcessingStatus status={item.attributes && item.attributes['arcade:results:status'] ? item.attributes['arcade:results:status'] : undefined}/>,
+						cell: (item) => <ProcessingStatus status={item.attributes && item.attributes['agie:results:status'] ? item.attributes['agie:results:status'] : undefined}/>,
 					},
 					{
 						id: 'lastAnalysis',
 						header: 'Last Analysis',
 						cell: (item) =>
-							item.attributes && item.attributes['arcade:results:updatedAt'] ? (
+							item.attributes && item.attributes['agie:results:updatedAt'] ? (
 								<Link
 									onFollow={() => {
 										const searchParams = new URLSearchParams();
@@ -140,12 +140,12 @@ export default function FarmsTable({ growerId, variant }: { growerId?: string; v
 										searchParams.set('bbox', bbox);
 										const farmId = item.id;
 										searchParams.set('farmId', farmId);
-										const timestamp = new Date(item.attributes!['arcade:results:updatedAt']!).toISOString();
+										const timestamp = new Date(item.attributes!['agie:results:updatedAt']!).toISOString();
 										searchParams.set('timestamp', timestamp);
 										navigate(`/analysis?${searchParams.toString()}`);
 									}}
 								>
-									{new Date(item.attributes['arcade:results:updatedAt']).toLocaleString()}
+									{new Date(item.attributes['agie:results:updatedAt']).toLocaleString()}
 								</Link>
 							) : (
 								'-'

@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/dynamodb-utils",
+	"name": "@agie/dynamodb-utils",
 	"version": "0.0.1",
 	"description": "Common DynamoDB utils.",
 	"author": "Dean Hart <deanhart@amazon.com>",

@@ -14,11 +14,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import pino from "pino";
 import { JobsService } from "./service.js";
-import { Region, RegionsClient, StacServerClient } from "@arcade/clients";
+import { Region, RegionsClient, StacServerClient } from "@agie/clients";
 import { mock, MockProxy } from "vitest-mock-extended";
 import { SendMessageBatchCommandInput, SQSClient } from "@aws-sdk/client-sqs";
 import { mockClient } from 'aws-sdk-client-mock';
-import { StacItem } from "@arcade/events";
+import { StacItem } from "@agie/events";
 import axios from "axios";
 
 vi.mock('axios')
@@ -223,13 +223,13 @@ describe('JobService', () => {
 		// verify that we only query regions that are both active and has on new scene configured
 		expect(mockStacServerClient.search).toHaveBeenCalledWith({
 			// verify that we only search in group_* collections
-			collections: ['arcade-region'],
+			collections: ['agie-region'],
 			"bbox": sentinelStacItemOne.bbox,
 			"query": {
-				"arcade:isActive": {
+				"agie:isActive": {
 					"eq": true
 				},
-				"arcade:processedOnNewScene": {
+				"agie:processedOnNewScene": {
 					"eq": true
 				}
 			}
@@ -268,7 +268,7 @@ describe('JobService', () => {
 		expect(mockRegionClient.getRegionById).toHaveBeenCalledWith('region1Id', mockContext)
 	});
 
-	it('should ignore regions if arcade stac server does not return any match', async () => {
+	it('should ignore regions if agie stac server does not return any match', async () => {
 		mockStacServerClient.search.mockReset();
 		mockStacServerClient.search.mockResolvedValue({ features: [] } as any);
 		await underTest.startJobOnRegionMatch([sentinelStacItemOne])

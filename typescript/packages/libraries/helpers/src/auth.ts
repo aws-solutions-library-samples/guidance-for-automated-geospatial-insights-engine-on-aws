@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 // @ts-ignore
-import { userPoolClientIdParameter, userPoolIdParameter } from '@arcade/infrastructure';
+import { userPoolClientIdParameter, userPoolIdParameter } from '@agie/infrastructure';
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import { Amplify } from 'aws-amplify';
 import { confirmSignIn, fetchAuthSession, getCurrentUser, signIn } from 'aws-amplify/auth';

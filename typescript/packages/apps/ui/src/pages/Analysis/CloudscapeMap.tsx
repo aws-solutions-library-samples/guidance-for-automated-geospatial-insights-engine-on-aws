@@ -28,7 +28,7 @@ import { HistogramData } from './Histogram';
 const UI_TILER_API_ENDPOINT = import.meta.env.VITE_UI_REST_API_URL;
 const MAP_REGION = import.meta.env.VITE_LOCATION_SERVICE_MAP_REGION;
 
-export interface ArcadeFeature extends Feature {
+export interface AgieFeature extends Feature {
 	collection: string;
 	assets: {
 		ndvi: {
@@ -98,7 +98,7 @@ const CloudscapeMap = () => {
 		return new URLSearchParams(filteredQueryParams).toString();
 	}, [selectedBandsId, searchParams, timestamp]);
 
-	const supplementProperties = (feature: ArcadeFeature): ArcadeFeature => {
+	const supplementProperties = (feature: AgieFeature): AgieFeature => {
 		const regionId = (feature.collection as string | undefined)?.startsWith('region_') ? (feature.collection as string | undefined)?.split('_')[1] : undefined;
 		const polygonId = (feature.id as string | undefined)?.split('_').length === 2 ? (feature.id as string | undefined)?.split('_')[1] : undefined;
 		const newFeature = { ...feature, properties: { ...feature.properties, polygonId, regionId, itemId: feature.id, collectionId: feature.collection } };
@@ -160,7 +160,7 @@ const CloudscapeMap = () => {
 							beforeId="bottom-layer"
 						/>
 					</Source>
-					{features.map((feature: ArcadeFeature) => {
+					{features.map((feature: AgieFeature) => {
 						// Two layers are made here:
 						// 1. A fill layer that fills the feature boundaries with clear fill so it can be clicked
 						// 2. A line layer that outlines the feature boundaries for visibility

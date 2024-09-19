@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { RegionResource } from '@arcade/events';
+import { RegionResource } from '@agie/events';
 
 export type StartJobRequest = RegionResource & { scheduleDateTime: string };
 

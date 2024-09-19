@@ -21,8 +21,8 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 	await app.register(FastifySwagger, {
 		openapi: {
 			info: {
-				title: 'ARCADE Notifications',
-				description: `Manages subscription and delivery of notification of ARCADE events`,
+				title: 'AGIE Notifications',
+				description: `Manages subscription and delivery of notification of AGIE events`,
 				version: '1.0.0',
 			},
 			servers: [

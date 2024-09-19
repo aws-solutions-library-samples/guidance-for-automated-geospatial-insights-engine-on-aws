@@ -12,16 +12,16 @@
  */
 
 import { Flags } from '@oclif/core';
-import { switchToArcadeLocation } from '../utils/shell.js';
+import { switchToAgieLocation } from '../utils/shell.js';
 import { getDeployedStackByName } from '../utils/cloudformation.js';
-import { ArcadeCommand } from '../types/arcadeCommand.js';
+import { AgieCommand } from '../types/agieCommand.js';
 import shell from 'shelljs';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : false;
 
-export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
-	public static description = 'Install ARCADE for the specified environment';
+export class AgieInstall extends AgieCommand<typeof AgieInstall> {
+	public static description = 'Install AGIE for the specified environment';
 	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -a dummyEmail@test.com -n +614xxxxxxxx'];
 	public static enableJsonFlag = true;
 
@@ -29,12 +29,12 @@ export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 		environment: Flags.string({
 			char: 'e',
 			required: true,
-			description: 'The environment used to deploy the arcade project to'
+			description: 'The environment used to deploy the agie project to'
 		}),
 		region: Flags.string({
 			char: 'r',
 			required: true,
-			description: 'The AWS Region arcade is deployed to'
+			description: 'The AWS Region agie is deployed to'
 		}),
 		administratorEmail: Flags.string({
 			char: 'a',
@@ -82,8 +82,8 @@ export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 	};
 
 	public async runChild(): Promise<void> {
-		const { flags } = await this.parse(ArcadeInstall);
-		await switchToArcadeLocation();
+		const { flags } = await this.parse(AgieInstall);
+		await switchToAgieLocation();
 
 		const { role, region, ...rest } = flags;
 
@@ -96,6 +96,6 @@ export class ArcadeInstall extends ArcadeCommand<typeof ArcadeInstall> {
 			}
 		}
 		shell.exec(`npm run cdk -- deploy --all --concurrency=10 --require-approval never ${role ? '--r ' + role : ''} ${params}`, { silent: isSilent });
-		this.log(`Finished Deployment of Arcade to ${region}`);
+		this.log(`Finished Deployment of Agie to ${region}`);
 	}
 }

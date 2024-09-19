@@ -12,10 +12,10 @@ importers:
 
   ../../infrastructure:
     dependencies:
-      '@arcade/cdk-common':
+      '@agie/cdk-common':
         specifier: workspace:*
         version: link:../typescript/packages/libraries/cdk-common
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../typescript/packages/libraries/events
       '@aws-cdk/aws-cognito-identitypool-alpha':
@@ -269,13 +269,13 @@ importers:
 
   ../../typescript/packages/apps/executor:
     dependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../../libraries/clients
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker
       '@aws-sdk/client-batch':
@@ -390,19 +390,19 @@ importers:
 
   ../../typescript/packages/apps/notifications:
     dependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../../libraries/clients
-      '@arcade/dynamodb-utils':
+      '@agie/dynamodb-utils':
         specifier: workspace:*
         version: link:../../libraries/dynamodb-utils
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker
-      '@arcade/rest-api-authorizer':
+      '@agie/rest-api-authorizer':
         specifier: workspace:*
         version: link:../../libraries/rest-api-authorizer
       '@aws-sdk/client-dynamodb':
@@ -523,13 +523,13 @@ importers:
 
   ../../typescript/packages/apps/regions:
     dependencies:
-      '@arcade/dynamodb-utils':
+      '@agie/dynamodb-utils':
         specifier: workspace:*
         version: link:../../libraries/dynamodb-utils
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/rest-api-authorizer':
+      '@agie/rest-api-authorizer':
         specifier: workspace:*
         version: link:../../libraries/rest-api-authorizer
       '@aws-sdk/client-dynamodb':
@@ -662,13 +662,13 @@ importers:
 
   ../../typescript/packages/apps/regions-extension:
     dependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../../libraries/clients
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker
       '@aws-sdk/client-lambda':
@@ -741,19 +741,19 @@ importers:
 
   ../../typescript/packages/apps/results:
     dependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../../libraries/clients
-      '@arcade/dynamodb-utils':
+      '@agie/dynamodb-utils':
         specifier: workspace:*
         version: link:../../libraries/dynamodb-utils
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker
-      '@arcade/rest-api-authorizer':
+      '@agie/rest-api-authorizer':
         specifier: workspace:*
         version: link:../../libraries/rest-api-authorizer
       '@aws-sdk/client-dynamodb':
@@ -904,13 +904,13 @@ importers:
 
   ../../typescript/packages/apps/scheduler:
     dependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../../libraries/clients
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../../libraries/events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../../libraries/lambda-invoker
       '@aws-sdk/client-batch':
@@ -1098,7 +1098,7 @@ importers:
         specifier: ~37
         version: 37.0.2(react@18.3.1)
     devDependencies:
-      '@arcade/regions':
+      '@agie/regions':
         specifier: workspace:*
         version: link:../regions
       '@aws-sdk/client-ssm':
@@ -1147,10 +1147,10 @@ importers:
         specifier: ~5
         version: 5.0.2
     devDependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../libraries/clients
-      '@arcade/regions':
+      '@agie/regions':
         specifier: workspace:*
         version: link:../apps/regions
       '@aws-amplify/auth':
@@ -1316,10 +1316,10 @@ importers:
 
   ../../typescript/packages/libraries/clients:
     dependencies:
-      '@arcade/events':
+      '@agie/events':
         specifier: workspace:*
         version: link:../events
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../lambda-invoker
       '@aws-sdk/client-lambda':
@@ -1478,7 +1478,7 @@ importers:
 
   ../../typescript/packages/libraries/helpers:
     dependencies:
-      '@arcade/infrastructure':
+      '@agie/infrastructure':
         specifier: workspace:*
         version: link:../../../../infrastructure
       '@aws-amplify/auth':
@@ -1597,10 +1597,10 @@ importers:
 
   ../../typescript/packages/libraries/resource-api-base:
     dependencies:
-      '@arcade/dynamodb-utils':
+      '@agie/dynamodb-utils':
         specifier: workspace:*
         version: link:../dynamodb-utils
-      '@arcade/lambda-invoker':
+      '@agie/lambda-invoker':
         specifier: workspace:*
         version: link:../lambda-invoker
       '@aws-sdk/client-dynamodb':
@@ -1724,7 +1724,7 @@ importers:
 
   ../../typescript/packages/libraries/rest-api-authorizer:
     dependencies:
-      '@arcade/resource-api-base':
+      '@agie/resource-api-base':
         specifier: workspace:*
         version: link:../resource-api-base
       '@aws-sdk/client-secrets-manager':
@@ -1800,7 +1800,7 @@ importers:
 
   ../../typescript/packages/seeder:
     devDependencies:
-      '@arcade/clients':
+      '@agie/clients':
         specifier: workspace:*
         version: link:../libraries/clients
       '@aws-amplify/auth':

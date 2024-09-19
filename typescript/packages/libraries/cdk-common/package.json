@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/cdk-common",
+	"name": "@agie/cdk-common",
 	"version": "0.0.1",
 	"description": "CDK constructs and shared utilities",
 	"author": "Pouya Bahavar <bahavare@amazon.com>",

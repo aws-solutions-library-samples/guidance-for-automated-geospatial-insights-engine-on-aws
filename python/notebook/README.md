@@ -7,7 +7,7 @@ Just a notebook, trying out the different steps.
 Create conda environment:
 
 ```shell
-> conda create -c conda-forge -n arcade-engine --file requirements.txt
+> conda create -c conda-forge -n agie-engine --file requirements.txt
 ```
 
 Enable Jupyter extensions:
@@ -19,5 +19,5 @@ Enable Jupyter extensions:
 Activate:
 
 ```shell
-> conda activate arcade-engine
+> conda activate agie-engine
 ```

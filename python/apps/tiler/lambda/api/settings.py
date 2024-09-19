@@ -18,7 +18,7 @@ from pydantic_settings import BaseSettings
 class ApiSettings(BaseSettings):
     """FASTAPI application settings."""
 
-    name: str = "ArcadeTiler"
+    name: str = "AgieTiler"
     cors_origins: str = "*"
     cors_allow_methods: str = "GET"
     root_path: str = ""

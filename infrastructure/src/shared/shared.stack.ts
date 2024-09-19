@@ -11,14 +11,14 @@
  *  and limitations under the License.
  */
 
-import { Bus, S3 } from '@arcade/cdk-common';
+import { Bus, S3 } from '@agie/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { Cognito } from './cognito.construct.js';
 import { identitySourceIdParameter } from './customResources/verifiedPermissions.CustomResource.js';
-import { ArcadeVpcConfig, Network } from './network.construct.js';
+import { AgieVpcConfig, Network } from './network.construct.js';
 import { VerifiedPermissions } from './verifiedPermissions.construct.js';
 import { VerifiedPermissionsIdentitySourceCreator } from './verifiedPermissionsIdentitySourceCreator.construct.js';
 
@@ -33,7 +33,7 @@ export type SharedStackProperties = StackProps & {
 		sesVerifiedDomain: string;
 	};
 	deleteBucket?: boolean;
-	userVpcConfig?: ArcadeVpcConfig;
+	userVpcConfig?: AgieVpcConfig;
 };
 
 export class SharedInfrastructureStack extends Stack {
@@ -49,7 +49,7 @@ export class SharedInfrastructureStack extends Stack {
 		const accountId = Stack.of(this).account;
 		const region = Stack.of(this).region;
 
-		const bucketName = `arcade-${props.environment}-${accountId}-${region}-shared`;
+		const bucketName = `agie-${props.environment}-${accountId}-${region}-shared`;
 		const s3 = new S3(this, 'S3', {
 			environment: props.environment,
 			bucketName,
@@ -78,7 +78,7 @@ export class SharedInfrastructureStack extends Stack {
 		vpIdentitySourceCreator.node.addDependency(vp);
 		vpIdentitySourceCreator.node.addDependency(cognito);
 
-		const eventBusName = `arcade-${props.environment}-${accountId}-${region}`;
+		const eventBusName = `agie-${props.environment}-${accountId}-${region}`;
 		const bus = new Bus(this, 'EventBus', {
 			environment: props.environment,
 			eventBusName,

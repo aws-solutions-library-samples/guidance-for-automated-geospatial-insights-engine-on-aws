@@ -17,7 +17,7 @@ import attr
 import httpx
 import morecantile
 
-from api.backend.arcade_stac_reader import STACReader
+from api.backend.agie_stac_reader import STACReader
 from api.routers.models import CommonFilterQueryParams
 from cogeo_mosaic.backends.base import BaseBackend
 from cogeo_mosaic.backends.stac import default_stac_accessor, query_from_link
@@ -34,12 +34,12 @@ from httpx_auth_awssigv4 import SigV4Auth
 
 
 @attr.s
-class ArcadeSTACBackend(BaseBackend):
+class AgieSTACBackend(BaseBackend):
 	# input should be the STAC-API url
 	input: str = attr.ib()
 	auth: SigV4Auth = attr.ib(default=None)
 
-	arcade_filters: CommonFilterQueryParams = attr.ib(factory=dict)
+	agie_filters: CommonFilterQueryParams = attr.ib(factory=dict)
 
 	minzoom: int = attr.ib()
 	maxzoom: int = attr.ib()
@@ -60,7 +60,7 @@ class ArcadeSTACBackend(BaseBackend):
 	# The reader is read-only, we can't pass mosaic_def to the init method
 	mosaic_def: MosaicJSON = attr.ib(init=False)
 
-	_backend_name = "Arcade"
+	_backend_name = "Agie"
 
 	@minzoom.default
 	def _minzoom(self):
@@ -143,13 +143,13 @@ class ArcadeSTACBackend(BaseBackend):
 			],
 		}
 		query["sortBy"] = [{"field": "properties.datetime", "direction": "desc"}]
-		if self.arcade_filters.timestamp is not None:
-			query["datetime"] = f"/{self.arcade_filters.timestamp.isoformat()}"
-		if self.arcade_filters.region_id is not None:
-			query["collections"] = ["arcade-polygon"]
+		if self.agie_filters.timestamp is not None:
+			query["datetime"] = f"/{self.agie_filters.timestamp.isoformat()}"
+		if self.agie_filters.region_id is not None:
+			query["collections"] = ["agie-polygon"]
 			query["query"] = {
-				"arcade:regionId": {
-					"eq": self.arcade_filters.region_id
+				"agie:regionId": {
+					"eq": self.agie_filters.region_id
 				}
 			}
 

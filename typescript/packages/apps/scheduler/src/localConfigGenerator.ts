@@ -24,7 +24,7 @@ const ssm = new SSMClient({ region: process.env['AWS_REGION'] });
 
 const getValues = async (module: string, mapping: Record<string, string>) => {
 	for (const key in mapping) {
-		const prefix = `/arcade/${ENVIRONMENT}/${module}/`;
+		const prefix = `/agie/${ENVIRONMENT}/${module}/`;
 		const name = `${prefix}${mapping[key]}`;
 		try {
 			const response = await ssm.send(

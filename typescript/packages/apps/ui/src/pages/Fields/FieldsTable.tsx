@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Polygon } from '@arcade/regions';
+import { Polygon } from '@agie/regions';
 import { Box, Button, Header, Link, Pagination, SpaceBetween, Table } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

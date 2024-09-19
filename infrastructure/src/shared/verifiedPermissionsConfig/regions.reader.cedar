@@ -1,27 +1,27 @@
 permit (
     principal,
     action in [
-        Arcade::Action::"ListGroups",
-        Arcade::Action::"DescribeGroup",
+        Agie::Action::"ListGroups",
+        Agie::Action::"DescribeGroup",
 
-        Arcade::Action::"ListRegions",
-        Arcade::Action::"DescribeRegion",
+        Agie::Action::"ListRegions",
+        Agie::Action::"DescribeRegion",
 
-        Arcade::Action::"ListPolygons",
-        Arcade::Action::"DescribePolygon",
+        Agie::Action::"ListPolygons",
+        Agie::Action::"DescribePolygon",
 
-        Arcade::Action::"ListStates",
-        Arcade::Action::"DescribeState",
+        Agie::Action::"ListStates",
+        Agie::Action::"DescribeState",
 
-        Arcade::Action::"ListRegionTasks",
-        Arcade::Action::"DescribeRegionTask",
-        Arcade::Action::"ListRegionTaskItems",
-        Arcade::Action::"DescribeRegionTaskItem",
+        Agie::Action::"ListRegionTasks",
+        Agie::Action::"DescribeRegionTask",
+        Agie::Action::"ListRegionTaskItems",
+        Agie::Action::"DescribeRegionTaskItem",
 
-        Arcade::Action::"ListPolygonTasks",
-        Arcade::Action::"DescribePolygonTask",
-        Arcade::Action::"ListPolygonTaskItems",
-        Arcade::Action::"DescribePolygonTaskItem"
+        Agie::Action::"ListPolygonTasks",
+        Agie::Action::"DescribePolygonTask",
+        Agie::Action::"ListPolygonTaskItems",
+        Agie::Action::"DescribePolygonTaskItem"
     ],
     resource
 )

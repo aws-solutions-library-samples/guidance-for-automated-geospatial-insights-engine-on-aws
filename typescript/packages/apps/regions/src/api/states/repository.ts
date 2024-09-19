@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
+import { DynamoDbUtils } from '@agie/dynamodb-utils';
 import { DynamoDBDocumentClient, ExecuteStatementCommand, TransactWriteCommandInput } from '@aws-sdk/lib-dynamodb';
 import { FastifyBaseLogger } from 'fastify';
 import { RESERVED_PREFIX, createDelimitedAttribute } from '../../common/ddbAttributes.util.js';

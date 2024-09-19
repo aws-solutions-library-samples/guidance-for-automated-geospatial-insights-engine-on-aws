@@ -16,7 +16,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IVpc, SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { NagSuppressions } from 'cdk-nag';
 
-export interface ArcadeVpcConfig {
+export interface AgieVpcConfig {
 	vpcId: string;
 	publicSubnetIds: string[],		// currently not actual public - see note below
 	privateSubnetIds: string[],
@@ -25,7 +25,7 @@ export interface ArcadeVpcConfig {
 }
 
 export interface NetworkConstructProperties {
-	userVpcConfig?: ArcadeVpcConfig;
+	userVpcConfig?: AgieVpcConfig;
 }
 
 export class Network extends Construct {
@@ -46,6 +46,7 @@ export class Network extends Construct {
 		} else {
 
 			this.vpc = new Vpc(this, 'Vpc', {
+				natGateways: 1,
 				subnetConfiguration: [
 					{
 						name: 'public-subnet',

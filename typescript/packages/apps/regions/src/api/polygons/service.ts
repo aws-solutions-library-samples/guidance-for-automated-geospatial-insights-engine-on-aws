@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { EventPublisher } from '@arcade/events';
+import { EventPublisher } from '@agie/events';
 import { area, multiPolygon, polygon } from '@turf/turf';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';

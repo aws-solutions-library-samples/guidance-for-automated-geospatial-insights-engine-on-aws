@@ -16,10 +16,10 @@ import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '
 import { asFunction, Lifetime } from 'awilix';
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { RegionsClient } from "@arcade/clients";
-import { Invoker } from "@arcade/lambda-invoker";
+import { RegionsClient } from "@agie/clients";
+import { Invoker } from "@agie/lambda-invoker";
 import { LambdaClient } from "@aws-sdk/client-lambda";
-import { EventPublisher } from "@arcade/events";
+import { EventPublisher } from "@agie/events";
 
 const { captureAWSv3Client } = pkg;
 

@@ -13,7 +13,7 @@
 
 import { ClientServiceBase } from "../common/common.js";
 import { BaseLogger } from "pino";
-import { Invoker, LambdaApiGatewayEventBuilder } from "@arcade/lambda-invoker";
+import { Invoker, LambdaApiGatewayEventBuilder } from "@agie/lambda-invoker";
 import { LambdaRequestContext } from "../common/models.js";
 import { ListResultsOptions, ResultListResource } from "./results.models.js";
 

@@ -22,7 +22,7 @@ export default function ({ items }: { items: BreadcrumbGroupProps['items'] }) {
 				event.preventDefault();
 				navigate(event.detail.href);
 			}}
-			items={[{ text: 'ARCADE', href: '/' }, ...items]}
+			items={[{ text: 'AGIE', href: '/' }, ...items]}
 			ariaLabel="Breadcrumbs"
 		/>
 	);

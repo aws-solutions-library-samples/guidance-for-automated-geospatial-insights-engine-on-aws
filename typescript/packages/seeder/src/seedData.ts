@@ -243,7 +243,7 @@ async function getApiEndpoints(environment: string): Promise<{
 	[key: string]: string
 }> {
 	// Get the url for the api endpoints
-	const regionsUrlPath = `/arcade/${environment}/regions/apiUrl`;
+	const regionsUrlPath = `/agie/${environment}/regions/apiUrl`;
 	const apiEndpointsPromises = await Promise.all([
 		getSSMParameter(regionsUrlPath, 'regions')
 	]);
@@ -282,8 +282,8 @@ if (operation === 'seed') {
 		const seedEntries = await listSeedEntries(seedDir);
 		const endPoints = await getApiEndpoints(environment);
 		const [userPool, userClient] = await Promise.all([
-			getSSMParameter(`/arcade/${environment}/shared/cognitoUserPoolId`, 'cognitoUserPoolId'),
-			getSSMParameter(`/arcade/${environment}/shared/cognitoUserPoolClientId`, 'cognitoUserClientId')
+			getSSMParameter(`/agie/${environment}/shared/cognitoUserPoolId`, 'cognitoUserPoolId'),
+			getSSMParameter(`/agie/${environment}/shared/cognitoUserPoolClientId`, 'cognitoUserClientId')
 		]);
 		process.env.COGNITO_USER_POOL_ID = userPool.value;
 		process.env.COGNITO_CLIENT_ID = userClient.value;

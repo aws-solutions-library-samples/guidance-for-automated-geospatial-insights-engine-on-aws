@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { getLambdaArchitecture } from '@arcade/cdk-common';
+import { getLambdaArchitecture } from '@agie/cdk-common';
 import {
 	CLI_CATALOG_CREATE_EVENT,
 	EXECUTOR_JOB_CREATED_EVENT,
@@ -20,7 +20,7 @@ import {
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
-} from '@arcade/events';
+} from '@agie/events';
 import * as cdk from 'aws-cdk-lib';
 import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import {
@@ -67,10 +67,10 @@ export interface ResultsConstructProperties {
 	readonly policyStoreId: string;
 }
 
-const resultsApiAuthorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/results/verifiedPermissionsAuthorizerFunctionArn`;
-export const resultsApiFunctionArnParameter = (environment: string) => `/arcade/${environment}/results/apiFunctionArn`;
-export const resultsApiUrlParameter = (environment: string) => `/arcade/${environment}/results/apiUrl`;
-export const resultsApiNameParameter = (environment: string) => `/arcade/${environment}/results/apiName`;
+const resultsApiAuthorizerFunctionArnParameter = (environment: string) => `/agie/${environment}/results/verifiedPermissionsAuthorizerFunctionArn`;
+export const resultsApiFunctionArnParameter = (environment: string) => `/agie/${environment}/results/apiFunctionArn`;
+export const resultsApiUrlParameter = (environment: string) => `/agie/${environment}/results/apiUrl`;
+export const resultsApiNameParameter = (environment: string) => `/agie/${environment}/results/apiName`;
 
 export class ResultsModule extends Construct {
 	public readonly tableName: string;
@@ -81,7 +81,7 @@ export class ResultsModule extends Construct {
 
 		const account = Stack.of(this).account;
 		const region = cdk.Stack.of(this).region;
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const bucket = Bucket.fromBucketName(this, 'Bucket', props.bucketName);
 		const regionsApiLambda = Function.fromFunctionAttributes(scope, 'RegionsApiFunction', { functionArn: props.regionsApiFunctionArn, skipPermissions: true });
@@ -126,7 +126,7 @@ export class ResultsModule extends Construct {
 		 */
 		const apiLambda = new NodejsFunction(this, 'ResultsApiLambda', {
 			functionName: `${namePrefix}-resultsApi`,
-			description: `ARCADE: Results API: ${props.environment}`,
+			description: `AGIE: Results API: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_apiGateway.ts'),
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
@@ -166,7 +166,7 @@ export class ResultsModule extends Construct {
 		 */
 		const authorizerLambda = new NodejsFunction(this, 'ResultsApiAuthorizerLambda', {
 			functionName: `${namePrefix}-resultsApi-authorizer`,
-			description: `ARCADE: Results API Authorizer: ${props.environment}`,
+			description: `AGIE: Results API Authorizer: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/results/src/lambda_authorizer.ts'),
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
@@ -215,7 +215,7 @@ export class ResultsModule extends Construct {
 		const logGroup = new LogGroup(this, 'ResultsApiLogs');
 		const apigw = new LambdaRestApi(this, 'ResultsApiGateway', {
 			restApiName: `${namePrefix}-results`,
-			description: `ARCADE: Results API: ${props.environment}`,
+			description: `AGIE: Results API: ${props.environment}`,
 			handler: apiLambda,
 			proxy: true,
 			deployOptions: {

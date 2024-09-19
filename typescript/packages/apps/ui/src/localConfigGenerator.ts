@@ -42,10 +42,10 @@ if (process.env['AWS_CREDS_TARGET_ROLE']) {
 
 const ssmClient = new SSMClient({ region: AWS_REGION, credentials });
 
-const arcadeConfiguration: Record<string, string> = {
+const agieConfiguration: Record<string, string> = {
 	'NODE_ENV': 'local',
-	VITE_LOCATION_SERVICE_BASE_MAP_NAME: `arcade.${ENVIRONMENT}.baseNavigationMap`,
-	VITE_LOCATION_SERVICE_SAT_MAP_NAME: `arcade.${ENVIRONMENT}.baseSatelliteMap`,
+	VITE_LOCATION_SERVICE_BASE_MAP_NAME: `agie.${ENVIRONMENT}.baseNavigationMap`,
+	VITE_LOCATION_SERVICE_SAT_MAP_NAME: `agie.${ENVIRONMENT}.baseSatelliteMap`,
 	VITE_COGNITO_USER_POOL_REGION: AWS_REGION,
 	VITE_LOCATION_SERVICE_MAP_REGION: AWS_REGION,
 	VITE_REGION: AWS_REGION
@@ -53,13 +53,13 @@ const arcadeConfiguration: Record<string, string> = {
 
 const getValues = async (module: string, mapping: Record<string, string>) => {
 	for (const key in mapping) {
-		const prefix = `/arcade/${ENVIRONMENT}/${module}/`;
+		const prefix = `/agie/${ENVIRONMENT}/${module}/`;
 		const name = `${prefix}${mapping[key]}`;
 		try {
 			const response = await ssmClient.send(new GetParameterCommand({
 				Name: name, WithDecryption: false
 			}));
-			arcadeConfiguration[key] = response.Parameter?.Value!;
+			agieConfiguration[key] = response.Parameter?.Value!;
 		} catch (e) {
 			throw new Error(`Parameter ${name} NOT Found !!!`);
 		}
@@ -83,4 +83,4 @@ await Promise.all([
 	})
 ]);
 
-fs.writeFileSync('.env.local', Object.entries(arcadeConfiguration).map(([key, value]) => `${key}=${value}`).join('\r\n'));
+fs.writeFileSync('.env.local', Object.entries(agieConfiguration).map(([key, value]) => `${key}=${value}`).join('\r\n'));

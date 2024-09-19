@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { EditGroup } from '@arcade/regions';
+import { EditGroup } from '@agie/regions';
 import { Button, Container, ContentLayout, Form, FormField, Header, Input, SpaceBetween } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';

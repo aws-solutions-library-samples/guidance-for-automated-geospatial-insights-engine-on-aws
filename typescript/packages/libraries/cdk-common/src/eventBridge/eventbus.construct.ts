@@ -15,8 +15,8 @@ import { EventBus } from 'aws-cdk-lib/aws-events';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
-export const eventBusNameParameter = (environment: string) => `/arcade/${environment}/shared/eventBusName`;
-export const eventBusArnParameter = (environment: string) => `/arcade/${environment}/shared/eventBusArn`;
+export const eventBusNameParameter = (environment: string) => `/agie/${environment}/shared/eventBusName`;
+export const eventBusArnParameter = (environment: string) => `/agie/${environment}/shared/eventBusArn`;
 
 export interface BusConstructProperties {
 	environment: string;
@@ -40,13 +40,13 @@ export class Bus extends Construct {
 
 		new StringParameter(this, `EventBusNameParameter`, {
 			parameterName: eventBusNameParameter(props.environment),
-			description: `ARCADE event bus name (${props.environment})`,
+			description: `AGIE event bus name (${props.environment})`,
 			stringValue: this.eventBusName,
 		});
 
 		new StringParameter(this, `EventBusArnParameter`, {
 			parameterName: eventBusArnParameter(props.environment),
-			description: `ARCADE event bus arn (${props.environment})`,
+			description: `AGIE event bus arn (${props.environment})`,
 			stringValue: this.eventBusArn,
 		});
 	}

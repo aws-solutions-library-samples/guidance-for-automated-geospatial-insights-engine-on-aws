@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { getLambdaArchitecture } from '@arcade/cdk-common';
+import { getLambdaArchitecture } from '@agie/cdk-common';
 import { Duration, Stack } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
@@ -40,7 +40,7 @@ export class VerifiedPermissionsIdentitySourceCreator extends Construct {
 	constructor(scope: Construct, id: string, props: VerifiedPermissionsIdentitySourceCreatorConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 		const accountId = Stack.of(this).account;
 		const region = Stack.of(this).region;
 
@@ -83,7 +83,7 @@ export class VerifiedPermissionsIdentitySourceCreator extends Construct {
 		this.verifiedPermissionsCustomResourceLambda.addToRolePolicy(
 			new PolicyStatement({
 				actions: ['ssm:GetParameter', 'ssm:PutParameter', 'ssm:DeleteParameter'],
-				resources: [`arn:aws:ssm:${region}:${accountId}:parameter/arcade/${props.environment}/*`],
+				resources: [`arn:aws:ssm:${region}:${accountId}:parameter/agie/${props.environment}/*`],
 			})
 		);
 
@@ -121,7 +121,7 @@ export class VerifiedPermissionsIdentitySourceCreator extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: [`Resource::arn:aws:ssm:${region}:${accountId}:parameter/arcade/${props.environment}/*`],
+					appliesTo: [`Resource::arn:aws:ssm:${region}:${accountId}:parameter/agie/${props.environment}/*`],
 					reason: 'The resource condition allows performing GetSSMParameter calls locked down to environment specific parameters.',
 				},
 				{

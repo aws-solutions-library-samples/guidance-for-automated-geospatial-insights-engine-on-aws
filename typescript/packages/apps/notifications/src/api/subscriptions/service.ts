@@ -28,8 +28,8 @@ import {
 import ow from 'ow';
 import { SnsUtil } from "../../common/snsUtil.js";
 import { ConflictError } from "../../common/errors.js";
-import { EventPublisher } from "@arcade/events";
-import { RegionsClient } from "@arcade/clients";
+import { EventPublisher } from "@agie/events";
+import { RegionsClient } from "@agie/clients";
 
 export class SubscriptionsService {
 

@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { createDelimitedAttribute, DocumentDbClientItem, expandDelimitedAttribute } from '@arcade/dynamodb-utils';
+import { createDelimitedAttribute, DocumentDbClientItem, expandDelimitedAttribute } from '@agie/dynamodb-utils';
 import {
 	DynamoDBDocumentClient,
 	GetCommand,

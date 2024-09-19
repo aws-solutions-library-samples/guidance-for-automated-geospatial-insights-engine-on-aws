@@ -14,7 +14,7 @@
 import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { bucketNameParameter, eventBusNameParameter } from "@arcade/cdk-common";
+import { bucketNameParameter, eventBusNameParameter } from "@agie/cdk-common";
 import { NotificationsModule } from "./notifications.construct.js";
 import { userPoolClientIdParameter, userPoolIdParameter } from "../shared/cognito.construct.js";
 import { NagSuppressions } from "cdk-nag";

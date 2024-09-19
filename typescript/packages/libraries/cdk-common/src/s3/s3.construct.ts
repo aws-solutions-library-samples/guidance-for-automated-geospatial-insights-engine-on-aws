@@ -16,8 +16,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
-export const bucketNameParameter = (environment: string) => `/arcade/${environment}/shared/bucketName`;
-export const bucketArnParameter = (environment: string) => `/arcade/${environment}/shared/bucketArn`;
+export const bucketNameParameter = (environment: string) => `/agie/${environment}/shared/bucketName`;
+export const bucketArnParameter = (environment: string) => `/agie/${environment}/shared/bucketArn`;
 
 export interface S3ConstructProperties {
 	environment: string;
@@ -55,13 +55,13 @@ export class S3 extends Construct {
 
 		new StringParameter(this, `${props.cdkResourceNamePrefix}BucketNameParameter`, {
 			parameterName: bucketNameParameter(props.environment),
-			description: `${props.cdkResourceNamePrefix} ARCADE bucket (${props.environment})`,
+			description: `${props.cdkResourceNamePrefix} AGIE bucket (${props.environment})`,
 			stringValue: this.bucketName,
 		});
 
 		new StringParameter(this, `${props.cdkResourceNamePrefix}BucketArnParameter`, {
 			parameterName: bucketArnParameter(props.environment),
-			description: `${props.cdkResourceNamePrefix} ARCADE bucket (${props.environment})`,
+			description: `${props.cdkResourceNamePrefix} AGIE bucket (${props.environment})`,
 			stringValue: this.bucketArn,
 		});
 	}

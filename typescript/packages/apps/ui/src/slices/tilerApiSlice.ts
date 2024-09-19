@@ -13,7 +13,7 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { ArcadeFeature } from '../pages/Analysis/CloudscapeMap';
+import { AgieFeature } from '../pages/Analysis/CloudscapeMap';
 
 interface FeatureFilterOptions {
 	group_id?: string;
@@ -47,7 +47,7 @@ export const tilerApiSlice = createApi({
 		},
 	}),
 	endpoints: (builder) => ({
-		getFeatures: builder.query<ArcadeFeature[], ListFeaturesOptions>({
+		getFeatures: builder.query<AgieFeature[], ListFeaturesOptions>({
 			query: ({ group_id, region_id, polygon_id, timestamp, bbox }) => ({
 				url: `/features`,
 				mode: 'cors',
@@ -61,7 +61,7 @@ export const tilerApiSlice = createApi({
 				},
 			}),
 		}),
-		getFeature: builder.query<ArcadeFeature, GetFeatureOptions>({
+		getFeature: builder.query<AgieFeature, GetFeatureOptions>({
 			query: ({ collection_id, item_id }) => ({
 				url: `/feature`,
 				mode: 'cors',

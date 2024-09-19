@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { getLambdaArchitecture } from '@arcade/cdk-common';
+import { getLambdaArchitecture } from '@agie/cdk-common';
 import { IdentityPool, UserPoolAuthenticationProvider } from '@aws-cdk/aws-cognito-identitypool-alpha';
 import * as cdk from 'aws-cdk-lib';
 import { Duration, Stack } from 'aws-cdk-lib';
@@ -44,13 +44,13 @@ export interface UIConstructProperties {
 	stacApiResourceArn: string;
 }
 
-export const uiApiUrlParameter = (environment: string) => `/arcade/${environment}/ui/apiUrl`;
-export const uiApiIdParameter = (environment: string) => `/arcade/${environment}/ui/apiId`;
-export const uiCognitoClientIdParameter = (environment: string) => `/arcade/${environment}/ui/cognitoClientId`;
-export const uiIdentityPoolIdParameter = (environment: string) => `/arcade/${environment}/ui/identityPoolId`;
+export const uiApiUrlParameter = (environment: string) => `/agie/${environment}/ui/apiUrl`;
+export const uiApiIdParameter = (environment: string) => `/agie/${environment}/ui/apiId`;
+export const uiCognitoClientIdParameter = (environment: string) => `/agie/${environment}/ui/cognitoClientId`;
+export const uiIdentityPoolIdParameter = (environment: string) => `/agie/${environment}/ui/identityPoolId`;
 
-export const uiBaseNavigationMapName = (environment: string) => `arcade.${environment}.baseNavigationMap`;
-export const uiBaseSatelliteMapName = (environment: string) => `arcade.${environment}.baseSatelliteMap`;
+export const uiBaseNavigationMapName = (environment: string) => `agie.${environment}.baseNavigationMap`;
+export const uiBaseSatelliteMapName = (environment: string) => `agie.${environment}.baseSatelliteMap`;
 
 export class UIModule extends Construct {
 	readonly userPoolClient: IUserPoolClient;
@@ -58,7 +58,7 @@ export class UIModule extends Construct {
 	constructor(scope: Construct, id: string, props: UIConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 		const account = Stack.of(this).account;
 		const region = cdk.Stack.of(this).region;
 		/**
@@ -66,7 +66,7 @@ export class UIModule extends Construct {
 		 */
 		const apiLambda = new Function(this, 'TilerApiLambda', {
 			functionName: `${namePrefix}-tiler-api`,
-			description: `ARCADE: UI Tiler: ${props.environment}`,
+			description: `AGIE: UI Tiler: ${props.environment}`,
 			runtime: Runtime.FROM_IMAGE,
 			tracing: Tracing.ACTIVE,
 			code: Code.fromAssetImage(path.join(__dirname, '../../../python/apps/tiler/lambda'), {

@@ -23,7 +23,7 @@ import {
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT
-} from "@arcade/events";
+} from "@agie/events";
 
 const app: FastifyInstance = await buildLightApp();
 const di: AwilixContainer = app.diContainer;

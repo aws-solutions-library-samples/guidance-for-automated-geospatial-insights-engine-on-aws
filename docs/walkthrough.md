@@ -1,12 +1,12 @@
 # Walkthrough
 
-This guide assumes you have a fresh [installation](./deployment.md) of the AWS `ARCADE`(Agricultural Root Cause Analysis and Decision Engine) framework, and will walk through the steps from the initial setup right through to viewing the analysis result of the processing engine.
+This guide assumes you have a fresh [installation](./deployment.md) of the AWS `AGIE`(Automated Geospatial Insight Engine) framework, and will walk through the steps from the initial setup right through to viewing the analysis result of the processing engine.
 
 ## Introduction
 
 In recent years, the availability of high-resolution satellite imagery has revolutionized the way we monitor and analyze agricultural landscapes. By combining remote sensing techniques with advanced software tools, it is now possible to track Normalized Difference Vegetation Index (`NDVI`) values across vast areas, enabling accurate and timely assessments of soil conditions and vegetation health.
 
-This walkthrough aims to guide you through the process of using `ARCADE` to ingest satellite imagery and use it to calculate and visualize `NDVI` values for agricultural fields or regions of interest.
+This walkthrough aims to guide you through the process of using `AGIE` to ingest satellite imagery and use it to calculate and visualize `NDVI` values for agricultural fields or regions of interest.
 
 By following the step-by-step instructions, you will learn how to access and interpret satellite data, apply NDVI calculations, and generate insightful maps and reports that can inform decision-making processes in agriculture, land management, and environmental monitoring
 
@@ -17,11 +17,11 @@ By following the step-by-step instructions, you will learn how to access and int
 5. Schedule Analysis Job
 6. View Analysis Result
 
-Note that ARCADE is a framework intended to be the foundation upon which you build your application on top. The framework includes an optional UI stack that demonstrates some of the backend modules capabilities that users can extend to fit their own requirements.
+Note that AGIE is a framework intended to be the foundation upon which you build your application on top. The framework includes an optional UI stack that demonstrates some of the backend modules capabilities that users can extend to fit their own requirements.
 
-## Mapping ARCADE to AgTech Domain
+## Mapping AGIE to AgTech Domain
 
-ARCADE takes an agnostic approach to defining geospatial hierarchies to enable it to be applicable cross domains. As this walkthrough focuses on the AgTech domain, the following is how ARCADE maps specifically to AgTech.
+AGIE takes an agnostic approach to defining geospatial hierarchies to enable it to be applicable cross domains. As this walkthrough focuses on the AgTech domain, the following is how AGIE maps specifically to AgTech.
 
 The `Regions` module manages AOIs (areas of interest) as a hierarchy of `Groups`, `Regions`, `Polygons`, and `States`.
 
@@ -131,19 +131,25 @@ A `Crop Season` provides details of the planted crop. Over time there can be mul
 
 ## Obtaining an authentication token
 
-To use the `ARCADE` modules REST API an authorization token, more specifically the `IdToken` token from Cognito, is required. To retrieve the id token, run the following command using the ARCADE `CLI module`, replace `<PASSWORD>` with your actual password:
+To use the `AGIE` modules REST API an authorization token, more specifically the `IdToken` token from Cognito, is required. To retrieve the id token, run the following command using the AGIE `CLI module`, replace `<PASSWORD>` with your actual password:
 
 ```shell
-> cd <ARCADE REPOSITORY>/typescript/packages/apps/cli
-> bin/run.js auth -e $ARCADE_ENVIRONMENT -u $ARCADE_ADMINISTRATOR_EMAIL -p <PASSWORD>
+> cd $AGIE_FOLDER/typescript/packages/apps/cli
+> bin/run.js auth -e $ENVIRONMENT -u $AGIE_ADMINISTRATOR_EMAIL -p <PASSWORD>
 ```
 
-Save the output token to be used to authenticate with the ARCADE REST API.
+Save the output token to be used to authenticate with the AGIE REST API.
 
 ## Regions Module
 
 > More details on the Regions Module can be found [here](../typescript/packages/apps/regions/README.md)
 
+
+Retrieve the `REGIONS_MODULE_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-regions" --query 'Stacks[0].Outputs' --output json
+```
 
 ### 1. Create the top level Group
 
@@ -420,11 +426,17 @@ Authorization: Bearer <AUTH_TOKEN>
 
 > More details on the Notification Module can be found [here](../typescript/packages/apps/notifications/README.md)
 
+Retrieve the `NOTIFICATIONS_MODULE_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-notifications" --query 'Stacks[0].Outputs' --output json
+```
+
 ### 1. Create a Subscription for a Region
 
-Create a `Subcription` for all `Notificaions` for a specific `Region` . Replace `<REGION_ID>` with the `id` of the created `Region`. `Notifications`API uses the user's email as the notification target for the subscription.
+Create a `Subcription` for all `Notifications` for a specific `Region` . Replace `<REGION_ID>` with the `id` of the created `Region`. `Notifications`API uses the user's email as the notification target for the subscription.
 
-In a test environment, to allow SNS to send notification to `ARCADE` users, you have to [add and verify the user's mobile number](https://docs.aws.amazon.com/sns/latest/dg/sns-sms-sandbox-verifying-phone-numbers.html) in the SMS sandbox.
+In a test environment, to allow SNS to send notification to `AGIE` users, you have to [add and verify the user's mobile number](https://docs.aws.amazon.com/sns/latest/dg/sns-sms-sandbox-verifying-phone-numbers.html) in the SMS sandbox.
 
 **Request:**
 
@@ -470,14 +482,15 @@ When analyzing a specific Region, you have three options for executing the engin
 2. **Rate Scheduled Mode**: Set up a recurring schedule to run the analysis at regular intervals, regardless of new imagery availability. This mode allows you to define a fixed rate (or one-time schedule) for executing the engine.
 3. **One Time Scheduled Mode**: Set up a one time schedule to run the analysis.
 
+
 ### 1. Configure a `one-time` schedule for the `Region` engine processing
 
-You configure a one-time schedule using an `at expression`. An `at expression` consists of the date and time at which you want ARCADE Scheduler to invoke your schedule, as shown in the following.
+You configure a one-time schedule using an `at expression`. An `at expression` consists of the date and time at which you want AGIE Scheduler to invoke your schedule, as shown in the following.
 
 In this walkthrough, we will create a one-time schedule to start analysis so we can view the results.
 
 ```http
-PATCH <SCHEDULER_MODULE_URL>/regions/<REGION_ID>
+PATCH <REGIONS_MODULE_URL>/regions/<REGION_ID>
 Content-Type: application/json
 Accept-Version: 1.0.0
 Accept: application/json
@@ -495,7 +508,7 @@ Authorization: Bearer <AUTH_TOKEN>
 ### 2. Configure an `onNewScene` schedule for the `Region` engine processing
 
 ```http
-PATCH <SCHEDULER_MODULE_URL>/regions/<REGION_ID
+PATCH <REGIONS_MODULE_URL>/regions/<REGION_ID
 Content-Type: application/json
 Accept-Version: 1.0.0
 Accept: application/json
@@ -516,7 +529,7 @@ Authorization: Bearer <AUTH_TOKEN>
 | unit  | The unit of time you want your schedule to invoke it's target.<br/>Valid inputs: `minutes, hours or days`. |
 
 ```http
-PATCH <SCHEDULER_MODULE_URL>/regions/<REGION_ID>
+PATCH <REGIONS_MODULE_URL>/regions/<REGION_ID>
 Content-Type: application/json
 Accept-Version: 1.0.0
 Accept: application/json
@@ -532,6 +545,13 @@ Authorization: Bearer <AUTH_TOKEN>
 ```
 
 ## Results Module
+
+
+Retrieve the `RESULTS_MODULE_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-results" --query 'Stacks[0].Outputs' --output json
+```
 
 ### 1. List all the analysis `Results` of a Region
 
@@ -571,19 +591,25 @@ x-id: 01j16hd6y1fm1rbkwdckck6z54
 
 Wait until the execution result returns `succeeded`.
 
-## ARCADE STAC Server
+## AGIE STAC Server
 
 > More details on the STAC server can be found [here](../typescript/packages/apps/results/README.md#stac-api).
 
+Retrieve the `STAC_SERVER_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-stacServer" --query 'Stacks[0].Outputs' --output json
+```
+
 ### Authentication
 
-The ARCADE `STAC API` Gateway is protected with IAM Authentication. You will need an [IAM principals](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html) that has permission to invoke the API Gateway.
+The AGIE `STAC API` Gateway is protected with IAM Authentication. You will need an [IAM principals](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html) that has permission to invoke the API Gateway.
 
 Follow this [instruction](https://learning.postman.com/docs/sending-requests/authorization/aws-signature/) to configure Postman to invoke API with AWS Signature Authentication.
 
-### 1. Search for `STAC` items generated by ARCADE
+### 1. Search for `STAC` items generated by AGIE
 
-To search for regions in the region collection, specify `arcade-region` as the collection parameters, and then specify your search criteria following the [specification](https://github.com/stac-api-extensions/collection-search).
+To search for regions in the region collection, specify `agie-region` as the collection parameters, and then specify your search criteria following the [specification](https://github.com/stac-api-extensions/collection-search).
 
 **Request:** Return all regions that intersect with the bounding box.
 
@@ -593,7 +619,7 @@ Accept-Version: 1.0.0
 Accept: application/json
 {
     "collections": [
-        "arcade-region"
+        "agie-region"
     ],
     "query": {
         "bbox": [
@@ -606,7 +632,7 @@ Accept: application/json
 }
 ```
 
-To search for polygon generated by analysis job, specify `arcade-polygon` as the collection parameters
+To search for polygon generated by analysis job, specify `agie-polygon` as the collection parameters
 
 **Request:** Return all polygons associated with a specific region.
 
@@ -616,10 +642,10 @@ Accept-Version: 1.0.0
 Accept: application/json
 {
     "collections": [
-        "arcade-polygon"
+        "agie-polygon"
     ],
     "query": {
-        "arcade:regionId": {
+        "agie:regionId": {
             "eq": "01j1c3naehgkvxk6fkkcsrcznq"
         }
     }
@@ -635,9 +661,9 @@ Accept: application/json
 Run the following command to open the demo UI:
 
 ```shell
-export ARCADE_WEB_URL=$(aws ssm get-parameter --name "/arcade/$ARCADE_ENVIRONMENT/ui/websiteUrl" --query "Parameter.Value" --output text)
+export AGIE_WEB_URL=$(aws ssm get-parameter --name "/agie/$ENVIRONMENT/ui/websiteUrl" --query "Parameter.Value" --output text)
 
-open "https://$ARCADE_WEB_URL"
+open "https://$AGIE_WEB_URL"
 ```
 
 Use the administrator's email and you set on the deployment step to log in to the demo UI.

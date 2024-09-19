@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/rest-api-authorizer",
+	"name": "@agie/rest-api-authorizer",
 	"version": "0.0.1",
 	"description": "REST API Authorizer.",
 	"exports": {
@@ -15,7 +15,7 @@
 		"test": "npm run build && vitest run"
 	},
 	"dependencies": {
-		"@arcade/resource-api-base": "workspace:*",
+		"@agie/resource-api-base": "workspace:*",
 		"@aws-sdk/client-verifiedpermissions": "~3",
 		"@aws-sdk/client-secrets-manager": "~3",
 		"@fastify/awilix": "~5",

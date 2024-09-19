@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { EventPublisher } from '@arcade/events';
+import { EventPublisher } from '@agie/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { NotFoundError } from '../../common/errors.js';

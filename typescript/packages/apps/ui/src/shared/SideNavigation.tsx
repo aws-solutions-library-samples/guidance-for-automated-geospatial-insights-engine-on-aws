@@ -22,7 +22,7 @@ export default () => {
 	return (
 		<SideNavigation
 			activeHref={`/${activeHref}`}
-			header={{ href: '/', text: 'ARCADE' }}
+			header={{ href: '/', text: 'AGIE' }}
 			onFollow={(event) => {
 				if (!event.detail.external) {
 					event.preventDefault();

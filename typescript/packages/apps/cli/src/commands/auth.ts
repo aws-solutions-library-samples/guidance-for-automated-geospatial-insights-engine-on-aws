@@ -24,8 +24,8 @@ export interface AuthorizerUserProps {
 	newPassword?: string;
 }
 
-export const userPoolIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolId`;
-export const userPoolClientIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolClientId`;
+export const userPoolIdParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolId`;
+export const userPoolClientIdParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolClientId`;
 
 export class Auth extends DeploymentCommand<typeof Auth> {
 	public static description = 'Walks the user through the authentication process to generate a JWT token for making API calls.';

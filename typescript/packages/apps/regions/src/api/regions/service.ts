@@ -11,10 +11,10 @@
  *  and limitations under the License.
  */
 
-import { EventPublisher } from '@arcade/events';
+import { EventPublisher } from '@agie/events';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
-import { CommonCache } from '../../common/cache.js';
+import { ICommonCache } from '../../common/cache.js';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { InvalidStateError, NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
@@ -39,8 +39,9 @@ export class RegionService {
 		readonly commonService: CommonService,
 		readonly commonRepository: CommonRepository,
 		readonly eventPublisher: EventPublisher,
-		readonly regionCache: CommonCache<Region>
-	) {}
+		readonly regionCache: ICommonCache<Region>
+	) {
+	}
 
 	public async create(securityContext: SecurityContext, groupId: string, region: CreateRegion): Promise<Region> {
 		this.log.debug(`RegionService> create> groupId:${groupId}, region:${JSON.stringify(region)}`);
@@ -53,7 +54,7 @@ export class RegionService {
 				name: ow.string.nonEmpty,
 				processingConfig: ow.object.nonEmpty,
 				attributes: ow.optional.object,
-				tags: ow.optional.object,
+				tags: ow.optional.object
 			})
 		);
 
@@ -78,7 +79,7 @@ export class RegionService {
 			eventType: 'created',
 			id: saved.id,
 			resourceType: 'Region',
-			new: saved,
+			new: saved
 		});
 
 		// return
@@ -93,7 +94,7 @@ export class RegionService {
 			ow.object.exactShape({
 				totalAreaDelta: ow.number.not.infinite,
 				totalPolygonsDelta: ow.number.not.infinite,
-				boundingBox: ow.object.nonEmpty,
+				boundingBox: ow.object.nonEmpty
 			})
 		);
 		// retrieve existing
@@ -107,7 +108,7 @@ export class RegionService {
 				id: updated.id,
 				resourceType: 'Region',
 				old: existing,
-				new: updated,
+				new: updated
 			});
 		}
 		this.log.debug(`RegionService> updateAggregatedPolygonsAttributes> exit>`);
@@ -123,7 +124,7 @@ export class RegionService {
 				name: ow.optional.string,
 				processingConfig: ow.optional.object,
 				attributes: ow.optional.object,
-				tags: ow.optional.object,
+				tags: ow.optional.object
 			})
 		);
 
@@ -149,7 +150,7 @@ export class RegionService {
 			id: merged.id,
 			resourceType: 'Region',
 			old: existing,
-			new: saved,
+			new: saved
 		});
 
 		this.log.debug(`RegionService> update> exit:${JSON.stringify(saved)}`);
@@ -178,30 +179,6 @@ export class RegionService {
 		return region;
 	}
 
-	private validateProcessingConfig(config: ProcessingConfig) {
-		switch (config.mode) {
-			case 'scheduled':
-				ow.object.exactShape({
-					mode: ow.string.nonEmpty,
-					scheduleExpression: ow.string.nonEmpty,
-					scheduleExpressionTimezone: ow.optional.string,
-					priority: ow.string.nonEmpty,
-				});
-				break;
-			case 'onNewScene':
-				ow.object.exactShape({
-					mode: ow.string.nonEmpty,
-					priority: ow.string.nonEmpty,
-				});
-				break;
-			case 'disabled':
-				ow.object.exactShape({
-					mode: ow.string.nonEmpty,
-				});
-				break;
-		}
-	}
-
 	public async delete(securityContext: SecurityContext, id: string): Promise<void> {
 		this.log.debug(`RegionService> delete> id:${id}`);
 
@@ -222,7 +199,7 @@ export class RegionService {
 			eventType: 'deleted',
 			id: existing.id,
 			resourceType: 'Region',
-			old: existing,
+			old: existing
 		});
 
 		this.log.debug(`RegionService> delete> exit:`);
@@ -252,5 +229,29 @@ export class RegionService {
 
 		this.log.debug(`RegionService> list> exit:${JSON.stringify([regions, paginationKey])}`);
 		return [regions, paginationKey];
+	}
+
+	private validateProcessingConfig(config: ProcessingConfig) {
+		switch (config.mode) {
+			case 'scheduled':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty,
+					scheduleExpression: ow.string.nonEmpty,
+					scheduleExpressionTimezone: ow.optional.string,
+					priority: ow.string.nonEmpty
+				});
+				break;
+			case 'onNewScene':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty,
+					priority: ow.string.nonEmpty
+				});
+				break;
+			case 'disabled':
+				ow.object.exactShape({
+					mode: ow.string.nonEmpty
+				});
+				break;
+		}
 	}
 }

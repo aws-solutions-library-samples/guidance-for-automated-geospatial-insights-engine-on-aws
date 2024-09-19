@@ -24,12 +24,12 @@ import { SNSClient } from '@aws-sdk/client-sns';
 import { SnsUtil } from "../common/snsUtil.js";
 import { NotificationsService } from "../api/notifications/service.js";
 import { LambdaClient } from '@aws-sdk/client-lambda';
-import { ApiAuthorizer } from "@arcade/rest-api-authorizer";
+import { ApiAuthorizer } from "@agie/rest-api-authorizer";
 import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
-import { EventPublisher, NOTIFICATIONS_EVENT_SOURCE } from "@arcade/events";
+import { EventPublisher, NOTIFICATIONS_EVENT_SOURCE } from "@agie/events";
 import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
-import { RegionsClient } from "@arcade/clients";
-import { Invoker } from "@arcade/lambda-invoker";
+import { RegionsClient } from "@agie/clients";
+import { Invoker } from "@agie/lambda-invoker";
 
 const { captureAWSv3Client } = pkg;
 

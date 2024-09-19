@@ -99,8 +99,8 @@ def start_task(
 
 		publish_event({
 			'EventBusName': event_bus_name,
-			'Source': 'com.aws.arcade.executor',
-			'DetailType': 'com.aws.arcade.executor>PolygonMetadata>created',
+			'Source': 'com.aws.agie.executor',
+			'DetailType': 'com.aws.agie.executor>PolygonMetadata>created',
 			'Detail': json.dumps({
 				"groupId": request.group_id,
 				"groupName": request.group_name,

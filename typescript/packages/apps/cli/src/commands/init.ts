@@ -19,9 +19,9 @@ import { NpmPackage } from "../packages/npm.package.js";
 
 
 export default class Init extends Command {
-	public static description = "Install ARCADE dependencies";
+	public static description = "Install AGIE dependencies";
 	public static examples = [
-		"$ arcade init",
+		"$ agie init",
 	];
 
 	public async run(): Promise<void> {

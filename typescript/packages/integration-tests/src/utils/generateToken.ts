@@ -21,8 +21,8 @@ if (process.argv.length < 3) {
 	throw new Error('Missing arguments\r\nHow to run the command: \r\n> npm run generate:token -- <environment> <username> <password> ');
 }
 (async () => {
-	process.env.COGNITO_CLIENT_ID = await getParameter(`/arcade/${environment}/shared/cognitoUserPoolClientId`);
-	process.env.COGNITO_USER_POOL_ID = await getParameter(`/arcade/${environment}/shared/cognitoUserPoolId`);
+	process.env.COGNITO_CLIENT_ID = await getParameter(`/agie/${environment}/shared/cognitoUserPoolClientId`);
+	process.env.COGNITO_USER_POOL_ID = await getParameter(`/agie/${environment}/shared/cognitoUserPoolId`);
 	console.log('authorizeUser');
 	const token = await authorizeUser(username, password, newPassword);
 	console.log(token);

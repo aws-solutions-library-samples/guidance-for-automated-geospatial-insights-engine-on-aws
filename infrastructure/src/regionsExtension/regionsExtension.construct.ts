@@ -18,9 +18,9 @@ import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import path from "path";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Duration } from "aws-cdk-lib";
-import { getLambdaArchitecture } from "@arcade/cdk-common";
+import { getLambdaArchitecture } from "@agie/cdk-common";
 import { fileURLToPath } from "url";
-import { RESULTS_EVENT_SOURCE, RESULTS_RESULT_CREATED_EVENT, RESULTS_RESULT_UPDATED_EVENT } from "@arcade/events";
+import { RESULTS_EVENT_SOURCE, RESULTS_RESULT_CREATED_EVENT, RESULTS_RESULT_UPDATED_EVENT } from "@agie/events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { AnyPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
@@ -39,7 +39,7 @@ export class RegionsExtensionModule extends Construct {
 	constructor(scope: Construct, id: string, props: RegionsExtensionConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName)
 

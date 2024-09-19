@@ -14,7 +14,7 @@
 import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { bucketNameParameter, eventBusNameParameter } from "@arcade/cdk-common";
+import { bucketNameParameter, eventBusNameParameter } from "@agie/cdk-common";
 import { SchedulerModule } from "./scheduler.construct.js";
 import { NagSuppressions } from "cdk-nag";
 import {

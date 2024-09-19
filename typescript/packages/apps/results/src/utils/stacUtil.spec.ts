@@ -16,7 +16,7 @@ import { StacUtil } from "./stacUtil.js";
 import pino from "pino";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Client } from "@aws-sdk/client-s3";
-import { RegionResource } from "@arcade/events";
+import { RegionResource } from "@agie/events";
 
 describe('StacUtil', () => {
 
@@ -33,7 +33,7 @@ describe('StacUtil', () => {
 		},
 		"createdAt": "2024-05-20T06:43:27.006Z",
 		updatedAt: "2024-05-20T06:43:27.006Z",
-		"createdBy": "arcadeTest@amazon.com",
+		"createdBy": "agieTest@amazon.com",
 		boundingBox: [
 			-72.4483377,
 			42.9027258,
@@ -61,7 +61,7 @@ describe('StacUtil', () => {
 		expect(result).toEqual(
 			{
 				"id": "01hxr5q6wkt4xbhk7thrvq269d",
-				"collection": "arcade-region",
+				"collection": "agie-region",
 				"type": "Feature",
 				"stac_version": "1.0.0",
 				"stac_extensions": [],
@@ -99,9 +99,9 @@ describe('StacUtil', () => {
 					42.9037868
 				],
 				"properties": {
-					"arcade:groupId": "01hxr5q5x80vvn71depzg9083k",
-					"arcade:isActive": true,
-					"arcade:processedOnNewScene": false,
+					"agie:groupId": "01hxr5q5x80vvn71depzg9083k",
+					"agie:isActive": true,
+					"agie:processedOnNewScene": false,
 					"createdAt": "2024-05-20T06:43:27.006Z",
 					"datetime": "2024-05-20T06:43:27.006Z",
 					"updatedAt": "2024-05-20T06:43:27.006Z",
@@ -117,7 +117,7 @@ describe('StacUtil', () => {
 		expect(result).toEqual(
 			{
 				"id": "01hxr5q6wkt4xbhk7thrvq269d",
-				"collection": "arcade-region",
+				"collection": "agie-region",
 				"type": "Feature",
 				"stac_version": "1.0.0",
 				"stac_extensions": [],
@@ -155,9 +155,9 @@ describe('StacUtil', () => {
 					42.9037868
 				],
 				"properties": {
-					"arcade:groupId": "01hxr5q5x80vvn71depzg9083k",
-					"arcade:isActive": false,
-					"arcade:processedOnNewScene": false,
+					"agie:groupId": "01hxr5q5x80vvn71depzg9083k",
+					"agie:isActive": false,
+					"agie:processedOnNewScene": false,
 					"createdAt": "2024-05-20T06:43:27.006Z",
 					"datetime": "2024-05-20T06:43:27.006Z",
 					"updatedAt": "2024-05-20T06:43:27.006Z",

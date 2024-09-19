@@ -15,8 +15,8 @@ import type { Callback, Context, EventBridgeHandler } from 'aws-lambda';
 import type { AwilixContainer } from 'awilix';
 import type { FastifyInstance } from 'fastify';
 import { buildLightApp } from './app.light.js';
-import { DomainEvent, RESULTS_EVENT_SOURCE, RESULTS_RESULT_CREATED_EVENT, RESULTS_RESULT_UPDATED_EVENT } from "@arcade/events";
-import { RegionsClient, ResultResource } from "@arcade/clients";
+import { DomainEvent, RESULTS_EVENT_SOURCE, RESULTS_RESULT_CREATED_EVENT, RESULTS_RESULT_UPDATED_EVENT } from "@agie/events";
+import { RegionsClient, ResultResource } from "@agie/clients";
 import ow from 'ow';
 
 const app: FastifyInstance = await buildLightApp();
@@ -53,11 +53,11 @@ export const handler: EventBridgeHandler<any, DomainEvent<ResultResource>, any> 
 		// update the region resource tag with execution information
 		await regionsClient.updateRegion(result.regionId, {
 			attributes: {
-				'arcade:results:id': result.id,
-				'arcade:results:status': result.status,
-				'arcade:results:message': result.message,
-				'arcade:results:createdAt': result.createdAt,
-				'arcade:results:updatedAt': result.updatedAt,
+				'agie:results:id': result.id,
+				'agie:results:status': result.status,
+				'agie:results:message': result.message,
+				'agie:results:createdAt': result.createdAt,
+				'agie:results:updatedAt': result.updatedAt,
 			}
 		}, securityContext);
 	}

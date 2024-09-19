@@ -15,7 +15,7 @@ import type { Callback, Context, EventBridgeHandler } from 'aws-lambda';
 import type { AwilixContainer } from 'awilix';
 import type { FastifyInstance } from 'fastify';
 import { buildLightApp } from './app.light.js';
-import { DomainEvent, EngineJobDetails, EXECUTOR_EVENT_SOURCE, EXECUTOR_JOB_CREATED_EVENT, EXECUTOR_JOB_UPDATED_EVENT } from "@arcade/events";
+import { DomainEvent, EngineJobDetails, EXECUTOR_EVENT_SOURCE, EXECUTOR_JOB_CREATED_EVENT, EXECUTOR_JOB_UPDATED_EVENT } from "@agie/events";
 import { NotificationsService } from "./api/notifications/service.js";
 
 const app: FastifyInstance = await buildLightApp();

@@ -16,7 +16,7 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
-import { bucketNameParameter, eventBusNameParameter } from '@arcade/cdk-common';
+import { bucketNameParameter, eventBusNameParameter } from '@agie/cdk-common';
 import { regionsApiFunctionArnParameter } from '../regions/regions.construct.js';
 import { ResultsModule } from './results.construct.js';
 import { userPoolClientIdParameter, userPoolIdParameter } from '../shared/cognito.construct.js';
@@ -29,8 +29,8 @@ export type ResultsStackProperties = StackProps & {
 	stacApiResourceArn: string;
 };
 
-export const resultsTableNameParameter = (environment: string) => `/arcade/${environment}/results/tableName`;
-export const resultsTableArnParameter = (environment: string) => `/arcade/${environment}/results/tableArn`;
+export const resultsTableNameParameter = (environment: string) => `/agie/${environment}/results/tableName`;
+export const resultsTableArnParameter = (environment: string) => `/agie/${environment}/results/tableArn`;
 
 export class ResultsStack extends Stack {
 	constructor(scope: Construct, id: string, props: ResultsStackProperties) {
@@ -81,13 +81,13 @@ export class ResultsStack extends Stack {
 
 		new ssm.StringParameter(this, 'tableNameParameter', {
 			parameterName: resultsTableNameParameter(props.environment),
-			description: 'results table Name for ARCADE',
+			description: 'results table Name for AGIE',
 			stringValue: results.tableName,
 		});
 
 		new ssm.StringParameter(this, 'tableArnParameter', {
 			parameterName: resultsTableArnParameter(props.environment),
-			description: 'shared Event Bus Arn for ARCADE',
+			description: 'shared Event Bus Arn for AGIE',
 			stringValue: results.tableArn,
 		});
 

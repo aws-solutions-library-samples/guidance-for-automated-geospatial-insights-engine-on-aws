@@ -1,11 +1,11 @@
 {
-	"name": "@arcade/cli",
+	"name": "@agie/cli",
 	"version": "0.0.1",
-	"description": "ARCADE CLI helper application.",
+	"description": "AGIE CLI helper application.",
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"type": "module",
 	"bin": {
-		"arcade": "./bin/run.js"
+		"agie": "./bin/run.js"
 	},
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -29,12 +29,12 @@
 		"version": "oclif readme && git add README.md"
 	},
 	"oclif": {
-		"bin": "arcade",
-		"dirname": "arcade",
+		"bin": "agie",
+		"dirname": "agie",
 		"helpClass": "./dist/utils/help",
 		"commands": "./dist/commands",
 		"macos": {
-			"identifier": "com.arcade.cli"
+			"identifier": "com.agie.cli"
 		},
 		"plugins": [
 			"@oclif/plugin-help",
@@ -45,8 +45,8 @@
 			"stacServer": {
 				"description": "Contains list of sub-commands to setup the Stac Server"
 			},
-			"arcade": {
-				"description": "Contains list of sub-commands to setup the Arcade"
+			"agie": {
+				"description": "Contains list of sub-commands to setup the Agie"
 			}
 		},
 		"hooks": {
