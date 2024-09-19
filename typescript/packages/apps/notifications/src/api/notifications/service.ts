@@ -12,7 +12,7 @@
  */
 
 import { FastifyBaseLogger } from "fastify";
-import { EngineJobDetails, EngineJobUpdatedDetails } from "@arcade/events";
+import { EngineJobDetails, EngineJobUpdatedDetails } from "@agie/events";
 import ow from 'ow';
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { SnsUtil } from "../../common/snsUtil.js";

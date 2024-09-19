@@ -1,5 +1,5 @@
 {
-  "name": "Arcade",
+  "name": "Agie",
   "version": "1",
   "items": [
     {
@@ -69,10 +69,10 @@
         },
         {
           "type": "http",
-          "name": "Arcade TileJSON",
+          "name": "Agie TileJSON",
           "seq": 2,
           "request": {
-            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/WebMercatorQuad/tilejson.json?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/WebMercatorQuad/tilejson.json?url={{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
             "method": "GET",
             "headers": [],
             "body": {
@@ -97,7 +97,7 @@
             "query": [
               {
                 "name": "url",
-                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "value": "{{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}",
                 "enabled": true
               },
               {
@@ -131,10 +131,10 @@
       "items": [
         {
           "type": "http",
-          "name": "Arcade Tile",
+          "name": "Agie Tile",
           "seq": 2,
           "request": {
-            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.5+Saturation+1.7+Sigmoidal+RGB+15+0.35",
             "method": "GET",
             "headers": [],
             "body": {
@@ -159,7 +159,7 @@
             "query": [
               {
                 "name": "url",
-                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "value": "{{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}",
                 "enabled": true
               },
               {
@@ -197,10 +197,10 @@
         },
         {
           "type": "http",
-          "name": "Arcade NVDI Tile",
+          "name": "Agie NVDI Tile",
           "seq": 2,
           "request": {
-            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}&assets=ndvi&colormap_name=viridis&rescale=-1,1",
+            "url": "https://0dev8hstd7.execute-api.us-west-2.amazonaws.com/prod/stac/tiles/WebMercatorQuad/15/6871/12415@1x?url={{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}&assets=ndvi&colormap_name=viridis&rescale=-1,1",
             "method": "GET",
             "headers": [],
             "body": {
@@ -225,7 +225,7 @@
             "query": [
               {
                 "name": "url",
-                "value": "{{arcade_stac_endpoint}}/collections/{{arcade_collection_id}}/items/{{arcade_item_id}}",
+                "value": "{{agie_stac_endpoint}}/collections/{{agie_collection_id}}/items/{{agie_item_id}}",
                 "enabled": true
               },
               {
@@ -292,10 +292,10 @@
         },
         {
           "type": "http",
-          "name": "Arcade Features Query",
+          "name": "Agie Features Query",
           "seq": 2,
           "request": {
-            "url": "{{arcade_stac_endpoint}}/search",
+            "url": "{{agie_stac_endpoint}}/search",
             "method": "POST",
             "headers": [
               {
@@ -336,7 +336,7 @@
     {
       "variables": [
         {
-          "name": "arcade_stac_endpoint",
+          "name": "agie_stac_endpoint",
           "value": "https://494srbp0ae.execute-api.us-west-2.amazonaws.com/dev/",
           "enabled": true,
           "secret": false,
@@ -364,7 +364,7 @@
           "type": "text"
         },
         {
-          "name": "arcade_collection_id",
+          "name": "agie_collection_id",
           "value": "region_01hwcet7zyhy0xe31mmfwh6qgk",
           "enabled": true,
           "secret": false,
@@ -378,7 +378,7 @@
           "type": "text"
         },
         {
-          "name": "arcade_item_id",
+          "name": "agie_item_id",
           "value": "01hwcf5s2s1h49jpf8s58qhrkb_20230725_000000",
           "enabled": true,
           "secret": false,

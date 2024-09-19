@@ -12,7 +12,7 @@
  *  and limitations under the License.
  */
 
-import { getOrThrow, tryGetBooleanContext } from '@arcade/cdk-common';
+import { getOrThrow, tryGetBooleanContext } from '@agie/cdk-common';
 import * as cdk from 'aws-cdk-lib';
 import { App } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
@@ -52,8 +52,10 @@ const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 
 // optional configuration for STAC OpenSearch servers
 const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'c5.large.search';
 const stacServerVolumeType = app.node.tryGetContext('stacServerVolumeType') as string ?? 'gp3';
-const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerVolumeSize') ?? 50);
-const stacServerInstanceCount = parseInt(app.node.tryGetContext('stacServerInstanceCount') ?? 2);
+const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerVolumeSize') ?? 20);
+const stacServerInstanceCount = parseInt(app.node.tryGetContext('stacServerInstanceCount') ?? 1);
+const stacServerDedicatedMasterEnabled = tryGetBooleanContext(app, 'stacServerDedicatedMasterEnabled', false);
+const stacServerZoneAwarenessEnabled = tryGetBooleanContext(app, 'stacServerZoneAwarenessEnabled', false);
 
 // optional requirement to remove bucket and objects when it got deleted
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
@@ -65,6 +67,9 @@ const sentinelCollection = app.node.tryGetContext('sentinelCollection') as strin
 
 // user VPC config
 const useExistingVpc = tryGetBooleanContext(app, 'useExistingVpc', false);
+
+// useRegionCache
+const useRegionCache = tryGetBooleanContext(app, 'useRegionCache', false);
 
 let userVpcId;
 let userIsolatedSubnetIds;
@@ -81,8 +86,8 @@ if (useExistingVpc) {
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 
-const stackName = (suffix: string) => `arcade-${environment}-${suffix}`;
-const stackDescription = (moduleName: string) => `Infrastructure for ARCADE ${moduleName} module`;
+const stackName = (suffix: string) => `agie-${environment}-${suffix}`;
+const stackDescription = (moduleName: string) => `Infrastructure for AGIE ${moduleName} module`;
 
 const deployPlatform = (callerEnvironment?: {
 	accountId?: string;
@@ -123,6 +128,7 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		policyStoreIdParameter: verifiedPermissionsPolicyStoreIdParameter(environment),
 		vpc: sharedStack.vpc,
+		useRegionCache,
 		env: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId
@@ -151,6 +157,8 @@ const deployPlatform = (callerEnvironment?: {
 		volumeType: stacServerVolumeType,
 		instanceType: stacServerInstanceType,
 		instanceCount: stacServerInstanceCount,
+		dedicatedMasterEnabled: stacServerDedicatedMasterEnabled,
+		zoneAwarenessEnabled: stacServerZoneAwarenessEnabled,
 		env: {
 			region: callerEnvironment?.region,
 			account: callerEnvironment?.accountId

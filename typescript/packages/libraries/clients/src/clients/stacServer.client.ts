@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
-import type { Catalog, Collection, StacItem } from '@arcade/events';
-import { SearchResult } from '@arcade/events';
+import type { Catalog, Collection, StacItem } from '@agie/events';
+import { SearchResult } from '@agie/events';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 import type { BaseLogger } from 'pino';
 import { ClientServiceBase } from '../common/common.js';

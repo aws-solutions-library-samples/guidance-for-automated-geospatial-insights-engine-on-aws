@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { bucketNameParameter, eventBusNameParameter } from "@arcade/cdk-common";
+import { bucketNameParameter, eventBusNameParameter } from "@agie/cdk-common";
 import * as cdk from 'aws-cdk-lib';
 import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';

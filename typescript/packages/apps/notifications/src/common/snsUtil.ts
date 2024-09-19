@@ -12,7 +12,7 @@
  */
 
 export class SnsUtil {
-	readonly TOPIC_PREFIX = 'arcade-events-';
+	readonly TOPIC_PREFIX = 'agie-events-';
 
 	constructor(readonly region: string,
 				readonly accountId: string) {

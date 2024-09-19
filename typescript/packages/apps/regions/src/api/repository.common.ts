@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { createDelimitedAttribute, createDelimitedAttributePrefix, expandDelimitedAttribute } from '@arcade/dynamodb-utils';
+import { createDelimitedAttribute, createDelimitedAttributePrefix, expandDelimitedAttribute } from '@agie/dynamodb-utils';
 import { TransactionCanceledException } from '@aws-sdk/client-dynamodb';
 import {
 	DynamoDBDocumentClient,

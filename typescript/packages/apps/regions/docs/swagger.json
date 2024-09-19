@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ARCADE Regions",
+    "title": "AGIE Regions",
     "description": "Manages hierarchical structures of groups, regions, and polygons.",
     "version": "1.0.0"
   },

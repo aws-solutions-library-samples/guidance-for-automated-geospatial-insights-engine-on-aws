@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/clients",
+	"name": "@agie/clients",
 	"version": "1.0.0",
 	"description": "Client library",
 	"author": "Pouya Bahavar <bahavar@amazon.com>",
@@ -16,8 +16,8 @@
 		"test": "npm run build && vitest run --passWithNoTests"
 	},
 	"dependencies": {
-		"@arcade/events": "workspace:*",
-		"@arcade/lambda-invoker": "workspace:*",
+		"@agie/events": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
 		"@aws-sdk/client-lambda": "~3",
 		"ow": "~1",
 		"@aws-sdk/client-sns": "~3",

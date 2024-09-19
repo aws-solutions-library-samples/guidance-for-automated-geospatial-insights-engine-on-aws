@@ -21,11 +21,11 @@ import { DynamoDBDocumentClient, TranslateConfig } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { BatchClient } from "@aws-sdk/client-batch";
 import { JobsService } from "../jobs/service.js";
-import { RegionsClient, ResultsClient } from "@arcade/clients";
-import { Invoker } from "@arcade/lambda-invoker";
+import { RegionsClient, ResultsClient } from "@agie/clients";
+import { Invoker } from "@agie/lambda-invoker";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { S3Client } from "@aws-sdk/client-s3";
-import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from "@arcade/events";
+import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from "@agie/events";
 import { JobQueueArn } from "../jobs/model.js";
 
 const { captureAWSv3Client } = pkg;

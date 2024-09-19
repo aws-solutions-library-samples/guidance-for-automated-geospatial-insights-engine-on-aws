@@ -18,7 +18,7 @@ from fastapi import APIRouter, Depends, Query, Response
 from httpx_auth_awssigv4 import SigV4Auth
 from rio_tiler.colormap import cmap
 
-from api.backend.arcade_stac_backend import ArcadeSTACBackend, fetch_feature
+from api.backend.agie_stac_backend import AgieSTACBackend, fetch_feature
 from api.errors import BadRequestError
 from api.settings import ApiSettings
 from .models import CommonFilterQueryParams, ImageType
@@ -26,7 +26,7 @@ from .models import CommonFilterQueryParams, ImageType
 api_settings = ApiSettings()
 
 router = APIRouter()
-arcade_query: Dict = {}
+agie_query: Dict = {}
 
 
 def get_auth() -> SigV4Auth:
@@ -61,10 +61,10 @@ def get_features(
 	filter_params: CommonFilterQueryParams = Depends(),
 	aws_auth: SigV4Auth = Depends(get_auth),
 ):
-	with ArcadeSTACBackend(
+	with AgieSTACBackend(
 		f"{api_settings.stac_url}search",
 		auth=aws_auth,
-		arcade_filters=filter_params,
+		agie_filters=filter_params,
 		stac_api_options={"max_items": 10},
 		minzoom=8,
 		maxzoom=16,
@@ -93,10 +93,10 @@ def get_tile(
 	tilesize: int = Query(512, description="The tile size"),
 	aws_auth: SigV4Auth = Depends(get_auth),
 ):
-	with ArcadeSTACBackend(
+	with AgieSTACBackend(
 		f"{api_settings.stac_url}search",
 		auth=aws_auth,
-		arcade_filters=filter_params,
+		agie_filters=filter_params,
 		stac_api_options={"max_items": 10},
 		minzoom=8,
 		maxzoom=16,

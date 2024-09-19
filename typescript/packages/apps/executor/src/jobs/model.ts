@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
-import { ResultResource, State } from '@arcade/clients';
-import { RegionResource } from '@arcade/events';
+import { ResultResource, State } from '@agie/clients';
+import { RegionResource } from '@agie/events';
 
 export type StartJobRequest = RegionResource & {
 	scheduleDateTime: string

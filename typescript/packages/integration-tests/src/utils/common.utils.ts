@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Tags } from '@arcade/regions';
+import { Tags } from '@agie/regions';
 import { request, spec, stash } from 'pactum';
 import Spec from 'pactum/src/models/Spec.js';
 import path from 'path';
@@ -30,7 +30,7 @@ initializeConfig(path.join(__dirname, '..', '..'));
 
 export const PAGINATION_ATTRIBUTE = 'pagination_attribute';
 
-export const BASE_URL = process.env.ARCADE_REGIONS_BASE_URL;
+export const BASE_URL = process.env.AGIE_REGIONS_BASE_URL;
 
 type BaseExpectArgs = {
 	expectStatus: number;
@@ -121,13 +121,13 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	let baseUrl: string;
 	switch (module) {
 		case 'regions':
-			baseUrl = process.env.ARCADE_REGIONS_BASE_URL
+			baseUrl = process.env.AGIE_REGIONS_BASE_URL
 			break;
 		case 'results':
-			baseUrl = process.env.ARCADE_RESULTS_BASE_URL
+			baseUrl = process.env.AGIE_RESULTS_BASE_URL
 			break;
 		case 'notifications':
-			baseUrl = process.env.ARCADE_NOTIFICATIONS_BASE_URL
+			baseUrl = process.env.AGIE_NOTIFICATIONS_BASE_URL
 			break;
 		case 'stac':
 			baseUrl = process.env.STAC_API_URL

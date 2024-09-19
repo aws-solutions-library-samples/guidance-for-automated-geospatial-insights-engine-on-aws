@@ -11,14 +11,14 @@
  *  and limitations under the License.
  */
 
-import { ArcadeCommand } from '../types/arcadeCommand.js';
+import { AgieCommand } from '../types/agieCommand.js';
 import shell from 'shelljs';
 
 const { SILENT_COMMAND_EXECUTION: isSilentStr } = process.env;
 const isSilent = isSilentStr ? isSilentStr === 'true' : false;
 
-export default class ArcadeBuild extends ArcadeCommand<typeof ArcadeBuild> {
-	public static description = 'Performs build operations for ARCADE';
+export default class AgieBuild extends AgieCommand<typeof AgieBuild> {
+	public static description = 'Performs build operations for AGIE';
 	public static examples = ['<%= config.bin %> <%= command.id %>'];
 
 	public async runChild(): Promise<void> {

@@ -127,13 +127,13 @@ class STACCatalogProcessor:
 
 	@staticmethod
 	def get_previous_tif(region_id: str, result_id: str, polygon_id: str) -> Optional[Item]:
-		arcade_stac_endpoint = os.getenv("STAC_API_ENDPOINT")
+		agie_stac_endpoint = os.getenv("STAC_API_ENDPOINT")
 		aws_region = os.getenv("AWS_REGION")
 
-		aws_auth = STACCatalogProcessor.get_api_auth(arcade_stac_endpoint, aws_region)
+		aws_auth = STACCatalogProcessor.get_api_auth(agie_stac_endpoint, aws_region)
 
 		# Retrieve the previous result stac item
-		url = "{}/collections/arcade-region/items/{}_{}".format(arcade_stac_endpoint, region_id, result_id, polygon_id)
+		url = "{}/collections/agie-region/items/{}_{}".format(agie_stac_endpoint, region_id, result_id, polygon_id)
 
 		# Set any required headers
 		headers = {

@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { DomainEvent } from "@arcade/events";
+import { DomainEvent } from "@agie/events";
 import { Polygon } from "../api/polygons/schemas.js";
 import { FastifyBaseLogger } from "fastify";
 import { BBox, bbox, bboxPolygon, multiPolygon, union } from "@turf/turf";

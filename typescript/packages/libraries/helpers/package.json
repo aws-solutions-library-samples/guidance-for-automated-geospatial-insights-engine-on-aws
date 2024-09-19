@@ -1,7 +1,7 @@
 {
-	"name": "@arcade/helpers",
+	"name": "@agie/helpers",
 	"version": "0.0.1",
-	"description": "ARCADE helpers.",
+	"description": "AGIE helpers.",
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"type": "module",
 	"exports": {
@@ -19,7 +19,7 @@
 		"build:bundled": "npx tsx esbuild.ts"
 	},
 	"dependencies": {
-		"@arcade/infrastructure": "workspace:*",
+		"@agie/infrastructure": "workspace:*",
 		"@aws-amplify/auth": "~6",
 		"@aws-sdk/client-ssm": "~3",
 		"aws-amplify": "~6",
@@ -29,7 +29,7 @@
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
 		"@types/node": "~20",
-		"@arcade/infrastructure": "workspace:*",
+		"@agie/infrastructure": "workspace:*",
 		"@typescript-eslint/eslint-plugin": "~7",
 		"@typescript-eslint/parser": "~7",
 		"aws-cdk": "~2",

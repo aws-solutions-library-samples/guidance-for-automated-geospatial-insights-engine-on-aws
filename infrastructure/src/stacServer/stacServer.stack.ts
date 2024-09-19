@@ -22,6 +22,8 @@ export type StacServerProperties = StackProps & {
 	readonly volumeSize: number;
 	readonly instanceCount: number;
 	readonly volumeType: string;
+	readonly dedicatedMasterEnabled: boolean;
+	readonly zoneAwarenessEnabled: boolean;
 };
 
 export class StacServerStack extends Stack {
@@ -38,7 +40,9 @@ export class StacServerStack extends Stack {
 			volumeSize: props.volumeSize,
 			instanceType: props.instanceType,
 			instanceCount: props.instanceCount,
-			volumeType: props.volumeType
+			volumeType: props.volumeType,
+			dedicatedMasterEnabled: props.dedicatedMasterEnabled,
+			zoneAwarenessEnabled: props.zoneAwarenessEnabled
 		});
 
 		this.stacServerEndpoint = stacServerModule.stacServerEndpoint;

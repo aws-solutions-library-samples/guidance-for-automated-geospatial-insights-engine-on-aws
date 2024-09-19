@@ -24,7 +24,7 @@ import {
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc.js';
 import pWaitFor from 'p-wait-for';
-import { ResultResource } from "@arcade/clients";
+import { ResultResource } from "@agie/clients";
 import { ID_PATTERN, ISO8601_DATE_TIME_MS_PATTERN, UUID_PATTERN } from "../utils/regex.js";
 import { createResourcesMethodForModules } from "../utils/common.utils.js";
 import { fromProcess } from "@aws-sdk/credential-providers";
@@ -66,7 +66,7 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		regionId = await createRegionWithoutSchedule(groupId, userToken);
 		polygonId = await createPolygon(regionId, userToken);
 		// verify that region stac collection is created
-		await waitForStacCollection(credentials, `arcade-region`, regionId)
+		await waitForStacCollection(credentials, `agie-region`, regionId)
 		stateId = await createState(polygonId, userToken);
 	});
 
@@ -77,7 +77,7 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 		const resultListResource = await waitForSuccessfulEngineExecution(regionId, userToken);
 
 		// wait until the stac collection is published
-		await waitForStacCollection(credentials, `arcade-polygon`, `${resultListResource[0].id}_${polygonId}`)
+		await waitForStacCollection(credentials, `agie-polygon`, `${resultListResource[0].id}_${polygonId}`)
 
 		// ensure that results status is propagated to the region resource
 		await regions.waitForGetResource('regions', {
@@ -85,10 +85,10 @@ describe(TEST_PREFIX + 'scheduler and engine modules integration', () => {
 			id: regionId,
 			expectJsonLike: {
 				attributes: {
-					'arcade:results:id': resultListResource[0].id,
-					'arcade:results:status': 'succeeded',
-					"arcade:results:message": "Essential container in task exited",
-					"arcade:results:updatedAt": ISO8601_DATE_TIME_MS_PATTERN,
+					'agie:results:id': resultListResource[0].id,
+					'agie:results:status': 'succeeded',
+					"agie:results:message": "Essential container in task exited",
+					"agie:results:updatedAt": ISO8601_DATE_TIME_MS_PATTERN,
 				}
 			},
 			expectStatus: 200,

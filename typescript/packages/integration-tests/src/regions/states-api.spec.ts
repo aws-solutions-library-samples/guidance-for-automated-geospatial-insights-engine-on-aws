@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { State } from '@arcade/regions';
+import { State } from '@agie/regions';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 import { create_group_body } from './groups.data.js';

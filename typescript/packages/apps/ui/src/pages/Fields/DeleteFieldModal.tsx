@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Polygon } from '@arcade/regions';
+import { Polygon } from '@agie/regions';
 import { Alert, Box, Button, Modal, SpaceBetween } from '@cloudscape-design/components';
 import { useDeletePolygonMutation } from '../../slices/regionsApiSlice';
 

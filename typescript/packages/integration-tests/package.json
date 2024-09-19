@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/integration-tests",
+	"name": "@agie/integration-tests",
 	"version": "0.0.1",
 	"description": "Framework wide integration tests.",
 	"type": "module",
@@ -11,8 +11,8 @@
 	},
 	"devDependencies": {
 		"@types/aws4": "~1",
-		"@arcade/regions": "workspace:*",
-		"@arcade/clients": "workspace:*",
+		"@agie/regions": "workspace:*",
+		"@agie/clients": "workspace:*",
 		"@aws-amplify/core": "~6",
 		"@aws-amplify/auth": "~6",
 		"aws-amplify": "~6",

@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
-import { getLambdaArchitecture } from '@arcade/cdk-common';
-import { REGIONS_EVENT_SOURCE, REGIONS_REGION_CREATED_EVENT, REGIONS_REGION_DELETED_EVENT, REGIONS_REGION_UPDATED_EVENT } from '@arcade/events';
+import { getLambdaArchitecture } from '@agie/cdk-common';
+import { REGIONS_EVENT_SOURCE, REGIONS_REGION_CREATED_EVENT, REGIONS_REGION_DELETED_EVENT, REGIONS_REGION_UPDATED_EVENT } from '@agie/events';
 import * as cdk from 'aws-cdk-lib';
 import { Duration, Stack } from 'aws-cdk-lib';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
@@ -47,7 +47,7 @@ export interface ScheduledConstructProperties {
 	readonly sentinelCollection: string;
 }
 
-const schedulerGroupNameParameter = (environment: string) => `/arcade/${environment}/scheduler/groupName`;
+const schedulerGroupNameParameter = (environment: string) => `/agie/${environment}/scheduler/groupName`;
 
 export class SchedulerModule extends Construct {
 
@@ -59,7 +59,7 @@ export class SchedulerModule extends Construct {
 		const account = Stack.of(this).account;
 		const region = cdk.Stack.of(this).region;
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName);
 
@@ -225,11 +225,11 @@ export class SchedulerModule extends Construct {
 		 * This is the eventbridge scheduler configured for a region (in a scheduled processing mode).
 		 * It will publish the scheduled event to the engine queue explained above.
 		 */
-		const cfnScheduleGroup = new CfnScheduleGroup(this, 'ArcadeScheduleGroup', {
+		const cfnScheduleGroup = new CfnScheduleGroup(this, 'AgieScheduleGroup', {
 			name: `${namePrefix}-scheduler`,
 		});
 
-		const arcadeSchedulerRole = new Role(this, 'ArcadeSchedulerRole', {
+		const agieSchedulerRole = new Role(this, 'AgieSchedulerRole', {
 			assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
 		});
 
@@ -239,7 +239,7 @@ export class SchedulerModule extends Construct {
 		});
 
 		// This role will be used by scheduled to push message to SQS
-		arcadeSchedulerRole.addToPolicy(
+		agieSchedulerRole.addToPolicy(
 			new PolicyStatement({
 				actions: ['sqs:SendMessage'],
 				effect: Effect.ALLOW,
@@ -261,7 +261,7 @@ export class SchedulerModule extends Construct {
 				EVENT_BUS_NAME: props.eventBusName,
 				SCHEDULER_GROUP: cfnScheduleGroup.name,
 				SQS_ARN: this.engineQueue.queueArn,
-				ROLE_ARN: arcadeSchedulerRole.roleArn,
+				ROLE_ARN: agieSchedulerRole.roleArn,
 				ENVIRONMENT: props.environment
 			},
 			bundling: {
@@ -278,7 +278,7 @@ export class SchedulerModule extends Construct {
 		});
 
 		// Allow eventbridge lambda role to pass scheduler rule when creating schedule
-		arcadeSchedulerRole.grantPassRole(eventbridgeLambda.role);
+		agieSchedulerRole.grantPassRole(eventbridgeLambda.role);
 		eventBus.grantPutEventsTo(eventbridgeLambda);
 		// Allow eventbridge lambda to create scheduler rule
 		eventbridgeLambda.addToRolePolicy(

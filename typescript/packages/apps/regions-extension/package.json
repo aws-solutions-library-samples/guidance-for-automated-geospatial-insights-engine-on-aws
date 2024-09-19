@@ -1,5 +1,5 @@
 {
-  "name": "@arcade/regions-extension",
+  "name": "@agie/regions-extension",
   "version": "0.0.1",
   "description": "Extending the functionality of the core region module to augment resources with external data.",
   "exports": {
@@ -18,9 +18,9 @@
     "cdk": "cdk"
   },
   "dependencies": {
-    "@arcade/events": "workspace:*",
-    "@arcade/clients": "workspace:*",
-    "@arcade/lambda-invoker": "workspace:*",
+    "@agie/events": "workspace:*",
+    "@agie/clients": "workspace:*",
+    "@agie/lambda-invoker": "workspace:*",
     "@aws-sdk/client-lambda": "~3",
     "@fastify/awilix": "~5",
     "@fastify/aws-lambda": "~4",

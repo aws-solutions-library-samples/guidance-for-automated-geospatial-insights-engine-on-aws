@@ -13,9 +13,9 @@
 
 import { asFunction, Lifetime } from 'awilix';
 import fp from 'fastify-plugin';
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
-import { EventPublisher, REGIONS_EVENT_SOURCE } from '@arcade/events';
-import { ApiAuthorizer, registerAuthAwilix } from '@arcade/rest-api-authorizer';
+import { DynamoDbUtils } from '@agie/dynamodb-utils';
+import { EventPublisher, REGIONS_EVENT_SOURCE } from '@agie/events';
+import { ApiAuthorizer, registerAuthAwilix } from '@agie/rest-api-authorizer';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
@@ -32,19 +32,19 @@ import { CommonService } from '../api/service.common.js';
 import { StateRepository } from '../api/states/repository.js';
 import { StateService } from '../api/states/service.js';
 import { TagUtils } from '../tags/tags.util.js';
-import { VerifiedPermissionsClient } from "@aws-sdk/client-verifiedpermissions";
-import { SQSClient } from "@aws-sdk/client-sqs";
-import { AggregatorService } from "../aggregator/service.js";
-import { PolygonTaskService } from "../api/polygonTasks/service.js";
-import { PolygonTaskWorkflowProcessor } from "../api/polygonTasks/workflows/processor.js";
+import { VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
+import { SQSClient } from '@aws-sdk/client-sqs';
+import { AggregatorService } from '../aggregator/service.js';
+import { PolygonTaskService } from '../api/polygonTasks/service.js';
+import { PolygonTaskWorkflowProcessor } from '../api/polygonTasks/workflows/processor.js';
 import { TaskRepository } from '../common/tasks/repository.js';
 import { TaskItemRepository } from '../common/taskItems/repository.js';
-import { TaskItemService } from "../common/taskItems/service.js";
-import { PkType } from "../common/pkTypes.js";
-import { RegionTaskService } from "../api/regionTasks/service.js";
-import { RegionTaskWorkflowProcessor } from "../api/regionTasks/workflows/processor.js";
-import { CommonCache } from "../common/cache.js";
-import { Region } from "../api/regions/schemas.js";
+import { TaskItemService } from '../common/taskItems/service.js';
+import { PkType } from '../common/pkTypes.js';
+import { RegionTaskService } from '../api/regionTasks/service.js';
+import { RegionTaskWorkflowProcessor } from '../api/regionTasks/workflows/processor.js';
+import { CommonCache, ICommonCache, NoOpCache } from '../common/cache.js';
+import { Region } from '../api/regions/schemas.js';
 
 const { captureAWSv3Client } = pkg;
 declare module '@fastify/awilix' {
@@ -78,7 +78,7 @@ declare module '@fastify/awilix' {
 		polygonTaskItemRepository: TaskItemRepository;
 		polygonTaskItemService: TaskItemService;
 		polygonTaskWorkflowProcessor: PolygonTaskWorkflowProcessor;
-		regionCache: CommonCache<Region>;
+		regionCache: ICommonCache<Region>;
 	}
 }
 
@@ -87,7 +87,7 @@ class EventBridgeClientFactory {
 	public static create(region: string): EventBridgeClient {
 		return captureAWSv3Client(
 			new EventBridgeClient({
-				region,
+				region
 			})
 		);
 	}
@@ -97,7 +97,7 @@ class SQSClientFactory {
 	public static create(region: string): SQSClient {
 		return captureAWSv3Client(
 			new SQSClient({
-				region,
+				region
 			})
 		);
 	}
@@ -107,7 +107,7 @@ class VerifiedPermissionsClientFactory {
 	public static create(region: string): VerifiedPermissionsClient {
 		return captureAWSv3Client(
 			new VerifiedPermissionsClient({
-				region,
+				region
 			})
 		);
 	}
@@ -119,10 +119,10 @@ class DynamoDBDocumentClientFactory {
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
-			convertClassInstanceToMap: false,
+			convertClassInstanceToMap: false
 		};
 		const unmarshallOptions = {
-			wrapNumbers: false,
+			wrapNumbers: false
 		};
 		const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 		const dbc = DynamoDBDocumentClient.from(ddb, translateConfig);
@@ -134,11 +134,11 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 	// first register the DI plugin
 	await app.register(fastifyAwilixPlugin, {
 		disposeOnClose: true,
-		disposeOnResponse: false,
+		disposeOnResponse: false
 	});
 
 	const commonInjectionOptions = {
-		lifetime: Lifetime.SINGLETON,
+		lifetime: Lifetime.SINGLETON
 	};
 
 	registerAuthAwilix(app.log);
@@ -156,114 +156,114 @@ export default fp<FastifyAwilixOptions>(async (app): Promise<void> => {
 	// then we can register our classes with the DI container
 	diContainer.register({
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		sqsClient: asFunction(() => SQSClientFactory.create(awsRegion), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		dynamoDbUtils: asFunction((c: Cradle) => new DynamoDbUtils(app.log, c.dynamoDBDocumentClient), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		tagUtils: asFunction((c: Cradle) => new TagUtils(app.log), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		commonRepository: asFunction((c: Cradle) => new CommonRepository(app.log, c.dynamoDBDocumentClient, tableName), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		commonService: asFunction((c: Cradle) => new CommonService(app.log, c.commonRepository, c.tagUtils), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		groupRepository: asFunction((c: Cradle) => new GroupRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		groupService: asFunction((c: Cradle) => new GroupService(app.log, c.groupRepository, c.commonService, c.commonRepository, c.eventPublisher), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		regionRepository: asFunction((c: Cradle) => new RegionRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		regionService: asFunction((c: Cradle) => new RegionService(app.log, c.regionRepository, c.groupService, c.commonService, c.commonRepository, c.eventPublisher, c.regionCache), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		polygonRepository: asFunction((c: Cradle) => new PolygonRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository, c.stateRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		polygonService: asFunction((c: Cradle) => new PolygonService(app.log, c.polygonRepository, c.regionService, c.commonService, c.commonRepository, c.eventPublisher), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		stateRepository: asFunction((c: Cradle) => new StateRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, c.commonRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 		stateService: asFunction(
 			(c: Cradle) => new StateService(app.log, c.stateRepository, c.regionService, c.polygonService, c.commonService, c.commonRepository, c.eventPublisher),
 			{
-				...commonInjectionOptions,
+				...commonInjectionOptions
 			}
 		),
 		aggregatorService: asFunction(
 			(c: Cradle) => new AggregatorService(app.log, c.regionService, c.groupService),
 			{
-				...commonInjectionOptions,
+				...commonInjectionOptions
 			}
 		),
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, REGIONS_EVENT_SOURCE), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		avpClient: asFunction(() => VerifiedPermissionsClientFactory.create(awsRegion), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		apiAuthorizer: asFunction((c: Cradle) => new ApiAuthorizer(app.log, c.avpClient, policyStoreId, userPoolId, clientId), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
-		regionCache: asFunction((c: Cradle) => new CommonCache(app.log, 'Region', redisEndpoint), {
-			...commonInjectionOptions,
+		regionCache: asFunction((c: Cradle) => redisEndpoint ? new CommonCache<Region>(app.log, 'Region', redisEndpoint) : new NoOpCache(), {
+			...commonInjectionOptions
 		}),
 
 		polygonTaskService: asFunction((c: Cradle) => new PolygonTaskService(app.log, c.polygonTaskRepository, c.commonRepository, app.config.TASK_BATCH_SIZE, c.sqsClient, app.config.TASK_QUEUE_URL, app.config.TASK_PARALLEL_LIMIT), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		polygonTaskRepository: asFunction((c: Cradle) => new TaskRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, PkType.PolygonTask), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		polygonTaskWorkflowProcessor: asFunction((c: Cradle) => new PolygonTaskWorkflowProcessor(app.log, c.polygonService, c.polygonTaskService, c.polygonTaskItemService, app.config.TASK_PARALLEL_LIMIT), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		polygonTaskItemRepository: asFunction((c: Cradle) => new TaskItemRepository(app.log, c.dynamoDBDocumentClient, tableName, PkType.PolygonTask, PkType.PolygonTaskItem), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		polygonTaskItemService: asFunction((c: Cradle) => new TaskItemService(app.log, c.polygonTaskItemRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		regionTaskRepository: asFunction((c: Cradle) => new TaskRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils, PkType.RegionTask), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		regionTaskService: asFunction((c: Cradle) => new RegionTaskService(app.log, c.regionTaskRepository, c.commonRepository, app.config.TASK_BATCH_SIZE, c.sqsClient, app.config.TASK_QUEUE_URL, app.config.TASK_PARALLEL_LIMIT), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		regionTaskItemRepository: asFunction((c: Cradle) => new TaskItemRepository(app.log, c.dynamoDBDocumentClient, tableName, PkType.RegionTask, PkType.RegionTaskItem), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		regionTaskItemService: asFunction((c: Cradle) => new TaskItemService(app.log, c.regionTaskItemRepository), {
-			...commonInjectionOptions,
+			...commonInjectionOptions
 		}),
 
 		regionTaskWorkflowProcessor: asFunction((c: Cradle) => new RegionTaskWorkflowProcessor(app.log, c.regionService, c.regionTaskService, c.regionTaskItemService, app.config.TASK_PARALLEL_LIMIT), {
-			...commonInjectionOptions,
-		}),
+			...commonInjectionOptions
+		})
 
 
 	});

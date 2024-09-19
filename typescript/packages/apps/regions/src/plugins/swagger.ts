@@ -21,7 +21,7 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 	await app.register(FastifySwagger, {
 		openapi: {
 			info: {
-				title: 'ARCADE Regions',
+				title: 'AGIE Regions',
 				description: `Manages hierarchical structures of groups, regions, and polygons.`,
 				version: '1.0.0',
 			},

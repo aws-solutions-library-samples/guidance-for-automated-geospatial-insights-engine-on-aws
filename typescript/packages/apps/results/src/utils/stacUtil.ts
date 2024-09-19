@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
-import { LambdaRequestContext } from '@arcade/clients';
-import { Catalog, CatalogDetails, polygonProcessingDetails, RegionResource, StacItem } from '@arcade/events';
+import { LambdaRequestContext } from '@agie/clients';
+import { Catalog, CatalogDetails, polygonProcessingDetails, RegionResource, StacItem } from '@agie/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import dayjs from 'dayjs';
@@ -28,8 +28,8 @@ dayjs.extend(utc);
 export class StacUtil {
 	readonly context: LambdaRequestContext;
 
-	private readonly regionIndexName = 'arcade-region';
-	private readonly polygonIndexName = 'arcade-polygon';
+	private readonly regionIndexName = 'agie-region';
+	private readonly polygonIndexName = 'agie-polygon';
 
 	public constructor(readonly log: BaseLogger, readonly s3Client: S3Client, readonly bucketName: string) {
 		this.log = log;
@@ -139,7 +139,7 @@ export class StacUtil {
 				rel: 'root',
 				href: '../catalog.json',
 				type: 'application/json',
-				title: 'ARCADE Catalog',
+				title: 'AGIE Catalog',
 			},
 		];
 
@@ -149,8 +149,8 @@ export class StacUtil {
 		// Update the properties
 		stacItem.properties = {
 			datetime: details.createdAt,
-			"arcade:groupId": details.groupId,
-			"arcade:regionId": details.regionId,
+			"agie:groupId": details.groupId,
+			"agie:regionId": details.regionId,
 			...engineMetadata.properties,
 		};
 
@@ -205,7 +205,7 @@ export class StacUtil {
 		const stacItem = new DefaultStacRecords().defaultStacItem;
 		const { id, groupId } = regionResource;
 		stacItem.id = id;
-		stacItem.collection = `arcade-region`;
+		stacItem.collection = `agie-region`;
 		stacItem.bbox = regionResource.boundingBox;
 		// for region stac item the bbox and the polygon covers the same area
 		stacItem.geometry = bboxPolygon(regionResource.boundingBox).geometry
@@ -213,9 +213,9 @@ export class StacUtil {
 			datetime: regionResource.createdAt,
 			createdAt: regionResource.createdAt,
 			updatedAt: regionResource.updatedAt,
-			"arcade:isActive": regionResource.isActive,
-			"arcade:processedOnNewScene": regionResource.processingConfig.mode === 'onNewScene',
-			"arcade:groupId": groupId
+			"agie:isActive": regionResource.isActive,
+			"agie:processedOnNewScene": regionResource.processingConfig.mode === 'onNewScene',
+			"agie:groupId": groupId
 		}
 		return stacItem;
 	}

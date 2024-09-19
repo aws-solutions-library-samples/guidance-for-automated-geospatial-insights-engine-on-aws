@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { bucketNameParameter } from '@arcade/cdk-common';
+import { bucketNameParameter } from '@agie/cdk-common';
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';

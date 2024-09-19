@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { DynamoDbUtils } from '@arcade/dynamodb-utils';
+import { DynamoDbUtils } from '@agie/dynamodb-utils';
 import {
 	DynamoDBDocumentClient,
 	TransactWriteCommandInput,

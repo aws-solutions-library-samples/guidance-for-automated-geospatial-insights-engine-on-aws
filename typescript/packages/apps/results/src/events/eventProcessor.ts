@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
-import type { StacServerClient } from '@arcade/clients';
-import type { CatalogCreateEvent, RegionChangeEvent } from '@arcade/events';
-import { EngineJobCreatedDetails, EngineJobUpdatedDetails, PolygonsProcessingEvent, ResultsChangeEvent } from '@arcade/events';
+import type { StacServerClient } from '@agie/clients';
+import type { CatalogCreateEvent, RegionChangeEvent } from '@agie/events';
+import { EngineJobCreatedDetails, EngineJobUpdatedDetails, PolygonsProcessingEvent, ResultsChangeEvent } from '@agie/events';
 import { FastifyBaseLogger } from 'fastify';
 import { ResultsService } from '../api/results/service.js';
 import { StacUtil } from '../utils/stacUtil.js';

@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { getAwsEnvironment } from '@arcade/cdk-common';
+import { getAwsEnvironment } from '@agie/cdk-common';
 import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

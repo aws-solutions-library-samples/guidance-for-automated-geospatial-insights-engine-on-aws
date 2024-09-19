@@ -24,7 +24,7 @@ const ssm = new SSMClient({ region: process.env['AWS_REGION'] });
 
 const getValues = async (module: string, mapping: Record<string, string>) => {
 	for (const key in mapping) {
-		const prefix = `/arcade/${ENVIRONMENT}/${module}/`;
+		const prefix = `/agie/${ENVIRONMENT}/${module}/`;
 		const name = `${prefix}${mapping[key]}`;
 		try {
 			const response = await ssm.send(
@@ -63,15 +63,15 @@ await getValues('shared', {
 });
 
 await getValues('regions', {
-	ARCADE_REGIONS_BASE_URL: 'apiUrl',
+	AGIE_REGIONS_BASE_URL: 'apiUrl',
 });
 
 await getValues('results', {
-	ARCADE_RESULTS_BASE_URL: 'apiUrl',
+	AGIE_RESULTS_BASE_URL: 'apiUrl',
 });
 
 await getValues('notifications', {
-	ARCADE_NOTIFICATIONS_BASE_URL: 'apiUrl',
+	AGIE_NOTIFICATIONS_BASE_URL: 'apiUrl',
 });
 
 await getValues('shared', {

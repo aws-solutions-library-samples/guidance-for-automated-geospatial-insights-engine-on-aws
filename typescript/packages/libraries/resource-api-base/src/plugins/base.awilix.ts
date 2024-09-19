@@ -20,7 +20,7 @@ import { Lifetime, asFunction } from 'awilix';
 import pkg from 'aws-xray-sdk';
 const { captureAWSv3Client } = pkg;
 //// @ts-ignore
-import { Invoker } from '@arcade/lambda-invoker';
+import { Invoker } from '@agie/lambda-invoker';
 import { Utils } from '../common/utils.js';
 
 import type { FastifyBaseLogger } from 'fastify';

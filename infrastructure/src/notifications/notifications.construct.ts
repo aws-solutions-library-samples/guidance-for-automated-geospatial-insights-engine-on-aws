@@ -18,8 +18,8 @@ import path from "path";
 import { Function, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Aspects, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
-import { getLambdaArchitecture } from "@arcade/cdk-common";
-import { EXECUTOR_EVENT_SOURCE, EXECUTOR_JOB_CREATED_EVENT, EXECUTOR_JOB_UPDATED_EVENT } from "@arcade/events";
+import { getLambdaArchitecture } from "@agie/cdk-common";
+import { EXECUTOR_EVENT_SOURCE, EXECUTOR_JOB_CREATED_EVENT, EXECUTOR_JOB_UPDATED_EVENT } from "@agie/events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { fileURLToPath } from "url";
@@ -44,13 +44,13 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const notificationsTableNameParameter = (environment: string) => `/arcade/${environment}/notifications/tableName`;
-const notificationsTableArnParameter = (environment: string) => `/arcade/${environment}/notifications/tableArn`;
-export const notificationsApiFunctionArnParameter = (environment: string) => `/arcade/${environment}/notifications/apiFunctionArn`;
-export const notificationsApiUrlParameter = (environment: string) => `/arcade/${environment}/notifications/apiUrl`;
-export const notificationsApiNameParameter = (environment: string) => `/arcade/${environment}/notifications/apiName`;
+const notificationsTableNameParameter = (environment: string) => `/agie/${environment}/notifications/tableName`;
+const notificationsTableArnParameter = (environment: string) => `/agie/${environment}/notifications/tableArn`;
+export const notificationsApiFunctionArnParameter = (environment: string) => `/agie/${environment}/notifications/apiFunctionArn`;
+export const notificationsApiUrlParameter = (environment: string) => `/agie/${environment}/notifications/apiUrl`;
+export const notificationsApiNameParameter = (environment: string) => `/agie/${environment}/notifications/apiName`;
 
-const notificationsApiAuthorizerFunctionArnParameter = (environment: string) => `/arcade/${environment}/notifications/verifiedPermissionsAuthorizerFunctionArn`;
+const notificationsApiAuthorizerFunctionArnParameter = (environment: string) => `/agie/${environment}/notifications/verifiedPermissionsAuthorizerFunctionArn`;
 
 export interface NotificationsConstructProperties {
 	environment: string;
@@ -67,7 +67,7 @@ export class NotificationsModule extends Construct {
 	constructor(scope: Construct, id: string, props: NotificationsConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 		const eventBus = EventBus.fromEventBusName(this, 'EventBus', props.eventBusName);
 		const accountId = Stack.of(this).account;
 
@@ -120,7 +120,7 @@ export class NotificationsModule extends Construct {
 		 */
 		const apiLambda = new NodejsFunction(this, 'NotificationsApiLambda', {
 			functionName: `${namePrefix}-notificationsApi`,
-			description: `ARCADE: Notifications API: ${props.environment}`,
+			description: `AGIE: Notifications API: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/notifications/src/lambda_apiGateway.ts'),
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
@@ -185,7 +185,7 @@ export class NotificationsModule extends Construct {
 		 */
 		const authorizerLambda = new NodejsFunction(this, 'ResultsApiAuthorizerLambda', {
 			functionName: `${namePrefix}-notificationsApi-authorizer`,
-			description: `ARCADE: Notifications API Authorizer: ${props.environment}`,
+			description: `AGIE: Notifications API Authorizer: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/notifications/src/lambda_authorizer.ts'),
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
@@ -236,7 +236,7 @@ export class NotificationsModule extends Construct {
 
 		const apigw = new LambdaRestApi(this, 'NotificationsApiGateway', {
 			restApiName: `${namePrefix}-notifications`,
-			description: `ARCADE: Notifications API: ${props.environment}`,
+			description: `AGIE: Notifications API: ${props.environment}`,
 			handler: apiLambda,
 			proxy: true,
 			deployOptions: {

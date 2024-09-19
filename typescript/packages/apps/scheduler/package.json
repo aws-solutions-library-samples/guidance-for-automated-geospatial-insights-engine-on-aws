@@ -1,7 +1,7 @@
 {
-	"name": "@arcade/scheduler",
+	"name": "@agie/scheduler",
 	"version": "0.0.1",
-	"description": "Manage the creation of schedule which will trigger the arcade engine.",
+	"description": "Manage the creation of schedule which will trigger the agie engine.",
 	"exports": {
 		".": {
 			"import": "./dist/index.js"
@@ -18,9 +18,9 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@arcade/events": "workspace:*",
-		"@arcade/clients": "workspace:*",
-		"@arcade/lambda-invoker": "workspace:*",
+		"@agie/events": "workspace:*",
+		"@agie/clients": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
 		"@aws-sdk/client-batch": "~3",
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-lambda": "~3",

@@ -26,7 +26,7 @@ import {
 import { createDelimitedAttribute, DocumentDbClientItem } from "../../common/ddbAttributes.util.js";
 import { TaskBatchProgress, TaskResource } from "./schemas.js";
 import { DatabaseTransactionError, NotFoundError, TransactionCancellationReason } from "../../common/errors.js";
-import { DynamoDbUtils } from "@arcade/dynamodb-utils";
+import { DynamoDbUtils } from "@agie/dynamodb-utils";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 
 

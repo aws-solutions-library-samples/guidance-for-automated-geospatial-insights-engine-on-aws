@@ -12,8 +12,8 @@
  */
 
 import { FastifyBaseLogger } from "fastify";
-import { LambdaRequestContext, RegionsClient, StacServerClient } from "@arcade/clients";
-import { RegionResource, StacItem } from "@arcade/events";
+import { LambdaRequestContext, RegionsClient, StacServerClient } from "@agie/clients";
+import { RegionResource, StacItem } from "@agie/events";
 import { booleanContains, booleanWithin, polygon, union } from "@turf/turf";
 import { SendMessageBatchCommand, SendMessageBatchRequestEntry, SQSClient } from "@aws-sdk/client-sqs";
 import ow from 'ow';
@@ -24,7 +24,7 @@ import dayjs from 'dayjs';
 export class JobsService {
 
 	private readonly context: LambdaRequestContext;
-	private readonly regionIndexName = 'arcade-region';
+	private readonly regionIndexName = 'agie-region';
 
 	constructor(private readonly logger: FastifyBaseLogger,
 				private readonly stacClient: StacServerClient,
@@ -113,10 +113,10 @@ export class JobsService {
 				collections: [this.regionIndexName],
 				bbox: sentinelStacItem.bbox,
 				"query": {
-					"arcade:isActive": {
+					"agie:isActive": {
 						"eq": true
 					},
-					"arcade:processedOnNewScene": {
+					"agie:processedOnNewScene": {
 						"eq": true
 					}
 				}

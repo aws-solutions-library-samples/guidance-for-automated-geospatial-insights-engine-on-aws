@@ -1,10 +1,10 @@
 permit (
     principal,
     action in [
-   		Arcade::Action::"CreateSubscription",
-		Arcade::Action::"ListSubscriptions",
-		Arcade::Action::"DescribeSubscription",
-		Arcade::Action::"DeleteSubscription"
+   		Agie::Action::"CreateSubscription",
+		Agie::Action::"ListSubscriptions",
+		Agie::Action::"DescribeSubscription",
+		Agie::Action::"DeleteSubscription"
     ],
     resource
 )

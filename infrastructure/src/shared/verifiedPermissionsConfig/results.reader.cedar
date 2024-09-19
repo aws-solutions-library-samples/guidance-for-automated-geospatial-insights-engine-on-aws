@@ -1,8 +1,8 @@
 permit (
     principal,
     action in [
-        Arcade::Action::"ListResults",
-        Arcade::Action::"DescribeResult"
+        Agie::Action::"ListResults",
+        Agie::Action::"DescribeResult"
     ],
     resource
 )

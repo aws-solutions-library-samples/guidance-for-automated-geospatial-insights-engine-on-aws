@@ -15,7 +15,7 @@ import type { Callback, Context, SQSHandler } from 'aws-lambda';
 import type { AwilixContainer } from 'awilix';
 import type { FastifyInstance } from 'fastify';
 import { buildLightApp } from './app.light.js';
-import { DomainEvent } from "@arcade/events";
+import { DomainEvent } from "@agie/events";
 import { AggregatorService } from "./aggregator/service.js";
 
 const app: FastifyInstance = await buildLightApp();

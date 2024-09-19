@@ -16,15 +16,15 @@ import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
 import { ulid } from 'ulid';
 import { SSMClient, SSMClientConfig } from "@aws-sdk/client-ssm";
 
-const stsClient = new STSClient({ region: process.env.ARCADE_REGION ?? process.env.AWS_REGION });
+const stsClient = new STSClient({ region: process.env.AGIE_REGION ?? process.env.AWS_REGION });
 
 async function getSSMClient(roleArn?: string): Promise<SSMClient> {
-	const clientConfig: SSMClientConfig = { region: process.env.ARCADE_REGION ?? process.env.AWS_REGION };
+	const clientConfig: SSMClientConfig = { region: process.env.AGIE_REGION ?? process.env.AWS_REGION };
 	let ssmClient;
 	if (roleArn) {
 		const command = new AssumeRoleCommand({
 			RoleArn: roleArn,
-			RoleSessionName: `arcade-cli-${ulid()}`,
+			RoleSessionName: `agie-cli-${ulid()}`,
 		});
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -46,12 +46,12 @@ async function getSSMClient(roleArn?: string): Promise<SSMClient> {
 }
 
 async function getCloudFormationClient(roleArn?: string): Promise<CloudFormationClient> {
-	const clientConfig: CloudFormationClientConfig = { region: process.env.ARCADE_REGION ?? process.env.AWS_REGION };
+	const clientConfig: CloudFormationClientConfig = { region: process.env.AGIE_REGION ?? process.env.AWS_REGION };
 	let cfClient;
 	if (roleArn) {
 		const command = new AssumeRoleCommand({
 			RoleArn: roleArn,
-			RoleSessionName: `arcade-cli-${ulid()}`,
+			RoleSessionName: `agie-cli-${ulid()}`,
 		});
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention

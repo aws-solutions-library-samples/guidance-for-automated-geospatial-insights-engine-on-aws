@@ -24,7 +24,7 @@ import {
 	REGIONS_REGION_CREATED_EVENT,
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT
-} from "@arcade/events";
+} from "@agie/events";
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { Polygon } from "./api/polygons/schemas.js";
 import { Region } from "./api/regions/schemas.js";

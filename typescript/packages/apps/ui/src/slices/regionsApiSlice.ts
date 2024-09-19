@@ -28,7 +28,7 @@ import {
 	RegionList,
 	State,
 	StateList,
-} from '@arcade/regions';
+} from '@agie/regions';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 

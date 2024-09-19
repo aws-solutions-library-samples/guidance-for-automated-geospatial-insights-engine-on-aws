@@ -19,11 +19,11 @@ import fp from 'fastify-plugin';
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { SchedulesService } from "../schedules/service.js";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { RegionsClient, StacServerClient } from "@arcade/clients";
+import { RegionsClient, StacServerClient } from "@agie/clients";
 import { SNSClient } from "@aws-sdk/client-sns";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { JobsService } from "../jobs/service.js";
-import { Invoker } from "@arcade/lambda-invoker";
+import { Invoker } from "@agie/lambda-invoker";
 import { SQSClient } from "@aws-sdk/client-sqs";
 
 const { captureAWSv3Client } = pkg;

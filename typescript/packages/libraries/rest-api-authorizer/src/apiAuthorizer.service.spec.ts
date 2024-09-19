@@ -142,12 +142,12 @@ describe('ApiAuthorizer', () => {
 		expect(spy.args[0].input).toStrictEqual({
 			policyStoreId: 'mockedPolicyStoreId',
 			identityToken: 'mockedJwt',
-			action: { actionType: 'Arcade::Action', actionId: 'DescribeGroup' },
-			resource: { entityType: 'Arcade::Resource', entityId: '/groups/01hwn3wbd67ntssw5jxmbbdg0e' },
+			action: { actionType: 'Agie::Action', actionId: 'DescribeGroup' },
+			resource: { entityType: 'Agie::Resource', entityId: '/groups/01hwn3wbd67ntssw5jxmbbdg0e' },
 			entities: {
 				entityList: [
 					{
-						identifier: { entityType: 'Arcade::Resource', entityId: '/groups/01hwn3wbd67ntssw5jxmbbdg0e' },
+						identifier: { entityType: 'Agie::Resource', entityId: '/groups/01hwn3wbd67ntssw5jxmbbdg0e' },
 					},
 				],
 			},

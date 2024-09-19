@@ -195,7 +195,7 @@
      * your PR branch, and in this situation "rush change" will also automatically invoke "git fetch"
      * to retrieve the latest activity for the remote main branch.
      */
-    "url": "git@github.com:aws-solutions-library-samples/guidance-for-agricultural-root-cause-analysis-and-decision-engine-in-aws.git",
+	  "url": "git@github.com:aws-solutions-library-samples/automated-geospatial-insight-engine.git",
     /**
      * The default branch name. This tells "rush change" which remote branch to compare against.
      * The default value is "main"
@@ -291,115 +291,115 @@
    */
   "projects": [
     {
-      "packageName": "@arcade/infrastructure",
+      "packageName": "@agie/infrastructure",
       "projectFolder": "infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/cdk-common",
+      "packageName": "@agie/cdk-common",
       "projectFolder": "typescript/packages/libraries/cdk-common",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/events",
+      "packageName": "@agie/events",
       "projectFolder": "typescript/packages/libraries/events",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/dynamodb-utils",
+      "packageName": "@agie/dynamodb-utils",
       "projectFolder": "typescript/packages/libraries/dynamodb-utils",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/resource-api-base",
+      "packageName": "@agie/resource-api-base",
       "projectFolder": "typescript/packages/libraries/resource-api-base",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/lambda-invoker",
+      "packageName": "@agie/lambda-invoker",
       "projectFolder": "typescript/packages/libraries/lambda-invoker",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/clients",
+      "packageName": "@agie/clients",
       "projectFolder": "typescript/packages/libraries/clients",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/rest-api-authorizer",
+      "packageName": "@agie/rest-api-authorizer",
       "projectFolder": "typescript/packages/libraries/rest-api-authorizer",
       "reviewCategory": "library",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/results",
+      "packageName": "@agie/results",
       "projectFolder": "typescript/packages/apps/results",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/regions",
+      "packageName": "@agie/regions",
       "projectFolder": "typescript/packages/apps/regions",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/notifications",
+      "packageName": "@agie/notifications",
       "projectFolder": "typescript/packages/apps/notifications",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/scheduler",
+      "packageName": "@agie/scheduler",
       "projectFolder": "typescript/packages/apps/scheduler",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/executor",
+      "packageName": "@agie/executor",
       "projectFolder": "typescript/packages/apps/executor",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/regions-extension",
+      "packageName": "@agie/regions-extension",
       "projectFolder": "typescript/packages/apps/regions-extension",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/integration-tests",
+      "packageName": "@agie/integration-tests",
       "projectFolder": "typescript/packages/integration-tests",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/seeder",
+      "packageName": "@agie/seeder",
       "projectFolder": "typescript/packages/seeder",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/cli",
+      "packageName": "@agie/cli",
       "projectFolder": "typescript/packages/apps/cli",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/helpers",
+      "packageName": "@agie/helpers",
       "projectFolder": "typescript/packages/libraries/helpers",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@arcade/ui",
+      "packageName": "@agie/ui",
       "projectFolder": "typescript/packages/apps/ui",
       "reviewCategory": "production",
       "shouldPublish": true

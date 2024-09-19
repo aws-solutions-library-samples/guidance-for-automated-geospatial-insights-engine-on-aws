@@ -17,7 +17,7 @@ import path from "path";
 import { IFunction, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Duration } from "aws-cdk-lib";
-import { getLambdaArchitecture } from "@arcade/cdk-common";
+import { getLambdaArchitecture } from "@agie/cdk-common";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { AnyPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { EcsJobDefinition, JobQueue } from "aws-cdk-lib/aws-batch";
@@ -50,7 +50,7 @@ export class ExecutorModule extends Construct {
 	constructor(scope: Construct, id: string, props: ExecutorConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 
 		const engineProcessorJobDefinition = EcsJobDefinition.fromJobDefinitionArn(scope, 'EngineProcessJobDefinition', props.jobDefinitionArn);
 

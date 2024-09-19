@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { UnauthorizedError } from '@arcade/resource-api-base';
+import { UnauthorizedError } from '@agie/resource-api-base';
 import { Decision, IsAuthorizedWithTokenCommand, IsAuthorizedWithTokenCommandOutput, VerifiedPermissionsClient } from '@aws-sdk/client-verifiedpermissions';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { decomposeUnverifiedJwt } from 'aws-jwt-verify/jwt';
@@ -19,7 +19,7 @@ import { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEvent } from 'aw
 import ow from 'ow';
 import { BaseLogger } from 'pino';
 
-export type ArcadeIdentity = {
+export type AgieIdentity = {
 	sub: string;
 	email: string;
 	role: string;
@@ -27,7 +27,7 @@ export type ArcadeIdentity = {
 };
 
 export type AuthDecision = {
-	identity: ArcadeIdentity;
+	identity: AgieIdentity;
 	decision: string;
 };
 
@@ -83,14 +83,14 @@ export class ApiAuthorizer {
 		}
 	}
 
-	public extractIdentity(authorizationHeader: string): ArcadeIdentity {
+	public extractIdentity(authorizationHeader: string): AgieIdentity {
 		this.logger.debug(`ApiAuthorizer> extractIdentity> in> authorizationHeader:${authorizationHeader}`);
 
 		ow(authorizationHeader, ow.string.nonEmpty);
 
 		const token = authorizationHeader?.replace('Bearer ', '');
 		const payload = decomposeUnverifiedJwt(token)?.payload;
-		const identity: ArcadeIdentity = {
+		const identity: AgieIdentity = {
 			sub: payload?.['sub']?.toString() ?? '?',
 			email: payload?.['email']?.toString() ?? '?',
 			role: payload?.['custom:role']?.toString() ?? '?',
@@ -100,7 +100,7 @@ export class ApiAuthorizer {
 		return identity;
 	}
 
-	public buildAPIGatewayAuthorizerResult(identity: ArcadeIdentity, decision: Decision, methodArn: string): APIGatewayAuthorizerResult {
+	public buildAPIGatewayAuthorizerResult(identity: AgieIdentity, decision: Decision, methodArn: string): APIGatewayAuthorizerResult {
 		const result: APIGatewayAuthorizerResult = {
 			principalId: identity?.sub,
 			policyDocument: {
@@ -169,18 +169,18 @@ export class ApiAuthorizer {
 			policyStoreId: this.policyStoreId,
 			identityToken: token,
 			action: {
-				actionType: `Arcade::Action`,
+				actionType: `Agie::Action`,
 				actionId,
 			},
 			resource: {
-				entityType: `Arcade::Resource`,
+				entityType: `Agie::Resource`,
 				entityId: event.path,
 			},
 			entities: {
 				entityList: [
 					{
 						identifier: {
-							entityType: `Arcade::Resource`,
+							entityType: `Agie::Resource`,
 							entityId: event.path,
 						},
 					},

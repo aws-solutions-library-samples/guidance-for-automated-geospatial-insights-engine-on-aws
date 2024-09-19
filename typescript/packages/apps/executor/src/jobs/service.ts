@@ -11,14 +11,14 @@
  *  and limitations under the License.
  */
 
-import { LambdaRequestContext, Polygon, RegionsClient, ResultResource, ResultsClient } from '@arcade/clients';
+import { LambdaRequestContext, Polygon, RegionsClient, ResultResource, ResultsClient } from '@agie/clients';
 import { BatchClient, ListTagsForResourceCommand, SubmitJobCommand, SubmitJobCommandInput } from '@aws-sdk/client-batch';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import pLimit from 'p-limit';
 import { BatchEngineInput, FinishJobRequest, JobQueueArn, StartJobRequest } from './model.js';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { ARCADE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, Priority, Status } from "@arcade/events";
+import { AGIE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, Priority, Status } from "@agie/events";
 import { ulid } from 'ulid';
 import dayjs from 'dayjs';
 
@@ -125,7 +125,7 @@ export class JobsService {
 				regionId: request.id,
 				resultId: resultId,
 				scheduleDateTime: request.scheduleDateTime,
-				createdBy: ARCADE_EVENT_SOURCE
+				createdBy: AGIE_EVENT_SOURCE
 			}
 		}
 
@@ -157,7 +157,7 @@ export class JobsService {
 		ow(request.status, ow.string.nonEmpty);
 		ow(request.statusReason, ow.optional.string);
 
-		// Query the arcade resources from the tag
+		// Query the agie resources from the tag
 		const listTagsResponse = await this.batchClient.send(new ListTagsForResourceCommand({ resourceArn: request.jobArn }))
 		const { regionId, scheduleDateTime, resultId } = listTagsResponse.tags;
 

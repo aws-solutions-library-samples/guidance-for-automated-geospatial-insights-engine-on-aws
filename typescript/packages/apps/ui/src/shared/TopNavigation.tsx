@@ -37,7 +37,7 @@ export default () => {
 					event.preventDefault();
 					navigate('/');
 				},
-				title: 'Agricultural Root Cause Analysis and Decision Engine (ARCADE)',
+				title: 'Automated Geospatial Insight Engine (AGIE)',
 				logo: {
 					src: '/aws-logo-rgb-rev.svg',
 					alt: 'AWS Logo',
