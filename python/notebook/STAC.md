@@ -1,19 +1,19 @@
-# ARCADE STAC
+# AGIE STAC
 
 ## Overview
 
-ARCADE manages geographic locations as a `group` / `region` / `zone` / `state` hierarchy. For the AgTech industry this hierarchy is mapped as:
+AGIE manages geographic locations as a `group` / `region` / `zone` / `state` hierarchy. For the AgTech industry this hierarchy is mapped as:
 
 - _Fields_ are represented as a `zone`.
 - Over time a field will have many different _crop_ seasons. Each of these crop seasons is represented as a `state` of a `zone`.
 - _Farms_ are comprised of many _fields_. A farm is represented as a `region`.
 - A _grower_ may own many _farms_. A grower is represented as a `group`.
 
-As ARCADE processes satellite imagery, the results are stored in an ARCADE specific SpatioTemporal Asset Catalog ([STAC](https://stacspec.org/en)).
+As AGIE processes satellite imagery, the results are stored in an AGIE specific SpatioTemporal Asset Catalog ([STAC](https://stacspec.org/en)).
 
 ## STAC Structure
 
-- All ARCADE results are stored within a single STAC Catalog.
+- All AGIE results are stored within a single STAC Catalog.
 - Individual `zones` (e.g. a field) along with their current `state` (e.g. crop details) details are indexed as individual STAC Items.
 - `Regions` (e.g. a farm) and `groups` (e.g. a grower) are indexed as [STAC Collections](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md).
 
@@ -75,13 +75,13 @@ As ARCADE processes satellite imagery, the results are stored in an ARCADE speci
             "rel": "parent",
             "href": "../catalog.json",
             "type": "application/json",
-            "title": "ARCADE Catalog"
+            "title": "AGIE Catalog"
         },
         {
             "rel": "root",
             "href": "../catalog.json",
             "type": "application/json",
-            "title": "ARCADE Catalog"
+            "title": "AGIE Catalog"
         }
     ]
 }
@@ -123,7 +123,7 @@ Identical format to the [Group](#group-collection) Collection with the exception
             "rel": "root",
             "href": "../catalog.json",
             "type": "application/json",
-            "title": "ARCADE Catalog"
+            "title": "AGIE Catalog"
         }
     ]
 }
@@ -141,7 +141,7 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
   - `proj:epsg`: `EPSG:4326` that we project our results to.
   - `proj:centroid`: calculated centroid of the `zone`.
   - `s2:degraded_msi_data_percentage`, `s2:nodata_pixel_percentage`, `s2:saturated_defective_pixel_percentage`, `s2:dark_features_percentage`, `s2:cloud_shadow_percentage`, `s2:vegetation_percentage`, `s2:not_vegetated_percentage`, `s2:water_percentage`, `unclassified_percentage`, `s2:medium_proba_clouds_percentage`, `s2:high_proba_clouds_percentage`, `s2:thin_cirrus_percentage`, and `s2:snow_ice_percentage`: statistics calculated based on processed Sentinel `scl` band(s) specific to the `zone` boundary.
-  - `arcade:*` and `arcade_agtech:*` : Refer to [ARCADE AgTech Extension](#arcade-agtech-extension) for details.
+  - `agie:*` and `agie_agtech:*` : Refer to [AGIE AgTech Extension](#agie-agtech-extension) for details.
 - `collection`: the parent `region` the `zone` belongs to.
 - `links`:
   - `self`: links to the STAC Item in context.
@@ -172,8 +172,8 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
 
 > **Decisions:**
 >
-> - Instrument details of `platform` (e.g. `sentinel-2b`) and `constellation` (e.g. `sentinel-2`) cannot be added as an ARCADE STAC Item may be the result of geomosaiced parent STAC Items meaning multiple possible values (e.g. a single `zone` spanning the boundaries of multiple Sentinel STAC Items but from different platforms `sentinel-2a` and `sentinel-2b`. Also, future requirements will see us enhancing ARCADE with results from other instruments too. Due to this, the whole instrument section that includes `instruments` and `gsd` too cannot be included).
-> - Parent STAC Item attributes from extensions such as `mgrs`, `grid`, and `view`, not added to the STAC Item due to same issue of ARCADE STAC Item being sourced from multiple geo-mosaiced parents.
+> - Instrument details of `platform` (e.g. `sentinel-2b`) and `constellation` (e.g. `sentinel-2`) cannot be added as an AGIE STAC Item may be the result of geomosaiced parent STAC Items meaning multiple possible values (e.g. a single `zone` spanning the boundaries of multiple Sentinel STAC Items but from different platforms `sentinel-2a` and `sentinel-2b`. Also, future requirements will see us enhancing AGIE with results from other instruments too. Due to this, the whole instrument section that includes `instruments` and `gsd` too cannot be included).
+> - Parent STAC Item attributes from extensions such as `mgrs`, `grid`, and `view`, not added to the STAC Item due to same issue of AGIE STAC Item being sourced from multiple geo-mosaiced parents.
 
 **Example:**
 
@@ -246,7 +246,7 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
         "s2:high_proba_clouds_percentage": 0.000003,
         "s2:thin_cirrus_percentage": 0.000375,
         "s2:snow_ice_percentage": 0,
-        "arcade:exclude_geometry": [
+        "agie:exclude_geometry": [
             {
                 "type": "Polygon",
                 "coordinates": [
@@ -302,10 +302,10 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
                 ]
             }
         ],
-        "arcade:area": 123.23,
-        "arcade:area_uom": "acres",
-        "arcade_agtech:crop": "wheat",
-        "arcade_agtech:planted_at": "2024-04-01"
+        "agie:area": 123.23,
+        "agie:area_uom": "acres",
+        "agie_agtech:crop": "wheat",
+        "agie_agtech:planted_at": "2024-04-01"
     },
     "collection": "region_jdywhkdjdu23jd",
     "links": [
@@ -331,7 +331,7 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
             "rel": "root",
             "href": "../catalog.json",
             "type": "application/json",
-            "title": "ARCADE Catalog"
+            "title": "AGIE Catalog"
         },
         {
             "rel": "group",
@@ -674,13 +674,13 @@ A `Zone` (e.g. field) and its `State` (e.g. crop) at a specific TOI are represen
 }
 ```
 
-## ARCADE AgTech Extension
+## AGIE AgTech Extension
 
-Industry specific metadata generated by ARCADE will each have their own custom extension.
+Industry specific metadata generated by AGIE will each have their own custom extension.
 
-### ARCADE General Extensions
+### AGIE General Extensions
 
-#### `arcade:exclude_geometry`
+#### `agie:exclude_geometry`
 
 Sub polygons within the primary polygon to exclude.
 
@@ -704,24 +704,24 @@ Sub polygons within the primary polygon to exclude.
 }]
 ```
 
-#### `arcade:area`
+#### `agie:area`
 
-Calculated area of the zone excluding `arcade:exclude_geometry`.
+Calculated area of the zone excluding `agie:exclude_geometry`.
 
-#### `arcade:area_uom`
+#### `agie:area_uom`
 
 UOM (e.g. acres) used in calculating the `zone` area.
 
-### ARCADE AgTech Extensions
+### AGIE AgTech Extensions
 
-#### `arcade_agtech:crop`
+#### `agie_agtech:crop`
 
 Name of crop planted.
 
-#### `arcade_agtech:planted_at`
+#### `agie_agtech:planted_at`
 
 Date planted.
 
-#### `arcade_agtech:harvested_at`
+#### `agie_agtech:harvested_at`
 
 Date harvested.

@@ -7,7 +7,7 @@ implication, estoppel or otherwise.
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 Do Not Translate or Localize
 
-ARCADE (Agricultural Root Cause Analysis and Decision Engine )
+AGIE (Automated Geospatial Insight Engine)
  incorporates third party material from the projects listed below.
 The original copyright notice and the license under which Amazon received
 such third party material are set forth below. Amazon reserves all other

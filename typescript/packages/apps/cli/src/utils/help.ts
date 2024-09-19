@@ -14,7 +14,7 @@
 import { Command, CommandHelp, Flags, Help } from '@oclif/core';
 import Flag = Command.Flag;
 
-export default class ArcadeHelp extends Help {
+export default class AgieHelp extends Help {
 	public getCommandHelpClass(command: Command.Loadable): CommandHelp {
 		command.flags = {
 			...command.flags,

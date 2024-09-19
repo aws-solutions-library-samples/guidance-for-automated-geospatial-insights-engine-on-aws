@@ -14,7 +14,7 @@
 import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { eventBusNameParameter } from "@arcade/cdk-common";
+import { eventBusNameParameter } from "@agie/cdk-common";
 import { NagSuppressions } from "cdk-nag";
 import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
 import { RegionsExtensionModule } from "./regionsExtension.construct.js";

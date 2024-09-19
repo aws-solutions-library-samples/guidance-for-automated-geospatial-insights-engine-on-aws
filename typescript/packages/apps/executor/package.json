@@ -1,5 +1,5 @@
 {
-  "name": "@arcade/executor",
+  "name": "@agie/executor",
   "version": "0.0.1",
   "description": "Manage the execution of engine when the schedule is triggered.",
   "exports": {
@@ -18,9 +18,9 @@
     "cdk": "cdk"
   },
   "dependencies": {
-    "@arcade/events": "workspace:*",
-    "@arcade/clients": "workspace:*",
-    "@arcade/lambda-invoker": "workspace:*",
+    "@agie/events": "workspace:*",
+    "@agie/clients": "workspace:*",
+    "@agie/lambda-invoker": "workspace:*",
     "@aws-sdk/client-batch": "~3",
     "@aws-sdk/client-dynamodb": "~3",
     "@aws-sdk/client-eventbridge": "~3",

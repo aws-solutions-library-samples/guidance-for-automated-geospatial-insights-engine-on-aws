@@ -301,10 +301,10 @@ const regionIndexMapping: Record<string, any> = {
 		"properties": {
 			"type": "object",
 			"properties": {
-				"arcade:isActive": {
+				"agie:isActive": {
 					"type": "boolean"
 				},
-				"arcade:processedOnNewScene": {
+				"agie:processedOnNewScene": {
 					"type": "boolean"
 				},
 				"created": {
@@ -400,7 +400,7 @@ const createCollectionIndices = async (): Promise<void> => {
 
 	const constructCollection = (type: string) => {
 		return {
-			id: `arcade-${type}`,
+			id: `agie-${type}`,
 			type: 'Collection',
 			stac_version: '1.0.0',
 			stac_extensions: [
@@ -408,7 +408,7 @@ const createCollectionIndices = async (): Promise<void> => {
 				'https://stac-extensions.github.io/projection/v1.0.0/schema.json',
 				'https://stac-extensions.github.io/view/v1.0.0/schema.json',
 			],
-			description: `Collection contains all ${type}s in ARCADE framework.`,
+			description: `Collection contains all ${type}s in AGIE framework.`,
 			license: 'proprietary',
 			extent: {
 				spatial: {
@@ -527,8 +527,8 @@ const init = async (): Promise<void> => {
 	await createCollectionIndices();
 
 	// create index for polygon and region resources
-	await createIndices(credentials, 'arcade-polygon', polygonIndexMapping);
-	await createIndices(credentials, 'arcade-region', regionIndexMapping);
+	await createIndices(credentials, 'agie-polygon', polygonIndexMapping);
+	await createIndices(credentials, 'agie-region', regionIndexMapping);
 
 	// update StacAPI lambda environment variables
 	await updateStacAPIEnvironmentVariables();

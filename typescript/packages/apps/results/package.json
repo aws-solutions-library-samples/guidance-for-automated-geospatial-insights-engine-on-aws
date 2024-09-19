@@ -1,6 +1,6 @@
 {
-  "name": "@arcade/results",
-  "description": "Arcade: Results module",
+  "name": "@agie/results",
+  "description": "Agie: Results module",
   "version": "0.0.1",
   "author": "Pouya Bahavar <bahavar@amazon.com>",
   "exports": {
@@ -18,11 +18,11 @@
     "test": "npm run build && vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@arcade/clients": "workspace:*",
-    "@arcade/rest-api-authorizer": "workspace:*",
-    "@arcade/events": "workspace:*",
-    "@arcade/lambda-invoker": "workspace:*",
-    "@arcade/dynamodb-utils": "workspace:*",
+    "@agie/clients": "workspace:*",
+    "@agie/rest-api-authorizer": "workspace:*",
+    "@agie/events": "workspace:*",
+    "@agie/lambda-invoker": "workspace:*",
+    "@agie/dynamodb-utils": "workspace:*",
     "@aws-sdk/client-dynamodb": "~3",
     "@aws-sdk/client-verifiedpermissions": "~3",
     "@aws-sdk/client-eventbridge": "~3",

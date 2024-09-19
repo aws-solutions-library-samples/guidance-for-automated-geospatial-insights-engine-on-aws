@@ -1,7 +1,7 @@
 {
-	"name": "@arcade/notifications",
+	"name": "@agie/notifications",
 	"version": "0.0.1",
-	"description": "Send notifications to subscribed users when arcade processing output exceeds some threshold.",
+	"description": "Send notifications to subscribed users when agie processing output exceeds some threshold.",
 	"exports": {
 		".": {
 			"import": "./dist/index.js"
@@ -18,11 +18,11 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@arcade/dynamodb-utils": "workspace:*",
-		"@arcade/events": "workspace:*",
-		"@arcade/clients": "workspace:*",
-		"@arcade/rest-api-authorizer": "workspace:*",
-		"@arcade/lambda-invoker": "workspace:*",
+		"@agie/dynamodb-utils": "workspace:*",
+		"@agie/events": "workspace:*",
+		"@agie/clients": "workspace:*",
+		"@agie/rest-api-authorizer": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
 		"@aws-sdk/client-eventbridge": "~3",
 		"@aws-sdk/client-scheduler": "~3",
 		"@aws-sdk/client-verifiedpermissions": "~3",

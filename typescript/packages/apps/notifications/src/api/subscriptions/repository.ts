@@ -14,7 +14,7 @@
 import pino from "pino";
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, GetCommandInput, PutCommand, PutCommandInput, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import { Subscription, SubscriptionListOptions, SubscriptionWithUserId } from "./schemas.js";
-import { createDelimitedAttribute, DocumentDbClientItem, expandDelimitedAttribute } from "@arcade/dynamodb-utils";
+import { createDelimitedAttribute, DocumentDbClientItem, expandDelimitedAttribute } from "@agie/dynamodb-utils";
 import { PkType } from "../../common/pkUtils.js";
 import BaseLogger = pino.BaseLogger;
 

@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ARCADE Results",
-    "description": "Manages ARCADE engine execution results.",
+    "title": "AGIE Results",
+    "description": "Manages AGIE engine execution results.",
     "version": "1.0.0"
   },
   "components": {

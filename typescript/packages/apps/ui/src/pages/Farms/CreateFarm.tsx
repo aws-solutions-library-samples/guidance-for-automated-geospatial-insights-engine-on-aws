@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { CreateRegion } from '@arcade/regions';
+import { CreateRegion } from '@agie/regions';
 import { Button, Container, ContentLayout, Form, FormField, Header, Input, Select, SpaceBetween } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';

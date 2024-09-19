@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Assets, Geometry, Link } from '@arcade/events';
+import { Assets, Geometry, Link } from '@agie/events';
 
 export interface EngineMetadata {
 	/**

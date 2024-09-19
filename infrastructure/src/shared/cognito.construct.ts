@@ -44,11 +44,11 @@ export interface CognitoConstructProperties {
 	};
 }
 
-export const userPoolIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolId`;
-export const userPoolArnParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolArn`;
-export const userPoolClientIdParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolClientId`;
-export const userPoolDomainParameter = (environment: string) => `/arcade/${environment}/shared/cognitoUserPoolDomain`;
-export const adminUserParameter = (environment: string) => `/arcade/${environment}/shared/cognitoAdminUser`;
+export const userPoolIdParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolId`;
+export const userPoolArnParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolArn`;
+export const userPoolClientIdParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolClientId`;
+export const userPoolDomainParameter = (environment: string) => `/agie/${environment}/shared/cognitoUserPoolDomain`;
+export const adminUserParameter = (environment: string) => `/agie/${environment}/shared/cognitoAdminUser`;
 
 export class Cognito extends Construct {
 	public readonly userPoolId: string;
@@ -57,7 +57,7 @@ export class Cognito extends Construct {
 	constructor(scope: Construct, id: string, props: CognitoConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 
 		const userPoolEmailSettings: UserPoolEmail | undefined = props.userPoolEmail
 			? cognito.UserPoolEmail.withSES({
@@ -194,7 +194,7 @@ export class Cognito extends Construct {
 		 */
 
 		const group = new CfnUserPoolGroup(this, 'Group', {
-			groupName: 'arcade',
+			groupName: 'agie',
 			userPoolId: userPool.userPoolId,
 		});
 		group.node.addDependency(userPool);

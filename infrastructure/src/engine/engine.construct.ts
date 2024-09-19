@@ -40,16 +40,16 @@ export interface EngineConstructProperties {
 	readonly sentinelCollection: string;
 }
 
-export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorJobDefinitionArn`;
-export const engineProcessorHighPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorHighPriorityQueueArn`;
-export const engineProcessorStandardPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorStandardPriorityQueueArn`;
-export const engineProcessorLowPriorityQueueArn = (environment: string) => `/arcade/${environment}/scheduler/engineProcessorLowPriorityQueueArn`;
+export const engineProcessorJobDefinitionArnParameter = (environment: string) => `/agie/${environment}/scheduler/engineProcessorJobDefinitionArn`;
+export const engineProcessorHighPriorityQueueArn = (environment: string) => `/agie/${environment}/scheduler/engineProcessorHighPriorityQueueArn`;
+export const engineProcessorStandardPriorityQueueArn = (environment: string) => `/agie/${environment}/scheduler/engineProcessorStandardPriorityQueueArn`;
+export const engineProcessorLowPriorityQueueArn = (environment: string) => `/agie/${environment}/scheduler/engineProcessorLowPriorityQueueArn`;
 
 export class EngineConstruct extends Construct {
 	constructor(scope: Construct, id: string, props: EngineConstructProperties) {
 		super(scope, id);
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 
 		const accessLogBucket = new Bucket(this, 's3AccessLog', {
 			bucketName: `${namePrefix}-${Stack.of(this).account}-${Stack.of(this).region}-access-log`,
@@ -58,32 +58,32 @@ export class EngineConstruct extends Construct {
 				{
 					name: 'archive',
 					archiveAccessTierTime: Duration.days(90),
-					deepArchiveAccessTierTime: Duration.days(180),
-				},
+					deepArchiveAccessTierTime: Duration.days(180)
+				}
 			],
 			blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
 			enforceSSL: true,
 			autoDeleteObjects: true,
 			versioned: false,
-			removalPolicy: RemovalPolicy.DESTROY,
+			removalPolicy: RemovalPolicy.DESTROY
 		});
 
 		NagSuppressions.addResourceSuppressions(accessLogBucket, [
 			{
 				id: 'AwsSolutions-S1',
-				reason: 'This is only the access log not the log that contains the vpc traffic information.',
-			},
+				reason: 'This is only the access log not the log that contains the vpc traffic information.'
+			}
 		]);
 
 		const bucket = Bucket.fromBucketName(scope, 'SharedBucket', props.bucketName);
 		const eventBus = EventBus.fromEventBusName(scope, 'SharedEventBus', props.eventBusName);
 
 		const engineProcessorContainerAsset = new ecr_assets.DockerImageAsset(this, 'EngineProcessorContainerAsset', {
-			directory: path.join(__dirname, '../../../python/apps/arcade-pipeline'),
+			directory: path.join(__dirname, '../../../python/apps/satellite-image-processor')
 		});
 
 		const jobRole = new Role(this, 'ContainerJobRole', {
-			assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
+			assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com')
 		});
 
 		// The job role is assumed by the code running inside the container
@@ -93,7 +93,7 @@ export class EngineConstruct extends Construct {
 			new PolicyStatement({
 				actions: ['execute-api:Invoke'],
 				effect: Effect.ALLOW,
-				resources: [props.stacApiResourceArn],
+				resources: [props.stacApiResourceArn]
 			})
 		);
 
@@ -102,9 +102,8 @@ export class EngineConstruct extends Construct {
 			jobDefinitionName: `${namePrefix}-engine-processor`,
 			container: new EcsFargateContainerDefinition(this, 'EngineProcessorContainerDefinition', {
 				image: ContainerImage.fromRegistry(engineProcessorContainerAsset.imageUri),
-				memory: Size.mebibytes(4096),
-				cpu: 2,
-				ephemeralStorageSize: Size.gibibytes(100),
+				memory: Size.mebibytes(2048),
+				cpu: 1,
 				fargateCpuArchitecture: CpuArchitecture.X86_64,
 				fargateOperatingSystemFamily: OperatingSystemFamily.LINUX,
 				jobRole,
@@ -114,13 +113,13 @@ export class EngineConstruct extends Construct {
 					STAC_API_ENDPOINT: props.stacApiEndpoint,
 					SENTINEL_API_URL: props.sentinelApiUrl,
 					SENTINEL_COLLECTION: props.sentinelCollection
-				},
-			}),
+				}
+			})
 		});
 
 		new StringParameter(this, 'engineProcessorJobDefinitionParameter', {
 			parameterName: engineProcessorJobDefinitionArnParameter(props.environment),
-			stringValue: engineProcessorJobDefinition.jobDefinitionArn,
+			stringValue: engineProcessorJobDefinition.jobDefinitionArn
 		});
 
 		// This role is assumed by the ecs agent which will pull the container image from ecr repository
@@ -131,52 +130,52 @@ export class EngineConstruct extends Construct {
 		);
 
 		const computeEnvironment = new FargateComputeEnvironment(this, 'FargateComputeEnvironment', {
-			vpc: props.vpc,
+			vpc: props.vpc
 		});
 
 		const highPriorityQueue = new JobQueue(this, 'HighPriorityQueue', {
 			computeEnvironments: [
 				{
 					computeEnvironment,
-					order: 1,
-				},
+					order: 1
+				}
 			],
-			priority: 10,
+			priority: 10
 		});
 
 		const standardPriorityQueue = new JobQueue(this, 'StandardPriorityQueue', {
 			computeEnvironments: [
 				{
 					computeEnvironment,
-					order: 1,
-				},
+					order: 1
+				}
 			],
-			priority: 5,
+			priority: 5
 		});
 
 		const lowPriorityQueue = new JobQueue(this, 'LowPriorityQueue', {
 			computeEnvironments: [
 				{
 					computeEnvironment,
-					order: 1,
-				},
+					order: 1
+				}
 			],
-			priority: 1,
+			priority: 1
 		});
 
 		new StringParameter(this, 'engineProcessorHighPriorityQueueArn', {
 			parameterName: engineProcessorHighPriorityQueueArn(props.environment),
-			stringValue: highPriorityQueue.jobQueueArn,
+			stringValue: highPriorityQueue.jobQueueArn
 		});
 
 		new StringParameter(this, 'engineProcessorStandardPriorityQueueArn', {
 			parameterName: engineProcessorStandardPriorityQueueArn(props.environment),
-			stringValue: standardPriorityQueue.jobQueueArn,
+			stringValue: standardPriorityQueue.jobQueueArn
 		});
 
 		new StringParameter(this, 'engineProcessorLowPriorityQueueArn', {
 			parameterName: engineProcessorLowPriorityQueueArn(props.environment),
-			stringValue: lowPriorityQueue.jobQueueArn,
+			stringValue: lowPriorityQueue.jobQueueArn
 		});
 
 		const account = cdk.Stack.of(this).account;
@@ -188,8 +187,8 @@ export class EngineConstruct extends Construct {
 				{
 					id: 'AwsSolutions-IAM5',
 					reason: 'Ignore for now.',
-					appliesTo: [`Resource::arn:<AWS::Partition>:logs:${region}:${account}:log-group:/aws/batch/job:*`],
-				},
+					appliesTo: [`Resource::arn:<AWS::Partition>:logs:${region}:${account}:log-group:/aws/batch/job:*`]
+				}
 			],
 			true
 		);
@@ -200,13 +199,13 @@ export class EngineConstruct extends Construct {
 				{
 					id: 'AwsSolutions-IAM4',
 					reason: 'This is required for the container to pull the necessary images from ECR.',
-					appliesTo: [`Policy::arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy`],
+					appliesTo: [`Policy::arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy`]
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					reason: 'This resource condition in the IAM policy is generated by CDK, this only applies to logs:DeleteRetentionPolicy and logs:PutRetentionPolicy actions.',
-					appliesTo: ['Resource:arn:<AWS::Partition>:logs:<AWS::Region>:<AWS::AccountId>:log-group:/aws/batch/job:*'],
-				},
+					appliesTo: ['Resource:arn:<AWS::Partition>:logs:<AWS::Region>:<AWS::AccountId>:log-group:/aws/batch/job:*']
+				}
 			],
 			true
 		);
@@ -226,8 +225,8 @@ export class EngineConstruct extends Construct {
 						'Resource::arn:<AWS::Partition>:logs:<AWS::Region>:<AWS::AccountId>:log-group:/aws/batch/job:*',
 						`Resource::arn:<AWS::Partition>:execute-api:${region}:${account}:<StacServerModuleStacApiGateway48C0D803>/*/*/*`
 					],
-					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
-				},
+					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.'
+				}
 			],
 			true
 		);

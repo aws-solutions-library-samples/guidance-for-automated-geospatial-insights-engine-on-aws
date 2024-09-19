@@ -30,12 +30,12 @@ function getOrThrow(app: App, name: string): string {
     return attribute;
 }
 
-export interface ArcadeAwsEnvironment {
+export interface AgieAwsEnvironment {
     accountId?: string;
     region?: string;
 }
 
-const getArcadeAwsEnvironment = async (): Promise<ArcadeAwsEnvironment> => {
+const getAgieAwsEnvironment = async (): Promise<AgieAwsEnvironment> => {
     const sts = new STS({});
     let accountId, region;
     try {
@@ -55,5 +55,5 @@ const getArcadeAwsEnvironment = async (): Promise<ArcadeAwsEnvironment> => {
 export {
     tryGetBooleanContext,
     getOrThrow,
-    getArcadeAwsEnvironment
+    getAgieAwsEnvironment
 };

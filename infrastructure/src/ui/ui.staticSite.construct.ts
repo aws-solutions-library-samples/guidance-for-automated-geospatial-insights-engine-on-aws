@@ -18,8 +18,8 @@ import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 
-export const websiteBucketParameter = (environment: string) => `/arcade/${environment}/ui/websiteBucket`;
-export const websiteUrlParameter = (environment: string) => `/arcade/${environment}/ui/websiteUrl`;
+export const websiteBucketParameter = (environment: string) => `/agie/${environment}/ui/websiteBucket`;
+export const websiteUrlParameter = (environment: string) => `/agie/${environment}/ui/websiteUrl`;
 
 export interface StaticSiteConstructProperties {
 	environment: string;

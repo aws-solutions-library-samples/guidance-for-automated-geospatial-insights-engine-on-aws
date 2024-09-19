@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/resource-api-base",
+	"name": "@agie/resource-api-base",
 	"version": "1.0.0",
 	"description": "Base containing common functionality to support all resource API's.",
 	"author": "Dean Hart <deanhart@amazon.com>",
@@ -32,8 +32,8 @@
 		"@fastify/swagger": "~8",
 		"@fastify/type-provider-typebox": "~4",
 		"@sinclair/typebox": "~0",
-		"@arcade/dynamodb-utils": "workspace:*",
-		"@arcade/lambda-invoker": "workspace:*",
+		"@agie/dynamodb-utils": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
 		"awilix": "~10",
 		"aws-xray-sdk": "~3",
 		"fastify-plugin": "~4",

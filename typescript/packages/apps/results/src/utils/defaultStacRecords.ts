@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Collection, StacItem, Catalog } from '@arcade/events';
+import { Collection, StacItem, Catalog } from '@agie/events';
 
 export class DefaultStacRecords {
 	public defaultCatalog: Catalog;

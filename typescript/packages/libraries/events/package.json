@@ -1,7 +1,7 @@
 {
-	"name": "@arcade/events",
+	"name": "@agie/events",
 	"version": "0.0.1",
-	"description": "Arcade events",
+	"description": "Agie events",
 	"author": "William Sia <willsia@amazon.com>",
 	"exports": {
 		".": {

@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/ui",
+	"name": "@agie/ui",
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
@@ -32,7 +32,7 @@
 		"react-redux": "~9"
 	},
 	"devDependencies": {
-		"@arcade/regions": "workspace:*",
+		"@agie/regions": "workspace:*",
 		"@aws-sdk/client-ssm": "~3",
 		"@aws-sdk/client-sts": "~3",
 		"@types/react": "~18",

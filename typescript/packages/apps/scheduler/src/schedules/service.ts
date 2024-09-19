@@ -14,7 +14,7 @@
 import { FastifyBaseLogger } from "fastify";
 import { CreateScheduleCommand, CreateScheduleCommandInput, DeleteScheduleCommand, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
 import ow from 'ow';
-import { DomainEvent, ProcessingConfig, RegionResource } from "@arcade/events";
+import { DomainEvent, ProcessingConfig, RegionResource } from "@agie/events";
 
 export class SchedulesService {
 	constructor(readonly log: FastifyBaseLogger,
@@ -27,7 +27,7 @@ export class SchedulesService {
 	}
 
 	private scheduleName(id: string): string {
-		return `arcade-${this.environment}-${id}-schedule`;
+		return `agie-${this.environment}-${id}-schedule`;
 	}
 
 

@@ -1,5 +1,5 @@
 {
-	"name": "@arcade/regions",
+	"name": "@agie/regions",
 	"version": "0.0.1",
 	"description": "Manages hierarchical structures of groups, regions, and polygons.",
 	"exports": {
@@ -18,9 +18,9 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@arcade/dynamodb-utils": "workspace:*",
-		"@arcade/events": "workspace:*",
-		"@arcade/rest-api-authorizer": "workspace:*",
+		"@agie/dynamodb-utils": "workspace:*",
+		"@agie/events": "workspace:*",
+		"@agie/rest-api-authorizer": "workspace:*",
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
 		"@aws-sdk/client-sqs": "~3",

@@ -18,14 +18,14 @@ import type { CloudFormationCustomResourceEvent } from 'aws-lambda';
 const ssmClient = new SSMClient({});
 const avpClient = new VerifiedPermissionsClient({});
 
-export const identitySourceIdParameter = (environment: string) => `/arcade/${environment}/shared/verifiedPermissionsIdentitySourceId`;
+export const identitySourceIdParameter = (environment: string) => `/agie/${environment}/shared/verifiedPermissionsIdentitySourceId`;
 
 const addIdentitySource = async (environment: string, userPoolArn: string, policyStoreId: string): Promise<void> => {
 	console.log(`verifiedPermissions.customResource > addIdentitySource > in`);
 
 	const command = new CreateIdentitySourceCommand({
 		policyStoreId,
-		principalEntityType: 'Arcade::User',
+		principalEntityType: 'Agie::User',
 		configuration: {
 			cognitoUserPoolConfiguration: {
 				userPoolArn,

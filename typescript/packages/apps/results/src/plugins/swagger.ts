@@ -21,8 +21,8 @@ export default fp<FastifySwaggerOptions>(async (app) => {
 	await app.register(FastifySwagger, {
 		openapi: {
 			info: {
-				title: 'ARCADE Results',
-				description: `Manages ARCADE engine execution results.`,
+				title: 'AGIE Results',
+				description: `Manages AGIE engine execution results.`,
 				version: '1.0.0',
 			},
 			servers: [

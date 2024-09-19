@@ -25,22 +25,22 @@ const execAsync = promisify<string, { silent: boolean }, string>(shell.exec);
 
 export type Folder = string;
 
-const switchToArcadeLocation = async (): Promise<Folder> => {
-	let arcadeLocation = config.get('arcadePath');
-	if (!arcadeLocation) {
-		arcadeLocation = path.join(__dirname, '../../../../../');
+const switchToAgieLocation = async (): Promise<Folder> => {
+	let agieLocation = config.get('agiePath');
+	if (!agieLocation) {
+		agieLocation = path.join(__dirname, '../../../../../');
 	}
 
 	const rushConfiguration = rushlib.RushConfiguration.loadFromDefaultLocation({
-		startingFolder: arcadeLocation,
+		startingFolder: agieLocation,
 	});
 
-	const moduleConfiguration = rushConfiguration.findProjectByShorthandName('@arcade/infrastructure');
+	const moduleConfiguration = rushConfiguration.findProjectByShorthandName('@agie/infrastructure');
 	if (!moduleConfiguration) {
-		throw new Error('Module @arcade/infrastructure does not exist');
+		throw new Error('Module @agie/infrastructure does not exist');
 	}
 	shell.cd(moduleConfiguration.projectFolder);
 	return moduleConfiguration.projectFolder;
 };
 
-export { execAsync, switchToArcadeLocation };
+export { execAsync, switchToAgieLocation };

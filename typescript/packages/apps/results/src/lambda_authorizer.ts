@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { ApiAuthorizer, ArcadeIdentity } from '@arcade/rest-api-authorizer';
+import { ApiAuthorizer, AgieIdentity } from '@agie/rest-api-authorizer';
 import { Decision } from '@aws-sdk/client-verifiedpermissions';
 import { AwilixContainer } from 'awilix';
 import { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEvent } from 'aws-lambda';
@@ -44,7 +44,7 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent): Promise<
 		// swallow
 	}
 
-	let identity: ArcadeIdentity;
+	let identity: AgieIdentity;
 	try {
 		// Depending on http1.1 or http2, API Gateway provides different case on the authorization header.
 		const authorizationHeader = event.headers?.Authorization ?? event.headers?.authorization;

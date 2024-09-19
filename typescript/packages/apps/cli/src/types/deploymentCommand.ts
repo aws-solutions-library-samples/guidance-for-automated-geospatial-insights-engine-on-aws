@@ -47,9 +47,9 @@ export abstract class DeploymentCommand<T extends typeof Command> extends Comman
 		const { flags } = await this.parse();
 		if (flags.region) {
 			// used by aws cdk running in child shell
-			shelljs.env.ARCADE_REGION = flags.region;
+			shelljs.env.AGIE_REGION = flags.region;
 			// used by aws sdk running in current shell
-			process.env.ARCADE_REGION = flags.region;
+			process.env.AGIE_REGION = flags.region;
 		}
 		return await this.runChild();
 	}

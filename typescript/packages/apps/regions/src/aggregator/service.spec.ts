@@ -15,7 +15,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { mock, MockProxy } from 'vitest-mock-extended';
 import { AggregatorService } from "./service.js";
 import pino from "pino";
-import { DomainEvent } from "@arcade/events";
+import { DomainEvent } from "@agie/events";
 import { Polygon } from "../api/polygons/schemas.js";
 import { Region } from "../api/regions/schemas.js";
 import { bbox, polygon } from "@turf/turf";

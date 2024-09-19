@@ -27,7 +27,7 @@ import {
 	REGIONS_REGION_DELETED_EVENT,
 	REGIONS_REGION_UPDATED_EVENT,
 	ResultsChangeEvent,
-} from '@arcade/events';
+} from '@agie/events';
 import type { AwilixContainer } from 'awilix';
 import type { Callback, Context, EventBridgeHandler } from 'aws-lambda';
 import type { FastifyInstance } from 'fastify';

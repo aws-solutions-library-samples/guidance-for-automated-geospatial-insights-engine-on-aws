@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { Group } from '@arcade/regions';
+import { Group } from '@agie/regions';
 import { Alert, Box, Button, Modal, SpaceBetween } from '@cloudscape-design/components';
 import { useDeleteGroupMutation } from '../../slices/regionsApiSlice';
 

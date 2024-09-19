@@ -1,37 +1,37 @@
 permit (
     principal,
     action in [
-        Arcade::Action::"CreateGroup",
-        Arcade::Action::"ListGroups",
-        Arcade::Action::"DescribeGroup",
-        Arcade::Action::"UpdateGroup",
+        Agie::Action::"CreateGroup",
+        Agie::Action::"ListGroups",
+        Agie::Action::"DescribeGroup",
+        Agie::Action::"UpdateGroup",
 
-        Arcade::Action::"CreateRegion",
-        Arcade::Action::"ListRegions",
-        Arcade::Action::"DescribeRegion",
-        Arcade::Action::"UpdateRegion",
+        Agie::Action::"CreateRegion",
+        Agie::Action::"ListRegions",
+        Agie::Action::"DescribeRegion",
+        Agie::Action::"UpdateRegion",
 
-        Arcade::Action::"CreatePolygon",
-        Arcade::Action::"ListPolygons",
-        Arcade::Action::"DescribePolygon",
-        Arcade::Action::"UpdatePolygon",
+        Agie::Action::"CreatePolygon",
+        Agie::Action::"ListPolygons",
+        Agie::Action::"DescribePolygon",
+        Agie::Action::"UpdatePolygon",
 
-        Arcade::Action::"CreateState",
-        Arcade::Action::"ListStates",
-        Arcade::Action::"DescribeState",
-        Arcade::Action::"UpdateState",
+        Agie::Action::"CreateState",
+        Agie::Action::"ListStates",
+        Agie::Action::"DescribeState",
+        Agie::Action::"UpdateState",
 
-        Arcade::Action::"ListRegionTasks",
-        Arcade::Action::"DescribeRegionTask",
-        Arcade::Action::"CreateRegionTask",
-        Arcade::Action::"ListRegionTaskItems",
-        Arcade::Action::"DescribeRegionTaskItem",
+        Agie::Action::"ListRegionTasks",
+        Agie::Action::"DescribeRegionTask",
+        Agie::Action::"CreateRegionTask",
+        Agie::Action::"ListRegionTaskItems",
+        Agie::Action::"DescribeRegionTaskItem",
 
-        Arcade::Action::"ListPolygonTasks",
-        Arcade::Action::"DescribePolygonTask",
-        Arcade::Action::"CreatePolygonTask",
-        Arcade::Action::"ListPolygonTaskItems",
-        Arcade::Action::"DescribePolygonTaskItem"
+        Agie::Action::"ListPolygonTasks",
+        Agie::Action::"DescribePolygonTask",
+        Agie::Action::"CreatePolygonTask",
+        Agie::Action::"ListPolygonTaskItems",
+        Agie::Action::"DescribePolygonTaskItem"
     ],
     resource
 )

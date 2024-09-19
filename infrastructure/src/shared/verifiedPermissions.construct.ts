@@ -25,7 +25,7 @@ export interface VerifiedPermissionsProperties {
 	environment: string;
 }
 
-export const verifiedPermissionsPolicyStoreIdParameter = (environment: string) => `/arcade/${environment}/shared/verifiedPermissionsPolicyStoreId`;
+export const verifiedPermissionsPolicyStoreIdParameter = (environment: string) => `/agie/${environment}/shared/verifiedPermissionsPolicyStoreId`;
 
 export class VerifiedPermissions extends Construct {
 	public readonly policyStoreId: string;

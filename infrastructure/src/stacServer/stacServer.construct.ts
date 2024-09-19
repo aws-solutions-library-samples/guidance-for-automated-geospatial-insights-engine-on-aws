@@ -16,7 +16,7 @@ import { Code, Function, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
-import { getLambdaArchitecture } from '@arcade/cdk-common';
+import { getLambdaArchitecture } from '@agie/cdk-common';
 import {
 	AccessLogFormat,
 	ApiKeySourceType,
@@ -52,11 +52,13 @@ export interface StacServerConstructProperties {
 	readonly volumeSize: number;
 	readonly instanceCount: number;
 	readonly volumeType: string;
+	readonly dedicatedMasterEnabled: boolean;
+	readonly zoneAwarenessEnabled: boolean;
 }
 
-export const stacServerOpenSearchUrlParameter = (environment: string) => `/arcade/${environment}/stacServer/openSearchUrl`;
-export const stacServerApiUrlParameter = (environment: string) => `/arcade/${environment}/stacServer/apiUrl`;
-export const stacServerAdministratorSecretNameParameter = (environment: string) => `/arcade/${environment}/stacServer/administratorSecretName`;
+export const stacServerOpenSearchUrlParameter = (environment: string) => `/agie/${environment}/stacServer/openSearchUrl`;
+export const stacServerApiUrlParameter = (environment: string) => `/agie/${environment}/stacServer/apiUrl`;
+export const stacServerAdministratorSecretNameParameter = (environment: string) => `/agie/${environment}/stacServer/administratorSecretName`;
 
 export class StacServerModule extends Construct {
 	public stacServerEndpoint: string;
@@ -70,7 +72,7 @@ export class StacServerModule extends Construct {
 		const account = Stack.of(this).account;
 		const region = Stack.of(this).region;
 
-		const namePrefix = `arcade-${props.environment}`;
+		const namePrefix = `agie-${props.environment}`;
 		const excludeCharacters = '"#%&\'()*,-./:;<=>@[\\]_`{|}~?';
 
 		// This will be used by custom resource to initialise the OpenSearch server with resources required fo STAC
@@ -239,8 +241,8 @@ export class StacServerModule extends Construct {
 			clusterConfig: {
 				instanceType: props.instanceType,
 				instanceCount: props.instanceCount,
-				dedicatedMasterEnabled: true,
-				zoneAwarenessEnabled: true
+				dedicatedMasterEnabled: props.dedicatedMasterEnabled,
+				zoneAwarenessEnabled: props.zoneAwarenessEnabled
 			},
 			engineVersion: 'OpenSearch_2.11',
 			logPublishingOptions: {
@@ -385,7 +387,7 @@ export class StacServerModule extends Construct {
 		const logGroup = new LogGroup(this, 'StacApiLogs');
 		const apigw = new LambdaRestApi(this, 'StacApiGateway', {
 			restApiName: `${namePrefix}-stac-server`,
-			description: `ARCADE: Stac Server API: ${props.environment}`,
+			description: `AGIE: Stac Server API: ${props.environment}`,
 			handler: stacApiLambda,
 			proxy: true,
 			deployOptions: {

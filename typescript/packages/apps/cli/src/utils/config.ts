@@ -14,9 +14,9 @@
 import Conf from 'conf';
 
 const config = new Conf({
-	projectName: 'arcade',
+	projectName: 'agie',
 	schema: {
-		arcadePath: {
+		agiePath: {
 			type: 'string',
 		}
 	},

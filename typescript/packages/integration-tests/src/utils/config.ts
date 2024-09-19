@@ -33,7 +33,7 @@ export const initializeConfig = (pathToRoot: string, print = true): void => {
 export const printConfig = () => {
 	console.log('==================== Config: ==================== ');
 	Object.entries(process.env)
-		.filter(([k]) => k.startsWith('ARCADE_'))
+		.filter(([k]) => k.startsWith('AGIE_'))
 		.sort((a, b) => a[0].localeCompare(b[0]))
 		.forEach(([key, value]) => {
 			console.log(`\t${key}: ${value}`);

@@ -183,7 +183,7 @@ license-checker/
 predeploy.json
 
 __pycache__
-/python/apps/arcade-pipeline/output/
+/python/apps/agie-pipeline/output/
 /python/notebook/output/
 local.env
 

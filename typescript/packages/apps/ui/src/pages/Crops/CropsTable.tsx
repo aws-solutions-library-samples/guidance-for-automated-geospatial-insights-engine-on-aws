@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { State } from '@arcade/regions';
+import { State } from '@agie/regions';
 import { Box, Button, Header, Pagination, SpaceBetween, Table } from '@cloudscape-design/components';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
