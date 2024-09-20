@@ -98,7 +98,7 @@ export default function CreateField() {
 											<FormField label='Name' description='Enter the name of the field.'>
 												<Input value={field.name} ariaRequired={true} onChange={({ detail: { value } }) => onChange('name', value)} />
 											</FormField>
-											<FormField label='Name' description='Enter the bounday of the field in multipolygon format.'>
+											<FormField label='Boundary' description='Enter the boundary of the field in multipolygon format.'>
 												<Input
 													value={field.boundary.toString()}
 													ariaRequired={true}
