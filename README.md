@@ -45,13 +45,9 @@ Upon successful deployment of this solution, you will be able to do the followin
 
 ### Cost
 
-You will need to pay for the AWS services used while running this guidance.
-
-For cost management, we recommend creating a budget through AWS Cost Explorer. Prices are subject to change. For more details, refer to the pricing pages for each AWS service used in this guidance.
+You will need to pay for the AWS services used while running this guidance. As of September 2024, the cost for running this Guidance with the default settings in the US East (N. Virginia) is approximately $147.66 per month for analyzing 1000 polygons every 5 days as illustrated in the sample table below.
 
 ### Sample cost table
-
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month with 1000 polygons being analyzed every 5 days.
 
 | Region                | Description                        | Service            | Monthly | Assumptions                                                                                                                                                                                                                                                                                                                                                                      |
 |-----------------------|------------------------------------|--------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
