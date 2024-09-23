@@ -37,13 +37,8 @@ export default () => {
 				{ type: 'divider' },
 				{
 					type: 'link',
-					text: 'Subscriptions',
-					href: '/subscriptions',
-				},
-				{
-					type: 'link',
 					text: 'Documentation',
-					href: 'https://example.com',
+					href: 'https://github.com/aws-solutions-library-samples/automated-geospatial-insight-engine',
 					external: true,
 				},
 			]}
