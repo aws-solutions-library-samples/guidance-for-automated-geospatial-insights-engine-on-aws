@@ -95,7 +95,7 @@ const deployPlatform = (callerEnvironment?: {
 }): void => {
 	const sharedStack = new SharedInfrastructureStack(app, 'SharedStack', {
 		stackName: stackName('shared'),
-		description: stackDescription('Shared'),
+		description: `Infrastructure for AGIE Shared module -- Guidance for Automated Geospatial Insight Engine on AWS (SO9531).`,
 		environment,
 		administratorEmail,
 		administratorPhoneNumber,
