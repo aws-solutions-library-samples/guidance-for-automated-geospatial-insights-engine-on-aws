@@ -20,7 +20,7 @@ Many industries depend upon intelligence and insights gained from earth observat
 - Seed and Chemical Manufacturers
 - Sustainability
 
-To dive deep into ARCADE components, please visit the following links:
+To dive deep into AGIE components, please visit the following links:
 
 - [Regions Module](typescript/packages/apps/regions)
 - [Executor Module](typescript/packages/apps/executor)
