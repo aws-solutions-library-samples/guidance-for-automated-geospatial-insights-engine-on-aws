@@ -84,8 +84,8 @@ In order to deploy `AGIE` from your local workstation, you need to install the f
 Run the following command to clone the solution repository into your local workstation:
 
 ```shell
-$ git clone https://github.com/aws-solutions-library-samples/automated-geospatial-insight-engine
-$ cd automated-geospatial-insight-engine
+$ git clone https://github.com/aws-solutions-library-samples/guidance-for-automated-geospatial-insights-engine-on-aws
+$ cd guidance-for-automated-geospatial-insights-engine-on-aws
 $ export AGIE_FOLDER=$PWD
 $ export CLI_FOLDER="$PWD/typescript/packages/apps/cli"
 ```
