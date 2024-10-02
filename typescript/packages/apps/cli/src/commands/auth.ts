@@ -12,13 +12,14 @@
  */
 
 import { Flags } from '@oclif/core';
-import { DeploymentCommand } from '../types/deploymentCommand.js';
 import { Amplify } from 'aws-amplify';
 import { confirmSignIn, fetchAuthSession, getCurrentUser, signIn } from 'aws-amplify/auth';
-import { getParameterValue } from "../utils/ssm.js";
+import { DeploymentCommand } from '../types/deploymentCommand.js';
+import { getParameterValue } from '../utils/ssm.js';
 
 export interface AuthorizerUserProps {
 	environment: string;
+	region?: string;
 	username: string;
 	password: string;
 	newPassword?: string;
@@ -34,6 +35,11 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 			char: 'e',
 			required: true,
 			description: 'The environment to authenticate against.',
+		}),
+		region: Flags.string({
+			char: 'r',
+			required: true,
+			description: 'The AWS Region agie is deployed to.',
 		}),
 		username: Flags.string({
 			char: 'u',
@@ -92,7 +98,7 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 				if (signInDetails?.authFlowType === 'USER_SRP_AUTH') {
 					const { idToken } = (await fetchAuthSession()).tokens ?? {};
 					loginFlowFinished = true;
-					return idToken.toString();
+					return idToken!.toString();
 				}
 			}
 		} catch (err: any) {

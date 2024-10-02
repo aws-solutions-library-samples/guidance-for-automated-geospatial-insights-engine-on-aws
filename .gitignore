@@ -199,3 +199,5 @@ infrastructure/src/stacServer/lambdas/api.zip
 infrastructure/src/stacServer/lambdas/ingest.zip
 
 stac-server
+
+**/package-lock.json

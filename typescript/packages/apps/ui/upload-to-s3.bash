@@ -14,7 +14,7 @@
 #
 
 # Retrieve the website hosting bucket
-AGIE_WEBSITE_BUCKET=$(aws ssm get-parameters --names /agie/${ENVIRONMENT}/ui/websiteBucket --query 'Parameters[0].Value' --output text)
+AGIE_WEBSITE_BUCKET=$(aws ssm get-parameters --names /agie/${ENVIRONMENT}/ui/websiteBucket --query 'Parameters[0].Value' --output text --region $AWS_REGION)
 
 # Upload the bundled artifacts to the bucket
-aws s3 sync ./dist s3://"$AGIE_WEBSITE_BUCKET"
+aws s3 sync ./dist s3://"$AGIE_WEBSITE_BUCKET" --region $AWS_REGION

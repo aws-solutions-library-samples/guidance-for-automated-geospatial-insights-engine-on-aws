@@ -11,15 +11,15 @@
  *  and limitations under the License.
  */
 
-import { GetParameterCommand } from "@aws-sdk/client-ssm";
-import { getSSMClient } from "./awsClient.js";
+import { GetParameterCommand } from '@aws-sdk/client-ssm';
+import { getSSMClient } from './awsClient.js';
 
-async function getParameterValue(path: string, roleArn?: string): Promise<string> {
-	const ssm = await getSSMClient(roleArn);
+async function getParameterValue(path: string, region?: string, roleArn?: string): Promise<string> {
+	const ssm = await getSSMClient(region!, roleArn);
 	const response = await ssm.send(
 		new GetParameterCommand({
 			Name: path,
-		})
+		}),
 	);
 	return response.Parameter?.Value as string;
 }

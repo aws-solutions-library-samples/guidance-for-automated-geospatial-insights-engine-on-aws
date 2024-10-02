@@ -42,7 +42,6 @@ Upon successful deployment of this guidance, you will be able to do the followin
 - Visualize processed imagery and meta data via an optional but integrated UI
 - Integrate, customize, extend and augment existing workflows to achieve business goals
 
-
 ### Cost
 
 You will need to pay for the AWS services used while running this guidance. As of September 2024, the cost for running this Guidance with the default settings in the US East (N. Virginia) is approximately $147.66 per month for analyzing 1000 polygons every 5 days as illustrated in the sample table below.
@@ -60,7 +59,6 @@ You will need to pay for the AWS services used while running this guidance. As o
 | US East (N. Virginia) | AGIE Modules Lambda                | AWS Lambda         | $0      | Average size of each request (50 KB) Requests (50,000 per month)                                                                                                                                                                                                                                                                                                                 |
 | Total                 |                                    |                    | $147.66 |                                                                                                                                                                                                                                                                                                                                                                                  |
 
-
 ## Prerequisites for Deployment
 
 In order to deploy `AGIE` from your local workstation, you need to install the following dependencies:
@@ -73,8 +71,8 @@ In order to deploy `AGIE` from your local workstation, you need to install the f
 - [pnpm 9.0.2](https://www.npmjs.com/package/pnpm/v/9.0.2)
 - [tsx](https://www.npmjs.com/package/tsx/v/4.18.0)
 - It may be necessary to bootstrap your AWS environment. Bootstrapping is the process of preparing your AWS environment for usage with the AWS Cloud Development Kit (AWS CDK). Before you deploy a CDK stack into an AWS environment, the environment must first be bootstrapped. For more information about bootstrapping, please review the following:
-    - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
-    - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-env.html
+  - <https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html>
+  - <https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-env.html>
 - NOTE: AWS AGIE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
 
 ## Deployment
@@ -90,55 +88,38 @@ $ export AGIE_FOLDER=$PWD
 $ export CLI_FOLDER="$PWD/typescript/packages/apps/cli"
 ```
 
-### 2. Bundle the artifact from `Stac-server` repository
-
-AGIE conforms to the [STAC specification](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md) and generates [STAC item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md) as a result of the analysis. It stores these analysis results in [Stac-server](https://github.com/stac-utils/stac-server). To make the deployment simpler, we port the infrastructure definition from `serverless` framework to `cdk`. Run the following command to bundle `Stac-server` NodeJS application codes which are referred by the [StacServer](infrastructure/src/stacServer/stacServer.stack.ts) stack
-
-```shell
-$ cd $AGIE_FOLDER
-$ git clone --depth 1 --branch v3.8.0 https://github.com/stac-utils/stac-server.git
-$ cd stac-server && npm install && npm run build
-$ cp dist/api/api.zip $AGIE_FOLDER/infrastructure/src/stacServer/lambdas && cp dist/ingest/ingest.zip $AGIE_FOLDER/infrastructure/src/stacServer/lambdas
-
-```
-
-### 3. Build the solution
+### 2. Build the solution
 
 Run the following command to install the solution dependencies and build it:
 
 ```shell
-$ cd $AGIE_FOLDER
-$ rush update
-$ rush build
+cd $AGIE_FOLDER
+rush update
+rush build
 ```
 
-### 4. Deploy the solution
+### 3. Deploy the solution
 
 Setup some environment variables which will be referenced by rest of the commands. Replace the following variables with the actual value.
 
 | Name                             | Description                                                                                                           |
 |----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| AGIE_ADMINISTRATOR_EMAIL         | Administrator's email.                                                                                                |
-| AGIE_ADMINISTRATOR_MOBILE_NUMBER | Administrator's phone number (including the area code, e.g. +61xxxxxx).                                               |
 | AWS_REGION                       | AGIE's AWS Region deployment.                                                                                         |
 | ENVIRONMENT                      | Environment (.e.g dev, stage or prod). You can have multiple environment deployed in the same AWS account and region. |
 
-
 ```shell
-$ export AGIE_ADMINISTRATOR_EMAIL=<AGIE_ADMINISTRATOR_EMAIL>
-$ export AGIE_ADMINISTRATOR_MOBILE_NUMBER=<AGIE_ADMINISTRATOR_MOBILE_NUMBER>
-$ export ENVIRONMENT=<ENVIRONMENT>
-$ export AWS_REGION=<AWS_REGION>
+export ENVIRONMENT=<ENVIRONMENT>
+export AWS_REGION=<AWS_REGION>
 ```
 
 Run the following command to start the installation of AGIE:
 
 ```shell
-$ cd $AGIE_FOLDER/infrastructure
-$ npm run cdk -- deploy --concurrency=10 --require-approval never  -c environment=$ENVIRONMENT -c administratorEmail=$AGIE_ADMINISTRATOR_EMAIL -c administratorPhoneNumber=$AGIE_ADMINISTRATOR_MOBILE_NUMBER --all
+cd $CLI_FOLDER
+bin/run.js install -e $ENVIRONMENT -r $AWS_REGION
 ```
 
-### 5. Deployment Validation
+### 4. Deployment Validation
 
 To validate the deployment, open the CloudFormation console and verify the status of the following stacks
 
@@ -152,16 +133,7 @@ To validate the deployment, open the CloudFormation console and verify the statu
 8. agie-\<ENVIRONMENT\>-engine
 9. agie-\<ENVIRONMENT\>-scheduler
 
-### 6. Deploy the UI
-
-Run the following the bundle the Web UI assets and upload it to the web artifact buckets:
-
-```shell
-$ cd $AGIE_FOLDER/typescript/packages/apps/ui
-$ npm run deploy
-```
-
-### 7. Set your initial password
+### 5. Set your initial password
 
 Run the following command to set the password for the administrator user (replace the `<PASSWORD>` with your own) :
 
@@ -172,7 +144,6 @@ aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID  --username
 ```
 
 Now that you have everything set up, visit [walkthrough](docs/walkthrough.md) to get started on working with `AGIE`.
-
 
 ## Next Steps
 
@@ -185,12 +156,13 @@ Now that you have everything set up, visit [walkthrough](docs/walkthrough.md) to
 When deleting resources, please follow these steps:
 
 ```shell
-$ cd $AGIE_FOLDER/infrastructure
-$ npm run cdk -- destroy --all
+cd $CLI_FOLDER
+bin/run.js remove -e $ENVIRONMENT -r $AWS_REGION
 ```
+
 Also, we've configured some resources not to be deleted automatically. Please follow these steps to delete them manually:
 
-1. **Open the AWS Management Console**: Go to the AWS Management Console (https://console.aws.amazon.com) and sign in with your AWS credentials.
+1. **Open the AWS Management Console**: Go to the AWS Management Console (<https://console.aws.amazon.com>) and sign in with your AWS credentials.
 
 2. **Navigate to the S3 Service**: In the AWS Management Console, search for the "S3" service or select it from the list of services.
 
@@ -211,7 +183,3 @@ Also, we've configured some resources not to be deleted automatically. Please fo
 8. **Confirm the Bucket Deletion**: A confirmation dialog will appear, asking you to type the bucket name to confirm the deletion. Type the bucket name exactly as shown and click the "Delete bucket" button to proceed.
 
 9. **Repeat for Other Buckets**: If you have multiple S3 buckets created by your CDK deployment that you want to delete, repeat steps 4-8 for each bucket.
-
-
-
-
