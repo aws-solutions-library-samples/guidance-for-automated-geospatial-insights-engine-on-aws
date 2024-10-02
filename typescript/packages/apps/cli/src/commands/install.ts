@@ -31,7 +31,7 @@ const execAsync = promisify<string, { silent: boolean }, string>(shell.exec);
 
 export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 	public static description = 'Install AGIE for the specified environment';
-	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2 -a dummyEmail@test.com -n +614xxxxxxxx'];
+	public static examples = ['$ <%= config.bin %> <%= command.id %> -e stage -r us-west-2'];
 	public static enableJsonFlag = true;
 
 	public static flags = {

@@ -64,15 +64,12 @@ You will need to pay for the AWS services used while running this guidance. As o
 In order to deploy `AGIE` from your local workstation, you need to install the following dependencies:
 
 - Active AWS Account
+- Node.js 20.x
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Rush.js](https://rushjs.io/)
-- Node.js 20.x
 - [pnpm 9.0.2](https://www.npmjs.com/package/pnpm/v/9.0.2)
 - [tsx](https://www.npmjs.com/package/tsx/v/4.18.0)
-- It may be necessary to bootstrap your AWS environment. Bootstrapping is the process of preparing your AWS environment for usage with the AWS Cloud Development Kit (AWS CDK). Before you deploy a CDK stack into an AWS environment, the environment must first be bootstrapped. For more information about bootstrapping, please review the following:
-  - <https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html>
-  - <https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-env.html>
 - NOTE: AWS AGIE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
 
 ## Deployment
@@ -112,7 +109,7 @@ export ENVIRONMENT=<ENVIRONMENT>
 export AWS_REGION=<AWS_REGION>
 ```
 
-Run the following command to start the installation of AGIE:
+The installer will guide you through a list of configurable settings that you can apply to your environment deployment. Run the following command to start the installation of AGIE:
 
 ```shell
 cd $CLI_FOLDER
@@ -135,12 +132,12 @@ To validate the deployment, open the CloudFormation console and verify the statu
 
 ### 5. Set your initial password
 
-Run the following command to set the password for the administrator user (replace the `<PASSWORD>` with your own) :
+Run the following command to set the password for the administrator user (replace the `ADMINISTRATOR_EMAIL` and `<PASSWORD>` with your own) :
 
 ```shell
 export USER_POOL_ID=$(aws ssm get-parameter --name "/agie/$ENVIRONMENT/shared/cognitoUserPoolId" --query "Parameter.Value" --output text)
 
-aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID  --username $AGIE_ADMINISTRATOR_EMAIL --password <PASSWORD> --permanent
+aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID  --username <ADMINISTRASTOR_EMAIL> --password <PASSWORD> --permanent
 ```
 
 Now that you have everything set up, visit [walkthrough](docs/walkthrough.md) to get started on working with `AGIE`.
