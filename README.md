@@ -1,10 +1,10 @@
 # **AGIE** (Automated Geospatial Insight Engine)
 
-## Solution Overview
+## Guidance Overview
 
 Many industries depend upon intelligence and insights gained from earth observation data (satellite imagery, aerial imagery, remote sensing) and processed geospatial data, within their enterprise. Earth observation data, coupled with models (mechanistic and AI-powered), helps customers to improve demand and supply forecasting, automate risk management and mitigation workflows, improve customer outcomes, and improve their ability to meet regulatory requirements.
 
-![solution overview](docs/images/agie-solution-overview.png)
+![guidance overview](docs/images/agie-solution-overview.png)
 
 `AWS AGIE` removes the undifferentiated heavy lifting that customers face when designing, building, and implementing geospatial and earth observation image processing pipelines and related infrastructure. Common industries that benefit from earth observation and geospatial data processing and analytics include:
 
@@ -31,7 +31,7 @@ To dive deep into AGIE components, please visit the following links:
 - [UI Module](typescript/packages/apps/ui)
 
 ### Success
-Upon successful deployment of this solution, you will be able to do the following:
+Upon successful deployment of this guidance, you will be able to do the following:
 - Enroll polygons (areas of interest, farm fields, geographical areas of land) for processing and analysis
 - Schedule the frequency of polygon analysis, for each polygon, to support one-time and recurring automated processing
 - Automate the searching, downloading, clipping, and processing of earth observation data into NDVI maps and meta data, per polygon
@@ -84,8 +84,8 @@ In order to deploy `AGIE` from your local workstation, you need to install the f
 Run the following command to clone the solution repository into your local workstation:
 
 ```shell
-$ git clone https://github.com/aws-solutions-library-samples/automated-geospatial-insight-engine
-$ cd automated-geospatial-insight-engine
+$ git clone https://github.com/aws-solutions-library-samples/guidance-for-automated-geospatial-insights-engine-on-aws
+$ cd guidance-for-automated-geospatial-insights-engine-on-aws
 $ export AGIE_FOLDER=$PWD
 $ export CLI_FOLDER="$PWD/typescript/packages/apps/cli"
 ```
