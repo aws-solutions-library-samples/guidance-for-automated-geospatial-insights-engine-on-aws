@@ -11,12 +11,11 @@
  *  and limitations under the License.
  */
 
-import shell from 'shelljs';
-import { promisify } from 'util';
-import config from './config.js';
 import rushlib from '@microsoft/rush-lib';
 import path from 'path';
+import shell from 'shelljs';
 import { fileURLToPath } from 'url';
+import { promisify } from 'util';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,14 +24,17 @@ const execAsync = promisify<string, { silent: boolean }, string>(shell.exec);
 
 export type Folder = string;
 
-const switchToAgieLocation = async (): Promise<Folder> => {
-	let agieLocation = config.get('agiePath');
-	if (!agieLocation) {
-		agieLocation = path.join(__dirname, '../../../../../');
-	}
+const switchToAgieRootFolder = async (): Promise<Folder> => {
+	const agieFolder = path.join(__dirname, '../../../../../..');
+	shell.cd(agieFolder);
+	return agieFolder!;
+};
+
+const switchToAgieInfrastructureFolder = async (): Promise<Folder> => {
+	const agieFolder = path.join(__dirname, '../../../../../..');
 
 	const rushConfiguration = rushlib.RushConfiguration.loadFromDefaultLocation({
-		startingFolder: agieLocation,
+		startingFolder: agieFolder,
 	});
 
 	const moduleConfiguration = rushConfiguration.findProjectByShorthandName('@agie/infrastructure');
@@ -43,4 +45,4 @@ const switchToAgieLocation = async (): Promise<Folder> => {
 	return moduleConfiguration.projectFolder;
 };
 
-export { execAsync, switchToAgieLocation };
+export { execAsync, switchToAgieInfrastructureFolder, switchToAgieRootFolder };

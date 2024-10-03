@@ -12,7 +12,7 @@
  */
 
 import { Command } from '@oclif/core';
-import { switchToAgieLocation } from '../utils/shell.js';
+import { switchToAgieInfrastructureFolder } from '../utils/shell.js';
 
 export abstract class AgieCommand<T extends typeof Command> extends Command {
 	protected bashAndOperator = ' && ';
@@ -20,7 +20,7 @@ export abstract class AgieCommand<T extends typeof Command> extends Command {
 	abstract runChild(): Promise<Record<string, unknown> | Record<string, unknown>[] | void>;
 
 	public async run(): Promise<Record<string, unknown> | Record<string, unknown>[] | void> {
-		await switchToAgieLocation();
+		await switchToAgieInfrastructureFolder();
 		return await this.runChild();
 	}
 }

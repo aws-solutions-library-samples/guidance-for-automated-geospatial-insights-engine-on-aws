@@ -21,5 +21,13 @@
 		"lib"
 	],
 	"formatFiles.runOrganizeImports": true,
-	"formatFiles.excludePattern": "*.log,*.tsbuildinfo"
+	"formatFiles.excludePattern": "*.log,*.tsbuildinfo",
+	"[shellscript]": {
+		"editor.defaultFormatter": "foxundermoon.shell-format"
+	},
+
+    "files.exclude": {
+        "**/*.js": true,
+        "**/*.map": true
+    }
 }

@@ -29,7 +29,8 @@
 		"victory": "~37",
 		"@aws/amazon-location-utilities-auth-helper": "~1",
 		"@reduxjs/toolkit": "~2",
-		"react-redux": "~9"
+		"react-redux": "~9",
+		"tsx": "~4"
 	},
 	"devDependencies": {
 		"@agie/regions": "workspace:*",

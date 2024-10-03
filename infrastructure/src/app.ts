@@ -20,14 +20,14 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EngineStack } from './engine/engine.stack.js';
+import { NotificationsStack } from './notifications/notifications.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
 import { RegionsExtensionStack } from './regionsExtension/regionsExtension.stack.js';
+import { ResultsStack } from './results/results.stack.js';
+import { SchedulerStack } from './scheduler/scheduler.stack.js';
 import { SharedInfrastructureStack } from './shared/shared.stack.js';
 import { verifiedPermissionsPolicyStoreIdParameter } from './shared/verifiedPermissions.construct.js';
 import { StacServerStack } from './stacServer/stacServer.stack.js';
-import { ResultsStack } from './results/results.stack.js';
-import { SchedulerStack } from './scheduler/scheduler.stack.js';
-import { NotificationsStack } from './notifications/notifications.stack.js';
 import { UIApiStack } from './ui/ui.stack.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -50,8 +50,8 @@ const cognitoReplyToEmail = app.node.tryGetContext('cognitoReplyToEmail') as str
 const concurrencyLimit = parseInt(app.node.tryGetContext('concurrencyLimit') ?? 10);
 
 // optional configuration for STAC OpenSearch servers
-const stacServerInstanceType = app.node.tryGetContext('stacServerInstanceType') as string ?? 'c5.large.search';
-const stacServerVolumeType = app.node.tryGetContext('stacServerVolumeType') as string ?? 'gp3';
+const stacServerInstanceType = (app.node.tryGetContext('stacServerInstanceType') as string) ?? 'c5.large.search';
+const stacServerVolumeType = (app.node.tryGetContext('stacServerVolumeType') as string) ?? 'gp3';
 const stacServerVolumeSize = parseInt(app.node.tryGetContext('stacServerVolumeSize') ?? 20);
 const stacServerInstanceCount = parseInt(app.node.tryGetContext('stacServerInstanceCount') ?? 1);
 const stacServerDedicatedMasterEnabled = tryGetBooleanContext(app, 'stacServerDedicatedMasterEnabled', false);
@@ -61,9 +61,9 @@ const stacServerZoneAwarenessEnabled = tryGetBooleanContext(app, 'stacServerZone
 const deleteBucket = tryGetBooleanContext(app, 'deleteBucket', false);
 
 // Sentinel-2 Open Data on AWS parameters
-const sentinelTopicArn = app.node.tryGetContext('sentinelTopicArn') as string ?? 'arn:aws:sns:us-west-2:608149789419:cirrus-es-prod-publish';
-const sentinelApiUrl = app.node.tryGetContext('sentinelApiUrl') as string ?? 'https://earth-search.aws.element84.com/v1';
-const sentinelCollection = app.node.tryGetContext('sentinelCollection') as string ?? 'sentinel-2-c1-l2a';
+const sentinelTopicArn = (app.node.tryGetContext('sentinelTopicArn') as string) ?? 'arn:aws:sns:us-west-2:608149789419:cirrus-es-prod-publish';
+const sentinelApiUrl = (app.node.tryGetContext('sentinelApiUrl') as string) ?? 'https://earth-search.aws.element84.com/v1';
+const sentinelCollection = (app.node.tryGetContext('sentinelCollection') as string) ?? 'sentinel-2-c1-l2a';
 
 // user VPC config
 const useExistingVpc = tryGetBooleanContext(app, 'useExistingVpc', false);
@@ -71,17 +71,26 @@ const useExistingVpc = tryGetBooleanContext(app, 'useExistingVpc', false);
 // useRegionCache
 const useRegionCache = tryGetBooleanContext(app, 'useRegionCache', false);
 
-let userVpcId;
-let userIsolatedSubnetIds;
-let userPrivateSubnetIds;
-let userPublicSubnetIds;
-let userAvailabilityZones;
+let userVpcId: string;
+let userIsolatedSubnetIds: string[];
+let userPrivateSubnetIds: string[];
+let userPublicSubnetIds: string[];
+let userAvailabilityZones: string[];
+
 if (useExistingVpc) {
 	userVpcId = getOrThrow(app, 'existingVpcId');
-	userIsolatedSubnetIds = getOrThrow(app, 'existingIsolatedSubnetIds').toString().split(',');
-	userPrivateSubnetIds = getOrThrow(app, 'existingPrivateSubnetIds').toString().split(',');
-	userPublicSubnetIds = getOrThrow(app, 'existingPublicSubnetIds').toString().split(',');
-	userAvailabilityZones = getOrThrow(app, 'userAvailabilityZones').toString().split(',');
+
+	const existingIsolatedSubnetIds = getOrThrow(app, 'userIsolatedSubnetIds');
+	userIsolatedSubnetIds = Array.isArray(existingIsolatedSubnetIds) ? existingIsolatedSubnetIds : existingIsolatedSubnetIds.toString().split(',');
+
+	const existingPrivateSubnetIds = getOrThrow(app, 'userPrivateSubnetIds');
+	userPrivateSubnetIds = Array.isArray(existingPrivateSubnetIds) ? existingPrivateSubnetIds : existingPrivateSubnetIds.toString().split(',');
+
+	const existingPublicSubnetIds = getOrThrow(app, 'userPublicSubnetIds');
+	userPublicSubnetIds = Array.isArray(existingPublicSubnetIds) ? existingPublicSubnetIds : existingPublicSubnetIds.toString().split(',');
+
+	const availabilityZones = getOrThrow(app, 'availabilityZones');
+	userAvailabilityZones = Array.isArray(availabilityZones) ? availabilityZones : availabilityZones.toString().split(',');
 }
 
 cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
@@ -89,10 +98,7 @@ cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 const stackName = (suffix: string) => `agie-${environment}-${suffix}`;
 const stackDescription = (moduleName: string) => `Infrastructure for AGIE ${moduleName} module`;
 
-const deployPlatform = (callerEnvironment?: {
-	accountId?: string;
-	region?: string
-}): void => {
+const deployPlatform = (callerEnvironment?: { accountId?: string; region?: string }): void => {
 	const sharedStack = new SharedInfrastructureStack(app, 'SharedStack', {
 		stackName: stackName('shared'),
 		description: `Infrastructure for AGIE Shared module -- Guidance for Automated Geospatial Insight Engine on AWS (SO9531).`,
@@ -100,26 +106,28 @@ const deployPlatform = (callerEnvironment?: {
 		administratorEmail,
 		administratorPhoneNumber,
 		deleteBucket,
-		userVpcConfig: useExistingVpc ? {
-			availabilityZones: userAvailabilityZones,
-			privateSubnetIds: userPrivateSubnetIds,
-			publicSubnetIds: userPublicSubnetIds,
-			isolatedSubnetIds: userIsolatedSubnetIds,
-			vpcId: userVpcId
-		} : undefined,
+		userVpcConfig: useExistingVpc
+			? {
+					availabilityZones: userAvailabilityZones,
+					privateSubnetIds: userPrivateSubnetIds,
+					publicSubnetIds: userPublicSubnetIds,
+					isolatedSubnetIds: userIsolatedSubnetIds,
+					vpcId: userVpcId,
+			  }
+			: undefined,
 		userPoolEmail:
 			cognitoFromEmail !== undefined
 				? {
-					fromEmail: cognitoFromEmail,
-					fromName: cognitoFromName,
-					replyTo: cognitoReplyToEmail,
-					sesVerifiedDomain: cognitoVerifiedDomain
-				}
+						fromEmail: cognitoFromEmail,
+						fromName: cognitoFromName,
+						replyTo: cognitoReplyToEmail,
+						sesVerifiedDomain: cognitoVerifiedDomain,
+				  }
 				: undefined,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	const regionsStack = new RegionsApiStack(app, 'RegionsModule', {
@@ -131,8 +139,8 @@ const deployPlatform = (callerEnvironment?: {
 		useRegionCache,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	regionsStack.addDependency(sharedStack);
@@ -143,8 +151,8 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	regionsExtensionStack.addDependency(regionsStack);
@@ -161,8 +169,8 @@ const deployPlatform = (callerEnvironment?: {
 		zoneAwarenessEnabled: stacServerZoneAwarenessEnabled,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 	stacServerStack.addDependency(sharedStack);
 
@@ -177,8 +185,8 @@ const deployPlatform = (callerEnvironment?: {
 		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	engineStack.addDependency(sharedStack);
@@ -189,11 +197,11 @@ const deployPlatform = (callerEnvironment?: {
 		environment,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
+			account: callerEnvironment?.accountId,
 		},
 		stacServerTopicArn: stacServerStack.stacIngestTopicArn,
 		stacApiEndpoint: stacServerStack.stacApiEndpoint,
-		stacApiResourceArn: stacServerStack.stacApiResourceArn
+		stacApiResourceArn: stacServerStack.stacApiResourceArn,
 	});
 
 	resultStack.addDependency(sharedStack);
@@ -211,8 +219,8 @@ const deployPlatform = (callerEnvironment?: {
 		sentinelCollection,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 
 	schedulerStack.addDependency(sharedStack);
@@ -223,7 +231,7 @@ const deployPlatform = (callerEnvironment?: {
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),
 		description: stackDescription('Notifications'),
-		environment
+		environment,
 	});
 
 	notificationsStack.addDependency(sharedStack);
@@ -237,24 +245,24 @@ const deployPlatform = (callerEnvironment?: {
 		stacApiResourceArn: stacServerStack.stacApiResourceArn,
 		env: {
 			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId
-		}
+			account: callerEnvironment?.accountId,
+		},
 	});
 	uiStack.addDependency(sharedStack);
 };
 
 const getCallerEnvironment = ():
 	| {
-	accountId?: string;
-	region?: string;
-}
+			accountId?: string;
+			region?: string;
+	  }
 	| undefined => {
 	if (!fs.existsSync(`${__dirname}/predeploy.json`)) {
 		throw new Error(
 			'Pre deployment file does not exist\n' +
-			'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
-			'EXAMPLE\n' +
-			'$ npm run cdk deploy -- -e sampleEnvironment'
+				'Make sure you run the cdk using npm script which will run the predeploy script automatically\n' +
+				'EXAMPLE\n' +
+				'$ npm run cdk deploy -- -e sampleEnvironment'
 		);
 	}
 	const { callerEnvironment } = JSON.parse(fs.readFileSync(`${__dirname}/predeploy.json`, 'utf-8'));

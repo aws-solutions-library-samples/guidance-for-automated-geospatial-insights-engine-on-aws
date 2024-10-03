@@ -11,66 +11,44 @@
  *  and limitations under the License.
  */
 
-import { CloudFormationClient, CloudFormationClientConfig } from '@aws-sdk/client-cloudformation';
+import { CloudFormationClient } from '@aws-sdk/client-cloudformation';
+import { EC2Client } from '@aws-sdk/client-ec2';
+import { OpenSearchClient } from '@aws-sdk/client-opensearch';
+import { SSMClient } from '@aws-sdk/client-ssm';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
+import { AwsCredentialIdentity } from '@smithy/types';
 import { ulid } from 'ulid';
-import { SSMClient, SSMClientConfig } from "@aws-sdk/client-ssm";
 
-const stsClient = new STSClient({ region: process.env.AGIE_REGION ?? process.env.AWS_REGION });
-
-async function getSSMClient(roleArn?: string): Promise<SSMClient> {
-	const clientConfig: SSMClientConfig = { region: process.env.AGIE_REGION ?? process.env.AWS_REGION };
-	let ssmClient;
-	if (roleArn) {
-		const command = new AssumeRoleCommand({
-			RoleArn: roleArn,
-			RoleSessionName: `agie-cli-${ulid()}`,
-		});
-
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		const { Credentials } = await stsClient.send(command);
-		ssmClient = new SSMClient({
-			...clientConfig,
-			credentials: {
-				accessKeyId: Credentials?.AccessKeyId || '',
-				secretAccessKey: Credentials?.SecretAccessKey || '',
-				sessionToken: Credentials?.SessionToken || '',
-			},
-		});
-	} else {
-		ssmClient = new SSMClient({
-			...clientConfig,
-		});
-	}
-	return ssmClient;
+async function getTemporaryCredentials(region: string, roleArn: string): Promise<AwsCredentialIdentity> {
+	const stsClient = new STSClient({ region });
+	const command = new AssumeRoleCommand({
+		RoleArn: roleArn,
+		RoleSessionName: `agie-cli-${ulid()}`,
+	});
+	const { Credentials } = await stsClient.send(command);
+	return { accessKeyId: Credentials?.AccessKeyId || '', secretAccessKey: Credentials?.SecretAccessKey || '', sessionToken: Credentials?.SessionToken || '' };
 }
 
-async function getCloudFormationClient(roleArn?: string): Promise<CloudFormationClient> {
-	const clientConfig: CloudFormationClientConfig = { region: process.env.AGIE_REGION ?? process.env.AWS_REGION };
-	let cfClient;
-	if (roleArn) {
-		const command = new AssumeRoleCommand({
-			RoleArn: roleArn,
-			RoleSessionName: `agie-cli-${ulid()}`,
-		});
-
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		const { Credentials } = await stsClient.send(command);
-
-		cfClient = new CloudFormationClient({
-			...clientConfig,
-			credentials: {
-				accessKeyId: Credentials?.AccessKeyId || '',
-				secretAccessKey: Credentials?.SecretAccessKey || '',
-				sessionToken: Credentials?.SessionToken || '',
-			},
-		});
-	} else {
-		cfClient = new CloudFormationClient({
-			...clientConfig,
-		});
-	}
-	return cfClient;
+async function getSSMClient(region: string, roleArn?: string): Promise<SSMClient> {
+	const credentials = roleArn ? await getTemporaryCredentials(region, roleArn) : undefined;
+	return new SSMClient({ region, credentials });
 }
 
-export { getCloudFormationClient, getSSMClient };
+const getEc2Client = async (region: string, roleArn?: string): Promise<EC2Client> => {
+	const credentials = roleArn ? await getTemporaryCredentials(region, roleArn) : undefined;
+
+	return new EC2Client({ region, credentials });
+};
+
+const getOpenSearchClient = async (region: string, roleArn?: string): Promise<OpenSearchClient> => {
+	const credentials = roleArn ? await getTemporaryCredentials(region, roleArn) : undefined;
+
+	return new OpenSearchClient({ region, credentials });
+};
+
+async function getCloudFormationClient(region: string, roleArn?: string): Promise<CloudFormationClient> {
+	const credentials = roleArn ? await getTemporaryCredentials(region, roleArn) : undefined;
+	return new CloudFormationClient({ region, credentials });
+}
+
+export { getCloudFormationClient, getEc2Client, getOpenSearchClient, getSSMClient };

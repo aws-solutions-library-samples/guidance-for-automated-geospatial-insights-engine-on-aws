@@ -19,8 +19,8 @@ export interface StackMetadata {
 	status?: string;
 }
 
-const getDeployedStackByName = async (stackName: string, roleArn?: string): Promise<StackMetadata> => {
-	const cfClient = await getCloudFormationClient(roleArn);
+const getDeployedStackByName = async (stackName: string, region: string, roleArn?: string): Promise<StackMetadata> => {
+	const cfClient = await getCloudFormationClient(region, roleArn);
 	return await cfClient.send(new DescribeStacksCommand({ StackName: stackName })).then(async (r) => {
 		const stackName = r.Stacks?.[0].StackName;
 		const stackStatus = r.Stacks?.[0].StackStatus;
