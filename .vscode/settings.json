@@ -24,5 +24,10 @@
 	"formatFiles.excludePattern": "*.log,*.tsbuildinfo",
 	"[shellscript]": {
 		"editor.defaultFormatter": "foxundermoon.shell-format"
-	}
+	},
+
+    "files.exclude": {
+        "**/*.js": true,
+        "**/*.map": true
+    }
 }

@@ -78,8 +78,12 @@ export class AgieRemove extends AgieCommand<typeof AgieRemove> {
 							observer.next(data);
 						});
 
-						child.on('exit', function () {
-							observer.complete();
+						child.on('exit', function (code: number) {
+							if (code === 1) {
+								observer.error('Encountered error when removing AGIE stacks');
+							} else {
+								observer.complete();
+							}
 						});
 					});
 				},

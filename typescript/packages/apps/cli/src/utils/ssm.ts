@@ -14,7 +14,7 @@
 import { GetParameterCommand } from '@aws-sdk/client-ssm';
 import { getSSMClient } from './awsClient.js';
 
-async function getParameterValue(path: string, region?: string, roleArn?: string): Promise<string> {
+async function getParameterValue(path: string, region: string, roleArn?: string): Promise<string> {
 	const ssm = await getSSMClient(region!, roleArn);
 	const response = await ssm.send(
 		new GetParameterCommand({

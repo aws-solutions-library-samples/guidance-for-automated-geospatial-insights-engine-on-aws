@@ -19,7 +19,7 @@ import { getParameterValue } from '../utils/ssm.js';
 
 export interface AuthorizerUserProps {
 	environment: string;
-	region?: string;
+	region: string;
 	username: string;
 	password: string;
 	newPassword?: string;
@@ -64,8 +64,8 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 	];
 
 	private async generateAuthToken(props: AuthorizerUserProps): Promise<string> {
-		const userPoolClientId = await getParameterValue(userPoolClientIdParameter(props.environment));
-		const userPoolId = await getParameterValue(userPoolIdParameter(props.environment));
+		const userPoolClientId = await getParameterValue(userPoolClientIdParameter(props.environment), props.region);
+		const userPoolId = await getParameterValue(userPoolIdParameter(props.environment), props.region);
 
 		Amplify.configure({
 			Auth: {
@@ -117,6 +117,7 @@ export class Auth extends DeploymentCommand<typeof Auth> {
 				username: flags.username,
 				password: flags.password,
 				newPassword: flags.newPassword,
+				region: flags.region,
 			});
 			console.log(token);
 		} catch (error) {

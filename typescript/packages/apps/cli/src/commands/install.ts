@@ -53,7 +53,6 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 			char: 'h',
 			description: 'If provided, bypass the questions. You will also need to specify the path configuration file using -c',
 			dependsOn: ['config'],
-			default: false,
 		}),
 		role: Flags.string({
 			description: 'The RoleArn for the CLI to assume for deployment.',
@@ -69,7 +68,7 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 
 		const installTasks = await this.getAgieInstallTask(flags.role!, region, rest);
 
-		const taskRunner: Listr = new Listr([this.getStacServerBundleTask(), ...installTasks]);
+		const taskRunner: Listr = new Listr([this.getStacServerBundleTask(), ...installTasks], { exitOnError: true });
 
 		await taskRunner.run({ answers });
 	}
@@ -118,6 +117,8 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 				task: async (_, task) => {
 					try {
 						await getDeployedStackByName('CDKToolkit', region, role);
+						task.skip('Skip boostrapping cdk');
+						return;
 					} catch (error) {
 						if ((error as Error).message === 'Stack with id CDKToolkit does not exist') {
 							task.output = `CDK has not been bootstrapped in ${region}, running bootstrap...`;
@@ -134,7 +135,7 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 			},
 			{
 				title: 'Deploying AGIE stacks',
-				task: async () => {
+				task: async (ctx, task) => {
 					return new Observable((observer) => {
 						shell.cd(infrastructureFolder);
 
@@ -151,8 +152,12 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 							observer.next(data);
 						});
 
-						child.on('exit', function () {
-							observer.complete();
+						child.on('exit', function (code: number) {
+							if (code === 1) {
+								observer.error('Encountered error when deploying AGIE stacks');
+							} else {
+								observer.complete();
+							}
 						});
 					});
 				},
@@ -170,8 +175,13 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 						child?.stderr?.on('data', function (data) {
 							observer.next(data);
 						});
-						child.on('exit', function () {
-							observer.complete();
+
+						child.on('exit', function (code: number) {
+							if (code === 1) {
+								observer.error('Encountered error when deploying the demo UI');
+							} else {
+								observer.complete();
+							}
 						});
 					});
 				},

@@ -106,7 +106,8 @@
 		"simple-git": "~3",
 		"replace-in-file": "~7",
 		"validator": "~13",
-		"rxjs": "~7"
+		"rxjs": "~7",
+		"tsx": "~4"
 	},
 	"devDependencies": {
 		"@oclif/test": "~3",

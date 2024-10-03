@@ -28,11 +28,11 @@ export interface ContextAnswer {
 	useRegionCache?: boolean;
 	// network configuration
 	useExistingVpc?: boolean;
-	userVpcId?: string;
+	existingVpcId?: string;
 	userIsolatedSubnetIds?: (string | undefined)[];
 	userPrivateSubnetIds?: (string | undefined)[];
 	userPublicSubnetIds?: (string | undefined)[];
-	userAvailabilityZones?: (string | undefined)[];
+	availabilityZones?: (string | undefined)[];
 }
 
 export const schema: JSONSchemaType<ContextAnswer> = {
@@ -55,11 +55,11 @@ export const schema: JSONSchemaType<ContextAnswer> = {
 		stacServerZoneAwarenessEnabled: { type: 'boolean', nullable: true },
 		useRegionCache: { type: 'boolean', nullable: true },
 		useExistingVpc: { type: 'boolean', nullable: true },
-		userVpcId: { type: 'string', nullable: true },
+		existingVpcId: { type: 'string', nullable: true },
 		userIsolatedSubnetIds: { type: 'array', items: { type: 'string', nullable: true }, nullable: true },
 		userPrivateSubnetIds: { type: 'array', items: { type: 'string', nullable: true }, nullable: true },
 		userPublicSubnetIds: { type: 'array', items: { type: 'string', nullable: true }, nullable: true },
-		userAvailabilityZones: { type: 'array', items: { type: 'string', nullable: true }, nullable: true },
+		availabilityZones: { type: 'array', items: { type: 'string', nullable: true }, nullable: true },
 	},
 	required: ['administratorEmail', 'administratorPhoneNumber'],
 	additionalProperties: true,
@@ -108,12 +108,12 @@ export class AnswersBuilder {
 				.map((o) => ({ name: o.InstanceType, value: o.InstanceType }));
 
 			answers.stacServerDedicatedMasterEnabled = await confirm({
-				message: `Indicates whether to use a dedicated master node for the OpenSearch Service domain.\r\nA dedicated master node is a cluster node that performs cluster management tasks, but doesn't hold data or respond to data upload requests.\r\nDedicated master nodes offload cluster management tasks to increase the stability of your search clusters`,
+				message: `A dedicated master node is a cluster node that performs cluster management tasks, but doesn't hold data or respond to data upload requests.\r\n  Dedicated master nodes offload cluster management tasks to increase the stability of your search clusters.\r\n  Do you want to use a dedicated master node for the OpenSearch Service domain?`,
 				default: answers.stacServerDedicatedMasterEnabled ?? false,
 			});
 
 			answers.stacServerZoneAwarenessEnabled = await confirm({
-				message: `Indicates whether to enable zone awareness for the OpenSearch Service domain.\r\nWhen you enable zone awareness, OpenSearch Service allocates the nodes and replica index shards that belong to a cluster across two Availability Zones (AZs) in the same region to prevent data loss and minimize downtime in the event of node or data center failure.\r\nDon't enable zone awareness if your cluster has no replica index shards or is a single-node cluster`,
+				message: `When you enable zone awareness, OpenSearch Service allocates the nodes and replica index shards that belong to a cluster across two Availability Zones (AZs) in the same region to prevent data loss and minimize downtime in the event of node or data center failure.\r\n  Don't enable zone awareness if your cluster has no replica index shards or is a single-node cluster\r\n  Do you want to enable zone awareness for the OpenSearch Service domain?`,
 				default: answers.stacServerZoneAwarenessEnabled ?? false,
 			});
 
@@ -179,22 +179,28 @@ export class AnswersBuilder {
 					};
 				}) ?? [];
 
-			answers.userVpcId = await select({
-				message: 'Select the existing VPC to use when deploying AGIE',
+			answers.existingVpcId = await select({
+				message: 'Select the existing VPC to use when deploying AGIE:',
 				choices: existingVpcList,
-				default: answers.userVpcId,
+				default: answers.existingVpcId,
 			});
 
-			if (answers.userVpcId === undefined) {
+			if (answers.existingVpcId === undefined) {
 				throw new Error('VPC ID is required if using an existing VPC');
 			}
 
 			const describeSubnetsInput: DescribeSubnetsCommandInput = {
-				Filters: [{ Name: 'vpc-id', Values: [answers.userVpcId] }],
+				Filters: [{ Name: 'vpc-id', Values: [answers.existingVpcId] }],
 			};
 
+			const allSubnets = (await ec2Client.send(new DescribeSubnetsCommand(describeSubnetsInput))).Subnets;
+
+			const availabilityZoneSet = new Set<string>();
+			allSubnets?.forEach((o) => availabilityZoneSet.add(o.AvailabilityZone!));
+			answers.availabilityZones = Array.from(availabilityZoneSet);
+
 			const existingVpcSubnets = (
-				(await ec2Client.send(new DescribeSubnetsCommand(describeSubnetsInput))).Subnets?.map((s) => {
+				allSubnets?.map((s) => {
 					const subnetName = s.Tags?.find((t) => {
 						return t.Key === 'Name';
 					});
@@ -207,7 +213,7 @@ export class AnswersBuilder {
 			).sort((a, b) => a.name!.localeCompare(b.name!));
 
 			answers.userIsolatedSubnetIds = await checkbox({
-				message: `Which subnets in vpc ${answers.userVpcId} should AGIE use as isolated subnets?`,
+				message: `Which subnets in vpc ${answers.existingVpcId} should AGIE use as isolated subnets?`,
 				required: true,
 				choices: existingVpcSubnets,
 				loop: false,
@@ -222,7 +228,7 @@ export class AnswersBuilder {
 			});
 
 			answers.userPrivateSubnetIds = await checkbox({
-				message: `Which subnets in vpc ${answers.userVpcId}  should AGIE use as private subnets?`,
+				message: `Which subnets in vpc ${answers.existingVpcId}  should AGIE use as private subnets?`,
 				choices: nonIsolatedSubnets.sort((a, b) => a.name!.localeCompare(b.name!)),
 				loop: false,
 			});
@@ -236,7 +242,7 @@ export class AnswersBuilder {
 			});
 
 			answers.userPublicSubnetIds = await checkbox({
-				message: `Which subnets in vpc ${answers.userVpcId}  should AGIE use as public subnets?`,
+				message: `Which subnets in vpc ${answers.existingVpcId}  should AGIE use as public subnets?`,
 				choices: nonPrivateAndIsolatedSubnets.sort((a, b) => a.value!.localeCompare(b.value!)),
 				loop: false,
 			});

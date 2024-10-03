@@ -31,7 +31,9 @@ To dive deep into AGIE components, please visit the following links:
 - [UI Module](typescript/packages/apps/ui)
 
 ### Success
+
 Upon successful deployment of this guidance, you will be able to do the following:
+
 - Enroll polygons (areas of interest, farm fields, geographical areas of land) for processing and analysis
 - Schedule the frequency of polygon analysis, for each polygon, to support one-time and recurring automated processing
 - Automate the searching, downloading, clipping, and processing of earth observation data into NDVI maps and meta data, per polygon
@@ -64,13 +66,12 @@ You will need to pay for the AWS services used while running this guidance. As o
 In order to deploy `AGIE` from your local workstation, you need to install the following dependencies:
 
 - Active AWS Account
-- Node.js 20.x
+- [Node.js 20.x](https://nodejs.org/en/download/package-manager)
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Rush.js](https://rushjs.io/)
-- [pnpm 9.0.2](https://www.npmjs.com/package/pnpm/v/9.0.2)
-- [tsx](https://www.npmjs.com/package/tsx/v/4.18.0)
-- NOTE: AWS AGIE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
+
+> NOTE: AWS AGIE includes an optional UI module. The optional and integrated UI module includes functionality provided by Amazon Location Service. As of 7/24, Amazon Location Service is not available in certain AWS Regions, including us-west-1. Please review the most current list of Region availability of Amazon Location Service to ensure the optional UI module can be deployed within a Region that meets your company requirements.
 
 ## Deployment
 
@@ -79,10 +80,10 @@ In order to deploy `AGIE` from your local workstation, you need to install the f
 Run the following command to clone the solution repository into your local workstation:
 
 ```shell
-$ git clone https://github.com/aws-solutions-library-samples/guidance-for-automated-geospatial-insights-engine-on-aws
-$ cd guidance-for-automated-geospatial-insights-engine-on-aws
-$ export AGIE_FOLDER=$PWD
-$ export CLI_FOLDER="$PWD/typescript/packages/apps/cli"
+git clone https://github.com/aws-solutions-library-samples/guidance-for-automated-geospatial-insights-engine-on-aws
+cd guidance-for-automated-geospatial-insights-engine-on-aws
+export AGIE_FOLDER=$PWD
+export CLI_FOLDER="$PWD/typescript/packages/apps/cli"
 ```
 
 ### 2. Build the solution
