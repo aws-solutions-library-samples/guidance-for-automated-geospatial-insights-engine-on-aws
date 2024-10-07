@@ -13,7 +13,5 @@
 
 export enum PkType {
 	RegionId = 'ri',
-	ResultId = 'rs',
-	Status = 'st',
-	EndDateTime = 'ed',
+	Day = 'dy',
 }

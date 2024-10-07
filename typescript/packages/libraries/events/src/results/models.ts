@@ -42,134 +42,134 @@ export type Role = 'thumbnail' | 'overview' | 'data' | 'metadata';
  * Polygon: "coordinates": [[[100.0, 0.0],[101.0, 0.0],[101.0, 1.0],[100.0, 1.0],[100.0, 0.0]]]
  */
 export type GeometryType =
-	'Point'
-	| 'MultiPoint'
-	| 'LineString'
-	| 'MultiLineString'
-	| 'Polygon'
-	| 'MultiPolygon'
-	| 'GeometryCollection';
+        'Point'
+        | 'MultiPoint'
+        | 'LineString'
+        | 'MultiLineString'
+        | 'Polygon'
+        | 'MultiPolygon'
+        | 'GeometryCollection';
 
 export interface Geometry {
-	type: GeometryType;
-	coordinates:
-		| [number, number] //Point
-		| [[number, number]] //LineString
-		| [[[number, number]]]; //Polygon
+    type: GeometryType;
+    coordinates:
+            | [number, number] //Point
+            | [[number, number]] //LineString
+            | [[[number, number]]]; //Polygon
 }
 
 /**
  * The searchable properties of a stac item
  */
 export interface Properties {
-	/**
-	 * The searchable date and time of the assets, which must be in UTC.
-	 * It is formatted according to RFC 3339, section 5.6. null is allowed, but requires start_datetime and end_datetime from common metadata to be set.
-	 */
-	datetime: string | null;
-	start_datetime?: string;
-	end_datetime?: string;
+    /**
+     * The searchable date and time of the assets, which must be in UTC.
+     * It is formatted according to RFC 3339, section 5.6. null is allowed, but requires start_datetime and end_datetime from common metadata to be set.
+     */
+    datetime: string | null;
+    start_datetime?: string;
+    end_datetime?: string;
 
-	/**
-	 * Providers should include metadata fields that are relevant for users of STAC, but it is recommended to select only those necessary for search.
-	 * Where possible metadata fields should be mapped to the STAC Common Metadata and widely used extensions, to enable cross-catalog search on known fields.
-	 */
-	[k: string]: unknown;
+    /**
+     * Providers should include metadata fields that are relevant for users of STAC, but it is recommended to select only those necessary for search.
+     * Where possible metadata fields should be mapped to the STAC Common Metadata and widely used extensions, to enable cross-catalog search on known fields.
+     */
+    [k: string]: unknown;
 }
 
 export interface Link {
-	/**
-	 * The actual link in the format of an URL. Relative and absolute links are both allowed.
-	 */
-	href: string;
-	/**
-	 * Relationship between the current document and the linked document. See chapter "Relation types" for more information.
-	 */
-	rel: RelationType;
-	/**
-	 * Media type of the referenced entity.
-	 * https://github.com/radiantearth/stac-spec/blob/master/catalog-spec/catalog-spec.md#media-types
-	 */
-	type?: MediaType;
-	/**
-	 * A human readable title to be used in rendered displays of the link.
-	 */
-	title?: string;
+    /**
+     * The actual link in the format of an URL. Relative and absolute links are both allowed.
+     */
+    href: string;
+    /**
+     * Relationship between the current document and the linked document. See chapter "Relation types" for more information.
+     */
+    rel: RelationType;
+    /**
+     * Media type of the referenced entity.
+     * https://github.com/radiantearth/stac-spec/blob/master/catalog-spec/catalog-spec.md#media-types
+     */
+    type?: MediaType;
+    /**
+     * A human readable title to be used in rendered displays of the link.
+     */
+    title?: string;
 }
 
 export interface Asset {
-	/**
-	 * URI to the asset object. Relative and absolute URI are both allowed.
-	 */
-	href: string;
-	/**
-	 * The displayed title for clients and users.
-	 */
-	title?: string;
-	/**
-	 * A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.
-	 */
-	description?: string;
-	/**
-	 * Media type of the asset.
-	 */
-	type?: MediaType;
-	roles?: Role[];
+    /**
+     * URI to the asset object. Relative and absolute URI are both allowed.
+     */
+    href: string;
+    /**
+     * The displayed title for clients and users.
+     */
+    title?: string;
+    /**
+     * A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.
+     */
+    description?: string;
+    /**
+     * Media type of the asset.
+     */
+    type?: MediaType;
+    roles?: Role[];
 
-	/**
-	 * Attributes enable via extension
-	 */
-	[k: string]: unknown;
+    /**
+     * Attributes enable via extension
+     */
+    [k: string]: unknown;
 }
 
 export interface Assets {
-	[k: string]: Asset;
+    [k: string]: Asset;
 }
 
 export interface StacItem {
-	/**
-	 * Provider identifier. The ID should be unique within the Collection that contains the Item.
-	 */
-	id: string;
-	/**
-	 * The id of the STAC Collection this Item references
-	 */
-	collection: string;
-	/**
-	 * Type of the GeoJSON Object. MUST be set to Feature.
-	 */
-	type: string;
-	/**
-	 * The STAC version the Item implements.
-	 */
-	stac_version: string;
-	/**
-	 * A list of extensions the Item implements.
+    /**
+     * Provider identifier. The ID should be unique within the Collection that contains the Item.
+     */
+    id: string;
+    /**
+     * The id of the STAC Collection this Item references
+     */
+    collection: string;
+    /**
+     * Type of the GeoJSON Object. MUST be set to Feature.
+     */
+    type: string;
+    /**
+     * The STAC version the Item implements.
+     */
+    stac_version: string;
+    /**
+     * A list of extensions the Item implements.
 
-	 */
-	stac_extensions: string[];
-	/**
-	 * Defines the full footprint of the asset represented by this item, formatted according to RFC 7946, section 3.1.
-	 * The footprint should be the default GeoJSON geometry, though additional geometries can be included.
-	 * Coordinates are specified in Longitude/Latitude or Longitude/Latitude/Elevation based on WGS 84.
-	 */
-	geometry: Geometry;
-	/**
-	 * Bounding Box of the asset represented by this Item, formatted according to RFC 7946, section 5.
-	 */
-	bbox: number[];
-	/**
-	 * A dictionary of additional metadata for the Item.
-	 */
-	properties: Properties;
-	/**
-	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
-	 */
-	links: Link[];
-	/**
-	 * Dictionary of asset objects that can be downloaded, each with a unique key.
-	 */
-	assets: Assets;
+     */
+    stac_extensions: string[];
+    /**
+     * Defines the full footprint of the asset represented by this item, formatted according to RFC 7946, section 3.1.
+     * The footprint should be the default GeoJSON geometry, though additional geometries can be included.
+     * Coordinates are specified in Longitude/Latitude or Longitude/Latitude/Elevation based on WGS 84.
+     */
+    geometry: Geometry;
+    /**
+     * Bounding Box of the asset represented by this Item, formatted according to RFC 7946, section 5.
+     */
+    bbox: number[];
+    /**
+     * A dictionary of additional metadata for the Item.
+     */
+    properties: Properties;
+    /**
+     * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
+     */
+    links: Link[];
+    /**
+     * Dictionary of asset objects that can be downloaded, each with a unique key.
+     */
+    assets: Assets;
 }
 
 /**
@@ -177,33 +177,33 @@ export interface StacItem {
  * May also include information about the final storage provider hosting the data.
  */
 export interface Provider {
-	/**
-	 * The name of the organization or the individual.
-	 */
-	name: string;
-	/**
-	 * Multi-line description to add further provider information such as processing details for processors and producers, hosting details for hosts or basic contact information.
-	 * CommonMark 0.29 syntax MAY be used for rich text representation.
-	 */
-	description?: string;
-	/**
-	 * Roles of the provider. Any of licensor, producer, processor or host.
-	 */
-	roles?: string[];
-	/**
-	 * Homepage on which the provider describes the dataset and publishes contact information.
-	 */
-	url?: string;
+    /**
+     * The name of the organization or the individual.
+     */
+    name: string;
+    /**
+     * Multi-line description to add further provider information such as processing details for processors and producers, hosting details for hosts or basic contact information.
+     * CommonMark 0.29 syntax MAY be used for rich text representation.
+     */
+    description?: string;
+    /**
+     * Roles of the provider. Any of licensor, producer, processor or host.
+     */
+    roles?: string[];
+    /**
+     * Homepage on which the provider describes the dataset and publishes contact information.
+     */
+    url?: string;
 }
 
 /**
  * The object describes the spatial extents of the Collection.
  */
 export interface Spatial {
-	/**
-	 * Potential spatial extents covered by the Collection.
-	 */
-	bbox: number[][];
+    /**
+     * Potential spatial extents covered by the Collection.
+     */
+    bbox: number[][];
 }
 
 /**
@@ -211,135 +211,135 @@ export interface Spatial {
  */
 
 export interface Temporal {
-	/**
-	 * Potential temporal extents covered by the Collection.
-	 */
-	interval: string[][];
+    /**
+     * Potential temporal extents covered by the Collection.
+     */
+    interval: string[][];
 }
 
 /**
  * The object describes the spatio-temporal extents of the Collection. Both spatial and temporal extents are required to be specified.
  */
 export interface Extent {
-	/**
-	 * Potential spatial extents covered by the Collection.
-	 */
-	spatial: Spatial;
-	/**
-	 * Potential temporal extents covered by the Collection.
-	 */
-	temporal: Temporal;
+    /**
+     * Potential spatial extents covered by the Collection.
+     */
+    spatial: Spatial;
+    /**
+     * Potential temporal extents covered by the Collection.
+     */
+    temporal: Temporal;
 }
 
 export interface Catalog {
-	/**
-	 * Identifier for the Catalog that is unique across the provider.
-	 */
-	id: string;
-	/**
-	 *  Set to Catalog if this Catalog only implements the Catalog spec.
-	 */
-	type: string;
-	/**
-	 * The STAC version the Catalog implements.
-	 */
-	stac_version: string;
+    /**
+     * Identifier for the Catalog that is unique across the provider.
+     */
+    id: string;
+    /**
+     *  Set to Catalog if this Catalog only implements the Catalog spec.
+     */
+    type: string;
+    /**
+     * The STAC version the Catalog implements.
+     */
+    stac_version: string;
 
-	/**
-	 * A list of extension identifiers the Catalog implements.
-	 */
-	stac_extensions?: string[];
-	/**
-	 * A short descriptive one-line title for the Catalog.
-	 */
-	title?: string;
-	/**
-	 * Detailed multi-line description to fully explain the Catalog. CommonMark 0.29 syntax MAY be used for rich text representation.
-	 */
-	description: string;
-	/**
-	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
-	 */
-	links: Link[];
+    /**
+     * A list of extension identifiers the Catalog implements.
+     */
+    stac_extensions?: string[];
+    /**
+     * A short descriptive one-line title for the Catalog.
+     */
+    title?: string;
+    /**
+     * Detailed multi-line description to fully explain the Catalog. CommonMark 0.29 syntax MAY be used for rich text representation.
+     */
+    description: string;
+    /**
+     * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
+     */
+    links: Link[];
 }
 
 export interface Collection {
-	/**
-	 * Identifier for the Collection that is unique across the provider.
-	 */
-	id: string;
-	/**
-	 *  Must be set to Collection to be a valid Collection.
-	 */
-	type: string;
-	/**
-	 * The STAC version the Collection implements.
-	 */
-	stac_version: string;
+    /**
+     * Identifier for the Collection that is unique across the provider.
+     */
+    id: string;
+    /**
+     *  Must be set to Collection to be a valid Collection.
+     */
+    type: string;
+    /**
+     * The STAC version the Collection implements.
+     */
+    stac_version: string;
 
-	/**
-	 * A list of extension identifiers the Collection implements.
-	 */
-	stac_extensions?: string[];
-	/**
-	 * A short descriptive one-line title for the Collection.
-	 */
-	title?: string;
-	/**
-	 * Detailed multi-line description to fully explain the Collection. CommonMark 0.29 syntax MAY be used for rich text representation.
-	 */
-	description: string;
-	/**
-	 * List of keywords describing the Collection.
-	 */
-	keywords?: string[];
-	/**
-	 * Collection's license(s), either a SPDX License identifier, various if multiple licenses apply or proprietary for all other cases.
-	 */
-	license: string;
+    /**
+     * A list of extension identifiers the Collection implements.
+     */
+    stac_extensions?: string[];
+    /**
+     * A short descriptive one-line title for the Collection.
+     */
+    title?: string;
+    /**
+     * Detailed multi-line description to fully explain the Collection. CommonMark 0.29 syntax MAY be used for rich text representation.
+     */
+    description: string;
+    /**
+     * List of keywords describing the Collection.
+     */
+    keywords?: string[];
+    /**
+     * Collection's license(s), either a SPDX License identifier, various if multiple licenses apply or proprietary for all other cases.
+     */
+    license: string;
 
-	/**
-	 * A list of providers, which may include all organizations capturing or processing the data or the hosting provider.
-	 * Providers should be listed in chronological order with the most recent provider being the last element of the list.
-	 */
-	providers?: Provider[];
-	/**
-	 * Spatial and temporal extents.
-	 */
-	extent: Extent;
-	/**
-	 * A map of property summaries, either a set of values, a range of values or a JSON Schema.
-	 */
-	summaries?: {
-		[k: string]: unknown
-	};
-	/**
-	 * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
-	 */
-	links: Link[];
-	/**
-	 * Dictionary of asset objects that can be downloaded, each with a unique key.
-	 */
-	assets?: Assets;
+    /**
+     * A list of providers, which may include all organizations capturing or processing the data or the hosting provider.
+     * Providers should be listed in chronological order with the most recent provider being the last element of the list.
+     */
+    providers?: Provider[];
+    /**
+     * Spatial and temporal extents.
+     */
+    extent: Extent;
+    /**
+     * A map of property summaries, either a set of values, a range of values or a JSON Schema.
+     */
+    summaries?: {
+        [k: string]: unknown
+    };
+    /**
+     * List of link objects to resources and related URLs. A link with the rel set to self is strongly recommended.
+     */
+    links: Link[];
+    /**
+     * Dictionary of asset objects that can be downloaded, each with a unique key.
+     */
+    assets?: Assets;
 
-	/**
-	 * Attributes enable via extension
-	 */
-	[k: string]: unknown;
+    /**
+     * Attributes enable via extension
+     */
+    [k: string]: unknown;
 }
 
 export interface SearchResult {
-	"type": string,
-	"stac_version": string,
-	"stac_extensions": string[],
-	"context": {
-		"limit": number,
-		"matched": number,
-		"returned": number
-	},
-	"numberMatched": number,
-	"numberReturned": number,
-	"features": StacItem[]
+    'type': string,
+    'stac_version': string,
+    'stac_extensions': string[],
+    'context': {
+        'limit': number,
+        'matched': number,
+        'returned': number
+    },
+    'numberMatched': number,
+    'numberReturned': number,
+    'features': StacItem[]
 }
 
 export type Status = 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeeded';
@@ -347,13 +347,14 @@ export type Status = 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeede
 export type EngineType = 'aws-batch';
 
 export interface engineJobCreatedDetails {
-	id: string;
-	regionId: string;
-	status: Status;
-	scheduleDateTime: string;
-	engineType: EngineType;
-	executionId?: string;
-	message?: string;
+    id: string;
+    regionId: string;
+    status: Status;
+    startDateTime: string;
+    endDateTime: string;
+    engineType: EngineType;
+    executionId?: string;
+    message?: string;
 }
 
 export type engineJobUpdatedDetails = Pick<engineJobCreatedDetails, 'id' | 'regionId' | 'status' | 'message'>;
@@ -361,63 +362,71 @@ export type engineJobUpdatedDetails = Pick<engineJobCreatedDetails, 'id' | 'regi
 export type engineJobDetails = engineJobCreatedDetails | engineJobUpdatedDetails;
 
 export interface polygonProcessingDetails {
-	/**
-	 * The id of the step function execution that this metadata belongs to
-	 */
-	jobId: string;
-	/**
-	 * Fields are represented as a polygon
-	 */
-	polygonId: string;
-	polygonName: string;
-	/**
-	 * A grower may own many farms. A grower is represented as a group.
-	 */
-	groupId: string;
-	groupName: string;
-	/**
-	 * Farms are comprised of many fields. A farm is represented as a region.
-	 */
-	regionId: string;
-	regionName: string;
-	/**
-	 * The id of the resource that this metadata belongs to.
-	 */
-	resultId: string;
-	/**
-	 * The schedule datetime that is being used to query the stac item collections.
-	 */
-	scheduleDateTime: string;
-	/**
-	 * The S3 key of the metadata output of the job
-	 */
-	engineOutputLocation?: string;
+    /**
+     * The date time the polygon is created
+     */
+    createdAt: string;
+    /**
+     * The id of the step function execution that this metadata belongs to
+     */
+    jobId: string;
+    /**
+     * Fields are represented as a polygon
+     */
+    polygonId: string;
+    polygonName: string;
+    /**
+     * A grower may own many farms. A grower is represented as a group.
+     */
+    groupId: string;
+    groupName: string;
+    /**
+     * Farms are comprised of many fields. A farm is represented as a region.
+     */
+    regionId: string;
+    regionName: string;
+    /**
+     * The id of the resource that this metadata belongs to.
+     */
+    resultId: string;
+    /**
+     * The schedule start datetime that is being used to query the stac item collections.
+     */
+    startDateTime: string;
+    /**
+     * The schedule end datetime that is being used to query the stac item collections.
+     */
+    endDateTime: string;
+    /**
+     * The S3 key of the metadata output of the job
+     */
+    engineOutputLocation?: string;
 }
 
 export interface catalogDetails {
-	id: string;
-	title: string;
-	description: string;
+    id: string;
+    title: string;
+    description: string;
 }
 
 export interface groupDetails {
-	/**
-	 * The id of the group the collection belongs to
-	 */
-	id: string;
-	name: string;
-	attributes?: Record<string, any>;
-	createdAt: string;
-	createdBy: string;
-	updatedBy: string;
-	updatedAt?: string;
+    /**
+     * The id of the group the collection belongs to
+     */
+    id: string;
+    name: string;
+    attributes?: Record<string, any>;
+    createdAt: string;
+    createdBy: string;
+    updatedBy: string;
+    updatedAt?: string;
 }
 
 export type {
-	catalogDetails as CatalogDetails,
-	groupDetails as GroupDetails,
-	polygonProcessingDetails as PipelineMetadataDetails,
-	engineJobDetails as EngineJobDetails,
-	engineJobCreatedDetails as EngineJobCreatedDetails,
-	engineJobUpdatedDetails as EngineJobUpdatedDetails,
+    catalogDetails as CatalogDetails,
+    groupDetails as GroupDetails,
+    polygonProcessingDetails as PipelineMetadataDetails,
+    engineJobDetails as EngineJobDetails,
+    engineJobCreatedDetails as EngineJobCreatedDetails,
+    engineJobUpdatedDetails as EngineJobUpdatedDetails
 };

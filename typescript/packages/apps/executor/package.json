@@ -1,64 +1,64 @@
 {
-  "name": "@agie/executor",
-  "version": "0.0.1",
-  "description": "Manage the execution of engine when the schedule is triggered.",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js"
-    }
-  },
-  "types": "./dist/index.d.js",
-  "type": "module",
-  "scripts": {
-    "clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-    "build": "npx tsc -b",
-    "test": "npm run build && vitest run",
-    "prestart": "npx tsx src/localConfigGenerator.ts",
-    "start": "rushx build && tsx src/server.ts",
-    "cdk": "cdk"
-  },
-  "dependencies": {
-    "@agie/events": "workspace:*",
-    "@agie/clients": "workspace:*",
-    "@agie/lambda-invoker": "workspace:*",
-    "@aws-sdk/client-batch": "~3",
-    "@aws-sdk/client-dynamodb": "~3",
-    "@aws-sdk/client-eventbridge": "~3",
-    "@aws-sdk/client-lambda": "~3",
-    "@aws-sdk/client-s3": "~3",
-    "@aws-sdk/client-ssm": "~3",
-    "@aws-sdk/lib-dynamodb": "~3",
-    "@fastify/awilix": "~5",
-    "@fastify/aws-lambda": "~4",
-    "@fastify/cors": "~9",
-    "@fastify/env": "~4",
-    "@fastify/sensible": "~5",
-    "@fastify/swagger": "~8",
-    "@fastify/type-provider-typebox": "~4",
-    "@sinclair/typebox": "~0",
-    "awilix": "~10",
-    "aws-lambda": "~1",
-    "aws-xray-sdk": "~3",
-    "dayjs": "~1",
-    "dotenv": "~16",
-    "fastify-plugin": "~4",
-    "fastify": "~4",
-    "ow": "~1",
-    "pino-pretty": "~11",
-    "pino": "~8",
-    "p-limit": "~5",
-    "ulid": "~2"
-  },
-  "devDependencies": {
-    "@tsconfig/node20": "~20",
-    "@types/aws-lambda": "~8",
-    "@types/node": "~20",
-    "eslint": "~9",
-    "shx": "~0",
-    "tsx": "~4",
-    "typescript": "~5",
-    "vitest": "~1",
-    "vitest-mock-extended": "~1"
-  },
-  "private": false
+	"name": "@agie/executor",
+	"version": "0.0.1",
+	"description": "Manage the execution of engine when the schedule is triggered.",
+	"exports": {
+		".": {
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.js",
+	"type": "module",
+	"scripts": {
+		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
+		"build": "npx tsc -b",
+		"test": "npm run build && vitest run --passWithNoTests",
+		"prestart": "npx tsx src/localConfigGenerator.ts",
+		"start": "rushx build && tsx src/server.ts",
+		"cdk": "cdk"
+	},
+	"dependencies": {
+		"@agie/events": "workspace:*",
+		"@agie/clients": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
+		"@aws-sdk/client-batch": "~3",
+		"@aws-sdk/client-dynamodb": "~3",
+		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-lambda": "~3",
+		"@aws-sdk/client-s3": "~3",
+		"@aws-sdk/client-ssm": "~3",
+		"@aws-sdk/lib-dynamodb": "~3",
+		"@fastify/awilix": "~6",
+		"@fastify/aws-lambda": "~5",
+		"@fastify/cors": "~10",
+		"@fastify/env": "~5",
+		"@fastify/sensible": "~6",
+		"@fastify/swagger": "~9",
+		"@fastify/type-provider-typebox": "~5",
+		"@sinclair/typebox": "~0",
+		"awilix": "~11",
+		"aws-lambda": "~1",
+		"aws-xray-sdk": "~3",
+		"dayjs": "~1",
+		"dotenv": "~16",
+		"fastify-plugin": "~5",
+		"fastify": "~5",
+		"ow": "~2",
+		"pino-pretty": "~11",
+		"pino": "~9",
+		"p-limit": "~6",
+		"ulid": "~2"
+	},
+	"devDependencies": {
+		"@tsconfig/node20": "~20",
+		"@types/aws-lambda": "~8",
+		"@types/node": "~22",
+		"eslint": "~9",
+		"shx": "~0",
+		"tsx": "~4",
+		"typescript": "~5",
+		"vitest": "~2",
+		"vitest-mock-extended": "~2"
+	},
+	"private": false
 }

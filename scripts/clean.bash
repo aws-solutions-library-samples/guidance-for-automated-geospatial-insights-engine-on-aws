@@ -13,14 +13,13 @@
 #  and limitations under the License.
 #
 
-
 set -e
 if [[ "$DEBUG" == "true" ]]; then
     set -x
 fi
 
 function help_message {
-    cat << EOF
+    cat <<EOF
 
 NAME
 
@@ -34,6 +33,6 @@ EOF
 }
 
 # clean all packages
-npx pnpm@6 recursive run clean:package
+npx pnpm@9.0.2 recursive run clean:package
 rush purge
 rush update --bypass-policy

@@ -14,23 +14,24 @@
 import { getLambdaArchitecture } from '@agie/cdk-common';
 import { REGIONS_EVENT_SOURCE, REGIONS_REGION_CREATED_EVENT, REGIONS_REGION_DELETED_EVENT, REGIONS_REGION_UPDATED_EVENT } from '@agie/events';
 import * as cdk from 'aws-cdk-lib';
-import { Duration, Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
+import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { AnyPrincipal, Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { CfnScheduleGroup } from 'aws-cdk-lib/aws-scheduler';
+import { FilterOrPolicy, SubscriptionFilter, Topic } from 'aws-cdk-lib/aws-sns';
+import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { IQueue, Queue } from 'aws-cdk-lib/aws-sqs';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { FilterOrPolicy, SubscriptionFilter, Topic } from "aws-cdk-lib/aws-sns";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ export interface ScheduledConstructProperties {
 	readonly stacApiEndpoint: string;
 	readonly stacApiResourceArn: string;
 	readonly regionsApiLambda: IFunction;
+	readonly resultsApiLambda: IFunction;
 	readonly sentinelApiUrl: string;
 	readonly sentinelCollection: string;
 }
@@ -50,7 +52,6 @@ export interface ScheduledConstructProperties {
 const schedulerGroupNameParameter = (environment: string) => `/agie/${environment}/scheduler/groupName`;
 
 export class SchedulerModule extends Construct {
-
 	public engineQueue: IQueue;
 
 	constructor(scope: Construct, id: string, props: ScheduledConstructProperties) {
@@ -63,15 +64,33 @@ export class SchedulerModule extends Construct {
 
 		const eventBus = EventBus.fromEventBusName(scope, 'EventBus', props.eventBusName);
 
-		const topic = Topic.fromTopicArn(this, 'Sentinel2Topic', props.sentinelTopicArn)
+		const topic = Topic.fromTopicArn(this, 'Sentinel2Topic', props.sentinelTopicArn);
+
+		// DynamoDb Table
+		const table = new Table(this, 'Table', {
+			tableName: `${namePrefix}-scheduler`,
+			partitionKey: {
+				name: 'pk',
+				type: AttributeType.STRING,
+			},
+			sortKey: {
+				name: 'sk',
+				type: AttributeType.STRING,
+			},
+			billingMode: BillingMode.PAY_PER_REQUEST,
+			encryption: TableEncryption.AWS_MANAGED,
+			pointInTimeRecovery: true,
+			removalPolicy: RemovalPolicy.DESTROY,
+			timeToLiveAttribute: 'ttl',
+		});
+
 		/**
 		 * This is the queue that the scheduler will publish to when a new processing task available for a region
 		 */
-		const engineDlq = new Queue(this, `taskDlq`,
-			{
-				queueName: `${namePrefix}-engine-dlq.fifo`,
-				fifo: true
-			});
+		const engineDlq = new Queue(this, `taskDlq`, {
+			queueName: `${namePrefix}-engine-dlq.fifo`,
+			fifo: true,
+		});
 
 		engineDlq.addToResourcePolicy(
 			new PolicyStatement({
@@ -159,16 +178,58 @@ export class SchedulerModule extends Construct {
 		);
 
 		// create subscription to the Sentinel topics
-		topic.addSubscription(new SqsSubscription(sentinelQueue,
-			{
+		topic.addSubscription(
+			new SqsSubscription(sentinelQueue, {
 				rawMessageDelivery: true,
 				filterPolicyWithMessageBody: {
-					collection: FilterOrPolicy.filter(SubscriptionFilter.stringFilter({
-						// only subscribed to cloud optimized sentinel images update
-						allowlist: ['sentinel-2-c1-l2a'],
-					}))
-				}
-			}));
+					collection: FilterOrPolicy.filter(
+						SubscriptionFilter.stringFilter({
+							// only subscribed to cloud optimized sentinel images update
+							allowlist: ['sentinel-2-c1-l2a'],
+						})
+					),
+				},
+			})
+		);
+
+		const eventBridgeSchedulerLambda = new NodejsFunction(this, 'EventBridgeSchedulerLambda', {
+			description: 'Scheduler module EventBridge Scheduler lambda',
+			entry: path.join(__dirname, '../../../typescript/packages/apps/scheduler/src/lambda_eventbridge_scheduler.ts'),
+			functionName: `${namePrefix}-scheduler-eventbridge-scheduler-processor`,
+			runtime: Runtime.NODEJS_20_X,
+			tracing: Tracing.ACTIVE,
+			memorySize: 512,
+			logRetention: RetentionDays.ONE_WEEK,
+			timeout: Duration.minutes(1),
+			environment: {
+				EVENT_BUS_NAME: props.eventBusName,
+				BUCKET_NAME: props.bucketName,
+				STAC_API_ENDPOINT: props.stacApiEndpoint,
+				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
+				RESULTS_API_FUNCTION_NAME: props.resultsApiLambda.functionName,
+				QUEUE_URL: this.engineQueue.queueUrl,
+				ENVIRONMENT: props.environment,
+				SENTINEL_API_URL: props.sentinelApiUrl,
+				SENTINEL_COLLECTION: props.sentinelCollection,
+				TABLE_NAME: table.tableName,
+			},
+			bundling: {
+				minify: true,
+				format: OutputFormat.ESM,
+				target: 'node20.1',
+				sourceMap: false,
+				sourcesContent: false,
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk', 'pg-native'],
+			},
+			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
+			architecture: getLambdaArchitecture(scope),
+		});
+
+		table.grantReadWriteData(eventBridgeSchedulerLambda);
+		this.engineQueue.grantSendMessages(eventBridgeSchedulerLambda);
+		props.regionsApiLambda.grantInvoke(eventBridgeSchedulerLambda);
+		props.resultsApiLambda.grantInvoke(eventBridgeSchedulerLambda);
 
 		// Lambda function that processor schedule queued in SQS
 		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
@@ -185,10 +246,12 @@ export class SchedulerModule extends Construct {
 				BUCKET_NAME: props.bucketName,
 				STAC_API_ENDPOINT: props.stacApiEndpoint,
 				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
+				RESULTS_API_FUNCTION_NAME: props.resultsApiLambda.functionName,
 				QUEUE_URL: this.engineQueue.queueUrl,
 				ENVIRONMENT: props.environment,
 				SENTINEL_API_URL: props.sentinelApiUrl,
-				SENTINEL_COLLECTION: props.sentinelCollection
+				SENTINEL_COLLECTION: props.sentinelCollection,
+				TABLE_NAME: table.tableName,
 			},
 			bundling: {
 				minify: true,
@@ -203,8 +266,10 @@ export class SchedulerModule extends Construct {
 			architecture: getLambdaArchitecture(scope),
 		});
 
+		table.grantReadWriteData(sqsProcessorLambda);
 		this.engineQueue.grantSendMessages(sqsProcessorLambda);
-		props.regionsApiLambda.grantInvoke(sqsProcessorLambda)
+		props.regionsApiLambda.grantInvoke(sqsProcessorLambda);
+		props.resultsApiLambda.grantInvoke(sqsProcessorLambda);
 		sqsProcessorLambda.addToRolePolicy(
 			new PolicyStatement({
 				actions: ['execute-api:Invoke'],
@@ -238,15 +303,6 @@ export class SchedulerModule extends Construct {
 			stringValue: cfnScheduleGroup.name,
 		});
 
-		// This role will be used by scheduled to push message to SQS
-		agieSchedulerRole.addToPolicy(
-			new PolicyStatement({
-				actions: ['sqs:SendMessage'],
-				effect: Effect.ALLOW,
-				resources: [this.engineQueue.queueArn],
-			})
-		);
-
 		// Lambda function that processor schedule queued in SQS
 		const eventbridgeLambda = new NodejsFunction(this, 'EventBridgeProcessorLambda', {
 			description: 'Scheduler module eventbridge processor',
@@ -261,8 +317,11 @@ export class SchedulerModule extends Construct {
 				EVENT_BUS_NAME: props.eventBusName,
 				SCHEDULER_GROUP: cfnScheduleGroup.name,
 				SQS_ARN: this.engineQueue.queueArn,
+				EVENTBRIDGE_LAMBDA_FUNCTION_ARN: eventBridgeSchedulerLambda.functionArn,
 				ROLE_ARN: agieSchedulerRole.roleArn,
-				ENVIRONMENT: props.environment
+				ENVIRONMENT: props.environment,
+				TABLE_NAME: table.tableName,
+				AWS_ACCOUNT_ID: account,
 			},
 			bundling: {
 				minify: true,
@@ -277,6 +336,9 @@ export class SchedulerModule extends Construct {
 			architecture: getLambdaArchitecture(scope),
 		});
 
+		eventBridgeSchedulerLambda.grantInvoke(agieSchedulerRole);
+		// Allow eventbridge lambda role to perform crud on engine run data
+		table.grantReadWriteData(eventbridgeLambda);
 		// Allow eventbridge lambda role to pass scheduler rule when creating schedule
 		agieSchedulerRole.grantPassRole(eventbridgeLambda.role);
 		eventBus.grantPutEventsTo(eventbridgeLambda);
@@ -321,7 +383,7 @@ export class SchedulerModule extends Construct {
 					// These events will trigger the creation/deletion of schedule for a region
 					REGIONS_REGION_CREATED_EVENT,
 					REGIONS_REGION_UPDATED_EVENT,
-					REGIONS_REGION_DELETED_EVENT
+					REGIONS_REGION_DELETED_EVENT,
 				],
 				source: [REGIONS_EVENT_SOURCE],
 			},
@@ -335,9 +397,20 @@ export class SchedulerModule extends Construct {
 			})
 		);
 
+		NagSuppressions.addResourceSuppressions(
+			[agieSchedulerRole],
+			[
+				{
+					id: 'AwsSolutions-IAM5',
+					appliesTo: ['Resource::<SchedulerModuleEventBridgeSchedulerLambdaE1519610.Arn>:*'],
+					reason: 'This role will be assumed by EventBridge scheduler to invoke the lambda.',
+				},
+			],
+			true
+		);
 
 		NagSuppressions.addResourceSuppressions(
-			[eventbridgeLambda, sqsProcessorLambda],
+			[eventbridgeLambda, sqsProcessorLambda, eventBridgeSchedulerLambda],
 			[
 				{
 					id: 'AwsSolutions-IAM4',
@@ -346,7 +419,12 @@ export class SchedulerModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Resource::*', 'Resource::<regionsApiFunctionArnParameter>:*', `Resource::arn:<AWS::Partition>:execute-api:${region}:${account}:<StacServerModuleStacApiGateway48C0D803>/*/*/*`],
+					appliesTo: [
+						'Resource::*',
+						'Resource::<regionsApiFunctionArnParameter>:*',
+						'Resource::<resultsApiFunctionArnParameter>:*',
+						`Resource::arn:<AWS::Partition>:execute-api:${region}:${account}:<StacServerModuleStacApiGateway48C0D803>/*/*/*`,
+					],
 					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
 				},
 			],
@@ -363,6 +441,5 @@ export class SchedulerModule extends Construct {
 			],
 			true
 		);
-
 	}
 }

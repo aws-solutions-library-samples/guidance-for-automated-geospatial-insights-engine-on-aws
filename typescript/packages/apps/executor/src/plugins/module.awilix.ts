@@ -11,22 +11,22 @@
  *  and limitations under the License.
  */
 
-import pkg from 'aws-xray-sdk';
+import { RegionsClient } from '@agie/clients';
+import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from '@agie/events';
+import { Invoker } from '@agie/lambda-invoker';
+import { BatchClient } from '@aws-sdk/client-batch';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
+import { LambdaClient } from '@aws-sdk/client-lambda';
+import { S3Client } from '@aws-sdk/client-s3';
+import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
 import { asFunction, Lifetime } from 'awilix';
+import pkg from 'aws-xray-sdk';
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { DynamoDBDocumentClient, TranslateConfig } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { BatchClient } from "@aws-sdk/client-batch";
-import { JobsService } from "../jobs/service.js";
-import { RegionsClient, ResultsClient } from "@agie/clients";
-import { Invoker } from "@agie/lambda-invoker";
-import { LambdaClient } from "@aws-sdk/client-lambda";
-import { S3Client } from "@aws-sdk/client-s3";
-import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from "@agie/events";
-import { JobQueueArn } from "../jobs/model.js";
+import { JobQueueArn } from '../jobs/model.js';
+import { JobsService } from '../jobs/service.js';
 
 const { captureAWSv3Client } = pkg;
 
@@ -41,7 +41,6 @@ declare module '@fastify/awilix' {
 		lambdaClient: LambdaClient;
 		s3Client: S3Client;
 		eventPublisher: EventPublisher;
-		resultsClient: ResultsClient;
 	}
 }
 
@@ -51,17 +50,16 @@ class DynamoDBDocumentClientFactory {
 		const marshallOptions = {
 			convertEmptyValues: false,
 			removeUndefinedValues: true,
-			convertClassInstanceToMap: false
+			convertClassInstanceToMap: false,
 		};
 		const unmarshallOptions = {
-			wrapNumbers: false
+			wrapNumbers: false,
 		};
 		const translateConfig: TranslateConfig = { marshallOptions, unmarshallOptions };
 		const dbc = DynamoDBDocumentClient.from(ddb, translateConfig);
 		return dbc;
 	}
 }
-
 
 class LambdaClientFactory {
 	public static create(region: string): LambdaClient {
@@ -90,7 +88,7 @@ class BatchClientFactory {
 
 const registerContainer = (app?: FastifyInstance) => {
 	const commonInjectionOptions = {
-		lifetime: Lifetime.SINGLETON
+		lifetime: Lifetime.SINGLETON,
 	};
 
 	const awsRegion = process.env['AWS_REGION'];
@@ -101,7 +99,6 @@ const registerContainer = (app?: FastifyInstance) => {
 	const standardPriorityQueueArn = process.env['STANDARD_PRIORITY_QUEUE_ARN'];
 
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
-	const resultsApiFunctionName = process.env['RESULTS_API_FUNCTION_NAME'];
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 
@@ -109,24 +106,24 @@ const registerContainer = (app?: FastifyInstance) => {
 		high: highPriorityQueueArn,
 		standard: standardPriorityQueueArn,
 		low: lowPriorityQueueArn,
-	}
+	};
 
 	diContainer.register({
 		// Clients
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		dynamoDBDocumentClient: asFunction(() => DynamoDBDocumentClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		batchClient: asFunction(() => BatchClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		s3Client: asFunction(() => S3ClientFactory.create(awsRegion), {
-			...commonInjectionOptions
+			...commonInjectionOptions,
 		}),
 
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, EXECUTOR_EVENT_SOURCE), {
@@ -134,7 +131,7 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher, c.resultsClient),
+			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher),
 			{
 				...commonInjectionOptions,
 			}
@@ -148,19 +145,9 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
-		regionsClient: asFunction((c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName),
-			{
-				...commonInjectionOptions,
-			}
-		),
-
-		resultsClient: asFunction((c: Cradle) => new ResultsClient(app.log, c.lambdaInvoker, resultsApiFunctionName),
-			{
-				...commonInjectionOptions,
-			}
-		),
-
-
+		regionsClient: asFunction((c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName), {
+			...commonInjectionOptions,
+		}),
 	});
 };
 
@@ -168,7 +155,7 @@ export default fp<FastifyAwilixOptions>(async (app: FastifyInstance): Promise<vo
 	// first register the DI plugin
 	await app.register(fastifyAwilixPlugin, {
 		disposeOnClose: true,
-		disposeOnResponse: false
+		disposeOnResponse: false,
 	});
 
 	registerContainer(app);

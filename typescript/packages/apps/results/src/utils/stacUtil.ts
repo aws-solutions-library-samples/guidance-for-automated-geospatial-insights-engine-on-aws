@@ -14,14 +14,14 @@
 import { LambdaRequestContext } from '@agie/clients';
 import { Catalog, CatalogDetails, polygonProcessingDetails, RegionResource, StacItem } from '@agie/events';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
+import { sdkStreamMixin } from '@smithy/util-stream';
+import { bboxPolygon } from '@turf/turf';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import ow from 'ow';
 import type { BaseLogger } from 'pino';
 import { EngineMetadata } from '../events/models.js';
 import { DefaultStacRecords } from './defaultStacRecords.js';
-import { bboxPolygon } from "@turf/turf";
 
 dayjs.extend(utc);
 
@@ -63,7 +63,8 @@ export class StacUtil {
 				polygonName: ow.string.nonEmpty,
 				resultId: ow.string.nonEmpty,
 				createdAt: ow.string.nonEmpty,
-				scheduleDateTime: ow.string.nonEmpty,
+				startDateTime: ow.string.nonEmpty,
+				endDateTime: ow.string.nonEmpty,
 				engineOutputLocation: ow.string.nonEmpty,
 			})
 		);
@@ -149,8 +150,8 @@ export class StacUtil {
 		// Update the properties
 		stacItem.properties = {
 			datetime: details.createdAt,
-			"agie:groupId": details.groupId,
-			"agie:regionId": details.regionId,
+			'agie:groupId': details.groupId,
+			'agie:regionId': details.regionId,
 			...engineMetadata.properties,
 		};
 
@@ -208,15 +209,15 @@ export class StacUtil {
 		stacItem.collection = `agie-region`;
 		stacItem.bbox = regionResource.boundingBox;
 		// for region stac item the bbox and the polygon covers the same area
-		stacItem.geometry = bboxPolygon(regionResource.boundingBox).geometry
+		stacItem.geometry = bboxPolygon(regionResource.boundingBox).geometry;
 		stacItem.properties = {
 			datetime: regionResource.createdAt,
 			createdAt: regionResource.createdAt,
 			updatedAt: regionResource.updatedAt,
-			"agie:isActive": regionResource.isActive,
-			"agie:processedOnNewScene": regionResource.processingConfig.mode === 'onNewScene',
-			"agie:groupId": groupId
-		}
+			'agie:isActive': regionResource.isActive,
+			'agie:processedOnNewScene': regionResource.processingConfig.mode === 'onNewScene',
+			'agie:groupId': groupId,
+		};
 		return stacItem;
 	}
 }

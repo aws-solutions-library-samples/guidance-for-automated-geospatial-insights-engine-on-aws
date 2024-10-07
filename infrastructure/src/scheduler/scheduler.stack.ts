@@ -11,22 +11,22 @@
  *  and limitations under the License.
  */
 
-import { Stack, StackProps } from "aws-cdk-lib";
-import { Construct } from "constructs";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { bucketNameParameter, eventBusNameParameter } from "@agie/cdk-common";
-import { SchedulerModule } from "./scheduler.construct.js";
-import { NagSuppressions } from "cdk-nag";
+import { bucketNameParameter, eventBusNameParameter } from '@agie/cdk-common';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Function } from 'aws-cdk-lib/aws-lambda';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
 import {
 	engineProcessorHighPriorityQueueArn,
 	engineProcessorJobDefinitionArnParameter,
 	engineProcessorLowPriorityQueueArn,
 	engineProcessorStandardPriorityQueueArn,
-} from "../engine/engine.construct.js";
-import { regionsApiFunctionArnParameter } from "../regions/regions.construct.js";
-import { ExecutorModule } from "./executor.construct.js";
-import { resultsApiFunctionArnParameter } from "../results/results.construct.js";
-import { Function } from "aws-cdk-lib/aws-lambda";
+} from '../engine/engine.construct.js';
+import { regionsApiFunctionArnParameter } from '../regions/regions.construct.js';
+import { resultsApiFunctionArnParameter } from '../results/results.construct.js';
+import { ExecutorModule } from './executor.construct.js';
+import { SchedulerModule } from './scheduler.construct.js';
 
 export type SchedulerStackProperties = StackProps & {
 	readonly environment: string;
@@ -36,11 +36,10 @@ export type SchedulerStackProperties = StackProps & {
 	readonly stacApiResourceArn: string;
 	readonly sentinelApiUrl: string;
 	readonly sentinelCollection: string;
-}
+};
 
 export class SchedulerStack extends Stack {
 	constructor(scope: Construct, id: string, props: SchedulerStackProperties) {
-
 		super(scope, id, props);
 
 		const eventBusName = StringParameter.fromStringParameterAttributes(this, 'eventBusName', {
@@ -83,11 +82,11 @@ export class SchedulerStack extends Stack {
 			simpleName: false,
 		}).stringValue;
 
-
 		const regionsApiLambda = Function.fromFunctionAttributes(this, 'RegionsApiFunction', { functionArn: regionsApiFunctionArn, sameEnvironment: true });
 
 		const resultsApiLambda = Function.fromFunctionAttributes(this, 'ResultsApiFunction', {
-			functionArn: resultsApiFunctionArn, sameEnvironment: true
+			functionArn: resultsApiFunctionArn,
+			sameEnvironment: true,
 		});
 
 		const schedulerModule = new SchedulerModule(this, 'SchedulerModule', {
@@ -96,11 +95,12 @@ export class SchedulerStack extends Stack {
 			eventBusName,
 			bucketName,
 			regionsApiLambda,
+			resultsApiLambda,
 			stacApiEndpoint: props.stacApiEndpoint,
 			stacApiResourceArn: props.stacApiResourceArn,
 			sentinelCollection: props.sentinelCollection,
-			sentinelApiUrl: props.sentinelApiUrl
-		})
+			sentinelApiUrl: props.sentinelApiUrl,
+		});
 
 		const executorModule = new ExecutorModule(this, 'ExecutorModule', {
 			environment: props.environment,
@@ -111,16 +111,13 @@ export class SchedulerStack extends Stack {
 			highPriorityQueueArn,
 			standardPriorityQueueArn,
 			regionsApiLambda,
-			resultsApiLambda,
 			bucketName,
-			engineQueue: schedulerModule.engineQueue
-		})
+			engineQueue: schedulerModule.engineQueue,
+		});
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,
-			[
-				'/SchedulerModule/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource',
-			],
+			['/SchedulerModule/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource'],
 			[
 				{
 					id: 'AwsSolutions-IAM4',

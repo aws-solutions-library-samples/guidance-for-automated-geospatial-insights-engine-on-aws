@@ -15,8 +15,8 @@ import { Type } from '@sinclair/typebox';
 import { commonHeaders, countPaginationQS, fromTokenPaginationQS } from '../../common/schemas.js';
 import { atLeastReader } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { regionId, resultList, ResultList } from './schemas.js';
-import { resultListResourceExample } from "./example.js";
+import { resultListResourceExample } from './example.js';
+import { regionId, resultList, ResultList, status } from './schemas.js';
 
 export default function listResultsRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -39,6 +39,7 @@ Permissions:
 			querystring: Type.Object({
 				count: countPaginationQS,
 				paginationToken: fromTokenPaginationQS,
+				status: Type.Optional(status),
 			}),
 			response: {
 				200: {
@@ -62,9 +63,9 @@ Permissions:
 			const svc = fastify.diContainer.resolve('resultsService');
 
 			// parse request
-			const { count, paginationToken } = request.query;
+			const { count, paginationToken, status } = request.query;
 			const { regionId } = request.params;
-			const [results, nextToken] = await svc.list(request.authz, regionId, { token: paginationToken, count });
+			const [results, nextToken] = await svc.list(request.authz, regionId, { token: paginationToken, count, status });
 			const response: ResultList = { results };
 			if (count || nextToken) {
 				response.pagination = {

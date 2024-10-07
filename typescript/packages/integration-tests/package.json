@@ -6,7 +6,8 @@
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
 		"build": "npx tsc -b",
-		"test": "npm run build && vitest run",
+		"test": "npm run build",
+		"test:integration": "npm run build && vitest run",
 		"pretest": "npx tsx src/localConfigGenerator.ts"
 	},
 	"devDependencies": {
@@ -25,8 +26,8 @@
 		"@opensearch-project/opensearch": "~2",
 		"@aws-sdk/client-cognito-identity-provider": "~3",
 		"@tsconfig/node20": "~20",
-		"@types/node": "~20",
-		"@vitest/ui": "~1",
+		"@types/node": "~22",
+		"@vitest/ui": "~2",
 		"dayjs": "~1",
 		"dotenv": "~16",
 		"eslint": "~9",
@@ -36,8 +37,8 @@
 		"shx": "~0",
 		"tsx": "~4",
 		"typescript": "~5",
-		"vitest-mock-extended": "~1",
-		"vitest": "~0",
+		"vitest-mock-extended": "~2",
+		"vitest": "~2",
 		"ulid": "~2",
 		"aws4": "~1"
 	},

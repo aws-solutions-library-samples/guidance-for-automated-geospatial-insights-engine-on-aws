@@ -23,3 +23,10 @@ export interface BatchEngineInput {
 	exclusions?: [[[number, number]]];
 	scheduleDateTime: string;
 }
+
+export type BatchEngineRun = {
+	regionId: string;
+	scheduleDay: string;
+	ttl?: number;
+}
+

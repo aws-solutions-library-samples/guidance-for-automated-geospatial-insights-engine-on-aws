@@ -22,17 +22,21 @@ export const status = stringEnum(['queued', 'starting', 'inProgress', 'failed', 
 
 export const engineType = stringEnum(['aws-batch'], 'The type of compute used to process the satellite images.');
 
-export const result = Type.Object({
-	regionId,
-	id: resultId,
-	scheduleDateTime: Type.Optional(Type.String({ description: 'The failure reason.' })),
-	executionId: Type.Optional(Type.String({ description: 'The id of the execution.' })),
-	createdAt: Type.String({ description: 'The creation time of the result' }),
-	updatedAt: Type.Optional(Type.String({ description: 'The update time of the result.' })),
-	message: Type.Optional(Type.String({ description: 'The failure reason.' })),
-	engineType,
-	status,
-}, { $id: 'resultResource' });
+export const result = Type.Object(
+	{
+		regionId,
+		id: resultId,
+		executionId: Type.Optional(Type.String({ description: 'The id of the execution.' })),
+		createdAt: Type.String({ description: 'The creation time of the result' }),
+		updatedAt: Type.Optional(Type.String({ description: 'The update time of the result.' })),
+		message: Type.Optional(Type.String({ description: 'The failure reason.' })),
+		startDateTime: Type.String({ description: "The query window's start time." }),
+		endDateTime: Type.String({ description: "The query window's end time" }),
+		engineType,
+		status,
+	},
+	{ $id: 'resultResource' }
+);
 
 export const count = Type.Optional(
 	Type.Integer({
@@ -46,6 +50,7 @@ export const paginationToken = Type.String({
 export const resultListOptions = Type.Object({
 	count: Type.Optional(count),
 	token: Type.Optional(paginationToken),
+	status: Type.Optional(status),
 });
 
 export const resultList = Type.Object(
@@ -62,8 +67,8 @@ export type Result = Static<typeof result>;
 export type ResultListOptions = Static<typeof resultListOptions>;
 export type ResultList = Static<typeof resultList>;
 
-export type CreateResult = Omit<Result, 'updatedAt' | 'createdAt'>
+export type CreateResult = Omit<Result, 'updatedAt' | 'createdAt'>;
 
-export type UpdateResult = Pick<Result, 'regionId' | 'id' | 'status' | 'message'>
+export type UpdateResult = Pick<Result, 'regionId' | 'id' | 'status' | 'message'>;
 
 export type ResultId = string;

@@ -11,25 +11,24 @@
  *  and limitations under the License.
  */
 
-import { FastifyBaseLogger } from "fastify";
-import { CreateScheduleCommand, CreateScheduleCommandInput, DeleteScheduleCommand, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
+import { DomainEvent, ProcessingConfig, RegionResource } from '@agie/events';
+import { CreateScheduleCommand, CreateScheduleCommandInput, DeleteScheduleCommand, GetScheduleCommand, SchedulerClient, UpdateScheduleCommand } from '@aws-sdk/client-scheduler';
+import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
-import { DomainEvent, ProcessingConfig, RegionResource } from "@agie/events";
 
 export class SchedulesService {
-	constructor(readonly log: FastifyBaseLogger,
-				readonly schedulerClient: SchedulerClient,
-				readonly schedulerGroup: string,
-				readonly sqsArn: string,
-				readonly roleArn: string,
-				readonly environment: string,
-	) {
-	}
+	constructor(
+		readonly log: FastifyBaseLogger,
+		readonly schedulerClient: SchedulerClient,
+		readonly schedulerGroup: string,
+		readonly lambdaArn: string,
+		readonly roleArn: string,
+		readonly environment: string
+	) {}
 
 	private scheduleName(id: string): string {
 		return `agie-${this.environment}-${id}-schedule`;
 	}
-
 
 	public async process(event: DomainEvent<RegionResource>): Promise<void> {
 		this.log.debug(`SchedulesService> process> event:${JSON.stringify(event)}`);
@@ -54,35 +53,47 @@ export class SchedulesService {
 
 		switch (event.eventType) {
 			// create schedule for new region
-			case "created":
+			case 'created':
 				ow(newRegion, ow.object.nonEmpty);
-				ow(newRegion.processingConfig, ow.object.partialShape({
-					mode: ow.string.nonEmpty
-				}));
+				ow(
+					newRegion.processingConfig,
+					ow.object.partialShape({
+						mode: ow.string.nonEmpty,
+					})
+				);
 				if (newRegion.processingConfig.mode === 'scheduled') {
-					await this.create(newRegion)
+					await this.create(newRegion);
 				}
 				break;
 			// delete schedule for deleted region
-			case "deleted":
+			case 'deleted':
 				ow(oldRegion, ow.object.nonEmpty);
-				ow(oldRegion.processingConfig, ow.object.partialShape({
-					mode: ow.string.nonEmpty
-				}));
-				await this.delete(oldRegion)
+				ow(
+					oldRegion.processingConfig,
+					ow.object.partialShape({
+						mode: ow.string.nonEmpty,
+					})
+				);
+				await this.delete(oldRegion);
 				break;
-			case "updated":
+			case 'updated':
 				ow(newRegion, ow.object.nonEmpty);
-				ow(newRegion.processingConfig, ow.object.partialShape({
-					mode: ow.string.nonEmpty
-				}));
+				ow(
+					newRegion.processingConfig,
+					ow.object.partialShape({
+						mode: ow.string.nonEmpty,
+					})
+				);
 				ow(oldRegion, ow.object.nonEmpty);
-				ow(oldRegion.processingConfig, ow.object.partialShape({
-					mode: ow.string.nonEmpty
-				}));
+				ow(
+					oldRegion.processingConfig,
+					ow.object.partialShape({
+						mode: ow.string.nonEmpty,
+					})
+				);
 				// delete schedule if processing mode set to disabled or scene update
 				if (newRegion.processingConfig.mode === 'disabled' || newRegion.processingConfig.mode === 'onNewScene') {
-					await this.delete(event.new)
+					await this.delete(event.new);
 				}
 				// create schedule is processing mode set to scheduled
 				else if (newRegion.processingConfig.mode === 'scheduled' && !isEqual(newRegion.processingConfig, oldRegion.processingConfig)) {
@@ -99,12 +110,12 @@ export class SchedulesService {
 		ow(request, ow.object.nonEmpty);
 		ow(request.id, ow.string.nonEmpty);
 		try {
-			await this.schedulerClient.send(new DeleteScheduleCommand({ Name: this.scheduleName(request.id), GroupName: this.schedulerGroup }))
+			await this.schedulerClient.send(new DeleteScheduleCommand({ Name: this.scheduleName(request.id), GroupName: this.schedulerGroup }));
 		} catch (err) {
 			if (err instanceof Error && err.name === 'ResourceNotFoundException') {
 				// ignore if schedule is no longer there
 			} else {
-				throw err
+				throw err;
 			}
 		}
 
@@ -125,36 +136,33 @@ export class SchedulesService {
 		ow(request.processingConfig.scheduleExpression, ow.string.nonEmpty);
 		ow(request.processingConfig.scheduleExpressionTimezone, ow.optional.string);
 
-		const scheduleName = this.scheduleName(request.id)
+		const scheduleName = this.scheduleName(request.id);
 		const schedulePayload: CreateScheduleCommandInput = {
 			Name: scheduleName,
 			FlexibleTimeWindow: {
-				Mode: "OFF"
+				Mode: 'OFF',
 			},
 			ScheduleExpression: request.processingConfig.scheduleExpression,
 			ScheduleExpressionTimezone: request.processingConfig.scheduleExpressionTimezone,
 			GroupName: this.schedulerGroup,
 			Target: {
-				Arn: this.sqsArn,
+				Arn: this.lambdaArn,
 				Input: JSON.stringify(request),
 				RoleArn: this.roleArn,
-				SqsParameters: {
-					MessageGroupId: request.id,
-				}
-			}
-		}
+			},
+		};
 
 		try {
 			// check if schedule already exists
-			await this.schedulerClient.send(new GetScheduleCommand({ Name: scheduleName, GroupName: this.schedulerGroup }))
+			await this.schedulerClient.send(new GetScheduleCommand({ Name: scheduleName, GroupName: this.schedulerGroup }));
 			// update the schedule if exists
-			await this.schedulerClient.send(new UpdateScheduleCommand(schedulePayload))
+			await this.schedulerClient.send(new UpdateScheduleCommand(schedulePayload));
 		} catch (err) {
 			if (err instanceof Error && err.name === 'ResourceNotFoundException') {
 				// create the schedule
-				await this.schedulerClient.send(new CreateScheduleCommand(schedulePayload))
+				await this.schedulerClient.send(new CreateScheduleCommand(schedulePayload));
 			} else {
-				throw err
+				throw err;
 			}
 		}
 

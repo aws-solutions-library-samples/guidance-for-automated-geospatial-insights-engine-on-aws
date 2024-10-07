@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
-import { Type } from "@sinclair/typebox";
-import { apiVersion100 } from "./types.js";
+import { Type } from '@sinclair/typebox';
+import { apiVersion100 } from './types.js';
 
 /**
  * Common headers

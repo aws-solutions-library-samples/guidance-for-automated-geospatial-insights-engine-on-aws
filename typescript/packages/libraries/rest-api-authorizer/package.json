@@ -18,29 +18,29 @@
 		"@agie/resource-api-base": "workspace:*",
 		"@aws-sdk/client-verifiedpermissions": "~3",
 		"@aws-sdk/client-secrets-manager": "~3",
-		"@fastify/awilix": "~5",
-		"awilix": "~10",
+		"@fastify/awilix": "~6",
+		"awilix": "~11",
 		"aws-jwt-verify": "~4",
 		"aws-lambda": "~1",
 		"aws-xray-sdk": "~3",
 		"dotenv": "~16",
-		"fastify-plugin": "~4",
-		"fastify": "~4",
-		"ow": "~1",
+		"fastify-plugin": "~5",
+		"fastify": "~5",
+		"ow": "~2",
 		"pino-pretty": "~11",
-		"pino": "~8"
+		"pino": "~9"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
-		"@types/node": "~20",
+		"@types/node": "~22",
 		"aws-sdk-client-mock": "~4",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",
 		"typescript": "~5",
-		"vitest-mock-extended": "~1",
-		"vitest": "~0"
+		"vitest-mock-extended": "~2",
+		"vitest": "~2"
 	},
 	"private": false
 }

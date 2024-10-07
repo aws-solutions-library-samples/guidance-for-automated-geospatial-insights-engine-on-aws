@@ -37,6 +37,7 @@ const getValues = async (module: string, mapping: Record<string, string>) => {
 				outputFile += `${key}=${response.Parameter?.Value}\r\n`;
 			}
 		} catch (e) {
+			console.log(e);
 			throw new Error(`
 			*************************************************************************************************************************************************************
 				Parameter ${name} not Found!

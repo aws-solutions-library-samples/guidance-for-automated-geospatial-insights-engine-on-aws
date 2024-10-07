@@ -11,33 +11,24 @@
  *  and limitations under the License.
  */
 
-import { Result, ResultList } from "./schemas.js";
-
-export const resultListResourceExample: ResultList = {
-	"results": [
-		{
-			"regionId": "01hwvwmm5d2crn4xx8k0s0a61z",
-			"id": "01hwy44p6yjpvkdx4c9g675h55",
-			"createdAt": "2024-05-03T02:22:16.932Z",
-			"engineType": "aws-batch",
-			"status": "succeeded",
-			"executionId": "56e998fb-8437-4bdb-b378-703481fdee6c",
-			"updatedAt": "2024-05-03T02:23:31.334Z",
-			"message": "Essential container in task exited"
-		}
-	],
-	"pagination": {
-		"count": 20
-	}
-}
+import { Result, ResultList } from './schemas.js';
 
 export const resultResourceExample: Result = {
-	"regionId": "01hwvwmm5d2crn4xx8k0s0a61z",
-	"id": "01hwy44p6yjpvkdx4c9g675h55",
-	"createdAt": "2024-05-03T02:22:16.932Z",
-	"engineType": "aws-batch",
-	"status": "succeeded",
-	"executionId": "56e998fb-8437-4bdb-b378-703481fdee6c",
-	"updatedAt": "2024-05-03T02:23:31.334Z",
-	"message": "Essential container in task exited"
-}
+	regionId: '01j8sbj1bjwwtv7482rnrdxtqg',
+	id: '01j8seqvy55xy4k4p51nz976zh',
+	createdAt: '2024-09-27T09:59:39.352Z',
+	startDateTime: '2024-09-22T09:59:32.518Z',
+	endDateTime: '2024-09-27T09:59:32.518Z',
+	engineType: 'aws-batch',
+	status: 'succeeded',
+	executionId: '2128c070-04ad-4476-8450-42d53b5954b4',
+	updatedAt: '2024-09-27T10:01:08.091Z',
+	message: 'Essential container in task exited',
+};
+
+export const resultListResourceExample: ResultList = {
+	results: [resultResourceExample],
+	pagination: {
+		count: 20,
+	},
+};

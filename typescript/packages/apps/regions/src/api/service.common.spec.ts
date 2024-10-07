@@ -121,6 +121,8 @@ describe('CommonService', () => {
 		expect(merged).toEqual({
 			id: existing.id,
 			name: updated.name,
+			totalArea: 100,
+			totalRegions: 2,
 			attributes: {
 				attr1: 'attr-one',
 				attr2: 'attr-two-changed',

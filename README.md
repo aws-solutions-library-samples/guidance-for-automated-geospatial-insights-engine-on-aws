@@ -117,6 +117,13 @@ cd $CLI_FOLDER
 bin/run.js install -e $ENVIRONMENT -r $AWS_REGION
 ```
 
+The installer will generate `cdk.context.json` in the `infrastructure` folder. For the subsequent deployment, if you want to use same configuration and skip the installation wizard, run the following command:
+
+```shell
+cd $CLI_FOLDER
+bin/run.js install -e $ENVIRONMENT -r $AWS_REGION -h -c "$AGIE_FOLDER/infrastructure/cdk.context.json"
+```
+
 ### 4. Deployment Validation
 
 To validate the deployment, open the CloudFormation console and verify the status of the following stacks

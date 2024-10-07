@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { RegionResource } from '../regions/models.js';
 import type { CatalogDetails, GroupDetails } from '../results/models.js';
 import { EngineJobDetails, polygonProcessingDetails } from '../results/models.js';
-import { RegionResource } from "../regions/models.js";
 
 export type EventType = 'created' | 'updated' | 'deleted';
 
@@ -127,4 +127,17 @@ export type {
 	polygonsProcessingEvent as PolygonsProcessingEvent,
 	regionChangeEvent as RegionChangeEvent,
 	resultsChangeEvent as ResultsChangeEvent,
+};
+
+export type StartJobRequest = RegionResource & {
+	startDateTime: string;
+	endDateTime: string;
+	latestResultId?: string;
+};
+
+export type FinishJobRequest = {
+	jobArn: string;
+	status: string;
+	statusReason: string;
+	jobId: string;
 };

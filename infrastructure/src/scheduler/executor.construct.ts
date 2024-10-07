@@ -11,30 +11,29 @@
  *  and limitations under the License.
  */
 
-import { Construct } from "constructs";
-import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
-import path from "path";
-import { IFunction, Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { Duration } from "aws-cdk-lib";
-import { getLambdaArchitecture } from "@agie/cdk-common";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { AnyPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { EcsJobDefinition, JobQueue } from "aws-cdk-lib/aws-batch";
-import { EventBus, Rule } from "aws-cdk-lib/aws-events";
-import { Bucket } from "aws-cdk-lib/aws-s3";
-import { IQueue, Queue } from "aws-cdk-lib/aws-sqs";
-import { NagSuppressions } from "cdk-nag";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { fileURLToPath } from "url";
+import { getLambdaArchitecture } from '@agie/cdk-common';
+import { Duration } from 'aws-cdk-lib';
+import { EcsJobDefinition, JobQueue } from 'aws-cdk-lib/aws-batch';
+import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { IQueue, Queue } from 'aws-cdk-lib/aws-sqs';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 export interface ExecutorConstructProperties {
-	environment: string
+	environment: string;
 	eventBusName: string;
 	bucketName: string;
 	jobDefinitionArn: string;
 	regionsApiLambda: IFunction;
-	resultsApiLambda: IFunction;
 	highPriorityQueueArn: string;
 	standardPriorityQueueArn: string;
 	lowPriorityQueueArn: string;
@@ -46,7 +45,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class ExecutorModule extends Construct {
-
 	constructor(scope: Construct, id: string, props: ExecutorConstructProperties) {
 		super(scope, id);
 
@@ -60,8 +58,7 @@ export class ExecutorModule extends Construct {
 
 		const bucket = Bucket.fromBucketName(scope, 'Bucket', props.bucketName);
 
-		const eventBus = EventBus.fromEventBusName(scope, 'Bus', props.eventBusName)
-
+		const eventBus = EventBus.fromEventBusName(scope, 'Bus', props.eventBusName);
 
 		// Lambda function that processor schedule queued in SQS
 		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
@@ -81,8 +78,7 @@ export class ExecutorModule extends Construct {
 				STANDARD_PRIORITY_QUEUE_ARN: standardPriorityQueue.jobQueueArn,
 				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
 				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
-				RESULTS_API_FUNCTION_NAME: props.resultsApiLambda.functionName,
-				BUCKET_NAME: props.bucketName
+				BUCKET_NAME: props.bucketName,
 			},
 			bundling: {
 				minify: true,
@@ -98,7 +94,6 @@ export class ExecutorModule extends Construct {
 		});
 
 		props.regionsApiLambda.grantInvoke(sqsProcessorLambda);
-		props.resultsApiLambda.grantInvoke(sqsProcessorLambda);
 		bucket.grantReadWrite(sqsProcessorLambda);
 		eventBus.grantPutEventsTo(sqsProcessorLambda);
 
@@ -117,15 +112,15 @@ export class ExecutorModule extends Construct {
 			})
 		);
 
-		const awsBatchStateChangeRule = new Rule(this, "AwsBatchStateChangeRule", {
+		const awsBatchStateChangeRule = new Rule(this, 'AwsBatchStateChangeRule', {
 			eventPattern: {
-				detailType: ["Batch Job State Change"],
-				source: ["aws.batch"],
-				"detail": {
-					"jobDefinition": [engineProcessorJobDefinition.jobDefinitionArn]
-				}
+				detailType: ['Batch Job State Change'],
+				source: ['aws.batch'],
+				detail: {
+					jobDefinition: [engineProcessorJobDefinition.jobDefinitionArn],
+				},
 			},
-		})
+		});
 
 		// Lambda function that processor schedule queued in SQS
 		const eventbridgeLambda = new NodejsFunction(this, 'EventBridgeProcessorLambda', {
@@ -208,8 +203,15 @@ export class ExecutorModule extends Construct {
 				},
 				{
 					id: 'AwsSolutions-IAM5',
-					appliesTo: ['Action::s3:Abort*', 'Action::s3:DeleteObject*', 'Action::s3:GetBucket*', 'Action::s3:GetObject*', 'Action::s3:List*', 'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*'],
-					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.'
+					appliesTo: [
+						'Action::s3:Abort*',
+						'Action::s3:DeleteObject*',
+						'Action::s3:GetBucket*',
+						'Action::s3:GetObject*',
+						'Action::s3:List*',
+						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
+					],
+					reason: 'the policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
 				},
 			],
 			true
@@ -225,6 +227,5 @@ export class ExecutorModule extends Construct {
 			],
 			true
 		);
-
 	}
 }

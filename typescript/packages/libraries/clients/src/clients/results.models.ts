@@ -14,12 +14,14 @@
 export interface ListResultsOptions {
 	paginationToken?: string;
 	count?: number;
+	status?: 'queued' | 'starting' | 'inProgress' | 'failed' | 'succeeded';
 }
 
 export interface ResultResource {
 	regionId: string;
 	id: string;
-	scheduleDateTime: string;
+	startDateTime: string;
+	endDateTime: string;
 	executionId: string;
 	createdAt: string;
 	updatedAt?: string;
@@ -29,9 +31,9 @@ export interface ResultResource {
 }
 
 export interface ResultListResource {
-	results: ResultResource[]
+	results: ResultResource[];
 	pagination?: {
 		count: number;
 		lastEvaluatedToken: string;
-	}
+	};
 }

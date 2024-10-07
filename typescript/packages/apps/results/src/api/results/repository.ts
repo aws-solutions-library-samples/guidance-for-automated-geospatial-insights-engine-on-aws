@@ -12,17 +12,10 @@
  */
 
 import { createDelimitedAttribute, DocumentDbClientItem, expandDelimitedAttribute } from '@agie/dynamodb-utils';
-import {
-	DynamoDBDocumentClient,
-	GetCommand,
-	PutCommand,
-	PutCommandInput,
-	QueryCommand,
-	QueryCommandInput
-} from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, PutCommandInput, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import type { BaseLogger } from 'pino';
-import { PkType } from "../../common/pkUtils.js";
-import { Result, ResultListOptions } from "./schemas.js";
+import { PkType } from '../../common/pkUtils.js';
+import { Result, ResultListOptions } from './schemas.js';
 
 export class ResultsRepository {
 	constructor(private readonly log: BaseLogger, private readonly dynamoDBClient: DynamoDBDocumentClient, private readonly tableName: string) {}
@@ -52,33 +45,71 @@ export class ResultsRepository {
 
 	public async list(regionId: string, options: ResultListOptions): Promise<[Result[], string]> {
 		this.log.info(`ResultsRepository> list> regionId:${regionId}`);
+
 		const executionIdKey = createDelimitedAttribute(PkType.RegionId, regionId);
 
-		// list all items directly relating to the execution
-		const queryCommandParams: QueryCommandInput = {
+		const commonParams: Pick<QueryCommandInput, 'TableName' | 'ScanIndexForward' | 'Limit' | 'ExclusiveStartKey'> = {
 			TableName: this.tableName,
-			// ensure that we return the latest result first
 			ScanIndexForward: false,
-			KeyConditionExpression: `#hash=:hash`,
-			ExpressionAttributeNames: {
-				'#hash': 'pk',
-			},
-			ExpressionAttributeValues: {
-				':hash': executionIdKey,
-			},
 			Limit: options?.count,
 			ExclusiveStartKey: options?.token
 				? {
-					pk: executionIdKey,
-					sk: createDelimitedAttribute(PkType.ResultId, options.token),
-				}
+						pk: executionIdKey,
+						sk: createDelimitedAttribute(PkType.ResultId, options.token),
+				  }
 				: undefined,
 		};
+
+		let queryCommandParams: QueryCommandInput;
+
+		if (options.status) {
+			let result: Result;
+			if (options.token) {
+				result = await this.get(regionId, options.token);
+				options.token = result.endDateTime;
+			}
+
+			// list all items directly relating to the execution
+			queryCommandParams = {
+				...commonParams,
+				IndexName: 'pk-siSort2-index',
+				KeyConditionExpression: `#hash=:hash AND begins_with(#sort,:sort)`,
+				ExpressionAttributeNames: {
+					'#hash': 'pk',
+					'#sort': 'siSort2',
+				},
+				ExpressionAttributeValues: {
+					':hash': executionIdKey,
+					':sort': createDelimitedAttribute(PkType.Status, options.status),
+				},
+				ExclusiveStartKey: options?.token
+					? {
+							...commonParams.ExclusiveStartKey,
+							siSort2: createDelimitedAttribute(PkType.Status, options.status, PkType.EndDateTime, options.token),
+					  }
+					: undefined,
+			};
+		} else {
+			// list all items directly relating to the execution
+			queryCommandParams = {
+				...commonParams,
+				KeyConditionExpression: `#hash=:hash`,
+				ExpressionAttributeNames: {
+					'#hash': 'pk',
+				},
+				ExpressionAttributeValues: {
+					':hash': executionIdKey,
+				},
+			};
+		}
 
 		try {
 			const response = await this.dynamoDBClient.send(new QueryCommand(queryCommandParams));
 			this.log.debug(`ResultsRepository> list> response:${JSON.stringify(response)}`);
-			return [this.assembleResultList(response.Items), response?.LastEvaluatedKey ? encodeURIComponent(expandDelimitedAttribute(response.LastEvaluatedKey['sk'])[1]) : undefined];
+			return [
+				this.assembleResultList(response.Items),
+				response?.LastEvaluatedKey ? encodeURIComponent(expandDelimitedAttribute(response.LastEvaluatedKey['sk'])[1]) : undefined,
+			];
 		} catch (err) {
 			if (err instanceof Error) {
 				this.log.error(err);
@@ -93,11 +124,13 @@ export class ResultsRepository {
 		this.log.info(`ResultsRepository> put> resultDetails:${JSON.stringify(resultDetails)}`);
 		const regionIdKey = createDelimitedAttribute(PkType.RegionId, resultDetails.regionId);
 		const resultIdKey = createDelimitedAttribute(PkType.ResultId, resultDetails.id);
+		const siSort2Key = createDelimitedAttribute(PkType.Status, resultDetails.status, PkType.EndDateTime, resultDetails.endDateTime);
 		const params: PutCommandInput = {
 			TableName: this.tableName,
 			Item: {
 				pk: regionIdKey,
 				sk: resultIdKey,
+				siSort2: siSort2Key,
 				...resultDetails,
 			},
 		};
@@ -135,6 +168,8 @@ export class ResultsRepository {
 		return {
 			regionId: expandDelimitedAttribute(item['pk'])[1],
 			id: expandDelimitedAttribute(item['sk'])[1],
+			startDateTime: item['startDateTime'],
+			endDateTime: item['endDateTime'],
 			executionId: item['executionId'],
 			createdAt: item['createdAt'],
 			updatedAt: item['updatedAt'],

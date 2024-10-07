@@ -67,7 +67,8 @@ class Result(DataClassJsonMixin):
 
 @dataclass
 class EngineRequest(DataClassJsonMixin):
-	schedule_date_time: str = field(metadata=config(field_name="scheduleDateTime"))
+	start_date_time: str = field(metadata=config(field_name="startDateTime"))
+	end_date_time: str = field(metadata=config(field_name="endDateTime"))
 	coordinates: List[List[List[tuple[float, float]]]] = field(metadata=config(field_name="coordinates"), default=None)
 	group_id: str = field(metadata=config(field_name="groupId"), default=None)
 	group_name: str = field(metadata=config(field_name="groupName"), default=None)
@@ -78,7 +79,7 @@ class EngineRequest(DataClassJsonMixin):
 	output_prefix: str = field(metadata=config(field_name="outputPrefix"), default=None)
 	result_id: str = field(metadata=config(field_name="resultId"), default=None)
 	state: Optional[State] = field(metadata=config(field_name="state"), default=None)
-	latest_successful_result: Optional[Result] = field(metadata=config(field_name="latestSuccessfulResult"), default=None)
+	latest_result_id: Optional[str] = field(metadata=config(field_name="latestResultId"), default=None)
 
 
 class STACCatalogProcessor:
@@ -94,16 +95,8 @@ class STACCatalogProcessor:
 		self.bounding_box: Optional[ndarray] = None
 
 	@staticmethod
-	def _load_stac_items(schedule_date_time: str, latest_successful_result: Result, bounding_box: list[float]) -> List[Item]:
-
-		# get the last successful run from region resource tags
-		if latest_successful_result is not None and latest_successful_result.created_at is not None:
-			last_successful_run = datetime.fromisoformat(latest_successful_result.created_at).strftime("%Y-%m-%d")
-		else:
-			# default to 5 days ago if we don't have a previous successful run
-			last_successful_run = (datetime.strptime(schedule_date_time, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
-
-		time_filter = "{}/{}".format(last_successful_run, schedule_date_time)
+	def _load_stac_items(start_date_time: str, end_date_time: str, bounding_box: list[float]) -> List[Item]:
+		time_filter = "{}/{}".format(start_date_time, end_date_time)
 
 		stac_catalog = Client.open(STAC_URL)
 
@@ -231,14 +224,14 @@ class STACCatalogProcessor:
 		# Store the bounding box
 		self.bounding_box = polygon_series.total_bounds
 
-		self.stac_items = self._load_stac_items(self.request.schedule_date_time, self.request.latest_successful_result, self.bounding_box)
+		self.stac_items = self._load_stac_items(self.request.start_date_time, self.request.end_date_time, self.bounding_box)
 
 		stac_assets = self._filter_stac_assets(self.stac_items, self.polygon_list, self.bounding_box)
 
 		previous_ndvi_raster = None
-		if self.request.latest_successful_result is not None and self.request.latest_successful_result.id is not None:
+		if self.request.latest_result_id is not None:
 			try:
-				previous_ndvi_raster = self.get_previous_tif(self.request.region_id, self.request.latest_successful_result.id, self.request.polygon_id)
+				previous_ndvi_raster = self.get_previous_tif(self.request.region_id, self.request.latest_result_id, self.request.polygon_id)
 			except Exception as e:
 				print(f"Error: {e}")
 

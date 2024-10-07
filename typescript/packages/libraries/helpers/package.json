@@ -23,22 +23,24 @@
 		"@aws-amplify/auth": "~6",
 		"@aws-sdk/client-ssm": "~3",
 		"aws-amplify": "~6",
-		"ow": "~1"
+		"ow": "~2"
 	},
 	"devDependencies": {
 		"@tsconfig/node20": "~20",
 		"@types/aws-lambda": "~8",
-		"@types/node": "~20",
+		"@types/node": "~22",
 		"@agie/infrastructure": "workspace:*",
-		"@typescript-eslint/eslint-plugin": "~7",
-		"@typescript-eslint/parser": "~7",
+		"@typescript-eslint/eslint-plugin": "~8",
+		"@typescript-eslint/parser": "~8",
 		"aws-cdk": "~2",
 		"cdk-nag": "~2",
 		"esbuild": "~0",
 		"eslint": "~9",
 		"shx": "~0",
 		"tsx": "~4",
-		"typescript": "~5"
+		"typescript": "~5",
+		"vitest": "~2",
+		"vitest-mock-extended": "~2"
 	},
 	"private": false
 }
