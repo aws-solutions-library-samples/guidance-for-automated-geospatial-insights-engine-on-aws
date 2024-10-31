@@ -113,6 +113,10 @@ export class StaticSite extends Construct {
 					id: 'AwsSolutions-CFR4',
 					reason: 'No TLSV1.1 or 1.2 on distribution for now.',
 				},
+				{
+					id: 'AwsSolutions-CFR7',
+					reason: 'WAF is not required for this static content distribution as it serves only public read-only content with no user input processing',
+				},
 			],
 			true
 		);

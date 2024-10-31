@@ -55,7 +55,7 @@ AWS_XRAY_CONTEXT_MISSING=IGNORE_ERROR
 await getValues('stacServer', {
 	STAC_API_URL: 'apiUrl',
 	STAC_OS_SERVER_URL: 'openSearchUrl',
-	STAC_OS_SECRET_NAME: 'administratorSecretName'
+	STAC_OS_SECRET_NAME: 'administratorSecretName',
 });
 
 await getValues('shared', {
@@ -68,6 +68,10 @@ await getValues('regions', {
 
 await getValues('results', {
 	AGIE_RESULTS_BASE_URL: 'apiUrl',
+});
+
+await getValues('executor', {
+	AGIE_EXECUTOR_BASE_URL: 'apiUrl',
 });
 
 await getValues('notifications', {

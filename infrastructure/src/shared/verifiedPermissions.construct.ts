@@ -53,13 +53,13 @@ export class VerifiedPermissions extends Construct {
 
 		/** policies */
 		/*
-		* Semgrep issue https://sg.run/OPqk
-		* Ignore reason: This is not an input that is provided by end user
-		*/
+		 * Semgrep issue https://sg.run/OPqk
+		 * Ignore reason: This is not an input that is provided by end user
+		 */
 		// nosemgrep
 		const loadPolicyFile = (filename: string): string => readFileSync(path.join(__dirname, 'verifiedPermissionsConfig', filename)).toString();
 
-		['Regions', 'Results', 'Notifications'].forEach(module => {
+		['Regions', 'Results', 'Notifications', 'Executor'].forEach((module) => {
 			new CfnPolicy(this, `${module}AdminPermissions`, {
 				definition: {
 					static: {
@@ -87,8 +87,6 @@ export class VerifiedPermissions extends Construct {
 				},
 				policyStoreId: this.policyStoreId,
 			});
-		})
-
-
+		});
 	}
 }

@@ -1,0 +1,619 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AGIE Notifications",
+    "description": "Manages subscription and delivery of notification of AGIE events",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "def-0": {
+        "type": "object",
+        "properties": {
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "startDateTime": {
+            "description": "The query window's start time.",
+            "type": "string"
+          },
+          "endDateTime": {
+            "description": "The query window's end time",
+            "type": "string"
+          },
+          "interval": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "description": "The length of the interval, expressed as a number.",
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month"
+                ],
+                "description": "`The unit of time used to measure the duration, such day, week or month`"
+              }
+            },
+            "required": [
+              "duration",
+              "unit"
+            ]
+          }
+        },
+        "required": [
+          "regionId",
+          "startDateTime",
+          "endDateTime",
+          "interval"
+        ],
+        "title": "executionTask_new"
+      },
+      "def-1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Task resource id.",
+            "type": "string"
+          },
+          "taskStatus": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "inProgress",
+              "success",
+              "failure"
+            ],
+            "description": "Task execution status"
+          },
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "startDateTime": {
+            "description": "The query window's start time.",
+            "type": "string"
+          },
+          "endDateTime": {
+            "description": "The query window's start time.",
+            "type": "string"
+          },
+          "interval": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "description": "The length of the interval, expressed as a number.",
+                "type": "number"
+              },
+              "unit": {
+                "description": "The unit of time used to measure the duration, such as seconds, minutes, hours, days, weeks, months, or years.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "duration",
+              "unit"
+            ]
+          },
+          "statusMessage": {
+            "description": "message for the status",
+            "type": "string"
+          },
+          "progress": {
+            "description": "total progress of the task",
+            "type": "number"
+          },
+          "itemsTotal": {
+            "description": "total number of items in the task",
+            "type": "number"
+          },
+          "itemsSucceeded": {
+            "description": "total number of items succeeded",
+            "type": "number"
+          },
+          "itemsFailed": {
+            "description": "no. of items failed",
+            "type": "number"
+          },
+          "itemsCompleted": {
+            "description": "no. of items completed",
+            "type": "number"
+          },
+          "createdAt": {
+            "description": "Date/time created",
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "description": "ID of owner.",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Date/time updated",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "Last ID of user who made a change.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "taskStatus",
+          "regionId",
+          "startDateTime",
+          "endDateTime",
+          "interval",
+          "itemsTotal",
+          "itemsSucceeded",
+          "itemsFailed",
+          "itemsCompleted",
+          "createdAt",
+          "createdBy"
+        ],
+        "title": "Task_resource"
+      },
+      "def-2": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-1"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluated": {
+                "description": "Last evaluated task Id",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ],
+        "title": "executionTasks_list"
+      },
+      "def-3": {
+        "type": "object",
+        "properties": {
+          "taskItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-4"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "description": "No. of results returned when pagination requested.",
+                "type": "integer"
+              },
+              "lastEvaluatedId": {
+                "description": "The query window's start time.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "taskItems"
+        ],
+        "title": "taskItem_List"
+      },
+      "def-4": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "description": "Execution task id.",
+            "type": "string"
+          },
+          "regionId": {
+            "description": "Unique Region ID.",
+            "type": "string"
+          },
+          "startDateTime": {
+            "description": "The query window's start time.",
+            "type": "string"
+          },
+          "resultId": {
+            "description": "Unique identifier for the result",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "failure"
+            ],
+            "description": "Execution task item state"
+          },
+          "statusMessage": {
+            "description": "failure message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "taskId",
+          "regionId",
+          "startDateTime",
+          "resultId"
+        ],
+        "title": "taskItem_resource"
+      }
+    }
+  },
+  "paths": {
+    "/executionTasks": {
+      "post": {
+        "tags": [
+          "Execution Tasks"
+        ],
+        "description": "Create a execution tasks in bulk",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-0"
+              },
+              "examples": {
+                "new execution task request": {
+                  "value": {
+                    "regionId": "",
+                    "startDateTime": "",
+                    "endDateTime": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "1.0.0",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "default": "application/json",
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-1"
+                },
+                "examples": {
+                  "Execution creation task": {
+                    "summary": "Existing execution task detail.",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsCompleted": 100,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere",
+                      "regionId": "",
+                      "startDateTime": "",
+                      "endDateTime": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Execution Tasks"
+        ],
+        "description": "Lists Execution Tasks",
+        "parameters": [
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "description": "Count of results to return, if not specified default to 20"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromTaskId",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-2"
+                },
+                "examples": {
+                  "List of Execution Tasks": {
+                    "summary": "Paginated list of executionTasks",
+                    "value": {
+                      "tasks": [
+                        {
+                          "id": "string",
+                          "taskStatus": "waiting",
+                          "statusMessage": "string",
+                          "progress": 50,
+                          "itemsTotal": 100,
+                          "itemsSucceeded": 99,
+                          "itemsCompleted": 100,
+                          "itemsFailed": 1,
+                          "createdAt": "2022-08-30T03:18:26.809Z",
+                          "createdBy": "someone@somewhere",
+                          "regionId": "",
+                          "startDateTime": "",
+                          "endDateTime": ""
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executionTasks/{id}": {
+      "get": {
+        "tags": [
+          "Execution Tasks"
+        ],
+        "description": "Retrieve details of an existing execution task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Unique id."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-1"
+                },
+                "examples": {
+                  "Existing Execution Task": {
+                    "summary": "Existing Execution Task details.",
+                    "value": {
+                      "id": "string",
+                      "taskStatus": "waiting",
+                      "statusMessage": "string",
+                      "progress": 50,
+                      "itemsTotal": 100,
+                      "itemsSucceeded": 99,
+                      "itemsCompleted": 100,
+                      "itemsFailed": 1,
+                      "createdAt": "2022-08-30T03:18:26.809Z",
+                      "createdBy": "someone@somewhere",
+                      "regionId": "",
+                      "startDateTime": "",
+                      "endDateTime": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executionTasks/{taskId}/taskItems": {
+      "get": {
+        "operationId": "listExecutionTaskItems",
+        "tags": [
+          "Task Items"
+        ],
+        "description": "Lists execution task items",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromDate",
+            "required": false,
+            "description": "Id to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "description": "Execution task id."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-3"
+                },
+                "examples": {
+                  "List of task items": {
+                    "summary": "Paginated list of execution task items",
+                    "value": {
+                      "taskItems": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:30001"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Subscriptions",
+      "description": "Subscriptions represent collections of subcription."
+    }
+  ]
+}

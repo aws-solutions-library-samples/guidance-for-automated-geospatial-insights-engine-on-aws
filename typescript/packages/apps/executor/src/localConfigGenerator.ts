@@ -11,8 +11,8 @@
  *  and limitations under the License.
  */
 
+import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import * as fs from 'fs';
-import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 
 const { ENVIRONMENT, AWS_REGION } = process.env;
 
@@ -50,8 +50,16 @@ await getValues('shared', {
 	EVENT_BUS_NAME: 'eventBusName',
 });
 
-await getValues('regions', {
+await getValues('executor', {
 	TABLE_NAME: 'tableName',
+});
+
+await getValues('scheduler', {
+	QUEUE_URL: 'engineSQSQueueUrl',
+});
+
+await getValues('regions', {
+	REGIONS_API_FUNCTION_NAME: 'apiFunctionArn',
 });
 
 fs.writeFileSync('.env', outputFile);

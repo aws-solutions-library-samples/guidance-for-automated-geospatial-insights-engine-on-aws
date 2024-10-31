@@ -12,18 +12,18 @@
  */
 
 import { Tags } from '@agie/regions';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { Client } from '@opensearch-project/opensearch';
+import { Request as AWS4Request, Credentials, sign } from 'aws4';
+import pWaitFor from 'p-wait-for';
 import { request, spec, stash } from 'pactum';
 import Spec from 'pactum/src/models/Spec.js';
 import path from 'path';
 import { initializeConfig } from '../utils/config.js';
 import { COMMON_HEADERS } from '../utils/headers.js';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
-import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { Client } from "@opensearch-project/opensearch";
-import pWaitFor from "p-wait-for";
-import { Credentials, Request as AWS4Request, sign } from "aws4";
 
-request.setDefaultTimeout(5000)
+request.setDefaultTimeout(5000);
 
 // load config from dotenv
 initializeConfig(path.join(__dirname, '..', '..'));
@@ -56,37 +56,32 @@ type AuthExpectArgs = {
 
 export type CreateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & AuthExpectArgs;
 export type CreateArgsWithParent = CreateArgs & ParentIdExpectArgs;
-export type UpdateArgs =
-	BaseExpectArgs
-	& RequestBodyExpectArgs
-	& ResponseBodyExpectArgs
-	& IdExpectArgs
-	& AuthExpectArgs;
+export type UpdateArgs = BaseExpectArgs & RequestBodyExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
 export type GetArgs = BaseExpectArgs & ResponseBodyExpectArgs & IdExpectArgs & AuthExpectArgs;
 export type ListExpectArgs = BaseExpectArgs &
 	AuthExpectArgs & {
-	withContentHeader?: string;
-	withCount?: number;
-	withToken?: string;
-	withPolygonId?: string;
-	withRegionId?: string;
-	withGroupId?: string;
-	withTags?: Tags;
-	expectCount?: number;
-	expectJsonLike: object;
-};
+		withContentHeader?: string;
+		withCount?: number;
+		withToken?: string;
+		withPolygonId?: string;
+		withRegionId?: string;
+		withGroupId?: string;
+		withTags?: Tags;
+		expectCount?: number;
+		expectJsonLike: object;
+	};
 export type DeleteArgs = Omit<BaseExpectArgs, 'expectStatus'> &
 	IdExpectArgs &
 	AuthExpectArgs & {
-	expectStatus?: number;
-};
+		expectStatus?: number;
+	};
 
 const secretsManagerClient = new SecretsManagerClient({ region: process.env['AWS_REGION'] });
-const secrets = await secretsManagerClient.send(new GetSecretValueCommand({ SecretId: process.env['STAC_OS_SECRET_NAME'] }))
-const { username, password } = JSON.parse(secrets.SecretString)
+const secrets = await secretsManagerClient.send(new GetSecretValueCommand({ SecretId: process.env['STAC_OS_SECRET_NAME'] }));
+const { username, password } = JSON.parse(secrets.SecretString);
 const openSearchClient = new Client({
 	node: `https://${username}:${password}@${process.env['STAC_OS_SERVER_URL']}`,
-})
+});
 
 export const initializeCommonDataStash = () => {
 	// data templates are a way to reuse json objects across tests
@@ -109,33 +104,35 @@ export const signResourceUrl = (baseUrl: string, resourcePlural: string, args: L
 		region: process.env['AWS_REGION'],
 		service: 'execute-api',
 		headers: COMMON_HEADERS(args.withIdToken),
-		signQuery: true
+		signQuery: true,
 	};
 	sign(signingOptions, args.withIAMCredentials);
-	resourcePlural = `${signingOptions.path.replace(`/${stage}/`, '')}`
+	resourcePlural = `${signingOptions.path.replace(`/${stage}/`, '')}`;
 	return resourcePlural;
-}
+};
 
-export const createResourcesMethodForModules = (module: 'results' | 'regions' | 'notifications' | 'stac') => {
-
+export const createResourcesMethodForModules = (module: 'results' | 'regions' | 'notifications' | 'stac' | 'executor') => {
 	let baseUrl: string;
 	switch (module) {
 		case 'regions':
-			baseUrl = process.env.AGIE_REGIONS_BASE_URL
+			baseUrl = process.env.AGIE_REGIONS_BASE_URL;
 			break;
 		case 'results':
-			baseUrl = process.env.AGIE_RESULTS_BASE_URL
+			baseUrl = process.env.AGIE_RESULTS_BASE_URL;
+			break;
+		case 'executor':
+			baseUrl = process.env.AGIE_EXECUTOR_BASE_URL;
 			break;
 		case 'notifications':
-			baseUrl = process.env.AGIE_NOTIFICATIONS_BASE_URL
+			baseUrl = process.env.AGIE_NOTIFICATIONS_BASE_URL;
 			break;
 		case 'stac':
-			baseUrl = process.env.STAC_API_URL
+			baseUrl = process.env.STAC_API_URL;
 			break;
 	}
 
 	const createResource = (resourcePlural: string, args: CreateArgs, parentResourcePlural?: string, parentId?: string): Spec => {
-		const url = parentId ? `${baseUrl}${parentResourcePlural}/${parentId}/${resourcePlural}` : `${BASE_URL}${resourcePlural}`;
+		const url = parentId ? `${baseUrl}${parentResourcePlural}/${parentId}/${resourcePlural}` : `${baseUrl}${resourcePlural}`;
 		let s = spec().post(url).withJson(args.withJson).withHeaders(COMMON_HEADERS(args.withIdToken)).expectStatus(args.expectStatus);
 
 		let requestBody = args.withJson;
@@ -169,23 +166,30 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 		return s;
 	};
 
-	const waitForGetResource = async (resourcePlural: string, args: GetArgs, waitConfiguration?: {
-		interval: number,
-		timeout: number
-	}): Promise<void> => {
-		await pWaitFor(async (): Promise<any> => {
-			try {
-				await getResource(resourcePlural, args).toss();
-				return true;
-			} catch (e) {
-				if (e.code === 'ERR_ASSERTION') {
-					return false;
-				} else {
-					throw e;
+	const waitForGetResource = async (
+		resourcePlural: string,
+		args: GetArgs,
+		waitConfiguration?: {
+			interval: number;
+			timeout: number;
+		}
+	): Promise<void> => {
+		await pWaitFor(
+			async (): Promise<any> => {
+				try {
+					await getResource(resourcePlural, args).toss();
+					return true;
+				} catch (e) {
+					if (e.code === 'ERR_ASSERTION') {
+						return false;
+					} else {
+						throw e;
+					}
 				}
-			}
-		}, { interval: waitConfiguration?.interval ?? 1000, timeout: waitConfiguration?.timeout ?? 5000 });
-	}
+			},
+			{ interval: waitConfiguration?.interval ?? 1000, timeout: waitConfiguration?.timeout ?? 5000 }
+		);
+	};
 
 	const getResource = (resourcePlural: string, args: GetArgs): Spec => {
 		if (args.withIAMCredentials) {
@@ -269,8 +273,12 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	return {
-		createResource, deleteResource, updateResource, listResources, teardownResources, getResource, waitForGetResource
-	}
-
-}
-
+		createResource,
+		deleteResource,
+		updateResource,
+		listResources,
+		teardownResources,
+		getResource,
+		waitForGetResource,
+	};
+};

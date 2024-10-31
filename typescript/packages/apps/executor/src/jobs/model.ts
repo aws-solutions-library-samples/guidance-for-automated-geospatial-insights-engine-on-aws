@@ -12,6 +12,9 @@
  */
 
 import { ResultResource, State } from '@agie/clients';
+import { count, stringEnum } from '@agie/resource-api-base';
+import { Type } from '@sinclair/typebox';
+import { endDateTime, regionId, startDateTime } from '../common/schemas.js';
 
 export interface BatchEngineInput {
 	polygonId: string;
@@ -78,3 +81,34 @@ export interface Tags {
 }
 
 export type JobQueueArn = string;
+
+export const taskItemStatus = stringEnum(['success', 'failure'], 'Activity task item state');
+
+export const taskId = Type.String({ description: 'Unique identifier for task resource.' });
+
+export const taskItemResource = Type.Object(
+	{
+		taskId,
+		regionId,
+		startDateTime,
+		endDateTime,
+		status: Type.Optional(taskItemStatus),
+		statusMessage: Type.Optional(Type.String({ description: 'failure message' })),
+	},
+	{
+		$id: 'taskItem_resource',
+	}
+);
+
+export const taskItemList = Type.Object(
+	{
+		taskItems: Type.Array(Type.Ref(taskItemResource)),
+		pagination: Type.Optional(
+			Type.Object({
+				count: Type.Optional(count),
+				lastEvaluatedId: Type.Optional(startDateTime),
+			})
+		),
+	},
+	{ $id: 'taskItem_List' }
+);

@@ -140,19 +140,20 @@ export abstract class TaskService {
 		const limit = pLimit(this.concurrencyLimit);
 		for (const batch of taskBatches) {
 			sqsFutures.push(
-				limit(() =>
-					this.sqsClient.send(
-						new SendMessageCommand({
-							QueueUrl: this.sqsQueueUrl,
-							MessageBody: JSON.stringify(batch),
-							MessageAttributes: {
-								messageType: {
-									DataType: 'String',
-									StringValue: `${this.resourceType}Task:${task.taskType}`,
+				limit(
+					async () =>
+						await this.sqsClient.send(
+							new SendMessageCommand({
+								QueueUrl: this.sqsQueueUrl,
+								MessageBody: JSON.stringify(batch),
+								MessageAttributes: {
+									messageType: {
+										DataType: 'String',
+										StringValue: `${this.resourceType}Task:${task.taskType}`,
+									},
 								},
-							},
-						})
-					)
+							})
+						)
 				)
 			);
 		}

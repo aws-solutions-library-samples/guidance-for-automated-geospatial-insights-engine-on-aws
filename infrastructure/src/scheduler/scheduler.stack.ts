@@ -14,23 +14,16 @@
 import { bucketNameParameter, eventBusNameParameter } from '@agie/cdk-common';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Function } from 'aws-cdk-lib/aws-lambda';
+import { IQueue } from 'aws-cdk-lib/aws-sqs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import {
-	engineProcessorHighPriorityQueueArn,
-	engineProcessorJobDefinitionArnParameter,
-	engineProcessorLowPriorityQueueArn,
-	engineProcessorStandardPriorityQueueArn,
-} from '../engine/engine.construct.js';
 import { regionsApiFunctionArnParameter } from '../regions/regions.construct.js';
 import { resultsApiFunctionArnParameter } from '../results/results.construct.js';
-import { ExecutorModule } from './executor.construct.js';
 import { SchedulerModule } from './scheduler.construct.js';
 
 export type SchedulerStackProperties = StackProps & {
 	readonly environment: string;
-	readonly concurrencyLimit: number;
 	readonly sentinelTopicArn: string;
 	readonly stacApiEndpoint: string;
 	readonly stacApiResourceArn: string;
@@ -39,6 +32,8 @@ export type SchedulerStackProperties = StackProps & {
 };
 
 export class SchedulerStack extends Stack {
+	public engineQueue: IQueue;
+
 	constructor(scope: Construct, id: string, props: SchedulerStackProperties) {
 		super(scope, id, props);
 
@@ -54,26 +49,6 @@ export class SchedulerStack extends Stack {
 
 		const resultsApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'resultsApiFunctionArn', {
 			parameterName: resultsApiFunctionArnParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const jobDefinitionArn = StringParameter.fromStringParameterAttributes(this, 'jobDefinitionArn', {
-			parameterName: engineProcessorJobDefinitionArnParameter(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const highPriorityQueueArn = StringParameter.fromStringParameterAttributes(this, 'highPriorityQueueArn', {
-			parameterName: engineProcessorHighPriorityQueueArn(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const standardPriorityQueueArn = StringParameter.fromStringParameterAttributes(this, 'standardPriorityQueueArn', {
-			parameterName: engineProcessorStandardPriorityQueueArn(props.environment),
-			simpleName: false,
-		}).stringValue;
-
-		const lowPriorityQueueArn = StringParameter.fromStringParameterAttributes(this, 'lowPriorityQueueArn', {
-			parameterName: engineProcessorLowPriorityQueueArn(props.environment),
 			simpleName: false,
 		}).stringValue;
 
@@ -102,18 +77,7 @@ export class SchedulerStack extends Stack {
 			sentinelApiUrl: props.sentinelApiUrl,
 		});
 
-		const executorModule = new ExecutorModule(this, 'ExecutorModule', {
-			environment: props.environment,
-			concurrencyLimit: props.concurrencyLimit,
-			jobDefinitionArn,
-			eventBusName,
-			lowPriorityQueueArn,
-			highPriorityQueueArn,
-			standardPriorityQueueArn,
-			regionsApiLambda,
-			bucketName,
-			engineQueue: schedulerModule.engineQueue,
-		});
+		this.engineQueue = schedulerModule.engineQueue;
 
 		NagSuppressions.addResourceSuppressionsByPath(
 			this,

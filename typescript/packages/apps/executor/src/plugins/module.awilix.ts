@@ -12,13 +12,16 @@
  */
 
 import { RegionsClient } from '@agie/clients';
+import { DynamoDbUtils } from '@agie/dynamodb-utils';
 import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from '@agie/events';
 import { Invoker } from '@agie/lambda-invoker';
+import { registerAuthAwilix } from '@agie/rest-api-authorizer';
 import { BatchClient } from '@aws-sdk/client-batch';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { LambdaClient } from '@aws-sdk/client-lambda';
 import { S3Client } from '@aws-sdk/client-s3';
+import { SQSClient } from '@aws-sdk/client-sqs';
 import { DynamoDBDocumentClient, TranslateConfig } from '@aws-sdk/lib-dynamodb';
 import { Cradle, diContainer, FastifyAwilixOptions, fastifyAwilixPlugin } from '@fastify/awilix';
 import { asFunction, Lifetime } from 'awilix';
@@ -27,12 +30,17 @@ import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { JobQueueArn } from '../jobs/model.js';
 import { JobsService } from '../jobs/service.js';
+import { ExecutionTaskItemRepository } from '../taskItems/repository.js';
+import { ExecutionTaskItemService } from '../taskItems/service.js';
+import { ExecutionTaskRepository } from '../tasks/repository.js';
+import { ExecutionTaskService } from '../tasks/service.js';
 
 const { captureAWSv3Client } = pkg;
 
 declare module '@fastify/awilix' {
 	interface Cradle {
 		eventBridgeClient: EventBridgeClient;
+		dynamoDbUtils: DynamoDbUtils;
 		dynamoDBDocumentClient: DynamoDBDocumentClient;
 		batchClient: BatchClient;
 		jobsService: JobsService;
@@ -40,7 +48,12 @@ declare module '@fastify/awilix' {
 		lambdaInvoker: Invoker;
 		lambdaClient: LambdaClient;
 		s3Client: S3Client;
+		sqsClient: SQSClient;
 		eventPublisher: EventPublisher;
+		executionTaskService: ExecutionTaskService;
+		executionTaskRepository: ExecutionTaskRepository;
+		executionTaskItemsRepository: ExecutionTaskItemRepository;
+		executionTaskItemService: ExecutionTaskItemService;
 	}
 }
 
@@ -64,6 +77,12 @@ class DynamoDBDocumentClientFactory {
 class LambdaClientFactory {
 	public static create(region: string): LambdaClient {
 		return captureAWSv3Client(new LambdaClient({ region }));
+	}
+}
+
+class SQSClientFactory {
+	public static create(region: string): SQSClient {
+		return captureAWSv3Client(new SQSClient({ region }));
 	}
 }
 
@@ -91,16 +110,19 @@ const registerContainer = (app?: FastifyInstance) => {
 		lifetime: Lifetime.SINGLETON,
 	};
 
+	registerAuthAwilix(app.log);
+
 	const awsRegion = process.env['AWS_REGION'];
 	const bucketName = process.env['BUCKET_NAME'];
 	const jobDefinitionArn = process.env['JOB_DEFINITION_ARN'];
 	const highPriorityQueueArn = process.env['HIGH_PRIORITY_QUEUE_ARN'];
 	const lowPriorityQueueArn = process.env['LOW_PRIORITY_QUEUE_ARN'];
 	const standardPriorityQueueArn = process.env['STANDARD_PRIORITY_QUEUE_ARN'];
-
+	const queueUrl = process.env['QUEUE_URL'];
 	const regionsApiFunctionName = process.env['REGIONS_API_FUNCTION_NAME'];
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 	const eventBusName = process.env['EVENT_BUS_NAME'];
+	const tableName = process.env['TABLE_NAME'];
 
 	const queuePriorityMap: Record<Priority, JobQueueArn> = {
 		high: highPriorityQueueArn,
@@ -111,6 +133,10 @@ const registerContainer = (app?: FastifyInstance) => {
 	diContainer.register({
 		// Clients
 		eventBridgeClient: asFunction(() => EventBridgeClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
+		dynamoDbUtils: asFunction((c: Cradle) => new DynamoDbUtils(app.log, c.dynamoDBDocumentClient), {
 			...commonInjectionOptions,
 		}),
 
@@ -126,12 +152,29 @@ const registerContainer = (app?: FastifyInstance) => {
 			...commonInjectionOptions,
 		}),
 
+		sqsClient: asFunction(() => SQSClientFactory.create(awsRegion), {
+			...commonInjectionOptions,
+		}),
+
 		eventPublisher: asFunction((c: Cradle) => new EventPublisher(app.log, c.eventBridgeClient, eventBusName, EXECUTOR_EVENT_SOURCE), {
 			...commonInjectionOptions,
 		}),
 
 		jobsService: asFunction(
-			(c: Cradle) => new JobsService(app.log, c.batchClient, c.regionsClient, jobDefinitionArn, queuePriorityMap, concurrencyLimit, bucketName, c.s3Client, c.eventPublisher),
+			(c: Cradle) =>
+				new JobsService(
+					app.log,
+					c.batchClient,
+					c.regionsClient,
+					jobDefinitionArn,
+					queuePriorityMap,
+					concurrencyLimit,
+					bucketName,
+					c.s3Client,
+					c.eventPublisher,
+					c.executionTaskService,
+					c.executionTaskItemService
+				),
 			{
 				...commonInjectionOptions,
 			}
@@ -146,6 +189,22 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		regionsClient: asFunction((c: Cradle) => new RegionsClient(app.log, c.lambdaInvoker, regionsApiFunctionName), {
+			...commonInjectionOptions,
+		}),
+
+		executionTaskService: asFunction((c: Cradle) => new ExecutionTaskService(app.log, c.executionTaskRepository, c.regionsClient, c.sqsClient, queueUrl, 10), {
+			...commonInjectionOptions,
+		}),
+
+		executionTaskRepository: asFunction((c: Cradle) => new ExecutionTaskRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils), {
+			...commonInjectionOptions,
+		}),
+
+		executionTaskItemsRepository: asFunction((c: Cradle) => new ExecutionTaskItemRepository(app.log, c.dynamoDBDocumentClient, tableName, c.dynamoDbUtils), {
+			...commonInjectionOptions,
+		}),
+
+		executionTaskItemService: asFunction((c: Cradle) => new ExecutionTaskItemService(app.log, c.executionTaskItemsRepository, c.executionTaskService), {
 			...commonInjectionOptions,
 		}),
 	});

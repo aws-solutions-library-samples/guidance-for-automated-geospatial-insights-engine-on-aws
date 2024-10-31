@@ -133,6 +133,7 @@ export type StartJobRequest = RegionResource & {
 	startDateTime: string;
 	endDateTime: string;
 	latestResultId?: string;
+	taskId?: string;
 };
 
 export type FinishJobRequest = {
