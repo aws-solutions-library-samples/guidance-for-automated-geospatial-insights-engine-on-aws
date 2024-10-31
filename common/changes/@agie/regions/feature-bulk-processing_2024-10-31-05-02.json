@@ -1,1 +1,0 @@
-{"changes":[{"packageName":"@agie/regions","comment":"Minor refactoring in TaskService class: Added async/await syntax to the SQS message sending process for better asynchronous handling.","type":"patch"}],"packageName":"@agie/regions"}

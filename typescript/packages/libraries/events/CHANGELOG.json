@@ -1,0 +1,17 @@
+{
+  "name": "@agie/events",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@agie/events_v0.1.0",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new optional property 'taskId' to StartJobRequest type"
+          }
+        ]
+      }
+    }
+  ]
+}

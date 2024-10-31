@@ -1,0 +1,34 @@
+{
+  "name": "@agie/infrastructure",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@agie/infrastructure_v0.1.0",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new ExecutorStack and ExecutorModule with associated constructs and configurations"
+          },
+          {
+            "comment": "Removed ExecutorModule from SchedulerStack and moved it to its own stack"
+          },
+          {
+            "comment": "Added new API methods and permissions for Executor in Verified Permissions"
+          },
+          {
+            "comment": "Updated SchedulerModule to expose table and engineQueue"
+          },
+          {
+            "comment": "Added new SSM parameters for Executor and Scheduler configurations"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@agie/seeder",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@agie/seeder_v0.0.2",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.0.1`"
+          }
+        ]
+      }
+    }
+  ]
+}

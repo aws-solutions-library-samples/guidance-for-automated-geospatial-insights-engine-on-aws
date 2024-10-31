@@ -1,6 +1,6 @@
 {
 	"name": "@agie/executor",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Manage the execution of engine when the schedule is triggered.",
 	"exports": {
 		".": {

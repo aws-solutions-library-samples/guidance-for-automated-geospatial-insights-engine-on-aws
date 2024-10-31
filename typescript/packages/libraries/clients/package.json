@@ -1,6 +1,6 @@
 {
 	"name": "@agie/clients",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Client library",
 	"author": "Pouya Bahavar <bahavar@amazon.com>",
 	"exports": {

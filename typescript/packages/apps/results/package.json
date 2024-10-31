@@ -1,7 +1,7 @@
 {
 	"name": "@agie/results",
 	"description": "Agie: Results module",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"author": "Pouya Bahavar <bahavar@amazon.com>",
 	"exports": {
 		".": {

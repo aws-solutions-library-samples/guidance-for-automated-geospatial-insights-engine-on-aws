@@ -1,0 +1,20 @@
+{
+  "name": "@agie/helpers",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@agie/helpers_v0.0.2",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/infrastructure\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/infrastructure\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

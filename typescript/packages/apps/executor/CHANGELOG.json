@@ -1,0 +1,34 @@
+{
+  "name": "@agie/executor",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@agie/executor_v0.1.0",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new API endpoints and functionality for managing execution tasks and task items"
+          },
+          {
+            "comment": "Added new schemas and models for execution tasks and task items"
+          },
+          {
+            "comment": "Added new repository and service layers for execution tasks and task items"
+          },
+          {
+            "comment": "Added new dependencies for DynamoDB, SQS, and other AWS services"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.0.1`"
+          }
+        ]
+      }
+    }
+  ]
+}

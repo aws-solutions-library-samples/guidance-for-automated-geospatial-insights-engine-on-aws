@@ -1,1 +1,0 @@
-{"changes":[{"packageName":"@agie/events","comment":"Added new optional property 'taskId' to StartJobRequest type","type":"minor"}],"packageName":"@agie/events"}

@@ -1,6 +1,6 @@
 {
 	"name": "@agie/scheduler",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Manage the creation of schedule which will trigger the agie engine.",
 	"exports": {
 		".": {

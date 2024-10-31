@@ -1,0 +1,17 @@
+{
+  "name": "@agie/clients",
+  "entries": [
+    {
+      "version": "1.0.1",
+      "tag": "@agie/clients_v1.0.1",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

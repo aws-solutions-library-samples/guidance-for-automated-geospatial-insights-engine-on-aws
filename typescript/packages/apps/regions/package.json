@@ -1,6 +1,6 @@
 {
 	"name": "@agie/regions",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Manages hierarchical structures of groups, regions, and polygons.",
 	"exports": {
 		".": {

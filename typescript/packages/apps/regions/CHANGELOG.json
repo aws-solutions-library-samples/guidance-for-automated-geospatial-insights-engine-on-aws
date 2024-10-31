@@ -1,0 +1,22 @@
+{
+  "name": "@agie/regions",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@agie/regions_v0.0.2",
+      "date": "Thu, 31 Oct 2024 05:15:58 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Minor refactoring in TaskService class: Added async/await syntax to the SQS message sending process for better asynchronous handling."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}
