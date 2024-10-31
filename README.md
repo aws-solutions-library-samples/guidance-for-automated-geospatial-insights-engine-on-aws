@@ -137,6 +137,7 @@ To validate the deployment, open the CloudFormation console and verify the statu
 7. agie-\<ENVIRONMENT\>-ui
 8. agie-\<ENVIRONMENT\>-engine
 9. agie-\<ENVIRONMENT\>-scheduler
+10. agie-\<ENVIRONMENT\>-executor
 
 ### 5. Set your initial password
 

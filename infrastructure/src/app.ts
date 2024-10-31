@@ -20,6 +20,7 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EngineStack } from './engine/engine.stack.js';
+import { ExecutorStack } from './executor/executor.stack.js';
 import { NotificationsStack } from './notifications/notifications.stack.js';
 import { RegionsApiStack } from './regions/regions.stack.js';
 import { RegionsExtensionStack } from './regionsExtension/regionsExtension.stack.js';
@@ -211,7 +212,6 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		stackName: stackName('scheduler'),
 		description: stackDescription('Scheduler'),
 		environment,
-		concurrencyLimit,
 		sentinelTopicArn,
 		stacApiEndpoint: stacServerStack.stacApiEndpoint,
 		stacApiResourceArn: stacServerStack.stacApiResourceArn,
@@ -227,6 +227,20 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	schedulerStack.addDependency(engineStack);
 	schedulerStack.addDependency(regionsStack);
 	schedulerStack.addDependency(resultStack);
+
+	const executorStack = new ExecutorStack(app, 'ExecutorModule', {
+		stackName: stackName('executor'),
+		description: stackDescription('Executors'),
+		environment,
+		concurrencyLimit,
+		engineQueue: schedulerStack.engineQueue,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
+	});
+
+	executorStack.addDependency(schedulerStack);
 
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),

@@ -144,7 +144,6 @@ Save the output token to be used to authenticate with the AGIE REST API.
 
 > More details on the Regions Module can be found [here](../typescript/packages/apps/regions/README.md)
 
-
 Retrieve the `REGIONS_MODULE_URL` by running the following command
 
 ```shell
@@ -482,7 +481,6 @@ When analyzing a specific Region, you have three options for executing the engin
 2. **Rate Scheduled Mode**: Set up a recurring schedule to run the analysis at regular intervals, regardless of new imagery availability. This mode allows you to define a fixed rate (or one-time schedule) for executing the engine.
 3. **One Time Scheduled Mode**: Set up a one time schedule to run the analysis.
 
-
 ### 1. Configure a `one-time` schedule for the `Region` engine processing
 
 You configure a one-time schedule using an `at expression`. An `at expression` consists of the date and time at which you want AGIE Scheduler to invoke your schedule, as shown in the following.
@@ -547,7 +545,6 @@ Authorization: Bearer <AUTH_TOKEN>
 
 ## Results Module
 
-
 Retrieve the `RESULTS_MODULE_URL` by running the following command
 
 ```shell
@@ -591,6 +588,160 @@ x-id: 01j16hd6y1fm1rbkwdckck6z54
 ```
 
 Wait until the execution result returns `succeeded`.
+
+## Executor Module
+
+> More details on the Executor Module can be found [here](../typescript/packages/apps/executor/README.md)
+
+Retrieve the `EXECUTOR_MODULE_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-executor" --query 'Stacks[0].Outputs' --output json
+```
+
+### 1. Create an execution task for a region
+
+Create task to run processing for a `Region` between `2023-01-01T09:30:00.000Z` and `2023-12-01T09:30:00.000Z` with monthly analysis.
+
+**Request:**
+
+```http
+POST <EXECUTOR_MODULE_URL>/executionTasks
+Content-Type: application/json
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+
+{
+    "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+    "startDateTime": "2023-01-01T09:30:00.000Z",
+    "endDateTime": "2023-12-01T09:30:00.000Z",
+    "interval": {
+        "duration": 1, 
+        "unit": "month"
+    }
+
+}
+```
+
+**Example Response:**
+
+```http
+Content-Type: application/json
+x-id: 01jbdqm00vdyz1d2bdbp26qm9p
+
+{
+    "id": "01jbdqm00vdyz1d2bdbp26qm9p",
+    "taskStatus": "waiting",
+    "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+    "startDateTime": "2023-02-01T09:30:00.000Z",
+    "endDateTime": "2023-12-01T09:30:00.000Z",
+    "interval": {
+        "duration": 1,
+        "unit": "month"
+    },
+    "itemsTotal": 11,
+    "itemsSucceeded": 0,
+    "itemsFailed": 0,
+    "itemsCompleted": 0,
+    "createdAt": "2024-10-30T03:30:58.734Z",
+    "createdBy": "someone@somewhere.com"
+}
+```
+
+### 2. View the `ExecutionTask`
+
+View the execution task resource to check if the task has finished execution. Replace `<TASK_ID>` with the `id` of the created `ExecutionTask`.
+
+**Request:**
+
+```http
+GET <EXECUTOR_MODULE_URL>/executionTasks/<TASK_ID>
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+```
+
+**Example Response:**
+
+```http
+Content-Type: application/json
+x-id: 01jbdqm00vdyz1d2bdbp26qm9p
+
+{
+    "id": "01jbdqm00vdyz1d2bdbp26qm9p",
+    "taskStatus": "success",
+    "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+    "startDateTime": "2023-02-01T09:30:00.000Z",
+    "endDateTime": "2023-12-01T09:30:00.000Z",
+    "interval": {
+        "duration": 1,
+        "unit": "month"
+    },
+    "itemsTotal": 11,
+    "itemsSucceeded": 11,
+    "itemsFailed": 0,
+    "itemsCompleted": 11,
+    "createdAt": "2024-10-30T03:30:58.734Z",
+    "createdBy": "someone@somewhere.com"
+}
+```
+
+### 3. View the `ExecutionTaskItem` list
+
+Examine the `ExecutionTaskItem` list linked to the `ExecutionTask` to monitor the progress of each individual `ExecutionTaskItem`.
+
+**Request:**
+
+```http
+GET <EXECUTOR_MODULE_URL>/executionTasks/<TASK_ID>/taskItems
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+```
+
+**Example Response:**
+
+```http
+Content-Type: application/json
+
+{
+    "taskItems": [
+        {
+            "taskId": "01jbdqm00vdyz1d2bdbp26qm9p",
+            "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+            "startDateTime": "2023-02-01T09:30:00.000Z",
+            "resultId": "01jbdqm3p4p422yccwpwvbgfn8",
+            "status": "success",
+            "statusMessage": "Essential container in task exited"
+        },
+        {
+            "taskId": "01jbdqm00vdyz1d2bdbp26qm9p",
+            "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+            "startDateTime": "2023-03-01T09:30:00.000Z",
+            "resultId": "01jbdqm2ng7e8qhbn7jh6e8hy8",
+            "status": "success",
+            "statusMessage": "Essential container in task exited"
+        },
+        {
+            "taskId": "01jbdqm00vdyz1d2bdbp26qm9p",
+            "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+            "startDateTime": "2023-04-01T09:30:00.000Z",
+            "resultId": "01jbdqm1d7f3b21cytavrw2smm",
+            "status": "success",
+            "statusMessage": "Essential container in task exited"
+        },
+        {
+            "taskId": "01jbdqm00vdyz1d2bdbp26qm9p",
+            "regionId": "01jb8zyt5ccs2zrq5c2vsmrx7a",
+            "startDateTime": "2023-05-01T09:30:00.000Z",
+            "resultId": "01jbdqm29vh5z9axwvmfwammpy",
+            "status": "success",
+            "statusMessage": "Essential container in task exited"
+        }
+    ]
+}
+```
 
 ## AGIE STAC Server
 
@@ -654,8 +805,6 @@ Authorization: <SIGNED_AWS_API_REQUEST>
     }
 }
 ```
-
-
 
 ## UI Module
 
