@@ -1,0 +1,17 @@
+{
+  "name": "@agie/cli",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@agie/cli_v0.0.2",
+      "date": "Tue, 19 Nov 2024 00:25:44 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Added BUILDX_NO_DEFAULT_ATTESTATIONS environment variable to the deployment command"
+          }
+        ]
+      }
+    }
+  ]
+}
