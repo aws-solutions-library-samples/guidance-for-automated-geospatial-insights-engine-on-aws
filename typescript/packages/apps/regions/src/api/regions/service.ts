@@ -11,14 +11,15 @@
  *  and limitations under the License.
  */
 
+import { EnginesClient, LambdaRequestContext } from '@agie/clients';
 import { EventPublisher } from '@agie/events';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { ICommonCache } from '../../common/cache.js';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { InvalidStateError, NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
-import { SecurityContext } from '../../common/scopes.js';
 import { GroupService } from '../groups/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
@@ -32,6 +33,8 @@ export type RegionListFilterOptions = TagFilterOptions & {
 const RESERVED_FIELDS_AS_TAGS = ['name', 'groupId'];
 
 export class RegionService {
+	private readonly context: LambdaRequestContext;
+
 	public constructor(
 		readonly log: FastifyBaseLogger,
 		readonly regionRepository: RegionRepository,
@@ -39,8 +42,17 @@ export class RegionService {
 		readonly commonService: CommonService,
 		readonly commonRepository: CommonRepository,
 		readonly eventPublisher: EventPublisher,
-		readonly regionCache: ICommonCache<Region>
+		readonly regionCache: ICommonCache<Region>,
+		readonly enginesClient: EnginesClient
 	) {
+		this.context = {
+			authorizer: {
+				claims: {
+					email: 'regions',
+					'custom:role': 'reader',
+				},
+			},
+		};
 	}
 
 	public async create(securityContext: SecurityContext, groupId: string, region: CreateRegion): Promise<Region> {
@@ -54,13 +66,13 @@ export class RegionService {
 				name: ow.string.nonEmpty,
 				processingConfig: ow.object.nonEmpty,
 				attributes: ow.optional.object,
-				tags: ow.optional.object
+				tags: ow.optional.object,
 			})
 		);
 
 		// validate the processing configuration
 		if (region.processingConfig) {
-			this.validateProcessingConfig(region.processingConfig);
+			await this.validateProcessingConfig(region.processingConfig);
 		}
 
 		// ensure parent group exists (will throw error if not exist or insufficient privileges)
@@ -79,7 +91,7 @@ export class RegionService {
 			eventType: 'created',
 			id: saved.id,
 			resourceType: 'Region',
-			new: saved
+			new: saved,
 		});
 
 		// return
@@ -94,7 +106,7 @@ export class RegionService {
 			ow.object.exactShape({
 				totalAreaDelta: ow.number.not.infinite,
 				totalPolygonsDelta: ow.number.not.infinite,
-				boundingBox: ow.object.nonEmpty
+				boundingBox: ow.object.nonEmpty,
 			})
 		);
 		// retrieve existing
@@ -108,7 +120,7 @@ export class RegionService {
 				id: updated.id,
 				resourceType: 'Region',
 				old: existing,
-				new: updated
+				new: updated,
 			});
 		}
 		this.log.debug(`RegionService> updateAggregatedPolygonsAttributes> exit>`);
@@ -124,7 +136,7 @@ export class RegionService {
 				name: ow.optional.string,
 				processingConfig: ow.optional.object,
 				attributes: ow.optional.object,
-				tags: ow.optional.object
+				tags: ow.optional.object,
 			})
 		);
 
@@ -132,7 +144,7 @@ export class RegionService {
 		const existing = await this.get(securityContext, id);
 
 		if (region.processingConfig) {
-			this.validateProcessingConfig(region.processingConfig);
+			await this.validateProcessingConfig(region.processingConfig);
 		}
 
 		// merge the existing and to be updated
@@ -150,7 +162,7 @@ export class RegionService {
 			id: merged.id,
 			resourceType: 'Region',
 			old: existing,
-			new: saved
+			new: saved,
 		});
 
 		this.log.debug(`RegionService> update> exit:${JSON.stringify(saved)}`);
@@ -199,7 +211,7 @@ export class RegionService {
 			eventType: 'deleted',
 			id: existing.id,
 			resourceType: 'Region',
-			old: existing
+			old: existing,
 		});
 
 		this.log.debug(`RegionService> delete> exit:`);
@@ -231,27 +243,32 @@ export class RegionService {
 		return [regions, paginationKey];
 	}
 
-	private validateProcessingConfig(config: ProcessingConfig) {
+	private async validateProcessingConfig(config: ProcessingConfig) {
 		switch (config.mode) {
 			case 'scheduled':
 				ow.object.exactShape({
 					mode: ow.string.nonEmpty,
 					scheduleExpression: ow.string.nonEmpty,
 					scheduleExpressionTimezone: ow.optional.string,
-					priority: ow.string.nonEmpty
+					priority: ow.string.nonEmpty,
 				});
 				break;
 			case 'onNewScene':
 				ow.object.exactShape({
 					mode: ow.string.nonEmpty,
-					priority: ow.string.nonEmpty
+					priority: ow.string.nonEmpty,
 				});
 				break;
 			case 'disabled':
 				ow.object.exactShape({
-					mode: ow.string.nonEmpty
+					mode: ow.string.nonEmpty,
 				});
 				break;
+		}
+
+		// This will throws exception if engine does not exists
+		if (config.engineId) {
+			await this.enginesClient.get(config.engineId, this.context);
 		}
 	}
 }

@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import type { FastifyBaseLogger } from 'fastify';
-import type { TaskItemListOptions } from './repository.js';
-import { TaskItemRepository } from "./repository.js";
-import { TaskItemResource } from "./schemas.js";
-import { SecurityContext } from "../../common/scopes.js";
 import { NotFoundError } from '../../common/errors.js';
+import type { TaskItemListOptions } from './repository.js';
+import { TaskItemRepository } from './repository.js';
+import { TaskItemResource } from './schemas.js';
 
 export class TaskItemService {
 	private readonly log: FastifyBaseLogger;
@@ -47,11 +47,7 @@ export class TaskItemService {
 		return taskItem;
 	}
 
-	public async list(
-		securityContext: SecurityContext,
-		taskId: string,
-		options: TaskItemListOptions
-	): Promise<[TaskItemResource[], string]> {
+	public async list(securityContext: SecurityContext, taskId: string, options: TaskItemListOptions): Promise<[TaskItemResource[], string]> {
 		this.log.debug(`TaskItemService> list> taskId: ${taskId} options: ${JSON.stringify(options)}`);
 
 		// retrieve the task items

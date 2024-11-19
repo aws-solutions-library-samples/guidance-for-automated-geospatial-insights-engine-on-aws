@@ -2,6 +2,26 @@
   "name": "@agie/scheduler",
   "entries": [
     {
+      "version": "0.0.3",
+      "tag": "@agie/scheduler_v0.0.3",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Modified the 'custom:role' claim in the authorizer object from '/|||reader' to 'reader'"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.2",
       "tag": "@agie/scheduler_v0.0.2",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

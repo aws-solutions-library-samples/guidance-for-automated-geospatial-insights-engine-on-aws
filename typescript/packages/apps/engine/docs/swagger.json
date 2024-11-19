@@ -1,0 +1,751 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AGIE Engine",
+    "description": "Manages the creation of engine resource that can be are used when processing regions.",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "def-0": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the job definition to register. It can be up to 128 letters long. It can\n     *       contain uppercase and lowercase letters, numbers, hyphens (-), and underscores (_)",
+            "pattern": "^[a-zA-Z0-9-_]+$",
+            "type": "string"
+          },
+          "jobRoleArn": {
+            "description": "IAM role ARN that the container can assume for Amazon Web Services permissions.",
+            "type": "string"
+          },
+          "image": {
+            "description": "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either repository-url/image:tag or repository-url/image@digest.",
+            "type": "string"
+          },
+          "memory": {
+            "description": "The memory hard limit (in MiB) present to the container.",
+            "type": "number"
+          },
+          "vcpus": {
+            "description": "The number of vCPUs reserved for the container.",
+            "type": "number"
+          },
+          "environment": {
+            "description": "The environment variables to pass to a container.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "jobRoleArn",
+          "image",
+          "memory",
+          "vcpus",
+          "environment"
+        ],
+        "title": "engine_new"
+      },
+      "def-1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Engine resource id.",
+            "type": "string"
+          },
+          "name": {
+            "description": "name of the engine.",
+            "type": "string"
+          },
+          "jobRoleArn": {
+            "description": "IAM role ARN that the container can assume for Amazon Web Services permissions.",
+            "type": "string"
+          },
+          "jobDefinitionArn": {
+            "description": "AWS Batch Job Definition Arn for the engine.",
+            "type": "string"
+          },
+          "image": {
+            "description": "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either repository-url/image:tag or repository-url/image@digest.",
+            "type": "string"
+          },
+          "memory": {
+            "description": "The memory hard limit (in MiB) present to the container.",
+            "type": "number"
+          },
+          "vcpus": {
+            "description": "The number of vCPUs reserved for the container.",
+            "type": "number"
+          },
+          "environment": {
+            "description": "The environment variables to pass to a container.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "jobRoleArn",
+          "jobDefinitionArn",
+          "image",
+          "memory",
+          "vcpus",
+          "environment"
+        ],
+        "title": "engine_resource"
+      },
+      "def-2": {
+        "type": "object",
+        "properties": {
+          "engines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-1"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluated": {
+                "description": "Engine resource id.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "engines"
+        ],
+        "title": "engine_list"
+      },
+      "def-3": {
+        "type": "object",
+        "properties": {
+          "jobRoleArn": {
+            "description": "IAM role ARN that the container can assume for Amazon Web Services permissions.",
+            "type": "string"
+          },
+          "image": {
+            "description": "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either repository-url/image:tag or repository-url/image@digest.",
+            "type": "string"
+          },
+          "memory": {
+            "description": "The memory hard limit (in MiB) present to the container.",
+            "type": "number"
+          },
+          "vcpus": {
+            "description": "The number of vCPUs reserved for the container.",
+            "type": "number"
+          },
+          "environment": {
+            "description": "The environment variables to pass to a container.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "engine_update"
+      },
+      "def-4": {
+        "type": "object",
+        "properties": {
+          "engineId": {
+            "description": "Engine Identifier associated with the registration resource.",
+            "type": "string"
+          },
+          "regionId": {
+            "description": "Region Identifier associated with the registration resource.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "engineId",
+          "regionId"
+        ],
+        "title": "registration_resource"
+      },
+      "def-5": {
+        "type": "object",
+        "properties": {
+          "registrations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/def-4"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "lastEvaluated": {
+                "description": "Unique Region ID.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "registrations"
+        ],
+        "title": "registration_list"
+      }
+    }
+  },
+  "paths": {
+    "/engines": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Create a new processing engine",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-0"
+              },
+              "examples": {
+                "new engine request": {
+                  "value": {
+                    "name": "sample-engine-processor",
+                    "jobRoleArn": "sample-role-arn",
+                    "image": "account.dkr.ecr.region.amazonaws.com/process-image:v1",
+                    "memory": 2048,
+                    "vcpus": 1,
+                    "environment": {
+                      "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-1"
+                },
+                "examples": {
+                  "Engine": {
+                    "summary": "Create engine detail.",
+                    "value": {
+                      "name": "sample-engine-processor",
+                      "jobRoleArn": "sample-role-arn",
+                      "image": "account.dkr.ecr.region.amazonaws.com/process-image:v1",
+                      "memory": 2048,
+                      "vcpus": 1,
+                      "environment": {
+                        "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                      },
+                      "id": "01jbv38j4mkej1pysmcs1bsp6q",
+                      "jobDefinitionArn": "arn:aws:batch:region:account:job-definition/sample-engine-processor:1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Lists Engine Resources",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromEngineId",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-2"
+                },
+                "examples": {
+                  "List of Engines": {
+                    "summary": "Paginated list of engines",
+                    "value": {
+                      "engines": [
+                        {
+                          "name": "sample-engine-processor",
+                          "jobRoleArn": "sample-role-arn",
+                          "image": "account.dkr.ecr.region.amazonaws.com/process-image:v1",
+                          "memory": 2048,
+                          "vcpus": 1,
+                          "environment": {
+                            "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                          },
+                          "id": "01jbv38j4mkej1pysmcs1bsp6q",
+                          "jobDefinitionArn": "arn:aws:batch:region:account:job-definition/sample-engine-processor:1"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engines/{id}": {
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Retrieve details of engine",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Unique id."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-1"
+                },
+                "examples": {
+                  "Existing Engine": {
+                    "summary": "Existing Engine details.",
+                    "value": {
+                      "name": "sample-engine-processor",
+                      "jobRoleArn": "sample-role-arn",
+                      "image": "account.dkr.ecr.region.amazonaws.com/process-image:v1",
+                      "memory": 2048,
+                      "vcpus": 1,
+                      "environment": {
+                        "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                      },
+                      "id": "01jbv38j4mkej1pysmcs1bsp6q",
+                      "jobDefinitionArn": "arn:aws:batch:region:account:job-definition/sample-engine-processor:1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engines/{engineId}": {
+      "delete": {
+        "operationId": "deleteEngine",
+        "summary": "Deletes an engine.",
+        "tags": [
+          "Engines"
+        ],
+        "description": "Deletes an engine.\n\nPermissions:\n- Only `admin` and above may delete engine.\n",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "engineId",
+            "required": true,
+            "description": "Engine resource id."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Update an existing processing engine",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/def-3"
+              },
+              "examples": {
+                "update engine request": {
+                  "value": {
+                    "memory": 4096,
+                    "vcpus": 2,
+                    "environment": {
+                      "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "engineId",
+            "required": true,
+            "description": "Engine resource id."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept-version",
+            "required": true,
+            "description": "API version"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "description": "Accepted Content Type"
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-1"
+                },
+                "examples": {
+                  "Engine": {
+                    "summary": "Updated engine detail.",
+                    "value": {
+                      "name": "sample-engine-processor",
+                      "jobRoleArn": "sample-role-arn",
+                      "image": "account.dkr.ecr.region.amazonaws.com/process-image:v1",
+                      "memory": 2048,
+                      "vcpus": 1,
+                      "environment": {
+                        "SENTINEL_COLLECTION": "sentinel-2-c1-l2a"
+                      },
+                      "id": "01jbv38j4mkej1pysmcs1bsp6q",
+                      "jobDefinitionArn": "arn:aws:batch:region:account:job-definition/sample-engine-processor:1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request.",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engines/{engineId}/registrations": {
+      "get": {
+        "tags": [
+          "Registrations"
+        ],
+        "description": "Lists Regions associated with Engine",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "count",
+            "required": false,
+            "description": "Count of results to return."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fromRegionId",
+            "required": false,
+            "description": "Token used to paginate from (exclusive)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "engineId",
+            "required": true,
+            "description": "Engine resource id."
+          }
+        ],
+        "x-security-scopes": [
+          "admin",
+          "contributor",
+          "reader"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Success.",
+                  "$ref": "#/components/schemas/def-5"
+                },
+                "examples": {
+                  "List of Engines": {
+                    "summary": "Paginated list of registration",
+                    "value": {
+                      "registrations": [
+                        {
+                          "engineId": "engine1",
+                          "regionId": "region1"
+                        },
+                        {
+                          "engineId": "engine1",
+                          "regionId": "region2"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:30001"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Engine",
+      "description": "Engine represents a job definition that can be scheduled and ran by AWS Batch."
+    }
+  ]
+}

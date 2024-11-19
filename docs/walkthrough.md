@@ -743,6 +743,116 @@ Content-Type: application/json
 }
 ```
 
+## Engine Module
+
+> More details on the Engine Module can be found [here](../typescript/packages/apps/engine/README.md)
+
+Retrieve the `ENGINE_MODULE_URL` by running the following command
+
+```shell
+aws cloudformation describe-stacks --stack-name "agie-$ENVIRONMENT-executor" --query 'Stacks[0].Outputs' --output json
+```
+
+### 1. Create a new engine resource
+
+To create a processor engine, you must specify a container `IMAGE_TAG`. This string is passed directly to the Docker daemon. Images in the Docker Hub registry are available by default. Other repositories are specified with `repository-url/image:tag`. You also need to specify `IAM_ROLE_ARN` parameter. Ensure the role includes all necessary policies for the engine container to access required AWS services.
+
+**Request:**
+
+```http
+POST <ENGINE_MODULE_URL>/engines
+Content-Type: application/json
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+
+{
+    "name": "custom-engine-processor",
+    "jobRoleArn": "<IAM_ROLE_ARN>",
+    "image": "<IMAGE_TAG>",
+    "memory": 2048,
+    "vcpus": 1,
+    "environment": {}
+}
+```
+
+**Example Response:**
+
+```http
+Content-Type: application/json
+x-id: 01jcd43hdreghzf5h1apyn7anm
+
+{
+    "id": "01jcd43hdreghzf5h1apyn7anm",
+    "name": "custom-engine-processor",
+    "jobRoleArn": "<IAM_ROLE_ARN>",
+    "jobDefinitionArn": "arn:aws:batch:<AWS_REGION>:<AWS_ACCOUNT>:job-definition/custom-engine-processor:1",
+    "image": "<IMAGE_TAG>",
+    "memory": 2048,
+    "vcpus": 1,
+    "environment": {},
+    "createdAt": "2024-11-11T08:05:38.360Z",
+    "createdBy": "someone@somewhere.com"
+}
+```
+
+### 2. Update the `Region` to use the newly created engine
+
+You can configure the processing engine for a region by specifying the `ENGINE_ID` that we created in the previous step in the `processingConfig` properties when updating/creating a `Region`.
+
+```http
+PATCH <REGIONS_MODULE_URL>/regions/<REGION_ID>
+Content-Type: application/json
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+
+{
+    "processingConfig": {
+        "scheduleExpression": "at(yyyy-mm-ddThh:mm:ss)",
+        "scheduleExpressionTimezone": "Australia/Perth",
+        "mode": "scheduled",
+        "engineId": "<ENGINE_ID>"
+    }
+}
+```
+
+### 3. List all regions registed to an engine
+
+To list all regions that uses an engine, run the following command. Replace the `ENGINE_ID` with the id of the engine created above.
+
+**Request:**
+
+```http
+GET <ENGINE_MODULE_URL>/engines/<ENGINE_ID>/registrations
+Accept-Version: 1.0.0
+Accept: application/json
+Authorization: Bearer <AUTH_TOKEN>
+```
+
+**Example Response:**
+
+```http
+Content-Type: application/json
+{
+    "engines": [
+        {
+            "id": "01jcd43hdreghzf5h1apyn7anm",
+            "name": "custom-engine-processor",
+            "jobRoleArn": "<IAM_ROLE_ARN>",
+            "jobDefinitionArn": "arn:aws:batch:<AWS_REGION>:<AWS_ACCOUNT>:job-definition/custom-engine-processor:1",
+            "image": "<IMAGE_TAG>",
+            "memory": 2048,
+            "vcpus": 1,
+            "environment": {},
+            "createdAt": "2024-11-11T08:05:38.360Z",
+            "createdBy": "someone@somewhere.com"
+        }
+    ]
+
+}
+```
+
 ## AGIE STAC Server
 
 > More details on the STAC server can be found [here](../typescript/packages/apps/results/README.md#stac-api).

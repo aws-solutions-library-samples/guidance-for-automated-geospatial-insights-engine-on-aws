@@ -11,48 +11,37 @@
  *  and limitations under the License.
  */
 
-import { Static, Type } from "@sinclair/typebox";
-import { stringEnum } from "../../common/types.js";
-import {
-	createdAt,
-	createdBy,
-	groupId,
-	paginationToken,
-	polygonId,
-	polygonTaskId,
-	regionId,
-	updatedAt,
-	updatedBy
-} from "../../common/schemas.js";
-import { SecurityContext } from "../../common/scopes.js";
-import { createPolygonRequestBody, editPolygonRequestBody } from "../../api/polygons/schemas.js";
-import { createRegionRequestBody, editRegionRequestBody } from "../../api/regions/schemas.js";
+import { SecurityContext } from '@agie/rest-api-authorizer';
+import { Static, Type } from '@sinclair/typebox';
+import { createPolygonRequestBody, editPolygonRequestBody } from '../../api/polygons/schemas.js';
+import { createRegionRequestBody, editRegionRequestBody } from '../../api/regions/schemas.js';
+import { createdAt, createdBy, groupId, paginationToken, polygonId, polygonTaskId, regionId, updatedAt, updatedBy } from '../../common/schemas.js';
+import { stringEnum } from '../../common/types.js';
 
 const taskStatus = stringEnum(['waiting', 'inProgress', 'success', 'failure'], 'Task execution status');
 
 const taskType = stringEnum(['create', 'update'], 'Task type');
 
-export const createPolygonRequestWithRegionIdBody = Type.Intersect(
-	[createPolygonRequestBody, Type.Object({ regionId: regionId })], { $id: 'createPolygonRequestWithRegionIdBody' })
+export const createPolygonRequestWithRegionIdBody = Type.Intersect([createPolygonRequestBody, Type.Object({ regionId: regionId })], {
+	$id: 'createPolygonRequestWithRegionIdBody',
+});
 
-export const editPolygonRequestWithIdBody = Type.Intersect(
-	[editPolygonRequestBody, Type.Object({ id: polygonId })], { $id: 'editPolygonRequestWithIdBody' }
-)
+export const editPolygonRequestWithIdBody = Type.Intersect([editPolygonRequestBody, Type.Object({ id: polygonId })], { $id: 'editPolygonRequestWithIdBody' });
 
-export const createRegionRequestWithGroupIdBody = Type.Intersect(
-	[createRegionRequestBody, Type.Object({ groupId: groupId })], { $id: 'createRegionRequestWithGroupIdBody' })
+export const createRegionRequestWithGroupIdBody = Type.Intersect([createRegionRequestBody, Type.Object({ groupId: groupId })], { $id: 'createRegionRequestWithGroupIdBody' });
 
-export const editRegionRequestWithIdBody = Type.Intersect(
-	[editRegionRequestBody, Type.Object({ id: regionId })], { $id: 'editRegionRequestWithIdBody' }
-)
+export const editRegionRequestWithIdBody = Type.Intersect([editRegionRequestBody, Type.Object({ id: regionId })], { $id: 'editRegionRequestWithIdBody' });
 
-export const createTaskRequestBody = Type.Object({
-	// the schema for item in the array will be check by validation method for each resource task, e.g. RegionTaskService validates create/update region request
-	items: Type.Array(Type.Any()),
-	taskType,
-}, {
-	$id: 'createTaskRequestBody'
-})
+export const createTaskRequestBody = Type.Object(
+	{
+		// the schema for item in the array will be check by validation method for each resource task, e.g. RegionTaskService validates create/update region request
+		items: Type.Array(Type.Any()),
+		taskType,
+	},
+	{
+		$id: 'createTaskRequestBody',
+	}
+);
 
 export const taskResource = Type.Object(
 	{
@@ -94,10 +83,10 @@ export const taskList = Type.Object(
 export type TaskResource = Static<typeof taskResource>;
 export type TaskList = Static<typeof taskList>;
 export type CreateTaskRequestBody = Static<typeof createTaskRequestBody>;
-export type CreatePolygonRequestWithRegionIdBody = Static<typeof createPolygonRequestWithRegionIdBody>
-export type EditPolygonRequestWithIdBody = Static<typeof editPolygonRequestWithIdBody>
-export type CreateRegionRequestWithGroupIdBody = Static<typeof createRegionRequestWithGroupIdBody>
-export type EditRegionRequestWithIdBody = Static<typeof editRegionRequestWithIdBody>
+export type CreatePolygonRequestWithRegionIdBody = Static<typeof createPolygonRequestWithRegionIdBody>;
+export type EditPolygonRequestWithIdBody = Static<typeof editPolygonRequestWithIdBody>;
+export type CreateRegionRequestWithGroupIdBody = Static<typeof createRegionRequestWithGroupIdBody>;
+export type EditRegionRequestWithIdBody = Static<typeof editRegionRequestWithIdBody>;
 
 export interface TaskBatchProgress {
 	taskId: string;

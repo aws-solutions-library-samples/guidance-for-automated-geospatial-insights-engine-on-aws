@@ -338,6 +338,48 @@
 					"resourceTypes": ["Resource"],
 					"principalTypes": ["User"]
 				}
+			},
+			"CreateEngine": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListEngines": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DescribeEngine": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"UpdateEngine": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"DeleteEngine": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
+			},
+			"ListRegistrations": {
+				"appliesTo": {
+					"context": { "type": "Record", "attributes": {} },
+					"resourceTypes": ["Resource"],
+					"principalTypes": ["User"]
+				}
 			}
 		}
 	}

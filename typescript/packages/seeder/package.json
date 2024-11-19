@@ -1,6 +1,6 @@
 {
 	"name": "@agie/seeder",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Tools to seed AGIE deployment with some data.",
 	"type": "module",
 	"scripts": {

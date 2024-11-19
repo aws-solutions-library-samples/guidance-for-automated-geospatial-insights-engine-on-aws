@@ -12,13 +12,13 @@
  */
 
 import { EventPublisher } from '@agie/events';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { area, multiPolygon, polygon } from '@turf/turf';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { InvalidRequestError, InvalidStateError, NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
-import { SecurityContext } from '../../common/scopes.js';
 import { RegionService } from '../regions/service.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';

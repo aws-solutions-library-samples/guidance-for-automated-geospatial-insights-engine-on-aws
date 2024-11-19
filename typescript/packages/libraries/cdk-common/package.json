@@ -1,6 +1,6 @@
 {
 	"name": "@agie/cdk-common",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "CDK constructs and shared utilities",
 	"author": "Pouya Bahavar <bahavare@amazon.com>",
 	"exports": {
@@ -12,7 +12,8 @@
 	"type": "module",
 	"scripts": {
 		"clean:package": "npx shx rm -rf dist *.log .rush tsconfig.tsbuildinfo",
-		"build": "npx tsc -b",
+		"build": "npx tsc -b && npm run bundle:lambda",
+		"bundle:lambda": "rm -rf dist/dynamodb-seeder/lambdas && node --no-warnings=ExperimentalWarning --loader ts-node/esm esbuild.ts",
 		"test": "npm run build && vitest run --passWithNoTests",
 		"build:bundled": "npx tsx src/esbuild.ts"
 	},
@@ -42,7 +43,9 @@
 		"shx": "~0",
 		"tsx": "~4",
 		"vitest-mock-extended": "~2",
-		"vitest": "~2"
+		"vitest": "~2",
+		"esbuild": "~0",
+		"ts-node": "~10"
 	},
 	"peerDependencies": {
 		"typescript": "~5"

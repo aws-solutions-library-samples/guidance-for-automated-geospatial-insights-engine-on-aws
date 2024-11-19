@@ -1,6 +1,6 @@
 {
 	"name": "@agie/regions-extension",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Extending the functionality of the core region module to augment resources with external data.",
 	"exports": {
 		".": {

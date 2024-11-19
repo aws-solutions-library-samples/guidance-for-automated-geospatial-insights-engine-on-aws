@@ -16,10 +16,11 @@ export type Priority = 'low' | 'standard' | 'high';
 export type Mode = 'scheduled' | 'disabled' | 'onNewScene';
 
 export interface ProcessingConfig {
-	mode: Mode,
-	priority?: Priority,
-	scheduleExpression?: string,
-	scheduleExpressionTimezone?: string
+	mode: Mode;
+	priority?: Priority;
+	scheduleExpression?: string;
+	scheduleExpressionTimezone?: string;
+	engineId?: string;
 }
 
 export interface RegionResource {
@@ -27,7 +28,7 @@ export interface RegionResource {
 	groupId: string;
 	name: string;
 	boundingBox: number[];
-	processingConfig: ProcessingConfig
+	processingConfig: ProcessingConfig;
 	tags?: Record<string, string>;
 	attributes?: Record<string, string>;
 	createdAt: string;

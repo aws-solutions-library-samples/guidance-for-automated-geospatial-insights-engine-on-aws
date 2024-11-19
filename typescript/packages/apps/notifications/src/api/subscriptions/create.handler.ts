@@ -11,13 +11,13 @@
  *  and limitations under the License.
  */
 
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse } from '../../common/schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { createSubscriptionRequestBody, regionId, subscriptionResource } from './schemas.js';
-import { SubscriptionsService } from "./service.js";
 import { subscriptionPostRequestExample, subscriptionResourceExample } from './example.js';
+import { createSubscriptionRequestBody, regionId, subscriptionResource } from './schemas.js';
+import { SubscriptionsService } from './service.js';
 
 export default function createSubscriptionRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -34,7 +34,7 @@ Permissions:
 			headers: commonHeaders,
 			operationId: 'createRegion',
 			params: Type.Object({
-				regionId: regionId
+				regionId: regionId,
 			}),
 			body: {
 				...Type.Ref(createSubscriptionRequestBody),
@@ -87,7 +87,7 @@ Permissions:
 
 		handler: async (request, reply) => {
 			const svc: SubscriptionsService = fastify.diContainer.resolve('subscriptionsService');
-			const { regionId } = request.params
+			const { regionId } = request.params;
 			const saved = await svc.create(request.authz, { regionId });
 			return reply.header('x-id', saved.id).status(201).send(saved);
 		},

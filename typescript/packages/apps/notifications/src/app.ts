@@ -11,20 +11,20 @@
  *  and limitations under the License.
  */
 
+import { authzPlugin } from '@agie/rest-api-authorizer';
 import cors from '@fastify/cors';
 import fastifySensible from '@fastify/sensible';
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import type { FastifyInstance } from 'fastify';
 import { fastify } from 'fastify';
+import createSubscriptionRoute from './api/subscriptions/create.handler.js';
+import deleteSubscriptionRoute from './api/subscriptions/delete.handler.js';
+import listSubscriptionsRoute from './api/subscriptions/list.handler.js';
+import { createSubscriptionRequestBody, subscriptionListResource, subscriptionResource } from './api/subscriptions/schemas.js';
 import { handleError } from './common/errors.js';
-import { authzPlugin } from './plugins/authz.js';
 import config from './plugins/config.js';
 import moduleAwilix from './plugins/module.awilix.js';
 import swagger from './plugins/swagger.js';
-import createSubscriptionRoute from "./api/subscriptions/create.handler.js";
-import listSubscriptionsRoute from "./api/subscriptions/list.handler.js";
-import deleteSubscriptionRoute from "./api/subscriptions/delete.handler.js";
-import { createSubscriptionRequestBody, subscriptionListResource, subscriptionResource } from "./api/subscriptions/schemas.js";
 
 export const buildApp = async (): Promise<FastifyInstance> => {
 	const node_env = process.env['NODE_ENV'] as string;

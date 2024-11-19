@@ -1,6 +1,6 @@
 {
 	"name": "@agie/regions",
-	"version": "0.0.2",
+	"version": "1.0.0",
 	"description": "Manages hierarchical structures of groups, regions, and polygons.",
 	"exports": {
 		".": {
@@ -18,11 +18,14 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
+		"@agie/clients": "workspace:*",
+		"@agie/lambda-invoker": "workspace:*",
 		"@agie/dynamodb-utils": "workspace:*",
 		"@agie/events": "workspace:*",
 		"@agie/rest-api-authorizer": "workspace:*",
 		"@aws-sdk/client-dynamodb": "~3",
 		"@aws-sdk/client-eventbridge": "~3",
+		"@aws-sdk/client-lambda": "~3",
 		"@aws-sdk/client-sqs": "~3",
 		"@aws-sdk/client-verifiedpermissions": "~3",
 		"@aws-sdk/lib-dynamodb": "~3",

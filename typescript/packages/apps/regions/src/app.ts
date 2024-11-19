@@ -26,13 +26,7 @@ import createPolygonRoute from './api/polygons/create.handler.js';
 import deletePolygonRoute from './api/polygons/delete.handler.js';
 import getPolygonRoute from './api/polygons/get.handler.js';
 import listPolygonsRoute from './api/polygons/list.handler.js';
-import {
-	createPolygonRequestBody,
-	editPolygonRequestBody,
-	polygonCoordinates,
-	polygonList,
-	polygonResource
-} from './api/polygons/schemas.js';
+import { createPolygonRequestBody, editPolygonRequestBody, polygonCoordinates, polygonList, polygonResource } from './api/polygons/schemas.js';
 import updatePolygonRoute from './api/polygons/update.handler.js';
 import createRegionRoute from './api/regions/create.handler.js';
 import deleteRegionRoute from './api/regions/delete.handler.js';
@@ -48,27 +42,27 @@ import { createStateRequestBody, editStateRequestBody, stateList, stateResource 
 import updateStateRoute from './api/states/update.handler.js';
 import { handleError } from './common/errors.js';
 import { attributes, tags } from './common/schemas.js';
-import { authzPlugin } from './plugins/authz.js';
 import config from './plugins/config.js';
 import moduleAwilix from './plugins/module.awilix.js';
 import swagger from './plugins/swagger.js';
 
-import createPolygonTaskRoute from './api/polygonTasks/create.handler.js'
-import listPolygonTasksRoute from './api/polygonTasks/list.handler.js'
-import getPolygonTaskRoute from './api/polygonTasks/get.handler.js'
-import listPolygonTaskItemsRoute from './api/polygonTaskItems/list.handler.js'
-import getPolygonTaskItemRoute from './api/polygonTaskItems/get.handler.js'
-import deletePolygonTaskRoute from './api/polygonTasks/delete.handler.js'
+import getPolygonTaskItemRoute from './api/polygonTaskItems/get.handler.js';
+import listPolygonTaskItemsRoute from './api/polygonTaskItems/list.handler.js';
+import createPolygonTaskRoute from './api/polygonTasks/create.handler.js';
+import deletePolygonTaskRoute from './api/polygonTasks/delete.handler.js';
+import getPolygonTaskRoute from './api/polygonTasks/get.handler.js';
+import listPolygonTasksRoute from './api/polygonTasks/list.handler.js';
 
-import createRegionTaskRoute from './api/regionTasks/create.handler.js'
-import listRegionTasksRoute from './api/regionTasks/list.handler.js'
-import getRegionTaskRoute from './api/regionTasks/get.handler.js'
-import listRegionTaskItemsRoute from './api/regionTaskItems/list.handler.js'
-import getRegionTaskItemRoute from './api/regionTaskItems/get.handler.js'
-import deleteRegionTaskRoute from './api/regionTasks/delete.handler.js'
+import getRegionTaskItemRoute from './api/regionTaskItems/get.handler.js';
+import listRegionTaskItemsRoute from './api/regionTaskItems/list.handler.js';
+import createRegionTaskRoute from './api/regionTasks/create.handler.js';
+import deleteRegionTaskRoute from './api/regionTasks/delete.handler.js';
+import getRegionTaskRoute from './api/regionTasks/get.handler.js';
+import listRegionTasksRoute from './api/regionTasks/list.handler.js';
 
-import { createTaskRequestBody, taskList, taskResource } from "./common/tasks/schemas.js";
-import { taskItemList, taskItemResource } from "./common/taskItems/schemas.js";
+import { authzPlugin } from '@agie/rest-api-authorizer';
+import { taskItemList, taskItemResource } from './common/taskItems/schemas.js';
+import { createTaskRequestBody, taskList, taskResource } from './common/tasks/schemas.js';
 
 export const buildApp = async (): Promise<FastifyInstance> => {
 	const node_env = process.env['NODE_ENV'] as string;

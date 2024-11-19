@@ -2,6 +2,43 @@
   "name": "@agie/regions",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@agie/regions_v1.0.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new dependencies: @agie/clients, @agie/lambda-invoker, and @aws-sdk/client-lambda"
+          },
+          {
+            "comment": "Added engineId to processingConfig schema in regions/schemas.ts"
+          },
+          {
+            "comment": "Updated RegionService to include enginesClient in constructor and added validation for engineId"
+          },
+          {
+            "comment": "Updated module.awilix.ts to include new dependencies and services"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Removed common/scopes.ts file and replaced its usage with @agie/rest-api-authorizer"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/rest-api-authorizer\" to `0.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.2",
       "tag": "@agie/regions_v0.0.2",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

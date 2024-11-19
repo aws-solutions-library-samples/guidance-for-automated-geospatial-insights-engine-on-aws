@@ -41,7 +41,7 @@ export class JobsService {
 			authorizer: {
 				claims: {
 					email: 'results',
-					'custom:role': '/|||reader',
+					'custom:role': 'reader',
 				},
 			},
 		};

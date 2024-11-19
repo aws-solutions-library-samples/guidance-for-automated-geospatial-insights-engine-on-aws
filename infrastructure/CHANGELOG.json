@@ -2,6 +2,35 @@
   "name": "@agie/infrastructure",
   "entries": [
     {
+      "version": "0.2.0",
+      "tag": "@agie/infrastructure_v0.2.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new Engine API and related infrastructure components"
+          },
+          {
+            "comment": "Updated Regions API to integrate with new Engine API"
+          },
+          {
+            "comment": "Added new permissions for Engine API in Verified Permissions"
+          },
+          {
+            "comment": "Updated Executor to use new Engine API"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/cdk-common\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.0",
       "tag": "@agie/infrastructure_v0.1.0",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

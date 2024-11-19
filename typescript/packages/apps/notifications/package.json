@@ -1,6 +1,6 @@
 {
 	"name": "@agie/notifications",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"description": "Send notifications to subscribed users when agie processing output exceeds some threshold.",
 	"exports": {
 		".": {

@@ -59,7 +59,7 @@ export class VerifiedPermissions extends Construct {
 		// nosemgrep
 		const loadPolicyFile = (filename: string): string => readFileSync(path.join(__dirname, 'verifiedPermissionsConfig', filename)).toString();
 
-		['Regions', 'Results', 'Notifications', 'Executor'].forEach((module) => {
+		['Regions', 'Results', 'Notifications', 'Executor', 'Engines'].forEach((module) => {
 			new CfnPolicy(this, `${module}AdminPermissions`, {
 				definition: {
 					static: {

@@ -14,6 +14,7 @@
 import { RegionsClient } from '@agie/clients';
 import { StartJobRequest } from '@agie/events';
 import { InvalidRequestError, NotFoundError } from '@agie/resource-api-base';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { SendMessageCommand, SendMessageCommandOutput, SQSClient } from '@aws-sdk/client-sqs';
 import dayjs from 'dayjs';
 import { FastifyBaseLogger } from 'fastify';
@@ -21,7 +22,6 @@ import ow from 'ow';
 import pLimit from 'p-limit';
 import { ulid } from 'ulid';
 import { ListPaginationOptions } from '../common/schemas.js';
-import { SecurityContext } from '../common/scopes.js';
 import { ExecutionTaskRepository } from './repository.js';
 import { TaskBatchProgress, TaskNew, TaskResource } from './schemas.js';
 

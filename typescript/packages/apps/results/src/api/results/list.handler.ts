@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, countPaginationQS, fromTokenPaginationQS } from '../../common/schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { resultListResourceExample } from './example.js';
 import { regionId, resultList, ResultList, status } from './schemas.js';

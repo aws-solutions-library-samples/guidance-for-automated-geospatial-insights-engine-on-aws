@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, notFoundResponse, polygonId } from '../../common/schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { polygonPatchRequestExample1, polygonPatchRequestExample2, polygonResourceExample2 } from './example.js';
 import { editPolygonRequestBody, polygonResource } from './schemas.js';

@@ -11,19 +11,18 @@
  *  and limitations under the License.
  */
 
-export interface SecurityContext {
-	email: string;
-	sub: string;
-	phoneNumber: string;
-	role: SecurityScope;
-}
+/* eslint-disable @rushstack/typedef-var */
+import { Type } from '@sinclair/typebox';
 
-export enum SecurityScope {
-	admin = 'admin',
-	contributor = 'contributor',
-	reader = 'reader',
-}
+export const regionId = Type.String({ description: 'Unique Region ID.' });
 
-export const atLeastAdmin: SecurityScope[] = [SecurityScope.admin];
-export const atLeastContributor: SecurityScope[] = [...atLeastAdmin, SecurityScope.contributor];
-export const atLeastReader: SecurityScope[] = [...atLeastContributor, SecurityScope.reader];
+export const startDateTime = Type.String({ description: "The query window's start time." });
+
+export const endDateTime = Type.String({ description: "The query window's end time" });
+
+export type NextToken = string;
+
+export type ListPaginationOptions = {
+	count?: number;
+	token?: NextToken;
+};

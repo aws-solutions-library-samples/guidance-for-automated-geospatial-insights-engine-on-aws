@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, countPaginationQS, fromTokenPaginationQS } from '../../common/schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
+import { TaskList, taskList } from '../../common/tasks/schemas.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { polygonTaskListResourceExample } from "./examples.js";
-import { TaskList, taskList } from "../../common/tasks/schemas.js";
+import { polygonTaskListResourceExample } from './examples.js';
 
 export default function listPolygonTasksRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({

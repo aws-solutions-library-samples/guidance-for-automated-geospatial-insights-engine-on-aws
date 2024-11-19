@@ -1,0 +1,33 @@
+{
+  "name": "@agie/rest-api-authorizer",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@agie/rest-api-authorizer_v0.1.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Added new dependency 'jwt-decode' to package.json"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Added new exports in index.ts for 'authz.js' and 'scopes.js'"
+          },
+          {
+            "comment": "Added new file 'authz.ts' with authentication plugin implementation"
+          },
+          {
+            "comment": "Added new file 'scopes.ts' with security scope definitions"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/resource-api-base\" to `1.0.1`"
+          }
+        ]
+      }
+    }
+  ]
+}

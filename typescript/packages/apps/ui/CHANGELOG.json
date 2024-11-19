@@ -2,6 +2,18 @@
   "name": "@agie/ui",
   "entries": [
     {
+      "version": "0.0.2",
+      "tag": "@agie/ui_v0.0.2",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/regions\" to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.1",
       "tag": "@agie/ui_v0.0.1",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

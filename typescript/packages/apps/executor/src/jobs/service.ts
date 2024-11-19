@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { LambdaRequestContext, Polygon, RegionsClient } from '@agie/clients';
+import { EnginesClient, LambdaRequestContext, Polygon, RegionsClient } from '@agie/clients';
 import { AGIE_EVENT_SOURCE, DomainEvent, EngineJobDetails, EngineType, EventPublisher, FinishJobRequest, Priority, StartJobRequest, Status } from '@agie/events';
 import { InvalidRequestError } from '@agie/resource-api-base';
 import { BatchClient, ListTagsForResourceCommand, SubmitJobCommand, SubmitJobCommandInput } from '@aws-sdk/client-batch';
@@ -35,14 +35,15 @@ export class JobsService {
 		readonly log: FastifyBaseLogger,
 		readonly batchClient: BatchClient,
 		readonly regionsClient: RegionsClient,
-		readonly jobDefinitionArn: string,
+		readonly defaultEngineResourceId: string,
 		readonly queuePriorityMap: Record<Priority, JobQueueArn>,
 		readonly concurrencyLimit: number,
 		readonly bucketName: string,
 		readonly s3Client: S3Client,
 		readonly eventPublisher: EventPublisher,
 		readonly executionTaskService: ExecutionTaskService,
-		readonly executionTaskItemService: ExecutionTaskItemService
+		readonly executionTaskItemService: ExecutionTaskItemService,
+		readonly enginesClient: EnginesClient
 	) {
 		this.engineType = 'aws-batch';
 		this.context = {
@@ -317,6 +318,10 @@ export class JobsService {
 
 		await this.uploadFileForBatchJob({ ...params, keyPrefix });
 
+		// if no engine id is specified, default to the one created by the deployment
+		const engine = await this.enginesClient.get(request.processingConfig.engineId ?? this.defaultEngineResourceId, this.context);
+		const jobDefinitionArn = engine.jobDefinitionArn;
+
 		const command: SubmitJobCommandInput = {
 			containerOverrides: {
 				environment: [
@@ -331,7 +336,7 @@ export class JobsService {
 				],
 			},
 			jobName: `${request.id}-${dayjs(request.endDateTime).unix()}`,
-			jobDefinition: this.jobDefinitionArn,
+			jobDefinition: jobDefinitionArn,
 			jobQueue: this.queuePriorityMap[request.processingConfig.priority],
 			tags: {
 				regionId: request.id,

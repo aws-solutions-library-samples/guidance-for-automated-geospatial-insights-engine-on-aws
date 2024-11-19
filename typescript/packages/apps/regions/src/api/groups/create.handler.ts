@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse } from '../../common/schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { groupPostRequestExample, groupResourceExample1 } from './example.js';
 import { createGroupRequestBody, groupResource } from './schemas.js';

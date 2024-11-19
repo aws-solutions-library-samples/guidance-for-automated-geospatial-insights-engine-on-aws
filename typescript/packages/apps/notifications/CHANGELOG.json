@@ -2,6 +2,37 @@
   "name": "@agie/notifications",
   "entries": [
     {
+      "version": "0.1.0",
+      "tag": "@agie/notifications_v0.1.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Removed local authorization plugin and scopes, replacing with @agie/rest-api-authorizer package"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated imports and usage of authorization functions throughout the codebase"
+          },
+          {
+            "comment": "Minor code formatting and import ordering changes"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/rest-api-authorizer\" to `0.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.2",
       "tag": "@agie/notifications_v0.0.2",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

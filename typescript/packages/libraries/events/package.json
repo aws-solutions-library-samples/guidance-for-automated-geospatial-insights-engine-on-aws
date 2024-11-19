@@ -1,6 +1,6 @@
 {
 	"name": "@agie/events",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Agie events",
 	"author": "William Sia <willsia@amazon.com>",
 	"exports": {

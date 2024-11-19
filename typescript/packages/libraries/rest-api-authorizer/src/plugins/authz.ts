@@ -14,13 +14,13 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 import { jwtDecode } from 'jwt-decode';
-import type { SecurityContext, SecurityScope } from '../common/scopes.js';
+import type { SecurityContext, SecurityScope } from './scopes.js';
 
 export type CognitoAuthToken = {
 	email: string;
 	role: string;
 	sub: string;
-	'phone_number': string;
+	phone_number: string;
 };
 
 /**
@@ -40,8 +40,7 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 	app.addHook('onRequest', async (req: FastifyRequest, _reply: FastifyReply) => {
 		app.log.debug('authz> onRequest> in>');
 
-
-		let email: string | undefined, sub: string | undefined, phoneNumber: string | undefined
+		let email: string | undefined, sub: string | undefined, phoneNumber: string | undefined;
 		let role: SecurityScope;
 
 		if (req.url.startsWith('/static')) {
@@ -92,7 +91,7 @@ export const authzPlugin = fp(async (app: any): Promise<void> => {
 			email,
 			role,
 			phoneNumber,
-			sub
+			sub,
 		};
 		app.log.debug(`authz> onRequest> req.authz: ${JSON.stringify(req.authz)}`);
 	});

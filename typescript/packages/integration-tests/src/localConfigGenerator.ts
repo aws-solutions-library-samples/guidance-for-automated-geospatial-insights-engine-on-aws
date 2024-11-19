@@ -66,6 +66,11 @@ await getValues('regions', {
 	AGIE_REGIONS_BASE_URL: 'apiUrl',
 });
 
+await getValues('engine', {
+	AGIE_ENGINE_BASE_URL: 'apiUrl',
+	AGIE_ENGINE_DEFAULT_ID: 'engineProcessorDefaultEngineId',
+});
+
 await getValues('results', {
 	AGIE_RESULTS_BASE_URL: 'apiUrl',
 });

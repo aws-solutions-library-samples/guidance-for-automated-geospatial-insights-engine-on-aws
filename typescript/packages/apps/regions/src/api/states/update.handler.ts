@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders, conflictResponse, forbiddenResponse, notFoundResponse, stateId } from '../../common/schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { statePatchRequestExample1, statePatchRequestExample2, stateResourceExample2 } from './example.js';
 import { editStateRequestBody, stateResource } from './schemas.js';
@@ -35,20 +35,20 @@ Permissions:
 			operationId: 'updateState',
 			headers: commonHeaders,
 			params: Type.Object({
-				stateId: stateId
+				stateId: stateId,
 			}),
 			body: {
 				...Type.Ref(editStateRequestBody),
 				'x-examples': {
 					'Update state': {
 						summary: 'Update an existing state.',
-						value: statePatchRequestExample1
+						value: statePatchRequestExample1,
 					},
 					'Changing tags': {
 						summary: 'Changing the tags of a state.',
-						value: statePatchRequestExample2
-					}
-				}
+						value: statePatchRequestExample2,
+					},
+				},
 			},
 			response: {
 				200: {
@@ -57,9 +57,9 @@ Permissions:
 					'x-examples': {
 						'Existing state updated successfully': {
 							summary: 'Existing state created successfully.',
-							value: stateResourceExample2
-						}
-					}
+							value: stateResourceExample2,
+						},
+					},
 				},
 				400: {
 					...badRequestResponse,
@@ -67,10 +67,10 @@ Permissions:
 						'Invalid request': {
 							summary: 'Invalid request.',
 							value: {
-								description: 'Expected `formula` to be defined but not provided.'
-							}
-						}
-					}
+								description: 'Expected `formula` to be defined but not provided.',
+							},
+						},
+					},
 				},
 				403: forbiddenResponse,
 				404: notFoundResponse,
@@ -80,16 +80,16 @@ Permissions:
 						'Name in use': {
 							summary: 'The `name` is already in use.',
 							value: {
-								description: 'Name `xyz` already exists.'
-							}
-						}
-					}
-				}
+								description: 'Name `xyz` already exists.',
+							},
+						},
+					},
+				},
 			},
-			'x-security-scopes': atLeastContributor
+			'x-security-scopes': atLeastContributor,
 		},
 		constraints: {
-			version: apiVersion100
+			version: apiVersion100,
 		},
 
 		handler: async (request, reply) => {
@@ -97,7 +97,7 @@ Permissions:
 			const { stateId } = request.params;
 			const saved = await svc.update(request.authz, stateId, request.body);
 			return reply.status(200).send(saved);
-		}
+		},
 	});
 
 	done();

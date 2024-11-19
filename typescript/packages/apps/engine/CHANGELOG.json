@@ -1,0 +1,31 @@
+{
+  "name": "@agie/engine",
+  "entries": [
+    {
+      "version": "0.2.0",
+      "tag": "@agie/engine_v0.2.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "New package created for engine functionality, including API routes, schemas, services and repositories for engines and registrations"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/rest-api-authorizer\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/resource-api-base\" to `1.0.1`"
+          }
+        ]
+      }
+    }
+  ]
+}

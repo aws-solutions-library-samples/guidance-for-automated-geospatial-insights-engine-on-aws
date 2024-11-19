@@ -12,6 +12,14 @@
  */
 
 import { getLambdaArchitecture } from '@agie/cdk-common';
+import {
+	REGIONS_POLYGON_CREATED_EVENT,
+	REGIONS_POLYGON_DELETED_EVENT,
+	REGIONS_POLYGON_UPDATED_EVENT,
+	REGIONS_REGION_CREATED_EVENT,
+	REGIONS_REGION_DELETED_EVENT,
+	REGIONS_REGION_UPDATED_EVENT,
+} from '@agie/events';
 import { Aspects, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import {
 	AccessLogFormat,
@@ -23,32 +31,24 @@ import {
 	LambdaRestApi,
 	LogGroupLogDestination,
 	MethodLoggingLevel,
-	RequestAuthorizer
+	RequestAuthorizer,
 } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { IVpc, Port, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { CfnServerlessCache } from 'aws-cdk-lib/aws-elasticache';
 import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { NodejsFunction, NodejsFunctionProps, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {
-	REGIONS_POLYGON_CREATED_EVENT,
-	REGIONS_POLYGON_DELETED_EVENT,
-	REGIONS_POLYGON_UPDATED_EVENT,
-	REGIONS_REGION_CREATED_EVENT,
-	REGIONS_REGION_DELETED_EVENT,
-	REGIONS_REGION_UPDATED_EVENT
-} from '@agie/events';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
-import { CfnServerlessCache } from 'aws-cdk-lib/aws-elasticache';
-import { IVpc, Port, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +61,7 @@ export interface RegionsConstructProperties {
 	policyStoreId: string;
 	vpc: IVpc;
 	useRegionCache: boolean;
+	engineApiLambda: IFunction;
 }
 
 export const regionsTaskQueueUrlParameter = (environment: string) => `/agie/${environment}/regions/taskQueueUrl`;
@@ -91,16 +92,16 @@ export class RegionsModule extends Construct {
 			tableName: `${namePrefix}-regions`,
 			partitionKey: {
 				name: 'pk',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
 			sortKey: {
 				name: 'sk',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
 			billingMode: BillingMode.PAY_PER_REQUEST,
 			encryption: TableEncryption.AWS_MANAGED,
 			pointInTimeRecovery: true,
-			removalPolicy: RemovalPolicy.DESTROY
+			removalPolicy: RemovalPolicy.DESTROY,
 		});
 
 		// define GSI1
@@ -108,13 +109,13 @@ export class RegionsModule extends Construct {
 			indexName: 'siKey1-pk-index',
 			partitionKey: {
 				name: 'siKey1',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
 			sortKey: {
 				name: 'pk',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
-			projectionType: ProjectionType.ALL
+			projectionType: ProjectionType.ALL,
 		});
 
 		// define GSI2
@@ -122,13 +123,13 @@ export class RegionsModule extends Construct {
 			indexName: 'type-sk-index',
 			partitionKey: {
 				name: 'type',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
 			sortKey: {
 				name: 'sk',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
-			projectionType: ProjectionType.ALL
+			projectionType: ProjectionType.ALL,
 		});
 
 		// define GSI3
@@ -136,37 +137,37 @@ export class RegionsModule extends Construct {
 			indexName: 'siKey2-siKey3-index',
 			partitionKey: {
 				name: 'siKey2',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
 			sortKey: {
 				name: 'siKey3',
-				type: AttributeType.STRING
+				type: AttributeType.STRING,
 			},
-			projectionType: ProjectionType.ALL
+			projectionType: ProjectionType.ALL,
 		});
 
 		this.tableName = table.tableName;
 
 		new StringParameter(this, `RegionsTableNameParameter`, {
 			parameterName: regionsTableNameParameter(props.environment),
-			stringValue: table.tableName
+			stringValue: table.tableName,
 		});
 
 		new StringParameter(this, `RegionsTableArnParameter`, {
 			parameterName: regionsTableArnParameter(props.environment),
-			stringValue: table.tableArn
+			stringValue: table.tableArn,
 		});
 
 		/**
 		 * Define the Redis Serverless cache
 		 */
 
-		let vpcConfiguration = {}, redisEndpoint;
+		let vpcConfiguration = {},
+			redisEndpoint;
 
 		if (props.useRegionCache) {
-
 			const redisSecurityGroup = new SecurityGroup(this, 'redisSecurityGroup', {
-				vpc: props.vpc
+				vpc: props.vpc,
 			});
 
 			const regionServerlessCache = new CfnServerlessCache(this, 'RegionServerlessCache', {
@@ -176,7 +177,7 @@ export class RegionsModule extends Construct {
 				description: 'description',
 				majorEngineVersion: '7',
 				securityGroupIds: [redisSecurityGroup.securityGroupId],
-				subnetIds: props.vpc.isolatedSubnets.map(o => o.subnetId)
+				subnetIds: props.vpc.isolatedSubnets.map((o) => o.subnetId),
 			});
 
 			redisSecurityGroup.addIngressRule(redisSecurityGroup, Port.tcp(6380), 'allow connection to redis writer endpoint');
@@ -184,14 +185,13 @@ export class RegionsModule extends Construct {
 
 			redisEndpoint = regionServerlessCache.attrReaderEndpointAddress;
 
-			vpcConfiguration =
-				{
-					securityGroups: [redisSecurityGroup],
-					vpc: props.vpc,
-					vpcSubnets: props.vpc.selectSubnets({
-						subnetType: SubnetType.PRIVATE_WITH_EGRESS
-					})
-				};
+			vpcConfiguration = {
+				securityGroups: [redisSecurityGroup],
+				vpc: props.vpc,
+				vpcSubnets: props.vpc.selectSubnets({
+					subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+				}),
+			};
 		}
 
 		/**
@@ -199,45 +199,49 @@ export class RegionsModule extends Construct {
 		 */
 		const taskDlq = new Queue(this, `TaskDlq`, { queueName: `${namePrefix}-task-dlq` });
 
-		taskDlq.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sqs:*'],
-			resources: [taskDlq.queueArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
-				}
-			}
-		}));
+		taskDlq.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [taskDlq.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
 
 		const taskQueue = new Queue(this, `TaskQueue`, {
 			queueName: `${namePrefix}-task`,
 			deadLetterQueue: {
 				maxReceiveCount: 10,
-				queue: taskDlq
+				queue: taskDlq,
 			},
-			visibilityTimeout: Duration.seconds(90)
+			visibilityTimeout: Duration.seconds(90),
 		});
 
 		new StringParameter(this, `RegionTaskQueueUrlParameter`, {
 			parameterName: regionsTaskQueueUrlParameter(props.environment),
-			stringValue: taskQueue.queueUrl
+			stringValue: taskQueue.queueUrl,
 		});
 
-		taskQueue.addToResourcePolicy(new PolicyStatement({
-			sid: 'enforce-ssl',
-			effect: Effect.DENY,
-			principals: [new AnyPrincipal()],
-			actions: ['sqs:*'],
-			resources: [taskQueue.queueArn],
-			conditions: {
-				'Bool': {
-					'aws:SecureTransport': 'false'
-				}
-			}
-		}));
+		taskQueue.addToResourcePolicy(
+			new PolicyStatement({
+				sid: 'enforce-ssl',
+				effect: Effect.DENY,
+				principals: [new AnyPrincipal()],
+				actions: ['sqs:*'],
+				resources: [taskQueue.queueArn],
+				conditions: {
+					Bool: {
+						'aws:SecureTransport': 'false',
+					},
+				},
+			})
+		);
 
 		const commonLambdaConfiguration: Pick<NodejsFunctionProps, 'bundling' | 'tracing' | 'runtime' | 'depsLockFilePath' | 'architecture' | 'logRetention'> = {
 			runtime: Runtime.NODEJS_20_X,
@@ -249,13 +253,12 @@ export class RegionsModule extends Construct {
 				target: 'node20',
 				sourceMap: false,
 				sourcesContent: false,
-				banner: 'import { createRequire } from \'module\';const require = createRequire(import.meta.url);import { fileURLToPath } from \'url\';import { dirname } from \'path\';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);',
-				externalModules: ['aws-sdk']
+				banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import { dirname } from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
+				externalModules: ['aws-sdk'],
 			},
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
-			architecture: getLambdaArchitecture(scope)
+			architecture: getLambdaArchitecture(scope),
 		};
-
 
 		/**
 		 * Define the SQS Lambdas
@@ -273,15 +276,15 @@ export class RegionsModule extends Construct {
 				NODE_ENV: 'cloud',
 				TABLE_NAME: table.tableName,
 				TASK_QUEUE_URL: taskQueue.queueUrl,
-				REDIS_ENDPOINT: redisEndpoint
-			}
+				REDIS_ENDPOINT: redisEndpoint,
+			},
 		});
 		sqsLambdaTask.node.addDependency(table);
 		sqsLambdaTask.node.addDependency(taskQueue);
 		sqsLambdaTask.addEventSource(
 			new SqsEventSource(taskQueue, {
 				batchSize: 10,
-				reportBatchItemFailures: true
+				reportBatchItemFailures: true,
 			})
 		);
 
@@ -292,7 +295,7 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:Scan'],
 				effect: Effect.DENY,
-				resources: [table.tableArn]
+				resources: [table.tableArn],
 			})
 		);
 
@@ -301,7 +304,7 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:PartiQLSelect'],
 				effect: Effect.ALLOW,
-				resources: [table.tableArn, `${table.tableArn}/index/*`]
+				resources: [table.tableArn, `${table.tableArn}/index/*`],
 			})
 		);
 
@@ -324,9 +327,12 @@ export class RegionsModule extends Construct {
 				NODE_ENV: 'cloud',
 				TABLE_NAME: this.tableName,
 				TASK_QUEUE_URL: taskQueue.queueUrl,
-				REDIS_ENDPOINT: redisEndpoint
-			}
+				REDIS_ENDPOINT: redisEndpoint,
+				ENGINES_FUNCTION_NAME: props.engineApiLambda.functionName,
+			},
 		});
+
+		props.engineApiLambda.grantInvoke(apiLambda);
 
 		apiLambda.node.addDependency(table);
 
@@ -335,7 +341,7 @@ export class RegionsModule extends Construct {
 
 		new StringParameter(this, 'regionsApiFunctionArnParameter', {
 			parameterName: regionsApiFunctionArnParameter(props.environment),
-			stringValue: apiLambda.functionArn
+			stringValue: apiLambda.functionArn,
 		});
 
 		// lambda permissions
@@ -347,7 +353,7 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:Scan'],
 				effect: Effect.DENY,
-				resources: [table.tableArn]
+				resources: [table.tableArn],
 			})
 		);
 
@@ -356,7 +362,7 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:PartiQLSelect'],
 				effect: Effect.ALLOW,
-				resources: [table.tableArn, `${table.tableArn}/index/*`]
+				resources: [table.tableArn, `${table.tableArn}/index/*`],
 			})
 		);
 
@@ -376,20 +382,20 @@ export class RegionsModule extends Construct {
 				NODE_ENV: 'cloud',
 				POLICY_STORE_ID: props.policyStoreId,
 				USER_POOL_ID: props.cognitoUserPoolId,
-				CLIENT_ID: props.cognitoClientId
-			}
+				CLIENT_ID: props.cognitoClientId,
+			},
 		});
 
 		authorizerLambda.addToRolePolicy(
 			new PolicyStatement({
 				actions: ['verifiedpermissions:IsAuthorizedWithToken'],
-				resources: [`arn:aws:verifiedpermissions::${account}:policy-store/${props.policyStoreId}`]
+				resources: [`arn:aws:verifiedpermissions::${account}:policy-store/${props.policyStoreId}`],
 			})
 		);
 
 		new StringParameter(this, 'regionsApiAuthorizerFunctionArnParameter', {
 			parameterName: regionsApiAuthorizerFunctionArnParameter(props.environment),
-			stringValue: authorizerLambda.functionArn
+			stringValue: authorizerLambda.functionArn,
 		});
 
 		/**
@@ -397,7 +403,7 @@ export class RegionsModule extends Construct {
 		 */
 		const authorizer = new RequestAuthorizer(this, 'Authorizer', {
 			handler: authorizerLambda,
-			identitySources: [IdentitySource.header('Authorization'), IdentitySource.context('path'), IdentitySource.context('httpMethod')]
+			identitySources: [IdentitySource.header('Authorization'), IdentitySource.context('path'), IdentitySource.context('httpMethod')],
 		});
 
 		const logGroup = new LogGroup(this, 'RegionsApiLogs');
@@ -410,17 +416,17 @@ export class RegionsModule extends Construct {
 				stageName: 'prod',
 				accessLogDestination: new LogGroupLogDestination(logGroup),
 				accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
-				loggingLevel: MethodLoggingLevel.INFO
+				loggingLevel: MethodLoggingLevel.INFO,
 			},
 			defaultCorsPreflightOptions: {
 				allowOrigins: Cors.ALL_ORIGINS,
-				allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent', 'Accept-Version']
+				allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent', 'Accept-Version'],
 			},
 			endpointTypes: [EndpointType.REGIONAL],
 			defaultMethodOptions: {
 				authorizationType: AuthorizationType.CUSTOM,
-				authorizer
-			}
+				authorizer,
+			},
 		});
 
 		Aspects.of(apigw).add({
@@ -428,19 +434,19 @@ export class RegionsModule extends Construct {
 				if (node instanceof CfnMethod && node.httpMethod === 'OPTIONS') {
 					node.addPropertyOverride('AuthorizationType', 'NONE');
 				}
-			}
+			},
 		});
 
 		apigw.node.addDependency(apiLambda);
 
 		new StringParameter(this, 'RegionsApiUrlParameter', {
 			parameterName: regionsApiUrlParameter(props.environment),
-			stringValue: apigw.url
+			stringValue: apigw.url,
 		});
 
 		new StringParameter(this, 'RegionsApiNameParameter', {
 			parameterName: regionsApiNameParameter(props.environment),
-			stringValue: apigw.restApiName
+			stringValue: apigw.restApiName,
 		});
 
 		/**
@@ -457,14 +463,12 @@ export class RegionsModule extends Construct {
 					// This events will trigger the creation of the catalog
 					REGIONS_POLYGON_CREATED_EVENT,
 					REGIONS_POLYGON_UPDATED_EVENT,
-					REGIONS_POLYGON_DELETED_EVENT
-				]
-			}
+					REGIONS_POLYGON_DELETED_EVENT,
+				],
+			},
 		});
 
-
-		const resourcesModifiedDlq = new Queue(this, `ResourcesModifiedDLQ`,
-			{ queueName: `${namePrefix}-resources-modified-dlq.fifo`, fifo: true });
+		const resourcesModifiedDlq = new Queue(this, `ResourcesModifiedDLQ`, { queueName: `${namePrefix}-resources-modified-dlq.fifo`, fifo: true });
 
 		resourcesModifiedDlq.addToResourcePolicy(
 			new PolicyStatement({
@@ -475,9 +479,9 @@ export class RegionsModule extends Construct {
 				resources: [resourcesModifiedDlq.queueArn],
 				conditions: {
 					Bool: {
-						'aws:SecureTransport': 'false'
-					}
-				}
+						'aws:SecureTransport': 'false',
+					},
+				},
 			})
 		);
 
@@ -487,9 +491,9 @@ export class RegionsModule extends Construct {
 			fifo: true,
 			deadLetterQueue: {
 				maxReceiveCount: 10,
-				queue: resourcesModifiedDlq
+				queue: resourcesModifiedDlq,
 			},
-			visibilityTimeout: Duration.minutes(2)
+			visibilityTimeout: Duration.minutes(2),
 		});
 
 		resourcesModifiedFifoQueue.addToResourcePolicy(
@@ -501,9 +505,9 @@ export class RegionsModule extends Construct {
 				resources: [resourcesModifiedFifoQueue.queueArn],
 				conditions: {
 					Bool: {
-						'aws:SecureTransport': 'false'
-					}
-				}
+						'aws:SecureTransport': 'false',
+					},
+				},
 			})
 		);
 
@@ -518,14 +522,13 @@ export class RegionsModule extends Construct {
 			timeout: Duration.minutes(1),
 			environment: {
 				EVENT_BUS_NAME: props.eventBusName,
-				SQS_QUEUE_URL: resourcesModifiedFifoQueue.queueUrl
-			}
+				SQS_QUEUE_URL: resourcesModifiedFifoQueue.queueUrl,
+			},
 		});
 
 		resourcesModifiedFifoQueue.grantSendMessages(eventbridgeLambda);
 
-		const resourcesModifiedEventBridgeDLQ = new Queue(this, `ResourcesModifiedEventBridgeDLQ`,
-			{ queueName: `${namePrefix}-resources-modified-eventbridge-dlq` });
+		const resourcesModifiedEventBridgeDLQ = new Queue(this, `ResourcesModifiedEventBridgeDLQ`, { queueName: `${namePrefix}-resources-modified-eventbridge-dlq` });
 
 		resourcesModifiedEventBridgeDLQ.addToResourcePolicy(
 			new PolicyStatement({
@@ -536,17 +539,19 @@ export class RegionsModule extends Construct {
 				resources: [resourcesModifiedEventBridgeDLQ.queueArn],
 				conditions: {
 					Bool: {
-						'aws:SecureTransport': 'false'
-					}
-				}
+						'aws:SecureTransport': 'false',
+					},
+				},
 			})
 		);
 
-		resourcesModifiedRule.addTarget(new LambdaFunction(eventbridgeLambda, {
-			deadLetterQueue: resourcesModifiedEventBridgeDLQ,
-			maxEventAge: Duration.minutes(5),
-			retryAttempts: 2
-		}));
+		resourcesModifiedRule.addTarget(
+			new LambdaFunction(eventbridgeLambda, {
+				deadLetterQueue: resourcesModifiedEventBridgeDLQ,
+				maxEventAge: Duration.minutes(5),
+				retryAttempts: 2,
+			})
+		);
 
 		const sqsProcessorLambda = new NodejsFunction(this, 'SqsProcessorLambda', {
 			...commonLambdaConfiguration,
@@ -562,8 +567,8 @@ export class RegionsModule extends Construct {
 				ENVIRONMENT: props.environment,
 				NODE_ENV: 'cloud',
 				TABLE_NAME: this.tableName,
-				REDIS_ENDPOINT: redisEndpoint
-			}
+				REDIS_ENDPOINT: redisEndpoint,
+			},
 		});
 
 		table.grantReadWriteData(sqsProcessorLambda);
@@ -574,7 +579,7 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:Scan'],
 				effect: Effect.DENY,
-				resources: [table.tableArn]
+				resources: [table.tableArn],
 			})
 		);
 
@@ -583,14 +588,14 @@ export class RegionsModule extends Construct {
 			new PolicyStatement({
 				actions: ['dynamodb:PartiQLSelect'],
 				effect: Effect.ALLOW,
-				resources: [table.tableArn, `${table.tableArn}/index/*`]
+				resources: [table.tableArn, `${table.tableArn}/index/*`],
 			})
 		);
 
 		sqsProcessorLambda.addEventSource(
 			new SqsEventSource(resourcesModifiedFifoQueue, {
 				batchSize: 10,
-				reportBatchItemFailures: true
+				reportBatchItemFailures: true,
 			})
 		);
 
@@ -600,9 +605,10 @@ export class RegionsModule extends Construct {
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: [
-						'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole', 'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+						'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+						'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole',
 					],
-					reason: 'This policy is the one generated by CDK.'
+					reason: 'This policy is the one generated by CDK.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',
@@ -612,20 +618,32 @@ export class RegionsModule extends Construct {
 						'Action::s3:GetBucket*',
 						'Action::s3:GetObject*',
 						'Action::s3:List*',
-						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*'
+						'Resource::arn:<AWS::Partition>:s3:::<bucketNameParameter>/*',
 					],
-					reason: 'This policy is required for the lambda to access the s3 bucket that contains reference datasets file.'
+					reason: 'This policy is required for the lambda to access the s3 bucket that contains reference datasets file.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: [`Resource::<RegionsModuleRegionsTable468824DB.Arn>/index/*`],
-					reason: 'This policy is required for the lambda to access the resource api table.'
+					reason: 'This policy is required for the lambda to access the resource api table.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: ['Resource::*'],
-					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.'
-				}
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
+				},
+			],
+			true
+		);
+
+		NagSuppressions.addResourceSuppressions(
+			[apiLambda],
+			[
+				{
+					id: 'AwsSolutions-IAM5',
+					appliesTo: ['Resource::<engineApiFunctionArnParameter>:*'],
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
+				},
 			],
 			true
 		);
@@ -636,13 +654,13 @@ export class RegionsModule extends Construct {
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'],
-					reason: 'This policy is the one generated by CDK.'
+					reason: 'This policy is the one generated by CDK.',
 				},
 				{
 					id: 'AwsSolutions-IAM5',
 					appliesTo: ['Resource::*'],
-					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.'
-				}
+					reason: 'The resource condition in the IAM policy is generated by CDK, this only applies to xray:PutTelemetryRecords and xray:PutTraceSegments actions.',
+				},
 			],
 			true
 		);
@@ -652,21 +670,21 @@ export class RegionsModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-APIG2',
-					reason: 'Request validation is being done by the Fastify module.'
+					reason: 'Request validation is being done by the Fastify module.',
 				},
 				{
 					id: 'AwsSolutions-IAM4',
 					appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'],
-					reason: 'API GW needs this policy to push logs to cloudwatch.'
+					reason: 'API GW needs this policy to push logs to cloudwatch.',
 				},
 				{
 					id: 'AwsSolutions-APIG4',
-					reason: 'OPTIONS has no auth.'
+					reason: 'OPTIONS has no auth.',
 				},
 				{
 					id: 'AwsSolutions-COG4',
-					reason: 'OPTIONS does not use Cognito auth.'
-				}
+					reason: 'OPTIONS does not use Cognito auth.',
+				},
 			],
 			true
 		);
@@ -676,8 +694,8 @@ export class RegionsModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-SQS3',
-					reason: 'This is the dead letter queue.'
-				}
+					reason: 'This is the dead letter queue.',
+				},
 			],
 			true
 		);
@@ -687,12 +705,12 @@ export class RegionsModule extends Construct {
 			[
 				{
 					id: 'AwsSolutions-SQS4',
-					reason: 'This is the dead letter queue.'
+					reason: 'This is the dead letter queue.',
 				},
 				{
 					id: 'AwsSolutions-SQS2',
-					reason: 'This is the dead letter queue.'
-				}
+					reason: 'This is the dead letter queue.',
+				},
 			],
 			true
 		);

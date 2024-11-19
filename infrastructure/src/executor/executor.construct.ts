@@ -56,6 +56,8 @@ export interface ExecutorConstructProperties {
 	readonly cognitoUserPoolId: string;
 	readonly cognitoClientId: string;
 	readonly policyStoreId: string;
+	readonly engineApiLambda: IFunction;
+	readonly defaultEngineResourceId: string;
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -71,6 +73,7 @@ export class ExecutorModule extends Construct {
 
 		const namePrefix = `agie-${props.environment}`;
 		const account = Stack.of(this).account;
+		const region = Stack.of(this).region;
 
 		const engineProcessorJobDefinition = EcsJobDefinition.fromJobDefinitionArn(scope, 'EngineProcessJobDefinition', props.jobDefinitionArn);
 
@@ -135,8 +138,10 @@ export class ExecutorModule extends Construct {
 				STANDARD_PRIORITY_QUEUE_ARN: standardPriorityQueue.jobQueueArn,
 				CONCURRENCY_LIMIT: props.concurrencyLimit.toString(),
 				REGIONS_API_FUNCTION_NAME: props.regionsApiLambda.functionName,
+				ENGINES_FUNCTION_NAME: props.engineApiLambda.functionName,
 				BUCKET_NAME: props.bucketName,
 				TABLE_NAME: table.tableName,
+				DEFAULT_RESOURCE_ENGINE_ID: props.defaultEngineResourceId,
 			},
 			bundling: {
 				minify: true,
@@ -150,6 +155,8 @@ export class ExecutorModule extends Construct {
 			depsLockFilePath: path.join(__dirname, '../../../common/config/rush/pnpm-lock.yaml'),
 			architecture: getLambdaArchitecture(scope),
 		});
+
+		props.engineApiLambda.grantInvoke(sqsProcessorLambda);
 
 		table.grantReadWriteData(sqsProcessorLambda);
 		props.regionsApiLambda.grantInvoke(sqsProcessorLambda);
@@ -167,7 +174,7 @@ export class ExecutorModule extends Construct {
 			new PolicyStatement({
 				effect: Effect.ALLOW,
 				actions: ['batch:SubmitJob', 'batch:DescribeJobs', 'batch:TerminateJob', 'batch:TagResource'],
-				resources: [engineProcessorJobDefinition.jobDefinitionArn, highPriorityQueue.jobQueueArn, lowPriorityQueue.jobQueueArn, standardPriorityQueue.jobQueueArn],
+				resources: [`arn:aws:batch:${region}:${account}:job-definition/*`, highPriorityQueue.jobQueueArn, lowPriorityQueue.jobQueueArn, standardPriorityQueue.jobQueueArn],
 			})
 		);
 
@@ -176,7 +183,7 @@ export class ExecutorModule extends Construct {
 				detailType: ['Batch Job State Change'],
 				source: ['aws.batch'],
 				detail: {
-					jobDefinition: [engineProcessorJobDefinition.jobDefinitionArn],
+					jobQueue: [props.lowPriorityQueueArn, props.highPriorityQueueArn, props.standardPriorityQueueArn],
 				},
 			},
 		});
@@ -291,7 +298,7 @@ export class ExecutorModule extends Construct {
 		 */
 		const authorizerLambda = new NodejsFunction(this, 'ExecutorApiAuthorizerLambda', {
 			functionName: `${namePrefix}-executorApi-authorizer`,
-			description: `AGIE: Results API Authorizer: ${props.environment}`,
+			description: `AGIE: Executor API Authorizer: ${props.environment}`,
 			entry: path.join(__dirname, '../../../typescript/packages/apps/executor/src/lambda_authorizer.ts'),
 			runtime: Runtime.NODEJS_20_X,
 			tracing: Tracing.ACTIVE,
@@ -374,6 +381,18 @@ export class ExecutorModule extends Construct {
 			parameterName: executorApiNameParameter(props.environment),
 			stringValue: apigw.restApiName,
 		});
+
+		NagSuppressions.addResourceSuppressions(
+			[sqsProcessorLambda],
+			[
+				{
+					id: 'AwsSolutions-IAM5',
+					appliesTo: ['Resource::<engineApiFunctionArnParameter>:*', `Resource::arn:aws:batch:${region}:${account}:job-definition/*`],
+					reason: 'SQS processor lambda needs to invoke engine API to retrieve AWS Batch Job Definition ARN.',
+				},
+			],
+			true
+		);
 
 		NagSuppressions.addResourceSuppressions(
 			[sqsProcessorLambda, eventbridgeLambda, apiLambda],

@@ -12,8 +12,8 @@
  */
 
 import { apiVersion100, FastifyTypebox, forbiddenResponse, id, notFoundResponse } from '@agie/resource-api-base';
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
-import { atLeastReader } from '../common/scopes.js';
 import { executionTaskResourceExample } from './examples.js';
 import { taskResource } from './schemas.js';
 import { ExecutionTaskService } from './service.js';

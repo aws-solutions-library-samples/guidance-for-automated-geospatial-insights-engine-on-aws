@@ -2,6 +2,40 @@
   "name": "@agie/results",
   "entries": [
     {
+      "version": "0.1.0",
+      "tag": "@agie/results_v0.1.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Removed local scopes.ts file and replaced with @agie/rest-api-authorizer package for authentication and authorization"
+          },
+          {
+            "comment": "Removed local authz.ts plugin and replaced with authzPlugin from @agie/rest-api-authorizer"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated imports and usage of SecurityContext and SecurityScope to use from @agie/rest-api-authorizer"
+          },
+          {
+            "comment": "Minor code formatting and cleanup changes"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/rest-api-authorizer\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.2",
       "tag": "@agie/results_v0.0.2",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

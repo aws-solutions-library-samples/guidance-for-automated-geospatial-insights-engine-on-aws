@@ -1,6 +1,6 @@
 {
 	"name": "@agie/helpers",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "AGIE helpers.",
 	"author": "Dean Hart <deanhart@amazon.com>",
 	"type": "module",

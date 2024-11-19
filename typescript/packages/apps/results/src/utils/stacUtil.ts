@@ -42,7 +42,7 @@ export class StacUtil {
 			authorizer: {
 				claims: {
 					email: 'results',
-					'custom:role': '/|||reader',
+					'custom:role': 'reader',
 				},
 			},
 		};
