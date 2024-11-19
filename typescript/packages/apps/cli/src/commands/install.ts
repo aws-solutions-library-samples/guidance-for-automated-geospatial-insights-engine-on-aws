@@ -140,7 +140,7 @@ export class AgieInstall extends AgieCommand<typeof AgieInstall> {
 						shell.cd(infrastructureFolder);
 
 						var child = shelljs.exec(
-							`export AWS_REGION=${region} && export AWS_DEFAULT_REGION=${region} && npm run cdk -- deploy --all --concurrency=10 --require-approval never ${role ? '--r ' + role : ''} ${params}`,
+							`export BUILDX_NO_DEFAULT_ATTESTATIONS=1 && export AWS_REGION=${region} && export AWS_DEFAULT_REGION=${region} && npm run cdk -- deploy --all --concurrency=10 --require-approval never ${role ? '--r ' + role : ''} ${params}`,
 							{ async: true, silent: isSilent },
 						);
 
