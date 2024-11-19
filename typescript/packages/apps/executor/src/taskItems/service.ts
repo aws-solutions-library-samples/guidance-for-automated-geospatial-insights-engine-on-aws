@@ -12,10 +12,10 @@
  */
 
 import { NotFoundError } from '@agie/resource-api-base';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { ListPaginationOptions, NextToken } from '../common/schemas.js';
-import { SecurityContext } from '../common/scopes.js';
 import { ExecutionTaskService } from '../tasks/service.js';
 import { ExecutionTaskItemRepository } from './repository.js';
 import { TaskItemResource } from './schemas.js';

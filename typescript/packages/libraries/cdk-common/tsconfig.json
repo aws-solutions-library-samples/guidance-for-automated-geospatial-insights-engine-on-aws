@@ -18,5 +18,5 @@
 		"composite": true
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["./**/__mocks__/*.ts", ".git", ".history", ".vscode", "cdk.out", "dist", "lib", "node_modules"]
+	"exclude": ["./**/__mocks__/*.ts", ".git", ".history", ".vscode", "cdk.out", "dist", "lib", "node_modules", "esbuild.ts"]
 }

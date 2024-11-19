@@ -11,6 +11,7 @@
  *  and limitations under the License.
  */
 
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { SQSClient, SendMessageCommand, SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
@@ -19,7 +20,6 @@ import { ulid } from 'ulid';
 import { CommonRepository, ResourceId } from '../../api/repository.common.js';
 import { ListPaginationOptions } from '../../api/service.common.js';
 import { NotFoundError } from '../../common/errors.js';
-import { SecurityContext } from '../../common/scopes.js';
 import { PkType } from '../pkTypes.js';
 import { TaskRepository } from './repository.js';
 import { CreateTaskRequestBody, ResourceType, TaskBatch, TaskBatchProgress, TaskResource } from './schemas.js';

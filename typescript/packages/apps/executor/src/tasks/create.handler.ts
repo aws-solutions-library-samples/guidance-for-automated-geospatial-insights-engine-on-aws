@@ -12,8 +12,8 @@
  */
 
 import { apiVersion100, badRequestResponse, commonHeaders, FastifyTypebox } from '@agie/resource-api-base';
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
-import { atLeastContributor } from '../common/scopes.js';
 import { executionTaskCreateRequestExample, executionTaskResourceExample } from './examples.js';
 import { taskNew, taskResource } from './schemas.js';
 import { ExecutionTaskService } from './service.js';

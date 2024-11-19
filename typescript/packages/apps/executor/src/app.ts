@@ -17,13 +17,13 @@ import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import type { FastifyInstance } from 'fastify';
 import { fastify } from 'fastify';
 import { handleError } from './common/errors.js';
-import { authzPlugin } from './plugins/authz.js';
 import config from './plugins/config.js';
 import moduleAwilix from './plugins/module.awilix.js';
 import swagger from './plugins/swagger.js';
 import { taskItemList, taskItemResource } from './taskItems/schemas.js';
 import { taskList, taskNew, taskResource } from './tasks/schemas.js';
 
+import { authzPlugin } from '@agie/rest-api-authorizer';
 import listExecutionTaskItemsRoute from './taskItems/list.handler.js';
 import createExecutionTaskRoute from './tasks/create.handler.js';
 import getExecutionTasksRoute from './tasks/get.handler.js';

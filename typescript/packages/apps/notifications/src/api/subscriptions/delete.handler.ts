@@ -11,11 +11,11 @@
  *  and limitations under the License.
  */
 
+import { atLeastAdmin } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, forbiddenResponse, noBodyResponse, notFoundResponse } from '../../common/schemas.js';
-import { atLeastAdmin } from '../../common/scopes.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { subscriptionId } from "./schemas.js";
+import { subscriptionId } from './schemas.js';
 
 export default function deleteSubscriptionRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -32,7 +32,7 @@ Permissions:
 			operationId: 'deleteSubscription',
 			headers: commonHeaders,
 			params: Type.Object({
-				subscriptionId: subscriptionId
+				subscriptionId: subscriptionId,
 			}),
 			response: {
 				204: noBodyResponse,

@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastAdmin } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, forbiddenResponse, groupId, noBodyResponse, notFoundResponse } from '../../common/schemas.js';
-import { atLeastAdmin } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 
 export default function deleteGroupRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {

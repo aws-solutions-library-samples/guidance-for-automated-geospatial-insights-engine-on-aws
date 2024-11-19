@@ -12,12 +12,7 @@
  */
 
 import { DynamoDbUtils } from '@agie/dynamodb-utils';
-import {
-	DynamoDBDocumentClient,
-	TransactWriteCommandInput,
-	UpdateCommand,
-	UpdateCommandInput
-} from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, TransactWriteCommandInput, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
 import { FastifyBaseLogger } from 'fastify';
 import { createDelimitedAttribute } from '../../common/ddbAttributes.util.js';
 import { PkType } from '../../common/pkTypes.js';
@@ -53,21 +48,21 @@ export class RegionRepository {
 		this.log.debug(`RegionRepository> updateAggregatedAttribute> id: ${id}, aggregatedAttribute: ${JSON.stringify(aggregatedAttribute)}`);
 		const regionDbId = createDelimitedAttribute(PkType.Region, id);
 		const params: UpdateCommandInput = {
-			UpdateExpression: "SET totalArea = totalArea + :totalAreaDelta, totalPolygons = totalPolygons + :totalPolygonsDelta, boundingBox = :boundingBox",
+			UpdateExpression: 'SET totalArea = totalArea + :totalAreaDelta, totalPolygons = totalPolygons + :totalPolygonsDelta, boundingBox = :boundingBox',
 			ExpressionAttributeValues: {
 				':totalAreaDelta': aggregatedAttribute.totalAreaDelta,
 				':totalPolygonsDelta': aggregatedAttribute.totalPolygonsDelta,
-				':boundingBox': aggregatedAttribute.boundingBox
+				':boundingBox': aggregatedAttribute.boundingBox,
 			},
 			Key: {
 				pk: regionDbId,
-				sk: regionDbId
+				sk: regionDbId,
 			},
 			TableName: this.tableName,
-			ReturnValues: "ALL_NEW"
-		}
+			ReturnValues: 'ALL_NEW',
+		};
 		const updateResponse = await this.dc.send(new UpdateCommand(params));
-		const region = this.assembleRegion([updateResponse.Attributes])
+		const region = this.assembleRegion([updateResponse.Attributes]);
 		this.log.debug(`RegionRepository> updateAggregatedAttribute> region: ${JSON.stringify(region)}`);
 		return region;
 	}
@@ -108,7 +103,7 @@ export class RegionRepository {
 							updatedBy: r.updatedBy,
 							totalArea: r.totalArea,
 							totalPolygons: r.totalPolygons,
-							boundingBox: r.boundingBox
+							boundingBox: r.boundingBox,
 						},
 					},
 				},
@@ -179,7 +174,7 @@ export class RegionRepository {
 				createdAt: regionItem.createdAt,
 				updatedBy: regionItem.updatedBy,
 				updatedAt: regionItem.updatedAt,
-				boundingBox: regionItem.boundingBox
+				boundingBox: regionItem.boundingBox,
 			};
 			this.commonRepository.assembleTags(items, region.tags);
 		}

@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { commonHeaders, notFoundResponse, polygonId } from '../../common/schemas.js';
-import { atLeastReader } from '../../common/scopes.js';
 import { FastifyTypebox, apiVersion100 } from '../../common/types.js';
 import { polygonResourceExample1 } from './example.js';
 import { polygonResource } from './schemas.js';

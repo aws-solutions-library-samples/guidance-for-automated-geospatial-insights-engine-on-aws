@@ -131,33 +131,6 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 		},
 	});
 
-	const regionsStack = new RegionsApiStack(app, 'RegionsModule', {
-		stackName: stackName('regions'),
-		description: stackDescription('Regions'),
-		environment,
-		policyStoreIdParameter: verifiedPermissionsPolicyStoreIdParameter(environment),
-		vpc: sharedStack.vpc,
-		useRegionCache,
-		env: {
-			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
-	});
-
-	regionsStack.addDependency(sharedStack);
-
-	const regionsExtensionStack = new RegionsExtensionStack(app, 'RegionsExtensionModule', {
-		stackName: stackName('regionsExtension'),
-		description: stackDescription('RegionsExtension'),
-		environment,
-		env: {
-			region: callerEnvironment?.region,
-			account: callerEnvironment?.accountId,
-		},
-	});
-
-	regionsExtensionStack.addDependency(regionsStack);
-
 	const stacServerStack = new StacServerStack(app, 'StacServerModule', {
 		stackName: stackName('stacServer'),
 		description: stackDescription('StacServer initializer'),
@@ -191,6 +164,34 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	});
 
 	engineStack.addDependency(sharedStack);
+
+	const regionsStack = new RegionsApiStack(app, 'RegionsModule', {
+		stackName: stackName('regions'),
+		description: stackDescription('Regions'),
+		environment,
+		policyStoreIdParameter: verifiedPermissionsPolicyStoreIdParameter(environment),
+		vpc: sharedStack.vpc,
+		useRegionCache,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
+	});
+
+	regionsStack.addDependency(sharedStack);
+	regionsStack.addDependency(engineStack);
+
+	const regionsExtensionStack = new RegionsExtensionStack(app, 'RegionsExtensionModule', {
+		stackName: stackName('regionsExtension'),
+		description: stackDescription('RegionsExtension'),
+		environment,
+		env: {
+			region: callerEnvironment?.region,
+			account: callerEnvironment?.accountId,
+		},
+	});
+
+	regionsExtensionStack.addDependency(regionsStack);
 
 	const resultStack = new ResultsStack(app, 'ResultsModule', {
 		stackName: stackName('results'),
@@ -241,6 +242,7 @@ const deployPlatform = (callerEnvironment?: { accountId?: string; region?: strin
 	});
 
 	executorStack.addDependency(schedulerStack);
+	executorStack.addDependency(engineStack);
 
 	const notificationsStack = new NotificationsStack(app, 'NotificationsModule', {
 		stackName: stackName('notifications'),

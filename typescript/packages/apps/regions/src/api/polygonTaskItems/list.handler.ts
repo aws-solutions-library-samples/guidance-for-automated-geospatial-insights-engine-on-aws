@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
+import { commonHeaders, countPaginationQS, fromIdPaginationQS } from '../../common/schemas.js';
+import { statusQS, taskId, TaskItemList, taskItemList, TaskItemStatus } from '../../common/taskItems/schemas.js';
+import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { taskItemListExample } from './examples.js';
-import { commonHeaders, countPaginationQS, fromIdPaginationQS } from "../../common/schemas.js";
-import { apiVersion100, FastifyTypebox } from "../../common/types.js";
-import { statusQS, taskId, TaskItemList, taskItemList, TaskItemStatus } from "../../common/taskItems/schemas.js";
-import { atLeastReader } from "../../common/scopes.js";
 
 export default function listTaskItemRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({

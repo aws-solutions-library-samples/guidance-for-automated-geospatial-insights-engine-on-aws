@@ -2,6 +2,18 @@
   "name": "@agie/events",
   "entries": [
     {
+      "version": "0.2.0",
+      "tag": "@agie/events_v0.2.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new property 'engineId' to ProcessingConfig interface"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.0",
       "tag": "@agie/events_v0.1.0",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

@@ -1,0 +1,28 @@
+{
+  "name": "@agie/cdk-common",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@agie/cdk-common_v0.1.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new esbuild.ts file for bundling lambda functions"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated package.json to include new build and bundle scripts"
+          },
+          {
+            "comment": "Added new dependencies esbuild and ts-node"
+          },
+          {
+            "comment": "Updated tsconfig.json to exclude esbuild.ts"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -2,6 +2,43 @@
   "name": "@agie/executor",
   "entries": [
     {
+      "version": "0.2.0",
+      "tag": "@agie/executor_v0.2.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Removed authz plugin and related files, replacing with @agie/rest-api-authorizer"
+          },
+          {
+            "comment": "Added EnginesClient to JobsService and module.awilix"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated imports to use @agie/rest-api-authorizer instead of local scopes"
+          },
+          {
+            "comment": "Modified JobsService to use EnginesClient for job definition retrieval"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/resource-api-base\" to `1.0.1`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/rest-api-authorizer\" to `0.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.0",
       "tag": "@agie/executor_v0.1.0",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

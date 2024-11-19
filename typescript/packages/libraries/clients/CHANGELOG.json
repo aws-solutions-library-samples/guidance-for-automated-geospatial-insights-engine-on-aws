@@ -2,6 +2,29 @@
   "name": "@agie/clients",
   "entries": [
     {
+      "version": "1.1.0",
+      "tag": "@agie/clients_v1.1.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new EnginesClient class with a 'get' method to retrieve engine resources"
+          },
+          {
+            "comment": "Added new EngineResource interface to define the structure of engine resources"
+          },
+          {
+            "comment": "Updated index.ts to export new engines-related modules"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/events\" to `0.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.1",
       "tag": "@agie/clients_v1.0.1",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

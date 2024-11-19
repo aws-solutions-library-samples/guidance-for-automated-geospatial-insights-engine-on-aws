@@ -77,6 +77,6 @@ export class InvalidStateError extends Error {
 export class InvalidRequestError extends Error {
 	public constructor(message: string) {
 		super(message);
-		this.name = 'InvalidRequest';
+		this.name = 'InvalidRequestError';
 	}
 }

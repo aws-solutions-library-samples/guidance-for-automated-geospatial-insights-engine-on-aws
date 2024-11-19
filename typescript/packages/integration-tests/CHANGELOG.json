@@ -2,6 +2,34 @@
   "name": "@agie/integration-tests",
   "entries": [
     {
+      "version": "0.2.0",
+      "tag": "@agie/integration-tests_v0.2.0",
+      "date": "Tue, 19 Nov 2024 00:04:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added new integration tests for engine API, including tests for registering regions to engines, creating/listing/deleting engines, and running processing with a new engine"
+          },
+          {
+            "comment": "Added new utility functions for engine-related API calls in common.utils.ts"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated localConfigGenerator.ts to include engine-related environment variables"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@agie/regions\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@agie/clients\" to `1.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.0",
       "tag": "@agie/integration-tests_v0.1.0",
       "date": "Thu, 31 Oct 2024 05:15:58 GMT",

@@ -12,17 +12,7 @@
  */
 
 import { Static, Type } from '@sinclair/typebox';
-import {
-	attributes,
-	createdAt,
-	createdBy,
-	groupId,
-	paginationToken,
-	regionId,
-	tags,
-	updatedAt,
-	updatedBy
-} from '../../common/schemas.js';
+import { attributes, createdAt, createdBy, groupId, paginationToken, regionId, tags, updatedAt, updatedBy } from '../../common/schemas.js';
 
 /**
  * Region specific path parameters
@@ -41,11 +31,11 @@ const processingMode = Type.Enum(
 	{
 		scheduled: 'scheduled',
 		disabled: 'disabled',
-		onNewScene: 'onNewScene'
+		onNewScene: 'onNewScene',
 	},
 	{
 		description: 'The region processing mode.',
-		default: 'disabled'
+		default: 'disabled',
 	}
 );
 
@@ -53,11 +43,11 @@ const processingPriority = Type.Enum(
 	{
 		low: 'low',
 		standard: 'standard',
-		high: 'high'
+		high: 'high',
 	},
 	{
 		description: `The region processing priority, required for mode is set to 'scheduled' or 'onNewScene'`,
-		default: 'standard'
+		default: 'standard',
 	}
 );
 
@@ -80,14 +70,18 @@ const scheduleExpression = Type.String({
 		'A rate expression consists of a value as a positive integer, and a unit with the following options: minute | minutes | hour | hours | day | days ',
 });
 
-const processingConfig = Type.Object({
-	mode: processingMode,
-	scheduleExpression: Type.Optional(scheduleExpression),
-	scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
-	priority: Type.Optional(processingPriority)
+const engineId = Type.String({ description: 'Identifier of engine used to process the region.' });
 
-}, { description: 'The processing configuration for the region.' })
-
+const processingConfig = Type.Object(
+	{
+		mode: processingMode,
+		scheduleExpression: Type.Optional(scheduleExpression),
+		scheduleExpressionTimezone: Type.Optional(scheduleExpressionTimezone),
+		priority: Type.Optional(processingPriority),
+		engineId: Type.Optional(engineId),
+	},
+	{ description: 'The processing configuration for the region.' }
+);
 
 const boundingBox = Type.Array(Type.Number(), { description: 'The bounding box of the region.' });
 
@@ -123,10 +117,10 @@ export type EditRegion = Static<typeof editRegionRequestBody>;
 export type BoundingBox = Static<typeof boundingBox>;
 
 export type UpdateAggregatedPolygonsParameter = {
-	boundingBox: BoundingBox,
-	totalAreaDelta: number
+	boundingBox: BoundingBox;
+	totalAreaDelta: number;
 	totalPolygonsDelta: number;
-}
+};
 
 export const regionResource = Type.Object(
 	{

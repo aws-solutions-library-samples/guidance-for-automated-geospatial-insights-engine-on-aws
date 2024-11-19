@@ -11,19 +11,17 @@
  *  and limitations under the License.
  */
 
-export interface SecurityContext {
-	email: string;
-	role: SecurityScope;
-	phoneNumber: string;
-	sub: string;
-}
+import awsLambdaFastify, { PromiseHandler } from '@fastify/aws-lambda';
 
-export enum SecurityScope {
-	admin = 'admin',
-	contributor = 'contributor',
-	reader = 'reader',
-}
+import { buildApp } from './app.js';
 
-export const atLeastAdmin: SecurityScope[] = [SecurityScope.admin];
-export const atLeastContributor: SecurityScope[] = [...atLeastAdmin, SecurityScope.contributor];
-export const atLeastReader: SecurityScope[] = [...atLeastContributor, SecurityScope.reader];
+import type { FastifyInstance } from 'fastify';
+
+const server: FastifyInstance = await buildApp();
+
+export const handler: PromiseHandler = awsLambdaFastify(server, {
+	decorateRequest: false,
+	serializeLambdaArguments: true,
+});
+
+await server.ready();

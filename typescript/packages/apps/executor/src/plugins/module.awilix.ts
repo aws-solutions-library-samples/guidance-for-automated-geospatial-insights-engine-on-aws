@@ -11,7 +11,7 @@
  *  and limitations under the License.
  */
 
-import { RegionsClient } from '@agie/clients';
+import { EnginesClient, RegionsClient } from '@agie/clients';
 import { DynamoDbUtils } from '@agie/dynamodb-utils';
 import { EventPublisher, EXECUTOR_EVENT_SOURCE, Priority } from '@agie/events';
 import { Invoker } from '@agie/lambda-invoker';
@@ -54,6 +54,7 @@ declare module '@fastify/awilix' {
 		executionTaskRepository: ExecutionTaskRepository;
 		executionTaskItemsRepository: ExecutionTaskItemRepository;
 		executionTaskItemService: ExecutionTaskItemService;
+		enginesClient: EnginesClient;
 	}
 }
 
@@ -123,6 +124,8 @@ const registerContainer = (app?: FastifyInstance) => {
 	const concurrencyLimit = parseInt(process.env['CONCURRENCY_LIMIT']);
 	const eventBusName = process.env['EVENT_BUS_NAME'];
 	const tableName = process.env['TABLE_NAME'];
+	const enginesFunctionName = process.env['ENGINES_FUNCTION_NAME'];
+	const defaultEngineResourceId = process.env['DEFAULT_RESOURCE_ENGINE_ID'];
 
 	const queuePriorityMap: Record<Priority, JobQueueArn> = {
 		high: highPriorityQueueArn,
@@ -166,14 +169,15 @@ const registerContainer = (app?: FastifyInstance) => {
 					app.log,
 					c.batchClient,
 					c.regionsClient,
-					jobDefinitionArn,
+					defaultEngineResourceId,
 					queuePriorityMap,
 					concurrencyLimit,
 					bucketName,
 					c.s3Client,
 					c.eventPublisher,
 					c.executionTaskService,
-					c.executionTaskItemService
+					c.executionTaskItemService,
+					c.enginesClient
 				),
 			{
 				...commonInjectionOptions,
@@ -205,6 +209,10 @@ const registerContainer = (app?: FastifyInstance) => {
 		}),
 
 		executionTaskItemService: asFunction((c: Cradle) => new ExecutionTaskItemService(app.log, c.executionTaskItemsRepository, c.executionTaskService), {
+			...commonInjectionOptions,
+		}),
+
+		enginesClient: asFunction((container: Cradle) => new EnginesClient(app.log, container.lambdaInvoker, enginesFunctionName), {
 			...commonInjectionOptions,
 		}),
 	});

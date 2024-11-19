@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
+import { forbiddenResponse, notFoundResponse, polygonTaskId } from '../../common/schemas.js';
+import { taskResource } from '../../common/tasks/schemas.js';
+import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { polygonTaskResourceExample } from './examples.js';
-import { apiVersion100, FastifyTypebox } from "../../common/types.js";
-import { forbiddenResponse, notFoundResponse, polygonTaskId } from "../../common/schemas.js";
-import { taskResource } from "../../common/tasks/schemas.js";
-import { atLeastReader } from "../../common/scopes.js";
 
 export default function getPolygonTaskRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({

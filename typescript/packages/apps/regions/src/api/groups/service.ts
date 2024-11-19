@@ -12,12 +12,12 @@
  */
 
 import { EventPublisher } from '@agie/events';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
 import { RESERVED_PREFIX } from '../../common/ddbAttributes.util.js';
 import { InvalidStateError, NotFoundError } from '../../common/errors.js';
 import { PkType } from '../../common/pkTypes.js';
-import { SecurityContext } from '../../common/scopes.js';
 import { CommonRepository, ResourceId } from '../repository.common.js';
 import { CommonService, TagFilterOptions } from '../service.common.js';
 import { GroupRepository } from './repository.js';

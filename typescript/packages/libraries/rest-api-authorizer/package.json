@@ -1,6 +1,6 @@
 {
 	"name": "@agie/rest-api-authorizer",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "REST API Authorizer.",
 	"exports": {
 		".": {
@@ -26,6 +26,7 @@
 		"dotenv": "~16",
 		"fastify-plugin": "~5",
 		"fastify": "~5",
+		"jwt-decode": "~4",
 		"ow": "~2",
 		"pino-pretty": "~11",
 		"pino": "~9"

@@ -11,19 +11,9 @@
  *  and limitations under the License.
  */
 
-export interface SecurityContext {
-	email: string;
-	phoneNumber: string;
-	role: SecurityScope;
-	sub: string;
+export enum PkType {
+	Engine = 'en',
+	EngineType = 'et',
+	Region = 'rg',
+	RegistrationType = 'rt',
 }
-
-export enum SecurityScope {
-	admin = 'admin',
-	contributor = 'contributor',
-	reader = 'reader',
-}
-
-export const atLeastAdmin: SecurityScope[] = [SecurityScope.admin];
-export const atLeastContributor: SecurityScope[] = [...atLeastAdmin, SecurityScope.contributor];
-export const atLeastReader: SecurityScope[] = [...atLeastContributor, SecurityScope.reader];

@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
+import { forbiddenResponse, notFoundResponse } from '../../common/schemas.js';
+import { name, taskId, taskItemResource } from '../../common/taskItems/schemas.js';
+import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 import { taskItemResourceExample } from './examples.js';
-import { apiVersion100, FastifyTypebox } from "../../common/types.js";
-import { forbiddenResponse, notFoundResponse } from "../../common/schemas.js";
-import { name, taskId, taskItemResource } from "../../common/taskItems/schemas.js";
-import { atLeastReader } from "../../common/scopes.js";
 
 export default function getTaskItemRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({

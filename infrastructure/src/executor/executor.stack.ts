@@ -19,6 +19,8 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import {
+	engineApiFunctionArnParameter,
+	engineProcessorDefaultResourceEngineIdParameter,
 	engineProcessorHighPriorityQueueArn,
 	engineProcessorJobDefinitionArnParameter,
 	engineProcessorLowPriorityQueueArn,
@@ -51,6 +53,11 @@ export class ExecutorStack extends Stack {
 
 		const jobDefinitionArn = StringParameter.fromStringParameterAttributes(this, 'jobDefinitionArn', {
 			parameterName: engineProcessorJobDefinitionArnParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const defaultEngineResourceId = StringParameter.fromStringParameterAttributes(this, 'DefaultEngineResourceId', {
+			parameterName: engineProcessorDefaultResourceEngineIdParameter(props.environment),
 			simpleName: false,
 		}).stringValue;
 
@@ -91,6 +98,13 @@ export class ExecutorStack extends Stack {
 
 		const regionsApiLambda = Function.fromFunctionAttributes(this, 'RegionsApiFunction', { functionArn: regionsApiFunctionArn, sameEnvironment: true });
 
+		const engineApiFunctionArn = StringParameter.fromStringParameterAttributes(this, 'engineApiFunctionArn', {
+			parameterName: engineApiFunctionArnParameter(props.environment),
+			simpleName: false,
+		}).stringValue;
+
+		const engineApiLambda = Function.fromFunctionAttributes(this, 'EngineApiFunction', { functionArn: engineApiFunctionArn, sameEnvironment: true });
+
 		new ExecutorModule(this, 'ExecutorModule', {
 			environment: props.environment,
 			concurrencyLimit: props.concurrencyLimit,
@@ -105,6 +119,8 @@ export class ExecutorStack extends Stack {
 			cognitoClientId,
 			cognitoUserPoolId,
 			policyStoreId,
+			engineApiLambda,
+			defaultEngineResourceId,
 		});
 
 		NagSuppressions.addResourceSuppressionsByPath(

@@ -111,7 +111,7 @@ export const signResourceUrl = (baseUrl: string, resourcePlural: string, args: L
 	return resourcePlural;
 };
 
-export const createResourcesMethodForModules = (module: 'results' | 'regions' | 'notifications' | 'stac' | 'executor') => {
+export const createResourcesMethodForModules = (module: 'results' | 'engine' | 'regions' | 'notifications' | 'stac' | 'executor') => {
 	let baseUrl: string;
 	switch (module) {
 		case 'regions':
@@ -119,6 +119,9 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			break;
 		case 'results':
 			baseUrl = process.env.AGIE_RESULTS_BASE_URL;
+			break;
+		case 'engine':
+			baseUrl = process.env.AGIE_ENGINE_BASE_URL;
 			break;
 		case 'executor':
 			baseUrl = process.env.AGIE_EXECUTOR_BASE_URL;
@@ -164,6 +167,31 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 			s = s.expectHeaderContains('content-type', 'application/json');
 		}
 		return s;
+	};
+
+	const waitForListResources = async (
+		resourcePlural: string,
+		args: ListExpectArgs,
+		waitConfiguration?: {
+			interval: number;
+			timeout: number;
+		}
+	): Promise<void> => {
+		await pWaitFor(
+			async (): Promise<any> => {
+				try {
+					await listResources(resourcePlural, args).toss();
+					return true;
+				} catch (e) {
+					if (e.code === 'ERR_ASSERTION') {
+						return false;
+					} else {
+						throw e;
+					}
+				}
+			},
+			{ interval: waitConfiguration?.interval ?? 1000, timeout: waitConfiguration?.timeout ?? 5000 }
+		);
 	};
 
 	const waitForGetResource = async (
@@ -246,7 +274,7 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 	};
 
 	const deleteResource = (resourcePlural: string, args: DeleteArgs): Spec => {
-		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken));
+		let s = spec().delete(`${baseUrl}${resourcePlural}/{id}`).withBody({}).withPathParams('id', args.id).withHeaders(COMMON_HEADERS(args.withIdToken));
 		if (args.expectStatus) {
 			s = s.expectStatus(args.expectStatus);
 		}
@@ -280,5 +308,6 @@ export const createResourcesMethodForModules = (module: 'results' | 'regions' | 
 		teardownResources,
 		getResource,
 		waitForGetResource,
+		waitForListResources,
 	};
 };

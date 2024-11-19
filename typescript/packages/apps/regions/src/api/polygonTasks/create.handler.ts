@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
+import { atLeastContributor } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
 import { badRequestResponse, commonHeaders } from '../../common/schemas.js';
-import { atLeastContributor } from '../../common/scopes.js';
+import { createTaskRequestBody, taskResource } from '../../common/tasks/schemas.js';
 import { apiVersion100, FastifyTypebox } from '../../common/types.js';
-import { polygonTaskPostRequestExample, polygonTaskResourceExample } from "./examples.js";
-import { createTaskRequestBody, taskResource } from "../../common/tasks/schemas.js";
+import { polygonTaskPostRequestExample, polygonTaskResourceExample } from './examples.js';
 
 export default function createPolygonTaskRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
@@ -63,7 +63,7 @@ Permissions:
 							},
 						},
 					},
-				}
+				},
 			},
 			'x-security-scopes': atLeastContributor,
 		},

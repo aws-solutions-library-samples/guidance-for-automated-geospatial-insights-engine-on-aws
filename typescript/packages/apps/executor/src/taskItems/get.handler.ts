@@ -15,8 +15,8 @@ import { Type } from '@sinclair/typebox';
 
 import { apiVersion100, FastifyTypebox, forbiddenResponse, notFoundResponse } from '@agie/resource-api-base';
 
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { startDateTime } from '../common/schemas.js';
-import { atLeastReader } from '../common/scopes.js';
 import { taskItemResourceExample } from './example.js';
 import { taskId, taskItemResource } from './schemas.js';
 

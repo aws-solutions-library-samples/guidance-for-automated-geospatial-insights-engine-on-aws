@@ -12,6 +12,8 @@
  */
 
 import { afterEach, beforeEach, describe, test } from 'vitest';
+import { getAuthToken } from '../utils/auth.js';
+import { createResourcesMethodForModules } from '../utils/common.utils.js';
 import { PAGINATION_TOKEN_PATTERN } from '../utils/regex.js';
 import { create_group_body } from './groups.data.js';
 import {
@@ -22,13 +24,10 @@ import {
 	update_region_body,
 	updated_region_resource,
 } from './regions.data.js';
-import { getAuthToken } from '../utils/auth.js';
-import { createResourcesMethodForModules } from "../utils/common.utils.js";
 
 const TEST_PREFIX = 'regions module (regions): ';
 const ADMIN_USERNAME = process.env['ADMIN_USERNAME'];
 const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'];
-
 
 const { createResource, deleteResource, getResource, listResources, teardownResources, updateResource, waitForGetResource } = createResourcesMethodForModules('regions');
 
@@ -161,10 +160,9 @@ describe(TEST_PREFIX + 'retrieving regions', () => {
 			withIdToken: userToken,
 			expectJsonLike: {
 				totalArea: 0,
-				totalRegions: 1
-			}
-		})
-
+				totalRegions: 1,
+			},
+		});
 	});
 
 	test('retrieving a region - not found', async () => {
@@ -359,9 +357,9 @@ describe(TEST_PREFIX + 'listing regions', () => {
 			withIdToken: userToken,
 			expectJsonLike: {
 				totalArea: 0,
-				totalRegions: 3
-			}
-		})
+				totalRegions: 3,
+			},
+		});
 	});
 });
 
@@ -397,9 +395,9 @@ describe(TEST_PREFIX + 'deleting regions', () => {
 			withIdToken: userToken,
 			expectJsonLike: {
 				totalArea: 0,
-				totalRegions: 1
-			}
-		})
+				totalRegions: 1,
+			},
+		});
 
 		await deleteResource('regions', {
 			withIdToken: userToken,
@@ -414,9 +412,9 @@ describe(TEST_PREFIX + 'deleting regions', () => {
 			withIdToken: userToken,
 			expectJsonLike: {
 				totalArea: 0,
-				totalRegions: 0
-			}
-		})
+				totalRegions: 0,
+			},
+		});
 	});
 
 	// TODO: test unable to delete region if it has polygons

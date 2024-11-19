@@ -14,7 +14,7 @@
 import { apiVersion100, commonHeaders, countPaginationQS, FastifyTypebox, fromIdPaginationQS } from '@agie/resource-api-base';
 import { Type } from '@sinclair/typebox';
 
-import { atLeastReader } from '../common/scopes.js';
+import { atLeastReader } from '@agie/rest-api-authorizer';
 import { executionTaskItemResourceList } from './example.js';
 import { taskId, taskItemList, TaskItemList } from './schemas.js';
 

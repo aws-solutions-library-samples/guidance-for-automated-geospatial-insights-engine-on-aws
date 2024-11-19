@@ -11,11 +11,9 @@
  *  and limitations under the License.
  */
 
-import { FastifyBaseLogger } from "fastify";
-import { SubscriptionsRepository } from "./repository.js";
-import { SecurityContext } from "../../common/scopes.js";
-import { Subscription, SubscriptionId, SubscriptionListOptions, SubscriptionWithUserId } from "./schemas.js";
-import { ulid } from "ulid";
+import { RegionsClient } from '@agie/clients';
+import { EventPublisher } from '@agie/events';
+import { SecurityContext } from '@agie/rest-api-authorizer';
 import {
 	CreateTopicCommand,
 	DeleteTopicCommand,
@@ -23,17 +21,18 @@ import {
 	ListSubscriptionsByTopicCommand,
 	SNSClient,
 	SubscribeCommand,
-	UnsubscribeCommand
-} from "@aws-sdk/client-sns";
+	UnsubscribeCommand,
+} from '@aws-sdk/client-sns';
+import { FastifyBaseLogger } from 'fastify';
 import ow from 'ow';
-import { SnsUtil } from "../../common/snsUtil.js";
-import { ConflictError } from "../../common/errors.js";
-import { EventPublisher } from "@agie/events";
-import { RegionsClient } from "@agie/clients";
+import { ulid } from 'ulid';
+import { ConflictError } from '../../common/errors.js';
+import { SnsUtil } from '../../common/snsUtil.js';
+import { SubscriptionsRepository } from './repository.js';
+import { Subscription, SubscriptionId, SubscriptionListOptions, SubscriptionWithUserId } from './schemas.js';
 
 export class SubscriptionsService {
-
-	readonly protocol = 'sms'
+	readonly protocol = 'sms';
 
 	public constructor(
 		readonly log: FastifyBaseLogger,
@@ -42,37 +41,36 @@ export class SubscriptionsService {
 		readonly snsUtil: SnsUtil,
 		readonly eventPublisher: EventPublisher,
 		readonly regionsClient: RegionsClient
-	) {
-	}
+	) {}
 
 	private async deleteSnsTopic(topicArn: string): Promise<void> {
 		this.log.debug(`SubscriptionsService> deleteSnsTopic> topicArn: ${topicArn}`);
-		const listSubscriptionResponse = await this.snsClient.send(new ListSubscriptionsByTopicCommand({ TopicArn: topicArn }))
+		const listSubscriptionResponse = await this.snsClient.send(new ListSubscriptionsByTopicCommand({ TopicArn: topicArn }));
 		if (listSubscriptionResponse.Subscriptions.length === 0) {
-			await this.snsClient.send(new DeleteTopicCommand({ TopicArn: topicArn }))
+			await this.snsClient.send(new DeleteTopicCommand({ TopicArn: topicArn }));
 		}
 		this.log.debug(`SubscriptionsService> deleteSnsTopic> exit`);
 	}
 
 	private async createSnsSubscription(regionId: string, phoneNumber: string): Promise<string> {
 		this.log.debug(`SubscriptionsService> createSnsSubscription> regionId: ${regionId}, phoneNumber: ${phoneNumber}`);
-		const topicArn = this.snsUtil.topicArn(regionId)
+		const topicArn = this.snsUtil.topicArn(regionId);
 		try {
-			await this.snsClient.send(new GetTopicAttributesCommand({ TopicArn: topicArn }))
+			await this.snsClient.send(new GetTopicAttributesCommand({ TopicArn: topicArn }));
 		} catch (e) {
 			if (e.name === 'NotFoundException') {
-				await this.snsClient.send(new CreateTopicCommand({ Name: this.snsUtil.topicName(regionId) }))
+				await this.snsClient.send(new CreateTopicCommand({ Name: this.snsUtil.topicName(regionId) }));
 			} else {
 				this.log.error(`SubscriptionsService> createSnsSubscription> error: ${e}`);
 				throw e;
 			}
 		}
 
-		const response = await this.snsClient.send(new SubscribeCommand({ Protocol: this.protocol, TopicArn: topicArn, Endpoint: phoneNumber }))
+		const response = await this.snsClient.send(new SubscribeCommand({ Protocol: this.protocol, TopicArn: topicArn, Endpoint: phoneNumber }));
 
 		this.log.debug(`SubscriptionsService> createSnsSubscription> exit>`);
 
-		return response.SubscriptionArn
+		return response.SubscriptionArn;
 	}
 
 	public async create(securityContext: SecurityContext, createSubscription: Pick<Subscription, 'regionId'>): Promise<Subscription> {
@@ -85,18 +83,17 @@ export class SubscriptionsService {
 
 		// this will throw exception if region does not exist
 		await this.regionsClient.getRegionById(createSubscription.regionId, {
-				authorizer: {
-					claims: {
-						email: securityContext.email,
-						'custom:role': `/|||${securityContext.role}`,
-					},
+			authorizer: {
+				claims: {
+					email: securityContext.email,
+					'custom:role': `/|||${securityContext.role}`,
 				},
-			}
-		);
+			},
+		});
 
 		const existingSubscription = await this.subscriptionsRepository.getByRegionId(securityContext.sub, createSubscription.regionId);
 		if (existingSubscription) {
-			throw new ConflictError(`Subscription exists to region ${createSubscription.regionId} for user: ${securityContext.email}`)
+			throw new ConflictError(`Subscription exists to region ${createSubscription.regionId} for user: ${securityContext.email}`);
 		}
 
 		const subscriptionArn = await this.createSnsSubscription(createSubscription.regionId, securityContext.phoneNumber);
@@ -105,8 +102,8 @@ export class SubscriptionsService {
 			createdAt: new Date(Date.now()).toISOString(),
 			regionId: createSubscription.regionId,
 			userId: securityContext.sub,
-			subscriptionArn
-		}
+			subscriptionArn,
+		};
 
 		await this.subscriptionsRepository.create(subscription);
 
@@ -119,7 +116,7 @@ export class SubscriptionsService {
 		});
 
 		this.log.debug(`SubscriptionsService> create> exit>`);
-		return subscription
+		return subscription;
 	}
 
 	public async list(securityContext: SecurityContext, options: SubscriptionListOptions): Promise<[Subscription[], SubscriptionId]> {
@@ -127,7 +124,7 @@ export class SubscriptionsService {
 		let listResponse: [Subscription[], SubscriptionId];
 		listResponse = await this.subscriptionsRepository.list(securityContext.sub, options);
 		this.log.debug(`SubscriptionsService> list> exit>`);
-		return listResponse
+		return listResponse;
 	}
 
 	public async delete(securityContext: SecurityContext, subscriptionId: string): Promise<void> {
@@ -137,18 +134,18 @@ export class SubscriptionsService {
 		// delete subscription information from DynamoDB and also from SNS
 		await Promise.all([
 			this.subscriptionsRepository.delete(securityContext.sub, subscriptionId),
-			this.snsClient.send(new UnsubscribeCommand({ SubscriptionArn: subscription.subscriptionArn }))
-		])
+			this.snsClient.send(new UnsubscribeCommand({ SubscriptionArn: subscription.subscriptionArn })),
+		]);
 
 		// delete the topic is no user is subscribing to it
-		await this.deleteSnsTopic(this.snsUtil.topicArn(subscription.regionId))
+		await this.deleteSnsTopic(this.snsUtil.topicArn(subscription.regionId));
 
 		// publish the event
 		await this.eventPublisher.publishEvent({
 			eventType: 'deleted',
 			id: subscription.id,
 			resourceType: 'Subscription',
-			old: subscription
+			old: subscription,
 		});
 		this.log.debug(`SubscriptionsService> delete> exit>`);
 	}

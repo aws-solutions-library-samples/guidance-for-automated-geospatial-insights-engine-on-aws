@@ -11,17 +11,10 @@
  *  and limitations under the License.
  */
 
+import { atLeastAdmin } from '@agie/rest-api-authorizer';
 import { Type } from '@sinclair/typebox';
-import { apiVersion100, FastifyTypebox } from "../../common/types.js";
-import {
-	commonHeaders,
-	forbiddenResponse,
-	noBodyResponse,
-	notFoundResponse,
-	polygonTaskId
-} from "../../common/schemas.js";
-import { atLeastAdmin } from "../../common/scopes.js";
-
+import { commonHeaders, forbiddenResponse, noBodyResponse, notFoundResponse, polygonTaskId } from '../../common/schemas.js';
+import { apiVersion100, FastifyTypebox } from '../../common/types.js';
 
 export default function deletePolygonTaskRoute(fastify: FastifyTypebox, _options: unknown, done: () => void): void {
 	fastify.route({
