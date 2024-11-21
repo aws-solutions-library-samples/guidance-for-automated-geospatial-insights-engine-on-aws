@@ -149,6 +149,8 @@ export USER_POOL_ID=$(aws ssm get-parameter --name "/agie/$ENVIRONMENT/shared/co
 aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID  --username <ADMINISTRASTOR_EMAIL> --password <PASSWORD> --permanent
 ```
 
+### 6. Walkthrough
+
 Now that you have everything set up, visit [walkthrough](docs/walkthrough.md) to get started on working with `AGIE`.
 
 ## Next Steps
