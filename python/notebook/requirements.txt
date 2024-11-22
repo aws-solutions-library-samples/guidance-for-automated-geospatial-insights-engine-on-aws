@@ -146,7 +146,7 @@ terminado==0.18.1
 threadpoolctl==3.4.0
 tinycss2==1.2.1
 toolz==0.12.1
-tornado==6.4.1
+tornado==6.4.2
 tqdm==4.66.3
 traitlets==5.14.3
 types-python-dateutil==2.9.0.20240316
